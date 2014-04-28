@@ -717,7 +717,7 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
     $fields = array();
     foreach ($bundles as $bundle => $v) {
       foreach ($this->fieldInfo->getBundleInstances($this->entityTypeId, $bundle) as $field_name => $instance) {
-        $fields[$field_name] = $instance->getField();
+        $fields[$field_name] = $instance;
       }
     }
 
@@ -782,9 +782,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
     }
 
     foreach ($this->fieldInfo->getBundleInstances($entity_type, $bundle) as $field_name => $instance) {
-      $field = $instance->getField();
-      $table_name = static::_fieldTableName($field);
-      $revision_name = static::_fieldRevisionTableName($field);
+      $table_name = static::_fieldTableName($instance);
+      $revision_name = static::_fieldRevisionTableName($instance);
 
       // Delete and insert, rather than update, in case a value was added.
       if ($update) {
@@ -804,13 +803,13 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
       // Prepare the multi-insert query.
       $do_insert = FALSE;
       $columns = array('entity_id', 'revision_id', 'bundle', 'delta', 'langcode');
-      foreach ($field->getColumns() as $column => $attributes) {
-        $columns[] = static::_fieldColumnName($field, $column);
+      foreach ($instance->getColumns() as $column => $attributes) {
+        $columns[] = static::_fieldColumnName($instance, $column);
       }
       $query = $this->database->insert($table_name)->fields($columns);
       $revision_query = $this->database->insert($revision_name)->fields($columns);
 
-      $langcodes = $field->isTranslatable() ? $translation_langcodes : array($default_langcode);
+      $langcodes = $instance->isTranslatable() ? $translation_langcodes : array($default_langcode);
       foreach ($langcodes as $langcode) {
         $delta_count = 0;
         $items = $entity->getTranslation($langcode)->get($field_name);
@@ -825,15 +824,15 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
             'delta' => $delta,
             'langcode' => $langcode,
           );
-          foreach ($field->getColumns() as $column => $attributes) {
-            $column_name = static::_fieldColumnName($field, $column);
+          foreach ($instance->getColumns() as $column => $attributes) {
+            $column_name = static::_fieldColumnName($instance, $column);
             // Serialize the value if specified in the column schema.
             $record[$column_name] = !empty($attributes['serialize']) ? serialize($item->$column) : $item->$column;
           }
           $query->values($record);
           $revision_query->values($record);
 
-          if ($field->getCardinality() != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED && ++$delta_count == $field->getCardinality()) {
+          if ($instance->getCardinality() != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED && ++$delta_count == $instance->getCardinality()) {
             break;
           }
         }
@@ -856,9 +855,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    */
   protected function doDeleteFieldItems(EntityInterface $entity) {
     foreach ($this->fieldInfo->getBundleInstances($entity->getEntityTypeId(), $entity->bundle()) as $instance) {
-      $field = $instance->getField();
-      $table_name = static::_fieldTableName($field);
-      $revision_name = static::_fieldRevisionTableName($field);
+      $table_name = static::_fieldTableName($instance);
+      $revision_name = static::_fieldRevisionTableName($instance);
       $this->database->delete($table_name)
         ->condition('entity_id', $entity->id())
         ->execute();
@@ -875,7 +873,7 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
     $vid = $entity->getRevisionId();
     if (isset($vid)) {
       foreach ($this->fieldInfo->getBundleInstances($entity->getEntityTypeId(), $entity->bundle()) as $instance) {
-        $revision_name = static::_fieldRevisionTableName($instance->getField());
+        $revision_name = static::_fieldRevisionTableName($instance);
         $this->database->delete($revision_name)
           ->condition('entity_id', $entity->id())
           ->condition('revision_id', $vid)
@@ -1006,9 +1004,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    * {@inheritdoc}
    */
   public function onInstanceDelete(FieldDefinitionInterface $field_definition) {
-    $field = $field_definition->getField();
-    $table_name = static::_fieldTableName($field);
-    $revision_name = static::_fieldRevisionTableName($field);
+    $table_name = static::_fieldTableName($field_definition);
+    $revision_name = static::_fieldRevisionTableName($field_definition);
     $this->database->update($table_name)
       ->fields(array('deleted' => 1))
       ->condition('bundle', $field_definition->bundle)
@@ -1028,9 +1025,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
     // using the old bundle name.
     $instances = entity_load_multiple_by_properties('field_instance_config', array('entity_type' => $this->entityTypeId, 'bundle' => $bundle, 'include_deleted' => TRUE));
     foreach ($instances as $instance) {
-      $field = $instance->getField();
-      $table_name = static::_fieldTableName($field);
-      $revision_name = static::_fieldRevisionTableName($field);
+      $table_name = static::_fieldTableName($instance);
+      $revision_name = static::_fieldRevisionTableName($instance);
       $this->database->update($table_name)
         ->fields(array('bundle' => $bundle_new))
         ->condition('bundle', $bundle)
@@ -1046,13 +1042,12 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    * {@inheritdoc}
    */
   protected function readFieldItemsToPurge(EntityInterface $entity, FieldDefinitionInterface $field_definition) {
-    $field = $field_definition->getField();
-    $table_name = static::_fieldTableName($field);
+    $table_name = static::_fieldTableName($field_definition);
     $query = $this->database->select($table_name, 't', array('fetch' => \PDO::FETCH_ASSOC))
       ->condition('entity_id', $entity->id())
       ->orderBy('delta');
-    foreach ($field->getColumns() as $column_name => $data) {
-      $query->addField('t', static::_fieldColumnName($field, $column_name), $column_name);
+    foreach ($field_definition->getColumns() as $column_name => $data) {
+      $query->addField('t', static::_fieldColumnName($field_definition, $column_name), $column_name);
     }
     return $query->execute()->fetchAll();
   }
@@ -1061,9 +1056,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    * {@inheritdoc}
    */
   public function purgeFieldItems(EntityInterface $entity, FieldDefinitionInterface $field_definition) {
-    $field = $field_definition->getField();
-    $table_name = static::_fieldTableName($field);
-    $revision_name = static::_fieldRevisionTableName($field);
+    $table_name = static::_fieldTableName($field_definition);
+    $revision_name = static::_fieldRevisionTableName($field_definition);
     $this->database->delete($table_name)
       ->condition('entity_id', $entity->id())
       ->execute();
@@ -1102,8 +1096,8 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    */
   public static function _fieldSqlSchema(FieldStorageDefinitionInterface $storage_definition, array $schema = NULL) {
     if ($storage_definition->deleted) {
-      $description_current = "Data storage for deleted field {$storage_definition->uuid()} ({$storage_definition->getTargetEntityTypeId()}, {$storage_definition->getName()}).";
-      $description_revision = "Revision archive storage for deleted field {$storage_definition->uuid()} ({$storage_definition->getTargetEntityTypeId()}, {$storage_definition->getName()}).";
+      $description_current = "Data storage for deleted field {$storage_definition->getUniqueStorageIdentifier()} ({$storage_definition->getTargetEntityTypeId()}, {$storage_definition->getName()}).";
+      $description_revision = "Revision archive storage for deleted field {$storage_definition->getUniqueStorageIdentifier()} ({$storage_definition->getTargetEntityTypeId()}, {$storage_definition->getName()}).";
     }
     else {
       $description_current = "Data storage for {$storage_definition->getTargetEntityTypeId()} field {$storage_definition->getName()}.";
@@ -1269,9 +1263,10 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
     if ($storage_definition->deleted) {
       // When a field is a deleted, the table is renamed to
       // {field_deleted_data_FIELD_UUID}. To make sure we don't end up with
-      // table names longer than 64 characters, we hash the uuid and return the
-      // first 10 characters so we end up with a short unique ID.
-      return "field_deleted_data_" . substr(hash('sha256', $storage_definition->uuid()), 0, 10);
+      // table names longer than 64 characters, we hash the unique storage
+      // identifier and return the first 10 characters so we end up with a short
+      // unique ID.
+      return "field_deleted_data_" . substr(hash('sha256', $storage_definition->getUniqueStorageIdentifier()), 0, 10);
     }
     else {
       return static::_generateFieldTableName($storage_definition, FALSE);
@@ -1298,9 +1293,10 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
     if ($storage_definition->deleted) {
       // When a field is a deleted, the table is renamed to
       // {field_deleted_revision_FIELD_UUID}. To make sure we don't end up with
-      // table names longer than 64 characters, we hash the uuid and return the
-      // first 10 characters so we end up with a short unique ID.
-      return "field_deleted_revision_" . substr(hash('sha256', $storage_definition->uuid()), 0, 10);
+      // table names longer than 64 characters, we hash the unique storage
+      // identifier and return the first 10 characters so we end up with a short
+      // unique ID.
+      return "field_deleted_revision_" . substr(hash('sha256', $storage_definition->getUniqueStorageIdentifier()), 0, 10);
     }
     else {
       return static::_generateFieldTableName($storage_definition, TRUE);
@@ -1332,7 +1328,7 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
       $separator = $revision ? '_r__' : '__';
       // Truncate to the same length for the current and revision tables.
       $entity_type = substr($storage_definition->getTargetEntityTypeId(), 0, 34);
-      $field_hash = substr(hash('sha256', $storage_definition->uuid), 0, 10);
+      $field_hash = substr(hash('sha256', $storage_definition->getUniqueStorageIdentifier()), 0, 10);
       $table_name = $entity_type . $separator . $field_hash;
     }
     return $table_name;

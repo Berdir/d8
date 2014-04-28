@@ -808,4 +808,11 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
     return $this->deleted;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getUniqueStorageIdentifier() {
+    return $this->field->uuid();
+  }
+
 }

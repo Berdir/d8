@@ -285,4 +285,7 @@ interface FieldStorageDefinitionInterface {
    */
   public function hasCustomStorage();
 
+
+  public function getUniqueStorageIdentifier();
+
 }

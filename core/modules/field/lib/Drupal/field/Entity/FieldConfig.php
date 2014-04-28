@@ -790,6 +790,14 @@ class FieldConfig extends ConfigEntityBase implements FieldConfigInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getUniqueStorageIdentifier() {
+    return $this->uuid();
+  }
+
+
+  /**
    * Helper to retrieve the field item class.
    */
   protected function getFieldItemClass() {

@@ -539,4 +539,12 @@ class FieldDefinition extends ListDataDefinition implements FieldDefinitionInter
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getUniqueStorageIdentifier() {
+    return $this->getTargetEntityTypeId() . '-' . $this->getName();
+  }
+
+
 }
