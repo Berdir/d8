@@ -122,6 +122,7 @@ class UserSelection extends SelectionBase {
           // field, and concatenate the field and the condition separately.
           $value_part = db_and();
           $value_part->condition('anonymous_name', $condition['value'], $condition['operator']);
+          $query->nextPlaceholder();
           $value_part->compile(Database::getConnection(), $query);
           $or->condition(db_and()
             ->where(str_replace('anonymous_name', ':anonymous_name', (string) $value_part), $value_part->arguments() + array(':anonymous_name' => user_format_name(user_load(0))))
