@@ -80,8 +80,8 @@ class UserSelection extends SelectionBase {
   /**
    * {@inheritdoc}
    */
-  public function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS') {
-    $query = parent::buildEntityQuery($match, $match_operator);
+  public function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS', $langcode = NULL) {
+    $query = parent::buildEntityQuery($match, $match_operator, $langcode);
 
     // The user entity doesn't have a label column.
     if (isset($match)) {

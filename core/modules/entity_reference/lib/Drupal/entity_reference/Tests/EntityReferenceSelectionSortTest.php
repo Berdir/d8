@@ -95,6 +95,7 @@ class EntityReferenceSelectionSortTest extends WebTestBase {
             'value' => 1,
           ),
         ),
+        'langcode' => 'en',
       ),
       'published2' => array(
         'type' => 'article',
@@ -106,6 +107,7 @@ class EntityReferenceSelectionSortTest extends WebTestBase {
             'value' => 2,
           ),
         ),
+        'langcode' => 'en',
       ),
     );
 

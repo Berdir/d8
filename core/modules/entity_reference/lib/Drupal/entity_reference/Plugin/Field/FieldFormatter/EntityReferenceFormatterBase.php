@@ -7,6 +7,7 @@
 
 namespace Drupal\entity_reference\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FormatterBase;
 
 /**
@@ -88,6 +89,21 @@ abstract class EntityReferenceFormatterBase extends FormatterBase {
         $items->filterEmptyItems();
       }
     }
+  }
+
+  /**
+   * Provides label for given entity.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   An entity to get the label.
+   *
+   * @return string
+   *   A string translated (if translatable) label.
+   */
+  protected function getEntityLabel(EntityInterface $entity) {
+    $translatable = is_a($entity, '\Drupal\Core\Entity\ContentEntityInterface');
+    $langcode = \Drupal::languageManager()->getCurrentLanguage()->id;
+    return $translatable ? $entity->getTranslation($langcode)->label() : $entity->label();
   }
 
 }

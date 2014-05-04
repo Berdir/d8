@@ -117,7 +117,7 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
       }
       else {
         // This is an "auto_create" item.
-        $elements[$delta] = array('#markup' => $item->entity->label());
+        $elements[$delta] = array('#markup' => $this->getEntityLabel($item));
       }
       $depth = 0;
     }

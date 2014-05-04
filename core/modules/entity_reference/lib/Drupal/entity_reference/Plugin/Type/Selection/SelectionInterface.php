@@ -23,11 +23,23 @@ interface SelectionInterface {
   /**
    * Returns a list of referenceable entities.
    *
+   * @param string $match
+   *   (optional) Text to match the label against. Defaults to NULL.
+   * @param string $match_operator
+   *   (optional) The operation the matching should be done with. Defaults
+   *   to "CONTAINS".
+   * @param int $limit
+   *   (optional) The maximum values to return. Defaults to 0, which means all
+   *   values.
+   * @param string $langcode
+   *   (optional) The language code of the entity. Defaults to NULL, which means
+   *   the current interface language would be used.
+   *
    * @return array
    *   An array of referenceable entities. Keys are entity IDs and
    *   values are (safe HTML) labels to be displayed to the user.
    */
-  public function getReferenceableEntities($match = NULL, $match_operator = 'CONTAINS', $limit = 0);
+  public function getReferenceableEntities($match = NULL, $match_operator = 'CONTAINS', $limit = 0, $langcode = NULL);
 
   /**
    * Counts entities that are referenceable by a given field.

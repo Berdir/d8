@@ -25,8 +25,8 @@ class NodeSelection extends SelectionBase {
   /**
    * {@inheritdoc}
    */
-  public function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS') {
-    $query = parent::buildEntityQuery($match, $match_operator);
+  public function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS', $langcode = NULL) {
+    $query = parent::buildEntityQuery($match, $match_operator, $langcode);
     // Adding the 'node_access' tag is sadly insufficient for nodes: core
     // requires us to also know about the concept of 'published' and
     // 'unpublished'. We need to do that as long as there are no access control

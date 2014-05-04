@@ -8,6 +8,7 @@
 namespace Drupal\entity_reference\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Component\Utility\String;
 
 /**
  * Plugin implementation of the 'entity reference label' formatter.
@@ -67,7 +68,7 @@ class EntityReferenceLabelFormatter extends EntityReferenceFormatterBase {
       }
       /** @var $referenced_entity \Drupal\Core\Entity\EntityInterface */
       if ($referenced_entity = $item->entity) {
-        $label = $referenced_entity->label();
+        $label = $this->getEntityLabel($referenced_entity);
         // If the link is to be displayed and the entity has a uri,
         // display a link.
         if ($this->getSetting('link') && $uri = $referenced_entity->urlInfo()) {
@@ -77,7 +78,7 @@ class EntityReferenceLabelFormatter extends EntityReferenceFormatterBase {
           ) + $uri->toRenderArray();
         }
         else {
-          $elements[$delta] = array('#markup' => check_plain($label));
+          $elements[$delta] = array('#markup' => String::checkPlain($label));
         }
         $elements[$delta]['#cache']['tags'] = $referenced_entity->getCacheTag();
       }

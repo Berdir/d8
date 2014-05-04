@@ -28,7 +28,7 @@ class SelectionBroken implements SelectionInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReferenceableEntities($match = NULL, $match_operator = 'CONTAINS', $limit = 0) {
+  public function getReferenceableEntities($match = NULL, $match_operator = 'CONTAINS', $limit = 0, $langcode = NULL) {
     return array();
   }
 

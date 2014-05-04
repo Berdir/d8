@@ -115,10 +115,11 @@ abstract class AutocompleteWidgetBase extends WidgetBase {
   /**
    * Gets the entity labels.
    */
-  protected function getLabels(FieldItemListInterface $items, $delta) {
+  protected function getLabels(FieldItemListInterface $items, $delta, $langcode = NULL) {
     if ($items->isEmpty()) {
       return array();
     }
+    $langcode = $langcode ? $langcode : \Drupal::languageManager()->getCurrentLanguage()->id;
 
     $entity_labels = array();
 
@@ -126,7 +127,9 @@ abstract class AutocompleteWidgetBase extends WidgetBase {
     $entities = entity_load_multiple($this->getFieldSetting('target_type'), $this->getEntityIds($items, $delta));
 
     foreach ($entities as $entity_id => $entity_item) {
-      $label = $entity_item->label();
+      // Check if the entity we are referencing supports translation.
+      $translatable = is_a($entity_item, '\Drupal\Core\Entity\ContentEntityInterface');
+      $label = $translatable ? $entity_item->getTranslation($langcode)->label() : $entity_item->label();
       $key = "$label ($entity_id)";
       // Labels containing commas or quotes must be wrapped in quotes.
       $key = Tags::encode($key);

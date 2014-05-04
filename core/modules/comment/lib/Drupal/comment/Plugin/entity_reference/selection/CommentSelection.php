@@ -27,8 +27,8 @@ class CommentSelection extends SelectionBase {
   /**
    * {@inheritdoc}
    */
-  public function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS') {
-    $query = parent::buildEntityQuery($match, $match_operator);
+  public function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS', $langcode = NULL) {
+    $query = parent::buildEntityQuery($match, $match_operator, $langcode);
 
     // Adding the 'comment_access' tag is sadly insufficient for comments:
     // core requires us to also know about the concept of 'published' and

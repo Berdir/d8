@@ -12,6 +12,7 @@ use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\entity_reference\Plugin\Type\Selection\SelectionInterface;
+use Drupal\Component\Utility\String;
 
 /**
  * Plugin implementation of the 'selection' entity_reference.
@@ -165,10 +166,11 @@ class SelectionBase implements SelectionInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReferenceableEntities($match = NULL, $match_operator = 'CONTAINS', $limit = 0) {
+  public function getReferenceableEntities($match = NULL, $match_operator = 'CONTAINS', $limit = 0, $langcode = NULL) {
     $target_type = $this->fieldDefinition->getSetting('target_type');
 
-    $query = $this->buildEntityQuery($match, $match_operator);
+    $langcode = $langcode ? $langcode : \Drupal::languageManager()->getCurrentLanguage()->id;
+    $query = $this->buildEntityQuery($match, $match_operator, $langcode);
     if ($limit > 0) {
       $query->range(0, $limit);
     }
@@ -181,9 +183,16 @@ class SelectionBase implements SelectionInterface {
 
     $options = array();
     $entities = entity_load_multiple($target_type, $result);
+
+    // Check if the entity we are referencing supports translation.
+    $translatable = \Drupal::entityManager()->getDefinition($target_type)->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface');
+
     foreach ($entities as $entity_id => $entity) {
+      $label = $translatable ? $entity->getTranslation($langcode)->label() : $entity->label();
       $bundle = $entity->bundle();
-      $options[$bundle][$entity_id] = check_plain($entity->label());
+
+      // Show the label of entity translation in the specified language.
+      $options[$bundle][$entity_id] = String::checkPlain($label);
     }
 
     return $options;
@@ -192,8 +201,8 @@ class SelectionBase implements SelectionInterface {
   /**
    * {@inheritdoc}
    */
-  public function countReferenceableEntities($match = NULL, $match_operator = 'CONTAINS') {
-    $query = $this->buildEntityQuery($match, $match_operator);
+  public function countReferenceableEntities($match = NULL, $match_operator = 'CONTAINS', $langcode = NULL) {
+    $query = $this->buildEntityQuery($match, $match_operator, $langcode);
     return $query
       ->count()
       ->execute();
@@ -259,17 +268,27 @@ class SelectionBase implements SelectionInterface {
    * @param string $match_operator
    *   (Optional) The operation the matching should be done with. Defaults
    *   to "CONTAINS".
+   * @param string $langcode
+   *   (Optional) The language code of the entity. Defaults to NULL, which means
+   *   the current language interface would be used.
    *
    * @return \Drupal\Core\Entity\Query\QueryInterface
    *   The EntityQuery object with the basic conditions and sorting applied to
    *   it.
    */
-  public function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS') {
+  public function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS', $langcode = NULL) {
     $target_type = $this->fieldDefinition->getSetting('target_type');
     $handler_settings = $this->fieldDefinition->getSetting('handler_settings');
     $entity_type = \Drupal::entityManager()->getDefinition($target_type);
 
     $query = \Drupal::entityQuery($target_type);
+    // Only the current language should be matched.
+    if ($entity_type->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface')) {
+      // @todo: Fix hardocding of property https://drupal.org/node/2143729.
+      $langcode = $langcode ? $langcode : \Drupal::languageManager()->getCurrentLanguage()->id;
+      $query->condition('langcode', $langcode);
+    }
+
     if (!empty($handler_settings['target_bundles'])) {
       $query->condition($entity_type->getKey('bundle'), $handler_settings['target_bundles'], 'IN');
     }

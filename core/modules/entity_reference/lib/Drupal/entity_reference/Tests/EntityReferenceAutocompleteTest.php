@@ -67,15 +67,15 @@ class EntityReferenceAutocompleteTest extends EntityUnitTestBase {
    */
   function testEntityReferenceAutocompletion() {
     // Add an entity with a slash in its name.
-    $entity_1 = entity_create($this->entityType, array('name' => '10/16/2011', $this->fieldName => NULL));
+    $entity_1 = entity_create($this->entityType, array('name' => '10/16/2011', $this->fieldName => NULL, 'langcode' => 'en'));
     $entity_1->save();
 
     // Add another entity that differs after the slash character.
-    $entity_2 = entity_create($this->entityType, array('name' => '10/17/2011', $this->fieldName => NULL));
+    $entity_2 = entity_create($this->entityType, array('name' => '10/17/2011', $this->fieldName => NULL, 'langcode' => 'en'));
     $entity_2->save();
 
     // Add another entity that has both a comma and a slash character.
-    $entity_3 = entity_create($this->entityType, array('name' => 'label with, and / test', $this->fieldName => NULL));
+    $entity_3 = entity_create($this->entityType, array('name' => 'label with, and / test', $this->fieldName => NULL, 'langcode' => 'en'));
     $entity_3->save();
 
     // Try to autocomplete a entity label that matches both entities.
@@ -140,9 +140,9 @@ class EntityReferenceAutocompleteTest extends EntityUnitTestBase {
    */
   public function testBaseField() {
     // Add two users.
-    $user_1 = entity_create('user', array('name' => 'auto1'));
+    $user_1 = entity_create('user', array('name' => 'auto1', 'langcode' => 'en'));
     $user_1->save();
-    $user_2 = entity_create('user', array('name' => 'auto2'));
+    $user_2 = entity_create('user', array('name' => 'auto2', 'langcode' => 'en'));
     $user_2->save();
 
     $request = Request::create('entity_reference/autocomplete/single/user_id/entity_test/entity_test/NULL');

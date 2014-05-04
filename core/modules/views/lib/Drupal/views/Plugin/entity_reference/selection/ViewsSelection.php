@@ -156,7 +156,7 @@ class ViewsSelection implements SelectionInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReferenceableEntities($match = NULL, $match_operator = 'CONTAINS', $limit = 0) {
+  public function getReferenceableEntities($match = NULL, $match_operator = 'CONTAINS', $limit = 0, $langcode = NULL) {
     $handler_settings = $this->fieldDefinition->getSetting('handler_settings');
     $display_name = $handler_settings['view']['display_name'];
     $arguments = $handler_settings['view']['arguments'];

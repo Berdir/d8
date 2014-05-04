@@ -52,9 +52,9 @@ class TermSelection extends SelectionBase {
   /**
    * {@inheritdoc}
    */
-  public function getReferenceableEntities($match = NULL, $match_operator = 'CONTAINS', $limit = 0) {
+  public function getReferenceableEntities($match = NULL, $match_operator = 'CONTAINS', $limit = 0, $langcode = NULL) {
     if ($match || $limit) {
-      return parent::getReferenceableEntities($match , $match_operator, $limit);
+      return parent::getReferenceableEntities($match , $match_operator, $limit, $langcode);
     }
 
     $options = array();

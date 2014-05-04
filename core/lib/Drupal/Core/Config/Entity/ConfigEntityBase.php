@@ -410,5 +410,4 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
   public function getConfigDependencyName() {
     return $this->getEntityType()->getConfigPrefix() . '.' . $this->id();
   }
-
 }
