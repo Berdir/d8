@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\taxonomy\Tests;
+use Drupal\field\Entity\FieldInstanceConfig;
 
 /**
  * Tests for taxonomy vocabulary functions.
@@ -168,7 +169,7 @@ class VocabularyUnitTest extends TaxonomyTestBase {
     $this->assertTrue(isset($info[$new_name]), 'The new bundle name appears in entity_get_bundles().');
 
     // Check that the field instance is still attached to the vocabulary.
-    $this->assertTrue(field_info_instance('taxonomy_term', 'field_test', $new_name), 'The bundle name was updated correctly.');
+    $this->assertTrue(FieldInstanceConfig::loadByName('taxonomy_term', $new_name, 'field_test'), 'The bundle name was updated correctly.');
   }
 
   /**

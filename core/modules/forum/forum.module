@@ -9,7 +9,7 @@ use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Component\Utility\String;
-use Drupal\field\Field;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Implements hook_help().
@@ -110,7 +110,7 @@ function forum_menu_local_tasks(&$data, $route_name) {
     $vid = \Drupal::config('forum.settings')->get('vocabulary');
     $links = array();
     // Loop through all bundles for forum taxonomy vocabulary field.
-    $field = Field::fieldInfo()->getField('node', 'taxonomy_forums');
+    $field = FieldConfig::loadByName('node', 'taxonomy_forums');
     foreach ($field->getBundles() as $type) {
       if (\Drupal::entityManager()->getAccessController('node')->createAccess($type)) {
         $links[$type] = array(

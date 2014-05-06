@@ -19,7 +19,7 @@ use Drupal\views\Plugin\views\filter\ManyToOne;
 class FieldList extends ManyToOne {
 
   public function getValueOptions() {
-    $field = field_info_field($this->definition['entity_type'], $this->definition['field_name']);
+    $field = \Drupal::entityManager()->getFieldStorageDefinitions($this->definition['entity_type'])[$this->definition['field_name']];
     $this->value_options = list_allowed_values($field);
   }
 

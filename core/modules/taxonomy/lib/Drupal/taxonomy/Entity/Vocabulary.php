@@ -106,7 +106,7 @@ class Vocabulary extends ConfigEntityBase implements VocabularyInterface {
       // Reflect machine name changes in the definitions of existing 'taxonomy'
       // fields.
       $field_ids = array();
-      $field_map = Field::fieldInfo()->getFieldMap();
+      $field_map = \Drupal::entityManager()->getFieldMap();
       foreach ($field_map as $entity_type => $fields) {
         foreach ($fields as $field => $info) {
           if ($info['type'] == 'taxonomy_term_reference') {

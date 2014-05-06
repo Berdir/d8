@@ -15,6 +15,7 @@ use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
 use Drupal\field\FieldInstanceConfigInterface;
@@ -97,15 +98,18 @@ function comment_help($path, $arg) {
  */
 function comment_entity_bundle_info() {
   $bundles = array();
-  foreach (\Drupal::service('comment.manager')->getAllFields() as $entity_type => $fields) {
-    foreach ($fields as $field_name => $field_info) {
-      $sample_bundle = reset($field_info['bundles']);
-      // We cannot use field info API here because it will result in recursion.
-      $config = \Drupal::config('field.instance.' . $entity_type .  '.' . $sample_bundle . '.' . $field_name);
-      $bundles['comment'][$entity_type . '__' . $field_name] = array(
-        'label' => $config->get('label'),
-      );
-    }
+  $ids = \Drupal::entityQuery('field_config')
+    ->condition('type', 'comment')
+    ->execute();
+  $config_factory = \Drupal::configFactory();
+  foreach ($ids as $id) {
+    list($entity_type_id, $field_name) = explode('.', $id);
+    $instance_ids = $config_factory->listAll('field.instance.' . $id . '.');
+    $instance_id = reset($instance_ids);
+    $config = \Drupal::config('field.instance.' . $instance_id);
+    $bundles['comment'][$entity_type_id . '__' . $field_name] = array(
+      'label' => $config->get('label'),
+    );
   }
   return $bundles;
 }
@@ -1134,16 +1138,15 @@ function comment_num_new($entity_id, $entity_type, $field_name = NULL, $timestam
  *
  * @param int $cid
  *   The comment ID.
- * @param array $instance
- *   Field instance as returned from field_info_instance().
+ * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+ *   Field definition of the comments.
  *
  * @return int
  *   The display ordinal for the comment.
  *
  * @see comment_get_display_page()
- * @see field_info_instance().
  */
-function comment_get_display_ordinal($cid, $instance) {
+function comment_get_display_ordinal($cid, FieldDefinitionInterface $field_definition) {
   // Count how many comments (c1) are before $cid (c2) in display order. This is
   // the 0-based display ordinal.
   $query = db_select('comment', 'c1');
@@ -1154,7 +1157,7 @@ function comment_get_display_ordinal($cid, $instance) {
     $query->condition('c1.status', CommentInterface::PUBLISHED);
   }
 
-  if ($instance->getSetting('default_mode') == COMMENT_MODE_FLAT) {
+  if ($field_definition->getSetting('default_mode') == COMMENT_MODE_FLAT) {
     // For flat comments, cid is used for ordering comments due to
     // unpredictable behavior with timestamp, so we make the same assumption
     // here.
@@ -1178,15 +1181,15 @@ function comment_get_display_ordinal($cid, $instance) {
  *
  * @param int $cid
  *   The comment ID.
- * @param array $instance
- *   Field instance as returned from field_info_instance().
+ * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+ *   Field definition of the comments.
  *
  * @return int
  *   The page number.
  */
-function comment_get_display_page($cid, $instance) {
-  $ordinal = comment_get_display_ordinal($cid, $instance);
-  $comments_per_page = $instance->getSetting('per_page');
+function comment_get_display_page($cid, FieldDefinitionInterface $field_definition) {
+  $ordinal = comment_get_display_ordinal($cid, $field_definition);
+  $comments_per_page = $field_definition->getSetting('per_page');
   return floor($ordinal / $comments_per_page);
 }
 
