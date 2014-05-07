@@ -55,11 +55,25 @@ class Translation extends AnnotationBase {
   use StringTranslationTrait;
 
   /**
-   * The translation of the value passed to the constructor of the class.
+   * The string to be translated.
    *
    * @var string
    */
-  protected $translation;
+  protected $string;
+
+  /**
+   * The translation arguments.
+   *
+   * @var array
+   */
+  protected $arguments;
+
+  /**
+   * The translation options.
+   *
+   * @var array
+   */
+  protected $options;
 
   /**
    * Constructs a new class instance.
@@ -75,26 +89,35 @@ class Translation extends AnnotationBase {
    *   - context (optional): a string that describes the context of "value";
    */
   public function __construct(array $values) {
-    $string = $values['value'];
-    $arguments = isset($values['arguments']) ? $values['arguments'] : array();
-    $options = array();
+    $this->string = $values['value'];
+    $this->arguments = isset($values['arguments']) ? $values['arguments'] : array();
+    $this->options = array();
     if (!empty($values['context'])) {
-      $options = array(
+      $this->options = array(
         'context' => $values['context'],
       );
     }
-    $this->translation = $this->t($string, $arguments, $options);
   }
 
   /**
-   * Implements Drupal\Core\Annotation\AnnotationInterface::get().
+   * {@inheritdoc}
    */
   public function get() {
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function __toString() {
-    return $this->translation;
+    return $this->t($this->string, $this->arguments, $this->options);
+  }
+
+  /**
+   * Magic __sleep() method to avoid serializing the string translator.
+   */
+  function __sleep() {
+    return array('string', 'arguments', 'options');
   }
 
 }
