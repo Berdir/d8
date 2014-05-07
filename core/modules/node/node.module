@@ -308,7 +308,6 @@ function node_type_get_types() {
  *   An array of node type labels, keyed by the node type name.
  */
 function node_type_get_names() {
-  debug(\Drupal::entityManager()->getBundleInfo('node'));
   return array_map(function ($bundle_info) {
     return $bundle_info['label'];
   }, \Drupal::entityManager()->getBundleInfo('node'));
