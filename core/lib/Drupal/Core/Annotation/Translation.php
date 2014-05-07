@@ -90,6 +90,10 @@ class Translation extends AnnotationBase {
    * Implements Drupal\Core\Annotation\AnnotationInterface::get().
    */
   public function get() {
+    return $this;
+  }
+
+  public function __toString() {
     return $this->translation;
   }
 
