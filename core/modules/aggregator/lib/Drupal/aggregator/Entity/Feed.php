@@ -176,11 +176,13 @@ class Feed extends ContentEntityBase implements FeedInterface {
 
     $fields['checked'] = FieldDefinition::create('timestamp')
       ->setLabel(t('Checked'))
-      ->setDescription(t('Last time feed was checked for new items, as Unix timestamp.'));
+      ->setDescription(t('Last time feed was checked for new items, as Unix timestamp.'))
+      ->setSetting('default_value', 0);
 
     $fields['queued'] = FieldDefinition::create('timestamp')
       ->setLabel(t('Queued'))
-      ->setDescription(t('Time when this feed was queued for refresh, 0 if not queued.'));
+      ->setDescription(t('Time when this feed was queued for refresh, 0 if not queued.'))
+      ->setSetting('default_value', 0);
 
     $fields['link'] = FieldDefinition::create('uri')
       ->setLabel(t('Link'))

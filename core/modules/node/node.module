@@ -822,6 +822,10 @@ function node_user_cancel($edit, $account, $method) {
         ->fetchCol();
       node_mass_update($nodes, array('uid' => 0), NULL, TRUE);
       // Anonymize old revisions.
+      db_update('node_revision')
+        ->fields(array('revision_uid' => 0))
+        ->condition('revision_uid', $account->id())
+        ->execute();
       db_update('node_field_revision')
         ->fields(array('uid' => 0))
         ->condition('uid', $account->id())

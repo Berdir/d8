@@ -38,4 +38,27 @@ class FileStorage extends ContentEntityDatabaseStorage implements FileStorageInt
       ':changed' => REQUEST_TIME - DRUPAL_MAXIMUM_TEMP_FILE_AGE
     ));
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSchema() {
+    $schema = parent::getSchema();
+
+    // @todo There should be a 'binary' field type or setting.
+    $schema['file_managed']['fields']['uri']['binary'] = TRUE;
+    $schema['file_managed']['indexes'] += array(
+      'file__status' => array('status'),
+      'file__changed' => array('changed'),
+    );
+    $schema['file_managed']['unique keys'] += array(
+      // FIXME We have an index size of 255, but the max URI length is 2048 so
+      // this might now always work. Should we replace this with a regular
+      // index?
+      'file__uri' => array(array('uri', 255)),
+    );
+
+    return $schema;
+  }
+
 }

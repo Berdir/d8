@@ -29,7 +29,7 @@ class ConfigImportRecreateTest extends DrupalUnitTestBase {
    *
    * @var array
    */
-  public static $modules = array('system', 'entity', 'field', 'text', 'node');
+  public static $modules = array('system', 'entity', 'field', 'text', 'node', 'user');
 
   public static function getInfo() {
     return array(
@@ -43,7 +43,7 @@ class ConfigImportRecreateTest extends DrupalUnitTestBase {
     parent::setUp();
 
     $this->installSchema('system', 'config_snapshot');
-    $this->installSchema('node', 'node');
+    $this->installEntitySchema('node');
 
     $this->copyConfig($this->container->get('config.storage'), $this->container->get('config.storage.staging'));
 

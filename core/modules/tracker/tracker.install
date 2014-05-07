@@ -16,12 +16,18 @@ function tracker_uninstall() {
  * Implements hook_install().
  */
 function tracker_install() {
-  $max_nid = db_query('SELECT MAX(nid) FROM {node}')->fetchField();
-  if ($max_nid != 0) {
-    \Drupal::state()->set('tracker.index_nid', $max_nid);
-    // To avoid timing out while attempting to do a complete indexing, we
-    // simply call our cron job to remove stale records and begin the process.
-    tracker_cron();
+  // @todo Is there some way to avoid this check?
+  if (\Drupal::database()->schema()->tableExists('node')) {
+    $nids = \Drupal::entityQuery('node')
+      ->sort('nid', 'DESC')
+      ->range(0, 1)
+      ->execute();
+    if (!empty($nids)) {
+      \Drupal::state()->set('tracker.index_nid', reset($nids));
+      // To avoid timing out while attempting to do a complete indexing, we
+      // simply call our cron job to remove stale records and begin the process.
+      tracker_cron();
+    }
   }
 }
 

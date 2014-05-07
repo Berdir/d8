@@ -21,6 +21,23 @@ class FeedStorage extends ContentEntityDatabaseStorage implements FeedStorageInt
   /**
    * {@inheritdoc}
    */
+  public function getSchema() {
+    $schema = parent::getSchema();
+
+    $schema['aggregator_feed']['indexes'] += array(
+      'aggregator_feed__url'  => array(array('url', 255)),
+      'aggregator_feed__queued' => array('queued'),
+    );
+    $schema['aggregator_feed']['unique keys'] += array(
+      'aggregator_feed__title' => array('title'),
+    );
+
+    return $schema;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getFeedDuplicates(FeedInterface $feed) {
     $query = \Drupal::entityQuery('aggregator_feed');
 

@@ -215,4 +215,14 @@ class NodeType extends ConfigEntityBase implements NodeTypeInterface {
     ), $values['settings']['node']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function onUpdateBundleEntity() {
+    // The bundle field definitions of nodes depend on the node type settings.
+    // @see \Drupal\node\Entity\Node::bundleFieldDefinitions()
+    $this->entityManager()->clearCachedFieldDefinitions();
+    parent::onUpdateBundleEntity();
+  }
+
 }

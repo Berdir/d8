@@ -120,9 +120,15 @@ class ContentEntityDatabaseStorageTest extends UnitTestCase {
     $module_handler = $this->getMock('Drupal\Core\Extension\ModuleHandlerInterface');
     $entity_manager = $this->getMock('Drupal\Core\Entity\EntityManagerInterface');
     // @todo Add field definitions to test default values of fields.
-    $entity_manager->expects($this->atLeastOnce())
+    $definitions = array();
+    $entity_manager->expects($this->once())
+      ->method('getBaseFieldDefinitions')
+      ->will($this->returnValue($definitions));
+    // ContentEntityStorageBase iterates over the entity which calls this method
+    // internally in ContentEntityBase::getProperties().
+    $entity_manager->expects($this->once())
       ->method('getFieldDefinitions')
-      ->will($this->returnValue(array()));
+      ->will($this->returnValue($definitions));
 
     $container = new ContainerBuilder();
     $container->set('language_manager', $language_manager);
@@ -130,7 +136,10 @@ class ContentEntityDatabaseStorageTest extends UnitTestCase {
     $container->set('module_handler', $module_handler);
     \Drupal::setContainer($container);
 
-    $entity = $this->getMockForAbstractClass('Drupal\Core\Entity\ContentEntityBase', array(), '', FALSE, TRUE, TRUE, array('id'));
+    $entity = $this->getMockBuilder('Drupal\Core\Entity\ContentEntityBase')
+      ->disableOriginalConstructor()
+      ->setMethods(array('id'))
+      ->getMockForAbstractClass();
     $entity_type = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
     $entity_type->expects($this->atLeastOnce())
       ->method('id')
@@ -154,10 +163,10 @@ class ContentEntityDatabaseStorageTest extends UnitTestCase {
     $connection = $this->getMockBuilder('Drupal\Core\Database\Connection')
       ->disableOriginalConstructor()
       ->getMock();
-    $field_info = $this->getMockBuilder('\Drupal\field\FieldInfo')
+    $field_info = $this->getMockBuilder('Drupal\field\FieldInfo')
       ->disableOriginalConstructor()
       ->getMock();
-    $entity_storage = new ContentEntityDatabaseStorage($entity_type, $connection, $field_info);
+    $entity_storage = new ContentEntityDatabaseStorage($entity_type, $connection, $entity_manager, $field_info);
 
     $entity = $entity_storage->create();
     $entity->expects($this->atLeastOnce())

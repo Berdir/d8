@@ -39,6 +39,7 @@ class EntityReferenceItem extends FieldItemBase {
     return array(
       'target_type' => \Drupal::moduleHandler()->moduleExists('node') ? 'node' : 'user',
       'target_bundle' => NULL,
+      'max_length' => 255,
     ) + parent::defaultSettings();
   }
 
@@ -114,7 +115,7 @@ class EntityReferenceItem extends FieldItemBase {
         'target_id' => array(
           'description' => 'The ID of the target entity.',
           'type' => 'varchar',
-          'length' => '255',
+          'length' => $field_definition->getSetting('max_length'),
         ),
       );
     }

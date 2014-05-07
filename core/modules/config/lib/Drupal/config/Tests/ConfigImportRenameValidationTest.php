@@ -32,7 +32,7 @@ class ConfigImportRenameValidationTest extends DrupalUnitTestBase {
    *
    * @var array
    */
-  public static $modules = array('system', 'node', 'field', 'text', 'entity', 'config_test');
+  public static $modules = array('system', 'user', 'node', 'field', 'text', 'entity', 'config_test');
 
   /**
    * {@inheritdoc}
@@ -52,7 +52,9 @@ class ConfigImportRenameValidationTest extends DrupalUnitTestBase {
     parent::setUp();
 
     $this->installSchema('system', 'config_snapshot');
-    $this->installSchema('node', 'node');
+
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('node');
 
     // Set up the ConfigImporter object for testing.
     $storage_comparer = new StorageComparer(

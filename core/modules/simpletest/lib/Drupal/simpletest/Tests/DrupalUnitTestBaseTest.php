@@ -19,7 +19,7 @@ class DrupalUnitTestBaseTest extends DrupalUnitTestBase {
    *
    * @var array
    */
-  public static $modules = array('entity', 'entity_test');
+  public static $modules = array('entity', 'entity_test', 'field');
 
   public static function getInfo() {
     return array(
@@ -33,17 +33,18 @@ class DrupalUnitTestBaseTest extends DrupalUnitTestBase {
    * Tests expected behavior of setUp().
    */
   function testSetUp() {
-    $modules = array('entity', 'entity_test');
-    $table = 'entity_test';
+    $tables = array('entity_test', 'test');
 
     // Verify that specified $modules have been loaded.
     $this->assertTrue(function_exists('entity_test_permission'), 'entity_test.module was loaded.');
     // Verify that there is a fixed module list.
-    $this->assertIdentical(array_keys(\Drupal::moduleHandler()->getModuleList()), $modules);
-    $this->assertIdentical(\Drupal::moduleHandler()->getImplementations('permission'), $modules);
+    $this->assertIdentical(array_keys(\Drupal::moduleHandler()->getModuleList()), static::$modules);
+    $this->assertIdentical(\Drupal::moduleHandler()->getImplementations('permission'), array('entity', 'entity_test'));
 
     // Verify that no modules have been installed.
-    $this->assertFalse(db_table_exists($table), "'$table' database table not found.");
+    foreach ($tables as $table) {
+      $this->assertFalse(db_table_exists($table), "'$table' database table not found.");
+    }
   }
 
   /**
@@ -74,8 +75,8 @@ class DrupalUnitTestBaseTest extends DrupalUnitTestBase {
    * Tests expected installation behavior of enableModules().
    */
   function testEnableModulesInstall() {
-    $module = 'node';
-    $table = 'node';
+    $module = 'ban';
+    $table = 'ban_ip';
 
     // Verify that the module does not exist yet.
     $this->assertFalse(\Drupal::moduleHandler()->moduleExists($module), "$module module not found.");
@@ -108,9 +109,9 @@ class DrupalUnitTestBaseTest extends DrupalUnitTestBase {
    */
   function testEnableModulesInstallContainer() {
     // Install Node module.
-    $this->enableModules(array('field', 'node'));
+    $this->enableModules(array('field', 'node', 'user'));
 
-    $this->installSchema('node', array('node', 'node_field_data'));
+    $this->installEntitySchema('node');
     // Perform an entity query against node.
     $query = \Drupal::entityQuery('node');
     // Disable node access checks, since User module is not enabled.
@@ -124,9 +125,22 @@ class DrupalUnitTestBaseTest extends DrupalUnitTestBase {
    * Tests expected behavior of installSchema().
    */
   function testInstallSchema() {
-    $module = 'entity_test';
-    $table = 'entity_test';
-    // Verify that we can install a table from the module schema.
+    // Verify that a table from a unknown module cannot be installed.
+    $module = 'database_test';
+    $table = 'test';
+    try {
+      $this->installSchema($module, $table);
+      $this->fail('Exception for non-retrievable schema found.');
+    }
+    catch (\Exception $e) {
+      $this->pass('Exception for non-retrievable schema found.');
+    }
+    $this->assertFalse(db_table_exists($table), "'$table' database table not found.");
+    $schema = drupal_get_schema($table);
+    $this->assertFalse($schema, "'$table' table schema not found.");
+
+    // Verify that the same table can be installed after enabling the module.
+    $this->enableModules(array($module));
     $this->installSchema($module, $table);
     $this->assertTrue(db_table_exists($table), "'$table' database table found.");
 
@@ -148,27 +162,6 @@ class DrupalUnitTestBaseTest extends DrupalUnitTestBase {
     $this->assertFalse(db_table_exists($table), "'$table' database table not found.");
     $schema = drupal_get_schema($table);
     $this->assertFalse($schema, "'$table' table schema not found.");
-
-    // Verify that a table from a unknown module cannot be installed.
-    $module = 'database_test';
-    $table = 'test';
-    try {
-      $this->installSchema($module, $table);
-      $this->fail('Exception for non-retrievable schema found.');
-    }
-    catch (\Exception $e) {
-      $this->pass('Exception for non-retrievable schema found.');
-    }
-    $this->assertFalse(db_table_exists($table), "'$table' database table not found.");
-    $schema = drupal_get_schema($table);
-    $this->assertFalse($schema, "'$table' table schema not found.");
-
-    // Verify that the same table can be installed after enabling the module.
-    $this->enableModules(array($module));
-    $this->installSchema($module, $table);
-    $this->assertTrue(db_table_exists($table), "'$table' database table found.");
-    $schema = drupal_get_schema($table);
-    $this->assertTrue($schema, "'$table' table schema found.");
   }
 
   /**

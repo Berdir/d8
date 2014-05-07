@@ -9,6 +9,7 @@ namespace Drupal\comment;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\field\FieldInfo;
@@ -36,13 +37,15 @@ class CommentStorage extends ContentEntityDatabaseStorage implements CommentStor
    *   An array of entity info for the entity type.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection to be used.
-   * @param \Drupal\field\FieldInfo $field_info
-   *   The field info service.
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
    * @param \Drupal\comment\CommentStatisticsInterface $comment_statistics
    *   The comment statistics service.
+   * @param \Drupal\field\FieldInfo $field_info
+   *   The field info service.
    */
-  public function __construct(EntityTypeInterface $entity_info, Connection $database, FieldInfo $field_info, CommentStatisticsInterface $comment_statistics) {
-    parent::__construct($entity_info, $database, $field_info);
+  public function __construct(EntityTypeInterface $entity_info, Connection $database, EntityManagerInterface $entity_manager, CommentStatisticsInterface $comment_statistics, FieldInfo $field_info) {
+    parent::__construct($entity_info, $database, $entity_manager, $field_info);
     $this->statistics = $comment_statistics;
   }
 
@@ -53,8 +56,9 @@ class CommentStorage extends ContentEntityDatabaseStorage implements CommentStor
     return new static(
       $entity_info,
       $container->get('database'),
-      $container->get('field.info'),
-      $container->get('comment.statistics')
+      $container->get('entity.manager'),
+      $container->get('comment.statistics'),
+      $container->get('field.info')
     );
   }
 
@@ -125,6 +129,43 @@ class CommentStorage extends ContentEntityDatabaseStorage implements CommentStor
       ->condition('pid', array_keys($comments))
       ->execute()
       ->fetchCol();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSchema() {
+    $schema = parent::getSchema();
+
+    unset($schema['comment']['indexes']['field__pid']);
+    unset($schema['comment']['indexes']['field__entity_id']);
+    $schema['comment']['indexes'] += array(
+      'comment__status_pid' => array('pid', 'status'),
+      'comment__num_new' => array(
+        'entity_id',
+        array('entity_type', 32),
+        array('field_id', 32),
+        'status',
+        'created',
+        'cid',
+        'thread',
+      ),
+      'comment__entity_langcode' => array(
+        'entity_id',
+        array('entity_type', 32),
+        array('field_id', 32),
+        'langcode',
+      ),
+      'comment__created' => array('created'),
+    );
+    $schema['comment']['foreign keys'] += array(
+      'comment__author' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
+    );
+
+    return $schema;
   }
 
 }

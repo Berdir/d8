@@ -12,8 +12,10 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Entity\Plugin\DataType\EntityReference;
 use Drupal\Core\Entity\Query\QueryException;
+use Drupal\Core\Entity\Sql\SqlStorageInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Field as FieldInfo;
+use Drupal\Core\Entity\EntityType;
 
 /**
  * Adds tables and fields to the SQL entity query.
@@ -35,7 +37,6 @@ class Tables implements TablesInterface {
    */
   protected $entityTables = array();
 
-
   /**
    * Field table array, key is table name, value is alias.
    *
@@ -46,10 +47,18 @@ class Tables implements TablesInterface {
   protected $fieldTables = array();
 
   /**
+   * The entity manager.
+   *
+   * @var \Drupal\Core\Entity\EntityManager
+   */
+  protected $entityManager;
+
+  /**
    * @param \Drupal\Core\Database\Query\SelectInterface $sql_query
    */
   public function __construct(SelectInterface $sql_query) {
     $this->sqlQuery = $sql_query;
+    $this->entityManager = \Drupal::entityManager();
   }
 
   /**
@@ -57,7 +66,6 @@ class Tables implements TablesInterface {
    */
   public function addField($field, $type, $langcode) {
     $entity_type_id = $this->sqlQuery->getMetaData('entity_type');
-    $entity_manager = \Drupal::entityManager();
     $field_info = FieldInfo::fieldInfo();
     $age = $this->sqlQuery->getMetaData('age');
     // This variable ensures grouping works correctly. For example:
@@ -74,7 +82,7 @@ class Tables implements TablesInterface {
     // This will contain the definitions of the last specifier seen by the
     // system.
     $propertyDefinitions = array();
-    $entity_type = $entity_manager->getDefinition($entity_type_id);
+    $entity_type = $this->entityManager->getDefinition($entity_type_id);
     // Use the lightweight and fast field map for checking whether a specifier
     // is a field or not. While calling field_info_field() on every specifier
     // delivers the same information, if no specifiers are using the field API
@@ -141,7 +149,7 @@ class Tables implements TablesInterface {
             if ($bundle_key = $entity_type->getKey('bundle')) {
               $values[$bundle_key] = reset($field_map[$entity_type_id][$field_name]['bundles']);
             }
-            $entity = $entity_manager
+            $entity = $this->entityManager
               ->getStorage($entity_type_id)
               ->create($values);
             $propertyDefinitions = $entity->$field_name->getFieldDefinition()->getPropertyDefinitions();
@@ -174,10 +182,10 @@ class Tables implements TablesInterface {
         $entity_tables = array();
         if ($data_table = $entity_type->getDataTable()) {
           $this->sqlQuery->addMetaData('simple_query', FALSE);
-          $entity_tables[$data_table] = drupal_get_schema($data_table);
+          $entity_tables[$data_table] = $this->getTableMapping($data_table, $entity_type_id);
         }
         $entity_base_table = $entity_type->getBaseTable();
-        $entity_tables[$entity_base_table] = drupal_get_schema($entity_base_table);
+        $entity_tables[$entity_base_table] = $this->getTableMapping($entity_base_table, $entity_type_id);
         $sql_column = $specifier;
         $table = $this->ensureEntityTable($index_prefix, $specifier, $type, $langcode, $base_table, $entity_id_field, $entity_tables);
       }
@@ -195,7 +203,7 @@ class Tables implements TablesInterface {
             $bundles = entity_get_bundles($entity_type_id);
             $values[$bundle_key] = key($bundles);
           }
-          $entity = $entity_manager
+          $entity = $this->entityManager
             ->getStorage($entity_type_id)
             ->create($values);
           $propertyDefinitions = $entity->$specifier->getFieldDefinition()->getPropertyDefinitions();
@@ -206,7 +214,7 @@ class Tables implements TablesInterface {
         if (isset($propertyDefinitions[$relationship_specifier]) && $entity->get($specifier)->first()->get('entity') instanceof EntityReference) {
           // If it is, use the entity type.
           $entity_type_id = $propertyDefinitions[$relationship_specifier]->getTargetDefinition()->getEntityTypeId();
-          $entity_type = $entity_manager->getDefinition($entity_type_id);
+          $entity_type = $this->entityManager->getDefinition($entity_type_id);
           // Add the new entity base table using the table and sql column.
           $join_condition= '%alias.' . $entity_type->getKey('id') . " = $table.$sql_column";
           $base_table = $this->sqlQuery->leftJoin($entity_type->getBaseTable(), NULL, $join_condition);
@@ -230,8 +238,8 @@ class Tables implements TablesInterface {
    * @throws \Drupal\Core\Entity\Query\QueryException
    */
   protected function ensureEntityTable($index_prefix, $property, $type, $langcode, $base_table, $id_field, $entity_tables) {
-    foreach ($entity_tables as $table => $schema) {
-      if (isset($schema['fields'][$property])) {
+    foreach ($entity_tables as $table => $mapping) {
+      if (isset($mapping[$property])) {
         if (!isset($this->entityTables[$index_prefix . $table])) {
           $this->entityTables[$index_prefix . $table] = $this->addJoin($type, $table, "%alias.$id_field = $base_table.$id_field", $langcode);
         }
@@ -270,6 +278,29 @@ class Tables implements TablesInterface {
       $arguments[$placeholder] = $langcode;
     }
     return $this->sqlQuery->addJoin($type, $table, NULL, $join_condition, $arguments);
+  }
+
+  /**
+   * Returns the schema for the given table.
+   *
+   * @param string $table
+   *   The table name.
+   *
+   * @return array|bool
+   *   The table field mapping for the given table or FALSE if not available.
+   */
+  protected function getTableMapping($table, $entity_type_id) {
+    $storage = $this->entityManager->getStorage($entity_type_id);
+    // @todo Stop calling drupal_get_schema() once menu links are converted
+    //   to the Entity Field API. See https://drupal.org/node/1842858.
+    $schema = drupal_get_schema($table);
+    if (!$schema && $storage instanceof SqlStorageInterface) {
+      $mapping = $storage->getTableMapping()->getAllColumns($table);
+    }
+    else {
+      $mapping = array_keys($schema['fields']);
+    }
+    return array_flip($mapping);
   }
 
 }

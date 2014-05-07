@@ -21,6 +21,7 @@ use Drupal\custom_block\CustomBlockInterface;
  *   label = @Translation("Custom Block"),
  *   bundle_label = @Translation("Custom Block type"),
  *   controllers = {
+ *     "storage" = "Drupal\custom_block\CustomBlockStorage",
  *     "access" = "Drupal\custom_block\CustomBlockAccessController",
  *     "list_builder" = "Drupal\custom_block\CustomBlockListBuilder",
  *     "view_builder" = "Drupal\custom_block\CustomBlockViewBuilder",

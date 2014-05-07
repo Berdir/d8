@@ -183,10 +183,6 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
       ->setLabel(t('Language code'))
       ->setDescription(t('The language code of the shortcut.'));
 
-    $fields['default_langcode'] = FieldDefinition::create('boolean')
-      ->setLabel(t('Default language'))
-      ->setDescription(t('Flag to indicate whether this is the default language.'));
-
     $fields['path'] = FieldDefinition::create('string')
       ->setLabel(t('Path'))
       ->setDescription(t('The computed shortcut path.'))

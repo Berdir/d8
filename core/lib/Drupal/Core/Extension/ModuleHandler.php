@@ -11,6 +11,7 @@ use Drupal\Component\Graph\Graph;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Entity\Schema\ContentEntitySchemaHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -799,6 +800,22 @@ class ModuleHandler implements ModuleHandlerInterface {
         }
         drupal_set_installed_schema_version($module, $version);
 
+        // Install any entity schemas belonging to the module.
+        $entity_manager = \Drupal::entityManager();
+        $schema = \Drupal::database()->schema();
+        foreach ($entity_manager->getDefinitions() as $entity_type) {
+          if ($entity_type->getProvider() == $module) {
+            $storage = $entity_manager->getStorage($entity_type->id());
+            if ($storage instanceof ContentEntitySchemaHandlerInterface) {
+              foreach ($storage->getSchema() as $table_name => $table_schema) {
+                if (!$schema->tableExists($table_name)) {
+                  $schema->createTable($table_name, $table_schema);
+                }
+              }
+            }
+          }
+        }
+
         // Record the fact that it was installed.
         $modules_installed[] = $module;
 
@@ -890,6 +907,22 @@ class ModuleHandler implements ModuleHandlerInterface {
 
       // Remove all configuration belonging to the module.
       \Drupal::service('config.manager')->uninstall('module', $module);
+
+      // Remove any entity schemas belonging to the module.
+      $entity_manager = \Drupal::entityManager();
+      $schema = \Drupal::database()->schema();
+      foreach ($entity_manager->getDefinitions() as $entity_type) {
+        if ($entity_type->getProvider() == $module) {
+          $storage = $entity_manager->getStorage($entity_type->id());
+          if ($storage instanceof ContentEntitySchemaHandlerInterface) {
+            foreach ($storage->getSchema() as $table_name => $table_schema) {
+              if ($schema->tableExists($table_name)) {
+                $schema->dropTable($table_name);
+              }
+            }
+          }
+        }
+      }
 
       // Remove the schema.
       drupal_uninstall_schema($module);

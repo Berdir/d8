@@ -20,6 +20,15 @@ class FieldInfoTest extends FieldUnitTestBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+
+    $this->installSchema('user', array('users_data'));
+  }
+
+  /**
    * Test that field types and field definitions are correctly cached.
    */
   function testFieldInfo() {
@@ -177,7 +186,6 @@ class FieldInfoTest extends FieldUnitTestBase {
   function testInstanceDisabledEntityType() {
     // Disabling a module invokes user_modules_uninstalled() and calls
     // drupal_flush_all_caches(). Install the necessary schema to support this.
-    $this->installSchema('user', array('users_data'));
     $this->installSchema('system', array('router'));
 
     // For this test the field type and the entity type must be exposed by

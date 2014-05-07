@@ -128,6 +128,7 @@ class MigrateFieldInstanceTest extends MigrateDrupalTestBase {
       'uri_scheme' => 'public',
       'handler' => 'default',
       'target_bundle' => NULL,
+      'max_length' => 255,
     );
     // This is the only way to compare arrays.
     $this->assertFalse(array_diff_assoc($field->getSettings(), $expected));

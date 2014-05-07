@@ -8,7 +8,13 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Entity\Schema\ContentEntitySchemaHandler;
+use Drupal\Core\Entity\Schema\ContentEntitySchemaHandlerInterface;
+use Drupal\Core\Entity\Sql\DefaultTableMapping;
+use Drupal\Core\Entity\Sql\SqlStorageInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\Language;
 use Drupal\field\FieldInfo;
@@ -26,7 +32,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * This class can be used as-is by most simple entity types. Entity types
  * requiring special handling can extend the class.
  */
-class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
+class ContentEntityDatabaseStorage extends ContentEntityStorageBase implements SqlStorageInterface, ContentEntitySchemaHandlerInterface {
+
+  /**
+   * The base field definitions for this entity type.
+   *
+   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface[]
+   */
+  protected $storageDefinitions;
+
+  /**
+   * A mapping of schema fields that will be stored per entity table.
+   *
+   * @var \Drupal\Core\Entity\Sql\DefaultTableMapping
+   */
+  protected $tableMapping;
 
   /**
    * Name of entity's revision database table field, if it supports revisions.
@@ -36,6 +56,13 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    * @var string
    */
   protected $revisionKey = FALSE;
+
+  /**
+   * The base table of the entity.
+   *
+   * @var string
+   */
+  protected $baseTable;
 
   /**
    * The table that stores revisions, if the entity supports revisions.
@@ -73,12 +100,27 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   protected $fieldInfo;
 
   /**
+   * The entity manager.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
+   */
+  protected $entityManager;
+
+  /**
+   * The entity schema handler.
+   *
+   * @var \Drupal\Core\Entity\Schema\ContentEntitySchemaHandlerInterface
+   */
+  protected $schemaHandler;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
       $container->get('database'),
+      $container->get('entity.manager'),
       $container->get('field.info')
     );
   }
@@ -90,33 +132,209 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    *   The entity type definition.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection to be used.
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager.
    * @param \Drupal\field\FieldInfo $field_info
-   *   The field info service.
+   *   (optional) The field info service. Defaults to NULL as storage can be
+   *   instantiated before Field module is installed.
    */
-  public function __construct(EntityTypeInterface $entity_type, Connection $database, FieldInfo $field_info) {
+  public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityManagerInterface $entity_manager, FieldInfo $field_info = NULL) {
     parent::__construct($entity_type);
 
     $this->database = $database;
     $this->fieldInfo = $field_info;
+    $this->entityManager = $entity_manager;
 
-    // Check if the entity type supports UUIDs.
+    // @todo Remove the check for FieldDefinitionInterface::isMultiple() when
+    //   multiple-value base fields are supported in
+    //   https://drupal.org/node/2248977.
+    $this->storageDefinitions = array_filter($entity_manager->getBaseFieldDefinitions($entity_type->id()), function (FieldDefinitionInterface $definition) {
+      return !$definition->isComputed() && !$definition->hasCustomStorage() && !$definition->isMultiple();
+    });
+
+    $this->idKey = $this->entityType->getKey('id') ?: 'id';
+
+    // The uuid and bundle keys are optional.
     $this->uuidKey = $this->entityType->getKey('uuid');
+    $this->bundleKey = $this->entityType->getKey('bundle');
 
-    // Check if the entity type supports revisions.
+    // @todo Remove table names from the entity type definition in
+    //   https://drupal.org/node/2232465
+    $this->baseTable = $this->entityType->getBaseTable() ?: $this->entityTypeId;
+
     if ($this->entityType->hasKey('revision')) {
-      $this->revisionKey = $this->entityType->getKey('revision');
-      $this->revisionTable = $this->entityType->getRevisionTable();
+      $this->revisionKey = $this->entityType->getKey('revision') ?: 'revision_id';
+      $this->revisionTable = $this->entityType->getRevisionTable() ?: $this->entityTypeId . '_revision';
     }
+    // @todo Remove the data table check once all entity types are using
+    // entity query and we have a views data controller. See:
+    // - https://drupal.org/node/2068325
+    // - https://drupal.org/node/1740492
+    $translatable = $this->entityType->getDataTable() && $this->entityType->isTranslatable();
+    if ($translatable) {
+      $this->dataTable = $this->entityType->getDataTable() ?: $this->entityTypeId . '_field_data';
+      $this->langcodeKey = $this->entityType->getKey('langcode') ?: 'langcode';
+      $this->defaultLangcodeKey = $this->entityType->getKey('default_langcode') ?: 'default_langcode';
+    }
+    if ($this->entityType->hasKey('revision') && $translatable) {
+      $this->revisionDataTable = $this->entityType->getRevisionDataTable() ?: $this->entityTypeId . '_field_revision';
+    }
+  }
 
-    // Check if the entity type has a dedicated table for fields.
-    if ($data_table = $this->entityType->getDataTable()) {
-      $this->dataTable = $data_table;
-      // Entity types having both revision and translation support should always
-      // define a revision data table.
-      if ($this->revisionTable && $revision_data_table = $this->entityType->getRevisionDataTable()) {
-        $this->revisionDataTable = $revision_data_table;
+  /**
+   * Returns the base table name.
+   *
+   * @return string
+   *   The table name.
+   */
+  public function getBaseTable() {
+    return $this->baseTable;
+  }
+
+  /**
+   * Returns the revision table name.
+   *
+   * @return string|false
+   *   The table name or FALSE if it is not available.
+   */
+  public function getRevisionTable() {
+    return $this->revisionTable;
+  }
+
+  /**
+   * Returns the data table name.
+   *
+   * @return string|false
+   *   The table name or FALSE if it is not available.
+   */
+  public function getDataTable() {
+    return $this->dataTable;
+  }
+
+  /**
+   * Returns the revision data table name.
+   *
+   * @return string|false
+   *   The table name or FALSE if it is not available.
+   */
+  public function getRevisionDataTable() {
+    return $this->revisionDataTable;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSchema() {
+    return $this->schemaHandler()->getSchema();
+  }
+
+  /**
+   * Gets the schema handler for this storage controller.
+   *
+   * @return \Drupal\Core\Entity\Schema\ContentEntitySchemaHandler
+   *   The schema handler.
+   */
+  protected function schemaHandler() {
+    if (!isset($this->schemaHandler)) {
+      $this->schemaHandler = new ContentEntitySchemaHandler($this->entityManager, $this->entityType, $this);
+    }
+    return $this->schemaHandler;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTableMapping() {
+    if (!isset($this->tableMapping)) {
+      $this->tableMapping = new DefaultTableMapping($this->storageDefinitions);
+
+      $key_fields = array_filter(array($this->idKey, $this->revisionKey, $this->bundleKey, $this->uuidKey, $this->langcodeKey));
+      $all_fields = array_keys($this->storageDefinitions);
+      $revisionable_fields = array_keys(array_filter($this->storageDefinitions, function (FieldStorageDefinitionInterface $definition) {
+        return $definition->isRevisionable();
+      }));
+      // Make sure the key fields come first in the list of fields.
+      $all_fields = array_merge($key_fields, array_diff($all_fields, $key_fields));
+
+
+      // Nodes have all three of these fields, while custom blocks only have log
+      // @todo Provide automatic definitions for revision metadata fields in
+      //   https://drupal.org/node/2248983.
+      // @todo Rename 'log' to 'revision_log' in
+      //   https://drupal.org/node/2248991.
+      $revision_metadata_fields = array_intersect(array('revision_timestamp', 'revision_uid', 'log'), $all_fields);
+
+      // @todo Remove the data table check once all entity types are using
+      // entity query and we have a views data controller. See:
+      // - https://drupal.org/node/2068325
+      // - https://drupal.org/node/1740492
+      $translatable = $this->entityType->getDataTable() && $this->entityType->isTranslatable();
+      if (!$this->entityType->hasKey('revision') && !$translatable) {
+        // The base layout stores all the base field values in the base table.
+        $this->tableMapping->addFieldColumns($this->baseTable, $all_fields);
+      }
+      elseif ($this->entityType->hasKey('revision') && !$translatable) {
+        // The revisionable layout stores all the base field values in the base
+        // table, except for revision metadata fields. Revisionable fields
+        // denormalized in the base table but also stored in the revision table
+        // together with the entity ID and the revision ID as identifiers.
+        $this->tableMapping->addFieldColumns($this->baseTable, array_diff($all_fields, $revision_metadata_fields));
+
+        $revision_key_fields = array($this->idKey, $this->revisionKey);
+        $this->tableMapping->addFieldColumns($this->revisionTable, array_merge($revision_key_fields, $revisionable_fields));
+      }
+      elseif (!$this->entityType->hasKey('revision') && $translatable) {
+        // Multilingual layouts store key field values in the base table. The
+        // other base field values are stored in the data table, no matter
+        // whether they are translatable or not. The data table holds also a
+        // denormalized copy of the bundle field value to allow for more
+        // performant queries. This means that only the UUID is not stored on
+        // the data table.
+        $this->tableMapping
+          ->addFieldColumns($this->baseTable, $key_fields)
+          ->addFieldColumns($this->dataTable, array_diff($all_fields, array($this->uuidKey)))
+          // Add the denormalized 'default_langcode' field to the mapping. Its
+          // value is identical to the query expression
+          // "base_table.langcode = data_table.langcode"
+          ->addExtraColumns($this->dataTable, array('default_langcode'));
+      }
+      elseif ($this->entityType->hasKey('revision') && $translatable) {
+        // The revisionable multilingual layout stores key field values in the
+        // base table, except for language, which is stored in the revision
+        // table along with revision metadata. The revision data table holds
+        // data field values for all the revisionable fields and the data table
+        // holds the data field values for all non-revisionable fields. The data
+        // field values of revisionable fields are denormalized in the data
+        // table, as well.
+        $this->tableMapping->addFieldColumns($this->baseTable, array_diff($key_fields, array($this->langcodeKey)));
+
+        // Like in the multilingual, non-revisionable case the UUID is not
+        // in the data table. Additionally, do not store revision metadata
+        // fields in the data table.
+        $data_fields = array_diff($all_fields, array($this->uuidKey), $revision_metadata_fields);
+        $this->tableMapping
+          ->addFieldColumns($this->dataTable, $data_fields)
+          // Add the denormalized 'default_langcode' field to the mapping. Its
+          // value is identical to the query expression
+          // "base_langcode = data_table.langcode" where "base_langcode" is
+          // the language code of the default revision.
+          ->addExtraColumns($this->dataTable, array('default_langcode'));
+
+        $revision_base_fields = array_merge(array($this->idKey, $this->revisionKey, $this->langcodeKey), $revision_metadata_fields);
+        $this->tableMapping->addFieldColumns($this->revisionTable, $revision_base_fields);
+
+        $revision_data_key_fields = array($this->idKey, $this->revisionKey, $this->langcodeKey);
+        $revision_data_fields = array_diff($revisionable_fields, $revision_metadata_fields);
+        $this->tableMapping
+          ->addFieldColumns($this->revisionDataTable, array_merge($revision_data_key_fields, $revision_data_fields))
+          // Add the denormalized 'default_langcode' field to the mapping. Its
+          // value is identical to the query expression
+          // "revision_table.langcode = data_table.langcode".
+          ->addExtraColumns($this->revisionDataTable, array('default_langcode'));
       }
     }
+
+    return $this->tableMapping;
   }
 
   /**
@@ -217,13 +435,14 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
       }
 
       $data = $query->execute();
-      $field_definitions = \Drupal::entityManager()->getBaseFieldDefinitions($this->entityTypeId);
+
+      $table_mapping = $this->getTableMapping();
       $translations = array();
       if ($this->revisionDataTable) {
-        $data_column_names = array_flip(array_diff(drupal_schema_fields_sql($this->entityType->getRevisionDataTable()), drupal_schema_fields_sql($this->entityType->getBaseTable())));
+        $data_fields = array_diff_key($table_mapping->getFieldNames($this->revisionDataTable), $table_mapping->getFieldNames($this->baseTable));
       }
       else {
-        $data_column_names = array_flip(drupal_schema_fields_sql($this->entityType->getDataTable()));
+        $data_fields = $table_mapping->getFieldNames($this->dataTable);
       }
 
       foreach ($data as $values) {
@@ -234,23 +453,16 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
         $langcode = empty($values['default_langcode']) ? $values['langcode'] : Language::LANGCODE_DEFAULT;
         $translations[$id][$langcode] = TRUE;
 
-        foreach (array_keys($field_definitions) as $field_name) {
-          // Handle columns named directly after the field.
-          if (isset($data_column_names[$field_name])) {
-            $entities[$id][$field_name][$langcode] = $values[$field_name];
+
+        foreach ($data_fields as $field_name) {
+          $columns = $table_mapping->getColumnMapping($field_name);
+          // Do not key single-column fields by property name.
+          if (count($columns) == 1) {
+            $entities[$id][$field_name][$langcode] = $values[reset($columns)];
           }
           else {
-            // @todo Change this logic to be based on a mapping of field
-            // definition properties (translatability, revisionability) in
-            // https://drupal.org/node/2144631.
-            foreach ($data_column_names as $data_column_name) {
-              // Handle columns named [field_name]__[column_name], for which we
-              // need to look through all column names from the table that start
-              // with the name of the field.
-              if (($data_field_name = strstr($data_column_name, '__', TRUE)) && $data_field_name === $field_name) {
-                $property_name = substr($data_column_name, strpos($data_column_name, '__') + 2);
-                $entities[$id][$field_name][$langcode][$property_name] = $values[$data_column_name];
-              }
+            foreach ($columns as $property_name => $column_name) {
+              $entities[$id][$field_name][$langcode][$property_name] = $values[$column_name];
             }
           }
         }
@@ -354,11 +566,12 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
     }
 
     // Add fields from the {entity} table.
-    $entity_fields = drupal_schema_fields_sql($this->entityType->getBaseTable());
+    $table_mapping = $this->getTableMapping();
+    $entity_fields = $table_mapping->getAllColumns($this->baseTable);
 
     if ($this->revisionTable) {
       // Add all fields from the {entity_revision} table.
-      $entity_revision_fields = drupal_schema_fields_sql($this->entityType->getRevisionTable());
+      $entity_revision_fields = $table_mapping->getAllColumns($this->revisionTable);
       $entity_revision_fields = array_combine($entity_revision_fields, $entity_revision_fields);
       // The ID field is provided by entity, so remove it.
       unset($entity_revision_fields[$this->idKey]);
@@ -462,6 +675,7 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
       db_ignore_slave();
       return $return;
     }
+
     catch (\Exception $e) {
       $transaction->rollback();
       watchdog_exception($this->entityTypeId, $e);
@@ -479,7 +693,12 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
     $is_new = $entity->isNew();
     if (!$is_new) {
       if ($entity->isDefaultRevision()) {
-        $return = drupal_write_record($this->entityType->getBaseTable(), $record, $this->idKey);
+        $this->database
+          ->update($this->baseTable)
+          ->fields((array) $record)
+          ->condition($this->idKey, $record->{$this->idKey})
+          ->execute();
+        $return = SAVED_UPDATED;
       }
       else {
         // @todo, should a different value be returned when saving an entity
@@ -487,13 +706,13 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
         $return = FALSE;
       }
       if ($this->revisionTable) {
-        $record->{$this->revisionKey} = $this->saveRevision($entity);
+        $entity->{$this->revisionKey}->value = $this->saveRevision($entity);
       }
       if ($this->dataTable) {
         $this->savePropertyData($entity);
       }
       if ($this->revisionDataTable) {
-        $this->savePropertyData($entity, 'revision_data_table');
+        $this->savePropertyData($entity, $this->revisionDataTable);
       }
       if ($this->revisionTable) {
         $entity->setNewRevision(FALSE);
@@ -504,7 +723,17 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
       // Ensure the entity is still seen as new after assigning it an id,
       // while storing its data.
       $entity->enforceIsNew();
-      $return = drupal_write_record($this->entityType->getBaseTable(), $record);
+      $insert_id = $this->database
+        ->insert($this->baseTable, array('return' => Database::RETURN_INSERT_ID))
+        ->fields((array) $record)
+        ->execute();
+      // Even if this is a new entity the ID key might have been set, in which
+      // case we should not override the provided ID. An empty value for the
+      // ID is interpreted as NULL and thus overriden.
+      if (empty($record->{$this->idKey})) {
+        $record->{$this->idKey} = $insert_id;
+      }
+      $return = SAVED_NEW;
       $entity->{$this->idKey}->value = (string) $record->{$this->idKey};
       if ($this->revisionTable) {
         $entity->setNewRevision();
@@ -514,8 +743,9 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
         $this->savePropertyData($entity);
       }
       if ($this->revisionDataTable) {
-        $this->savePropertyData($entity, 'revision_data_table');
+        $this->savePropertyData($entity, $this->revisionDataTable);
       }
+
       $entity->enforceIsNew(FALSE);
       if ($this->revisionTable) {
         $entity->setNewRevision(FALSE);
@@ -545,13 +775,14 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity object.
-   * @param string $table_key
-   *   (optional) The entity key identifying the target table. Defaults to
-   *   'data_table'.
+   * @param string $table_name
+   *   (optional) The table name to save to. Defaults to the data table.
    */
-  protected function savePropertyData(EntityInterface $entity, $table_key = 'data_table') {
-    $table_name = $this->entityType->get($table_key);
-    $revision = $table_key != 'data_table';
+  protected function savePropertyData(EntityInterface $entity, $table_name = NULL) {
+    if (!isset($table_name)) {
+      $table_name = $this->dataTable;
+    }
+    $revision = $table_name != $this->dataTable;
 
     if (!$revision || !$entity->isNewRevision()) {
       $key = $revision ? $this->revisionKey : $this->idKey;
@@ -566,7 +797,7 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
 
     foreach ($entity->getTranslationLanguages() as $langcode => $language) {
       $translation = $entity->getTranslation($langcode);
-      $record = $this->mapToDataStorageRecord($translation, $table_key);
+      $record = $this->mapToDataStorageRecord($translation, $table_name);
       $values = (array) $record;
       $query
         ->fields(array_keys($values))
@@ -589,50 +820,32 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   /**
    * Maps from an entity object to the storage record.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   The entity object.
-   * @param string $table_key
-   *   (optional) The entity key identifying the target table. Defaults to
-   *   'base_table'.
+   * @param string $table_name
+   *   (optional) The table name to map records to. Defaults to the base table.
    *
    * @return \stdClass
    *   The record to store.
    */
-  protected function mapToStorageRecord(EntityInterface $entity, $table_key = 'base_table') {
+  protected function mapToStorageRecord(ContentEntityInterface $entity, $table_name = NULL) {
+    if (!isset($table_name)) {
+      $table_name = $this->baseTable;
+    }
+
     $record = new \stdClass();
-    $values = array();
-    $definitions = $entity->getFieldDefinitions();
-    $schema = drupal_get_schema($this->entityType->get($table_key));
-    $is_new = $entity->isNew();
-
-    $multi_column_fields = array();
-    foreach (drupal_schema_fields_sql($this->entityType->get($table_key)) as $name) {
-      // Check for fields which store data in multiple columns and process them
-      // separately.
-      if ($field = strstr($name, '__', TRUE)) {
-        $multi_column_fields[$field] = TRUE;
-        continue;
-      }
-      $values[$name] = isset($definitions[$name]) && isset($entity->$name->value) ? $entity->$name->value : NULL;
-    }
-
-    // Handle fields that store multiple properties and match each property name
-    // to its schema column name.
-    foreach (array_keys($multi_column_fields) as $field_name) {
-      $field_items = $entity->get($field_name);
-      $field_value = $field_items->getValue();
-      foreach (array_keys($field_items->getFieldDefinition()->getColumns()) as $field_schema_column) {
-        if (isset($schema['fields'][$field_name . '__' . $field_schema_column])) {
-          $values[$field_name . '__' . $field_schema_column] = isset($field_value[0][$field_schema_column]) ? $field_value[0][$field_schema_column] : NULL;
+    $table_mapping = $this->getTableMapping();
+    foreach ($table_mapping->getFieldNames($table_name) as $field_name) {
+      $columns = $table_mapping->getColumnMapping($field_name);
+      if (!empty($this->storageDefinitions[$field_name])) {
+        $definition = $this->storageDefinitions[$field_name];
+        foreach ($columns as $column_name => $schema_name) {
+          $value = isset($entity->$field_name->$column_name) ? $entity->$field_name->$column_name : NULL;
+          if (!empty($definition->getSchema()['columns'][$column_name]['serialize'])) {
+            $value = serialize($value);
+          }
+          $record->$schema_name = drupal_schema_get_field_value($definition->getSchema()['columns'][$column_name], $value);
         }
-      }
-    }
-
-    foreach ($values as $field_name => $value) {
-      // If we are creating a new entity, we must not populate the record with
-      // NULL values otherwise defaults would not be applied.
-      if (isset($value) || !$is_new) {
-        $record->$field_name = drupal_schema_get_field_value($schema['fields'][$field_name], $value);
       }
     }
 
@@ -644,15 +857,17 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity object.
-   * @param string $table_key
-   *   (optional) The entity key identifying the target table. Defaults to
-   *   'data_table'.
+   * @param string $table_name
+   *   (optional) The table name to map records to. Defaults to the data table.
    *
    * @return \stdClass
    *   The record to store.
    */
-  protected function mapToDataStorageRecord(EntityInterface $entity, $table_key = 'data_table') {
-    $record = $this->mapToStorageRecord($entity, $table_key);
+  protected function mapToDataStorageRecord(EntityInterface $entity, $table_name = NULL) {
+    if (!isset($table_name)) {
+      $table_name = $this->dataTable;
+    }
+    $record = $this->mapToStorageRecord($entity, $table_name);
     $record->langcode = $entity->language()->id;
     $record->default_langcode = intval($record->langcode == $entity->getUntranslated()->language()->id);
     return $record;
@@ -668,12 +883,20 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    *   The revision id.
    */
   protected function saveRevision(EntityInterface $entity) {
-    $record = $this->mapToStorageRecord($entity, 'revision_table');
+    $record = $this->mapToStorageRecord($entity, $this->revisionTable);
 
     $entity->preSaveRevision($this, $record);
 
     if ($entity->isNewRevision()) {
-      drupal_write_record($this->revisionTable, $record);
+      $insert_id = $this->database
+        ->insert($this->revisionTable, array('return' => Database::RETURN_INSERT_ID))
+        ->fields((array) $record)
+        ->execute();
+      // Even if this is a new revsision, the revision ID key might have been
+      // set in which case we should not override the provided revision ID.
+      if (!isset($record->{$this->revisionKey})) {
+        $record->{$this->revisionKey} = $insert_id;
+      }
       if ($entity->isDefaultRevision()) {
         $this->database->update($this->entityType->getBaseTable())
           ->fields(array($this->revisionKey => $record->{$this->revisionKey}))
@@ -682,7 +905,11 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
       }
     }
     else {
-      drupal_write_record($this->revisionTable, $record, $this->revisionKey);
+      $this->database
+        ->update($this->revisionTable)
+        ->fields((array) $record)
+        ->condition($this->revisionKey, $record->{$this->revisionKey})
+        ->execute();
     }
 
     // Make sure to update the new revision key for the entity.

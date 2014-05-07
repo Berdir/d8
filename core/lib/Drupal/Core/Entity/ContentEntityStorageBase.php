@@ -23,6 +23,13 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Fie
   protected $bundleKey = FALSE;
 
   /**
+   * The entity langcode key
+   *
+   * @var string|bool
+   */
+  protected $langcodeKey = FALSE;
+
+  /**
    * Constructs a ContentEntityStorageBase object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
