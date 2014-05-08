@@ -12,12 +12,11 @@ use Drupal\Core\Entity\EntityStorageInterface;
 /**
  * A base class for config entity types that act as bundles.
  *
- * Entity types that what to use this base class must use bundle_of in their
+ * Entity types that want to use this base class must use bundle_of in their
  * annotation to specify for which entity type they are providing bundles for.
  */
 abstract class ConfigEntityBundleBase extends ConfigEntityBase {
 
-  /**
   /**
    * {@inheritdoc}
    */
