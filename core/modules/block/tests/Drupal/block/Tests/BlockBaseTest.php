@@ -34,9 +34,16 @@ class BlockBaseTest extends UnitTestCase {
    */
   public function testGetMachineNameSuggestion() {
     $transliteraton = $this->getMockBuilder('Drupal\Core\Transliteration\PHPTransliteration')
-      // @todo Inject the module handler into PHPTransliteration.
-      ->setMethods(array('readLanguageOverrides'))
+      ->disableOriginalConstructor()
       ->getMock();
+    $transliteraton->expects($this->at(0))
+      ->method('transliterate')
+      ->with('Admin label')
+      ->will($this->returnValue('adminlabel'));
+    $transliteraton->expects($this->at(1))
+      ->method('transliterate')
+      ->with('über åwesome')
+      ->will($this->returnValue('uberawesome'));
 
     $container = new ContainerBuilder();
     $container->set('transliteration', $transliteraton);

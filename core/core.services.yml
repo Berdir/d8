@@ -638,6 +638,7 @@ services:
     arguments: ['@csrf_token']
   transliteration:
     class: Drupal\Core\Transliteration\PHPTransliteration
+    arguments: [null, '@module_handler']
   flood:
     class: Drupal\Core\Flood\DatabaseBackend
     arguments: ['@database', '@request_stack']
