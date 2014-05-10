@@ -87,6 +87,10 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
         'label' => 'hidden',
         'type' => 'string',
         'weight' => -5,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'string',
+        'weight' => -5,
       ));
 
     // @todo: Add allowed values validation.
