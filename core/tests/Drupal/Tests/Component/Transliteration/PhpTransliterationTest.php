@@ -100,11 +100,6 @@ class PhpTransliterationTest extends UnitTestCase {
       array('dk', $two_byte, 'A O U Aa Oe aouaaoehello'),
       array('dk', $random, $random),
       array('kg', $three_byte, 'ts'),
-      // Test the language override hook in the test module, which changes
-      // the transliteration of Ä to Z and provides for the 5-byte characters.
-      // array('zz', $two_byte, 'Z O U A O aouaohello'),
-      // array('zz', $random, $random),
-      // array('zz', $five_byte, 'ATh', $five_byte_printable),
       // Test strings in some other languages.
       // Turkish, provided by drupal.org user Kartagis.
       array('tr', 'Abayı serdiler bize. Söyleyeceğim yüzlerine. Sanırım hepimiz aynı şeyi düşünüyoruz.', 'Abayi serdiler bize. Soyleyecegim yuzlerine. Sanirim hepimiz ayni seyi dusunuyoruz.'),
