@@ -414,7 +414,7 @@ function toolbar_toolbar() {
  * @param array $render_tree
  *   A menu link tree render array. The contained url objects are modified.
  */
-function toolbar_menu_navigation_links($render_tree) {
+function toolbar_menu_navigation_links($tree) {
   foreach (Element::children($tree, FALSE) as $key) {
     $element = $tree[$key];
     // Configure sub-items.
