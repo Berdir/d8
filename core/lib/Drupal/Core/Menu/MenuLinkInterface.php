@@ -124,20 +124,6 @@ interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspect
   public function getMetaData();
 
   /**
-   * Sets the options for this link instance when rendering it.
-   *
-   * The options set will not be preserved.
-   *
-   * @param array $options
-   *   The new values of the options
-   *
-   * @todo: kill this method.
-   *
-   * @return $this
-   */
-  public function setOptions($options);
-
-  /**
    * Update and save values for a menu link.
    *
    * The override is written depending on the implementation.

@@ -13,7 +13,6 @@ use Drupal\Component\Utility\Crypt;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\user\RoleInterface;
 use Drupal\user\UserInterface;
-use Drupal\Component\Utility\String;
 
 /**
  * Implements hook_help().
@@ -346,14 +345,15 @@ function toolbar_toolbar() {
     '#weight' => -20,
   );
 
-  // Retrieve the administration menu from the database.
-  $tree = toolbar_get_menu_tree();
+  $menu_tree = \Drupal::menuTree();
+  // Retrieve the administration menu from the menu tree manager.
+  $tree = $menu_tree->buildTree('admin', array(
+    'expanded' => array('system.admin')
+  ));
 
+  $render_tree = $menu_tree->buildRenderTree($tree);
   // Add attributes to the links before rendering.
-  toolbar_menu_navigation_links($tree);
-
-  /** @var \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree */
-  $menu_tree = \Drupal::service('plugin.manager.menu.link_tree');
+  toolbar_menu_navigation_links($render_tree);
 
   $menu = array(
     '#heading' => t('Administration menu'),
@@ -362,7 +362,7 @@ function toolbar_toolbar() {
       '#attributes' => array(
         'class' => array('toolbar-menu-administration'),
       ),
-      'administration_menu' => $menu_tree->buildRenderTree($tree),
+      'administration_menu' => $render_tree,
     ),
   );
 
@@ -407,51 +407,44 @@ function toolbar_toolbar() {
 }
 
 /**
- * Gets only the top level items below the 'admin' path.
+ * Modifies a render array of links from a menu tree array.
  *
- * @return
- *   An array containing a menu tree of top level items below the 'admin' path.
+ * Adds route-based IDs and icon placeholders to the link attributes.
+ *
+ * @param array $render_tree
+ *   A menu link tree render array. The contained url objects are modified.
  */
-function toolbar_get_menu_tree() {
-  /** @var \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree */
-  $menu_tree = \Drupal::service('plugin.manager.menu.link_tree');
-
-  $tree = $menu_tree->buildTree('admin', array(
-    'expanded' => array('system.admin')
-  ));
-
-  return $tree;
-}
-
-/**
- * Generates an array of links from a menu tree array.
- *
- * Based on menu_navigation_links(). Adds path based IDs and icon placeholders
- * to the links.
- *
- * @return
- *   An array of links as defined above.
- */
-function toolbar_menu_navigation_links(&$tree) {
-  foreach ($tree as $key => $item) {
+function toolbar_menu_navigation_links($render_tree) {
+  foreach (Element::children($tree, FALSE) as $key) {
+    $element = $tree[$key];
     // Configure sub-items.
-    if (!empty($item['below'])) {
-      toolbar_menu_navigation_links($tree[$key]['below']);
+    if (!empty($element['#below'])) {
+      toolbar_menu_navigation_links($tree[$key]['#below']);
     }
+    /** @var \Drupal\Core\Url $url */
+    $url = $element['#url'];
     // Make sure we have a path specific ID in place, so we can attach icons
     // and behaviors to the items.
-    /** @var \Drupal\Core\Menu\MenuLinkInterface $link */
-    $link = $item['link'];
-    $options = $link->getOptions();
+    if ($url->isExternal()) {
+      // This is an unusual case, so just get a distinct, safe string
+      $id = substr(Crypt::hashBase64($url->getPath()), 0, 16);
+    }
+    else {
+      $id = str_replace(array('.', '<', '>'), array('-', '', ''), $url->getRouteName());
+    }
+    $options = $url->getOptions();
     $options['attributes'] = array(
-      'id' => 'toolbar-link-' . str_replace(array('.', '<', '>'), array('-', '', ''), $link->getUrlObject()->getRouteName()),
+      'id' => 'toolbar-link-' . $id,
       'class' => array(
         'toolbar-icon',
-        'toolbar-icon-' . strtolower(str_replace(' ', '-', $link->getTitle())),
       ),
-      'title' => check_plain($link->getDescription()),
     );
-    $link->setOptions($options);
+    // Get the non-localized title to make the icon class.
+    $definition = $element['#original_link']->getPluginDefinition();
+    if (!empty($definition['title'])) {
+      $options['attributes']['class'][] = 'toolbar-icon-' . strtolower(str_replace(' ', '-', $definition['title']));
+    }
+    $url->setOptions($options);
   }
 }
 
@@ -468,18 +461,16 @@ function toolbar_get_rendered_subtrees() {
     /** @var \Drupal\Core\Menu\MenuLinkInterface $item */
     $item = $tree_item['link'];
     if ($tree_item['below']) {
-      $subtree = $tree_item['below'];
+      $subtree = $menu_tree->buildRenderTree($tree_item['below']);debug(array_keys($subtree));
       toolbar_menu_navigation_links($subtree);
-      $subtree = $menu_tree->buildRenderTree($subtree);
-      $subtree = drupal_render($subtree);
-
+      $output = drupal_render($subtree);
     }
     else {
-      $subtree = '';
+      $output = '';
     }
     $id = str_replace(array('.', '<', '>'), array('-', '', '' ), $item->getUrlObject()->getRouteName());
 
-    $subtrees[$id] = $subtree;
+    $subtrees[$id] = $output;
   }
   return $subtrees;
 }

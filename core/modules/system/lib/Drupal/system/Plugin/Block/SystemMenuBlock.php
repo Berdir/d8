@@ -66,8 +66,9 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
    * {@inheritdoc}
    */
   public function build() {
-    $menu = $this->getDerivativeId();
-    return $this->menuTree->renderMenu($menu);
+    $menu_name = $this->getDerivativeId();
+    $tree = $this->menuTree->buildPageData($menu_name);
+    return $this->menuTree->buildRenderTree($tree);
   }
 
   /**

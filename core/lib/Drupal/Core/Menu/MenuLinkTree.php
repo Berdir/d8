@@ -454,7 +454,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
       // @todo Use route name and parameters to generate the link path, unless
       //    it is external.
       $element['#url'] = $link->getUrlObject();
-      $element['#below'] = $data['below'] ? $this->buildRenderTree($data['below']) : $data['below'];
+      $element['#below'] = $data['below'] ? $this->buildRenderTree($data['below']) : array();
       $element['#original_link'] = $link;
       // Index using the link's unique ID.
       $build[$data['link']->getPluginId()] = $element;
@@ -501,9 +501,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   }
 
   /**
-   * todo
-   *
-   * @return \Drupal\Core\Menu\MenuLinkInterface|NULL
+   * {@inheritdoc}
    */
   public function menuLinkGetPreferred($route_name = NULL, array $route_parameters = array(), $selected_menu = NULL) {
     if (!isset($route_name)) {
@@ -711,15 +709,6 @@ class MenuLinkTree implements MenuLinkTreeInterface {
       }
     }
     return $links;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function renderMenu($menu_name) {
-
-    $tree = $this->buildPageData($menu_name);
-    return $this->buildRenderTree($tree);
   }
 
   /**
@@ -973,14 +962,14 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   }
 
   /**
-   * Rests the local definition cache.
+   * {@inheritdoc}
    */
   public function resetDefinitions() {
     $this->definitions = array();
   }
 
   /**
-   * Rests the local definition cache.
+   * Resets the local definition cache for one plugin.
    *
    * @param string $id
    *   The menu link plugin ID.

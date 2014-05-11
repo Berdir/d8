@@ -151,18 +151,6 @@ interface MenuLinkTreeInterface extends PluginManagerInterface {
   public function buildAllData($menu_name, $link = NULL, $max_depth = NULL);
 
   /**
-   * Renders a menu tree based on the current path.
-   *
-   * @param string $menu_name
-   *   The name of the menu.
-   *
-   * @return array
-   *   A structured array representing the specified menu on the current page,
-   *   to be rendered by drupal_render().
-   */
-  public function renderMenu($menu_name);
-
-  /**
    * Builds a menu tree, translates links, and checks access.
    *
    * @param string $menu_name
@@ -317,4 +305,8 @@ interface MenuLinkTreeInterface extends PluginManagerInterface {
 
   public function getParentDepthLimit($id);
 
+  /**
+   * Resets any local definition cache. Used for testing.
+   */
+  public function resetDefinitions();
 }

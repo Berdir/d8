@@ -611,10 +611,8 @@ class MenuLinkTreeStorage implements MenuLinkTreeStorageInterface {
    */
   public function getMaterializedPathIds($id) {
     $subquery = $this->connection->select($this->table, $this->options);
-    // @todo - make this dynamic based on static::MAX_DEPTH or
-    // using the schema?
-    // @todo - should we statically cache the loaded definitions in the hope
-    // of short-circuiting this?
+    // @todo: consider making this dynamic based on static::MAX_DEPTH
+    //   or from the schema if that is generated using static::MAX_DEPTH.
     $subquery->fields($this->table, array('p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9'));
     $subquery->condition('id', $id);
     $result = current($subquery->execute()->fetchAll(\PDO::FETCH_ASSOC));
@@ -623,6 +621,8 @@ class MenuLinkTreeStorage implements MenuLinkTreeStorageInterface {
     $query->fields($this->table, array('id'));
     $query->orderBy('depth', 'ASC');
     $query->condition('mlid', $ids, 'IN');
+    // @todo: cache this result in memory if we find it's being used more
+    //   than once per page load.
     return $this->safeExecuteSelect($query)->fetchAllKeyed(0, 0);
   }
 
@@ -722,7 +722,7 @@ class MenuLinkTreeStorage implements MenuLinkTreeStorageInterface {
       return $tree;
     }
     $query = $this->connection->select($this->table, $this->options);
-    $query->fields($this->table);
+    $query->fields($this->table, $this->definitionFields());
     for ($i = 1; $i <= $this->maxDepth(); $i++) {
       $query->orderBy('p' . $i, 'ASC');
     }

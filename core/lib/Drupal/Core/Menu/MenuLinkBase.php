@@ -156,13 +156,6 @@ abstract class MenuLinkBase extends PluginBase implements MenuLinkInterface {
   /**
    * {@inheritdoc}
    */
-  public function setOptions($options) {
-    return $this->pluginDefinition['options'] = $options;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getUrlObject($title_attribute = TRUE) {
     $options = $this->getOptions();
     $description = $this->getDescription();
