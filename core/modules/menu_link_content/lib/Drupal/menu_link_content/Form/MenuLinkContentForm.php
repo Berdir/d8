@@ -309,7 +309,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
   protected function doValidate(array $form, array &$form_state) {
     $menu_link = $this->buildEntity($form, $form_state);
 
-    $normal_path = $this->pathAliasManager->getSystemPath($menu_link->getUrl());
+    $normal_path = $this->pathAliasManager->getPathByAlias($menu_link->getUrl());
 
     // @todo Can we leverage constrains here?
     if ($menu_link->getUrl() != $normal_path) {

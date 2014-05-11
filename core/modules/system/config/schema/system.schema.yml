@@ -391,6 +391,30 @@ system.theme.global:
   type: theme_settings
   label: 'Theme global settings'
 
+# @TODO this does not work yet
 menu_link.static.overrides.definitions:
-  type: sequence
+  type: mapping
   label: 'Menu link overrides'
+  mapping:
+    definitions:
+      type: sequence
+      label: Definitions
+      sequence:
+        type: mapping
+        label: Definition
+        mapping:
+          menu_name:
+            type: string
+            label: 'Menu name'
+          parent:
+            type: string
+            label: 'Parent'
+          weight:
+            type: integer
+            label: 'Weight'
+          expanded:
+            type: boolean
+            label: 'Expanded'
+          hidden:
+            type: boolean
+            label: 'Hidden'

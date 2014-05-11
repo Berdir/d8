@@ -50,8 +50,8 @@ class MenuLinkTreeTest extends UnitTestCase {
    */
   public static function getInfo() {
     return array(
-      'title' => 'Tests \Drupal\Core\Menu\MenuLinkTree',
-      'description' => 'blub',
+      'name' => 'Tests \Drupal\Core\Menu\MenuLinkTree',
+      'description' => '',
       'group' => 'Menu'
     );
   }

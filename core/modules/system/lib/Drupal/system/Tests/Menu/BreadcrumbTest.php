@@ -88,15 +88,10 @@ class BreadcrumbTest extends MenuTestBase {
     );
     $this->assertBreadcrumb('admin/structure/menu/manage/tools', $trail);
 
-    $mlid_node_add = \Drupal::entityQuery('menu_link')
-      ->condition('machine_name', 'node.add_page')
-      ->condition('module', 'node')
-      ->execute();
-    $mlid_node_add = reset($mlid_node_add);
     $trail += array(
       'admin/structure/menu/manage/tools' => t('Tools'),
     );
-    $this->assertBreadcrumb("admin/structure/menu/item/$mlid_node_add/edit", $trail);
+    $this->assertBreadcrumb("admin/structure/menu/item/node.add_page/edit", $trail);
     $this->assertBreadcrumb('admin/structure/menu/manage/tools/add', $trail);
 
     // Verify Node administration breadcrumbs.
@@ -179,12 +174,13 @@ class BreadcrumbTest extends MenuTestBase {
       $node2 = $this->drupalCreateNode(array(
         'type' => $type,
         'title' => $title,
-        'menu' => entity_create('menu_link', array(
+        'menu' => entity_create('menu_link_content', array(
           'enabled' => 1,
-          'link_title' => 'Parent ' . $title,
+          'title' => 'Parent ' . $title,
           'description' => '',
           'menu_name' => $menu,
-          'plid' => 0,
+          'parent' => '',
+          'bundle' => 'menu_link_content',
         )),
       ));
 
@@ -197,19 +193,19 @@ class BreadcrumbTest extends MenuTestBase {
     // link below it, and verify a full breadcrumb for the last child node.
     $menu = 'tools';
     $edit = array(
-      'link_title' => 'Root',
-      'link_path' => 'node',
+      'title[0][value]' => 'Root',
+      'url' => 'node',
     );
     $this->drupalPostForm("admin/structure/menu/manage/$menu/add", $edit, t('Save'));
-    $menu_links = entity_load_multiple_by_properties('menu_link', array('link_title' => 'Root'));
+    $menu_links = entity_load_multiple_by_properties('menu_link_content', array('title' => 'Root'));
     $link = reset($menu_links);
 
     $edit = array(
-      'menu[parent]' => $link['menu_name'] . ':' . $link['mlid'],
+      'menu[parent]' => $link->getMenuName() . ':' . $link->getPluginId(),
     );
     $this->drupalPostForm('node/' . $parent->id() . '/edit', $edit, t('Save and keep published'));
     $expected = array(
-      "node" => $link['link_title'],
+      "node" => $link->getTitle(),
     );
     $trail = $home + $expected;
     $tree = $expected + array(
@@ -250,15 +246,14 @@ class BreadcrumbTest extends MenuTestBase {
     foreach ($tags as $name => $data) {
       $term = $data['term'];
       $edit = array(
-        'link_title' => "$name link",
-        'link_path' => "taxonomy/term/{$term->id()}",
+        'title[0][value]' => "$name link",
+        'url' => "taxonomy/term/{$term->id()}",
         'parent' => "$menu:{$parent_mlid}",
       );
       $this->drupalPostForm("admin/structure/menu/manage/$menu/add", $edit, t('Save'));
-      $menu_links = entity_load_multiple_by_properties('menu_link', array('link_title' => $edit['link_title'], 'link_path' => $edit['link_path']));
+      $menu_links = entity_load_multiple_by_properties('menu_link_content', array('title' => $edit['link_title'], 'route_name' => 'taxonomy.term_page', 'route_parameters' => serialize(array('taxonomy_term' => $term->id()))));
       $tags[$name]['link'] = reset($menu_links);
-      $tags[$name]['link']['link_path'] = $edit['link_path'];
-      $parent_mlid = $tags[$name]['link']['mlid'];
+      $parent_mlid = $tags[$name]['link']->getPluginId();
     }
 
     // Verify expected breadcrumbs for menu links.

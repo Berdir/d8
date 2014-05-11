@@ -171,8 +171,6 @@ function seven_admin_block_content($variables) {
     foreach ($content as $item) {
       $output .= '<li>';
       $content = '<span class="label">' . Xss::filterAdmin($item['title']) . '</span>';
-      $options = $item['options'];
-      $options['html'] = TRUE;
       if (isset($item['description']) && !system_admin_compact_mode()) {
         $content .= '<div class="description">' . Xss::filterAdmin($item['description']) . '</div>';
       }
