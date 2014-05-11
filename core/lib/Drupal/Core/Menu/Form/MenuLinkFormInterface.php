@@ -42,7 +42,7 @@ interface MenuLinkFormInterface {
   public function validateEditForm(array &$form, array &$form_state);
 
   /**
-   * Form validation handler.
+   * Form submission handler.
    *
    * @param array $form
    *   An associative array containing the structure of the form.
@@ -54,6 +54,17 @@ interface MenuLinkFormInterface {
    */
   public function submitEditForm(array &$form, array &$form_state);
 
+  /**
+   * Form plugin helper.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param array $form_state
+   *   An associative array containing the current state of the form.
+   *
+   * @return array
+   *   The new plugin definition values takes from the form values.
+   */
   public function extractFormValues(array &$form, array &$form_state);
 
 }

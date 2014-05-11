@@ -8,6 +8,7 @@
 namespace Drupal\menu_link_content\Form;
 
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Url;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -15,6 +16,7 @@ use Drupal\Core\Menu\Form\MenuLinkFormInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Path\AliasManagerInterface;
+use Drupal\Core\Routing\MatchingRouteNotFoundException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RequestContext;
 
@@ -87,10 +89,16 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
    * {@inheritdoc}
    */
   public function setMenuLinkInstance(MenuLinkInterface $menu_link) {
-    // Load the entity for the entity form using the UUID of the custom menu
-    // link plugin ID.
-    $links = $this->entityManager->getStorage('menu_link_content')->loadByProperties(array('uuid' => $menu_link->getDerivativeId()));
-    $this->entity = reset($links);
+    // Load the entity for the entity form.
+    $metadata = $menu_link->getMetaData();
+    if (!empty($metadata['entity_id'])) {
+      $this->entity = $this->entityManager->getStorage('menu_link_content')->load($metadata['entity_id']);
+    }
+    else {
+      // Fallback to the loading by the uuid.
+      $links = $this->entityManager->getStorage('menu_link_content')->loadByProperties(array('uuid' => $menu_link->getDerivativeId()));
+      $this->entity = reset($links);
+    }
   }
 
   /**
@@ -114,33 +122,73 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
    * {@inheritdoc}
    */
   public function submitEditForm(array &$form, array &$form_state) {
-    $new_definition = $this->extractFormValues($form, $form_state);
+    $menu_link = $this->buildEntity($form, $form_state);
+    $menu_link->save();
+    return $this->menuTree->createInstance($menu_link->getPluginId());
+  }
 
-    return $this->menuTree->updateLink($this->entity->getPluginId(), $new_definition);
+  /**
+   * Break up a user-entered URL or path into all the relevant parts.
+   *
+   * @param string $url
+   *
+   * @return array
+   *   The extracted parts.
+   */
+  protected function extractUrl($url) {
+    $extracted = UrlHelper::parse($url);
+    $external = UrlHelper::isExternal($url);
+    if ($external) {
+      $extracted['url'] = $parsed_link['path'];
+      $extracted['route_name'] = NULL;
+      $extracted['route_parameters'] = array();
+    }
+    else {
+      $extracted['url'] = '';
+      try {
+        // Find the route_name.
+        $url_obj = Url::createFromPath($extracted['path']);
+        $extracted['route_name'] = $url_obj->getRouteName();
+        $extracted['route_parameters'] = $url_obj->getRouteParameters();
+      }
+      catch (MatchingRouteNotFoundException $e) {
+        // If the path doesn't match a Drupal path, set the route empty too.
+        $extracted['route_name'] = NULL;
+        $extracted['route_parameters'] = array();
+      }
+    }
+    return $extracted;
   }
 
   /**
    * {@inheritdoc}
    */
   public function extractFormValues(array &$form, array &$form_state) {
-    $this->entity = $this->buildEntity($form, $form_state);
-    $this->entity->save();
 
     $new_definition = array();
-    $new_definition['expanded'] = $this->entity->isExpanded();
-    $new_definition['hidden'] = $this->entity->isHidden();
-    $new_definition['route_name'] = $this->entity->getRouteName();
-    $new_definition['route_parameters'] = $this->entity->getRouteParameters();
-    $new_definition['weight'] = $this->entity->getWeight();
+    $new_definition['expanded'] = !empty($form_state['values']['expanded']) ? 1 : 0;
+    $new_definition['hidden'] = empty($form_state['values']['enabled']) ? 1 : 0;
     list($menu_name, $parent) = explode(':', $form_state['values']['menu_parent'], 2);
     if (!empty($menu_name)) {
       $new_definition['menu_name'] = $menu_name;
     }
-    if (isset($parent)) {
-      $new_definition['parent'] = $parent;
+    $new_definition['parent'] = isset($parent) ? $parent : '';
+
+    $extracted = $this->extractUrl($form_state['values']['url']);
+    $new_definition['url'] = $extracted['path'];
+    $new_definition['route_name'] = $extracted['route_name'];
+    $new_definition['route_parameters'] = $extracted['route_parameters'];
+    $new_definition['options'] = array();
+    if ($extracted['query']) {
+      $new_definition['options']['query'] = $extracted['query'];
     }
-    $new_definition['description'] = $this->entity->getDescription();
-    $new_definition['options'] = $this->entity->getOptions();
+    if ($extracted['fragment']) {
+      $new_definition['options']['fragment'] = $extracted['fragment'];
+    }
+    $new_definition['title'] = $form_state['values']['title'][0]['value'];
+    $new_definition['description'] = $form_state['values']['description'][0]['value'];
+    $new_definition['weight'] = (int) $form_state['values']['weight'][0]['value'];
+
     return $new_definition;
   }
 
@@ -225,58 +273,14 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
   public function buildEntity(array $form, array &$form_state) {
     /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $entity */
     $entity = parent::buildEntity($form, $form_state);
+    $new_definition = $this->extractFormValues($form, $form_state);
 
-    // @TODO Is there a better way to define default value?
-    $options = $entity->options->value;
-    if (!isset($options)) {
-      $entity->options->value = array();
-    }
+    $entity->hidden->value = (bool) $new_definition['hidden'];
 
-    $entity->hidden->value = !$form_state['values']['enabled'];
-
-    list($menu_name, $parent) = explode(':', $form_state['values']['menu_parent'], 2);
-    if (!empty($menu_name)) {
-      $entity->menu_name->value =$menu_name;
-    }
-    if (isset($parent)) {
-      $entity->parent->value = $parent;
-    }
-
-    $entity->expanded->value = (bool) $form_state['values']['expanded'];
-
-    $entity->url->value = $form_state['values']['url'];
-
-    if (!UrlHelper::isExternal($entity->getUrl())) {
-      $parsed_link = parse_url($entity->getUrl());
-      if (isset($parsed_link['query'])) {
-        $query = array();
-        parse_str($parsed_link['query'], $query);
-
-        $options = $entity->getOptions();
-        $options['query'] = $query;
-        $entity->setOptions($options);
-      }
-      else {
-        // Use unset() rather than setting to empty string
-        // to avoid redundant serialized data being stored.
-        $options = $entity->getOptions();
-        unset($options['query']);
-        $entity->setOptions($options);
-      }
-      if (isset($parsed_link['fragment'])) {
-        $options = $entity->getOptions();
-        $options['fragment'] = $parsed_link['fragment'];
-        $entity->setOptions($options);
-      }
-      else {
-        $options = $entity->getOptions();
-        unset($options['fragment']);
-        $entity->setOptions($options);
-      }
-      if (isset($parsed_link['path']) && $entity->getUrl() != $parsed_link['path']) {
-        $entity->url->value = $parsed_link['path'];
-      }
-    }
+    $entity->url->value = $new_definition['url'];
+    $entity->route_name->value = $new_definition['route_name'];
+    $entity->setRouteParameters($new_definition['route_parameters']);
+    $entity->setOptions($new_definition['options']);
 
     return $entity;
   }
@@ -285,7 +289,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
    * {@inheritdoc}
    */
   public function save(array $form, array &$form_state) {
-    $menu_link = $this->entity;
+    $menu_link = $this->buildEntity($form, $form_state);
     $saved = $menu_link->save();
 
     if ($saved) {
@@ -307,21 +311,20 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
    * Validates the form, both on the menu link edit and content menu link form.
    */
   protected function doValidate(array $form, array &$form_state) {
-    $menu_link = $this->buildEntity($form, $form_state);
+    $extracted = $this->extractUrl($form_state['values']['url']);
 
-    $normal_path = $this->pathAliasManager->getPathByAlias($menu_link->getUrl());
-
-    // @todo Can we leverage constrains here?
-    if ($menu_link->getUrl() != $normal_path) {
-      drupal_set_message($this->t('The menu system stores system paths only, but will use the URL alias for display. %link_path has been stored as %normal_path', array(
-            '%link_path' => $menu_link->getUrl(),
-            '%normal_path' => $normal_path
-          )));
-      $menu_link->url->value = $normal_path;
-      $form_state['values']['url'] = $normal_path;
+    if (!$extracted['url'] && !$extracted['route_name']) {
+      $this->setFormError('url', $form_state, $this->t("The path '@link_path' is either invalid or you do not have access to it.", array('@link_path' => $form_state['values']['url'])));
     }
-    if (!trim($menu_link->getUrl()) || !drupal_valid_path($menu_link->getUrl(), TRUE)) {
-      $this->setFormError('url', $form_state, $this->t("The path '@link_path' is either invalid or you do not have access to it.", array('@link_path' => $menu_link->getUrl())));
+    elseif ($extracted['route_name']) {
+      // The user entered a Drupal path.
+      $normal_path = $this->pathAliasManager->getPathByAlias($extracted['path']);
+      if ($extracted['path'] != $normal_path) {
+        drupal_set_message($this->t('The menu system stores system paths only, but will use the URL alias for display. %link_path has been stored as %normal_path', array(
+          '%link_path' => $extracted['path'],
+          '%normal_path' => $normal_path
+        )));
+      }
     }
   }
 

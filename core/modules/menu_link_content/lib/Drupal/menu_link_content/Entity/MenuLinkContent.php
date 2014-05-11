@@ -213,28 +213,6 @@ class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterf
   /**
    * {@inheritdoc}
    */
-  public function preSave(EntityStorageInterface $storage) {
-    parent::preSave($storage);
-
-    // Find the route_name.
-    if ($input_url = $this->getUrl()) {
-      $url = Url::createFromPath($this->getUrl());
-      if (!$url->isExternal()) {
-        $this->route_name->value = $url->getRouteName();
-        $this->setRouteParameters($url->getRouteParameters());
-        $this->url->value = '';
-      }
-      else {
-        // We don't store the route name/parameters for external urls.
-        $this->route_name->value = NULL;
-        $this->setRouteParameters(array());
-      }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
