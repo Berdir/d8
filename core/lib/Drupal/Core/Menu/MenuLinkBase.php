@@ -26,10 +26,10 @@ abstract class MenuLinkBase extends PluginBase implements MenuLinkInterface {
   /**
    * {@inheritdoc}
    */
-  public function build($add_title = TRUE) {
+  public function build($title_attribute = TRUE) {
     $options = $this->getOptions();
     $description = $this->getDescription();
-    if ($add_title && $description) {
+    if ($title_attribute && $description) {
       $options['attributes']['title'] = $description;
     }
     $build = array(
@@ -163,12 +163,18 @@ abstract class MenuLinkBase extends PluginBase implements MenuLinkInterface {
   /**
    * {@inheritdoc}
    */
-  public function getUrlObject() {
+  public function getUrlObject($title_attribute = TRUE) {
+    $options = $this->getOptions();
+    $description = $this->getDescription();
+    if ($title_attribute && $description) {
+      $options['attributes']['title'] = $description;
+    }
     if (empty($this->pluginDefinition['url'])) {
-      return new Url($this->pluginDefinition['route_name'], $this->pluginDefinition['route_parameters'], $this->getOptions());
+      return new Url($this->pluginDefinition['route_name'], $this->pluginDefinition['route_parameters'], $options);
     }
     else {
       $url = Url::createFromPath($this->pluginDefinition['url']);
+      $url->setOptions($options);
       return $url;
     }
   }

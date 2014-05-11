@@ -176,7 +176,7 @@ class MenuLinkTreeTest extends UnitTestCase {
     /**
    * Tests the output with a single level.
    *
-   * @covers ::renderTree
+   * @covers ::buildRenderTree
    */
   public function testOutputWithSingleLevel() {
     $tree = array(
@@ -188,7 +188,7 @@ class MenuLinkTreeTest extends UnitTestCase {
       ) + $this->treeItemDefault,
     );
 
-    $output = $this->menuTree->renderTree($tree);
+    $output = $this->menuTree->buildRenderTree($tree);
 
     // Validate that the - in main-menu is changed into an underscore
     print_r($output);
@@ -200,7 +200,7 @@ class MenuLinkTreeTest extends UnitTestCase {
   /**
    * Tests the output method with a complex example.
    *
-   * @covers ::renderTree
+   * @covers ::buildRenderTree
    */
   public function testOutputWithComplexData() {
     $tree = array(
@@ -220,7 +220,7 @@ class MenuLinkTreeTest extends UnitTestCase {
       'test5' => array('link' => $this->menuLinkInstanceHelper('test5', 'Item 5', 'test_e')) + $this->treeItemDefault,
     );
 
-    $output = $this->menuTree->renderTree($tree);
+    $output = $this->menuTree->buildRenderTree($tree);
 
     // Looking for child items in the data
     $this->assertEquals($output['test1']['#below']['test2']['#url']->getRouteName(), 'test_a_b', 'Checking the href on a child item');

@@ -17,8 +17,13 @@ interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspect
 
   /**
    * Return a localized link render array
+   *
+   * @param bool $title_attribute
+   *   If TRUE, add the link description (if present) as the title attribute.
+   *
+   * @return array
    */
-  public function build();
+  public function build($title_attribute = TRUE);
 
   /**
    * Returns the weight of the menu link.
@@ -95,9 +100,12 @@ interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspect
   /**
    * Returns the URL object containing either the external path or route.
    *
+   * @param bool $title_attribute
+   *   If TRUE, add the link description (if present) as the title attribute.
+   *
    * @return \Drupal\Core\Url
    */
-  public function getUrlObject();
+  public function getUrlObject($title_attribute = TRUE);
 
   /**
    * Returns the options for this link.

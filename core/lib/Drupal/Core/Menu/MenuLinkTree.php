@@ -419,7 +419,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   /**
    * {@inheritdoc}
    */
-  public function renderTree($tree) {
+  public function buildRenderTree($tree) {
     $build = array();
 
     foreach ($tree as $data) {
@@ -454,9 +454,9 @@ class MenuLinkTree implements MenuLinkTreeInterface {
       // @todo Use route name and parameters to generate the link path, unless
       //    it is external.
       $element['#url'] = $link->getUrlObject();
-      $element['#below'] = $data['below'] ? $this->renderTree($data['below']) : $data['below'];
+      $element['#below'] = $data['below'] ? $this->buildRenderTree($data['below']) : $data['below'];
       $element['#original_link'] = $link;
-      // Index using the link's unique mlid.
+      // Index using the link's unique ID.
       $build[$data['link']->getPluginId()] = $element;
     }
     if ($build) {
@@ -719,7 +719,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   public function renderMenu($menu_name) {
 
     $tree = $this->buildPageData($menu_name);
-    return $this->renderTree($tree);
+    return $this->buildRenderTree($tree);
   }
 
   /**

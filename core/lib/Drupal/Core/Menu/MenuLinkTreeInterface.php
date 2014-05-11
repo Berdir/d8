@@ -74,7 +74,7 @@ interface MenuLinkTreeInterface extends PluginManagerInterface {
   public function loadLinksByRoute($route_name, array $route_parameters = array(), $include_hidden = FALSE);
 
   /**
-   * Returns a rendered menu tree.
+   * Returns a menu tree ready to be rendered.
    *
    * The menu item's LI element is given one of the following classes:
    * - expanded: The menu item is showing its submenu.
@@ -87,7 +87,7 @@ interface MenuLinkTreeInterface extends PluginManagerInterface {
    * @return array
    *   A structured array to be rendered by drupal_render().
    */
-  public function renderTree($tree);
+  public function buildRenderTree($tree);
 
   /**
    * Gets the active trail IDs of the specified menu tree.

@@ -11,10 +11,9 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Utility\Crypt;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Drupal\menu_link\MenuLinkInterface;
 use Drupal\user\RoleInterface;
 use Drupal\user\UserInterface;
+use Drupal\Component\Utility\String;
 
 /**
  * Implements hook_help().
@@ -363,7 +362,7 @@ function toolbar_toolbar() {
       '#attributes' => array(
         'class' => array('toolbar-menu-administration'),
       ),
-      'administration_menu' => $menu_tree->renderTree($tree),
+      'administration_menu' => $menu_tree->buildRenderTree($tree),
     ),
   );
 
@@ -471,7 +470,7 @@ function toolbar_get_rendered_subtrees() {
     if ($tree_item['below']) {
       $subtree = $tree_item['below'];
       toolbar_menu_navigation_links($subtree);
-      $subtree = $menu_tree->renderTree($subtree);
+      $subtree = $menu_tree->buildRenderTree($subtree);
       $subtree = drupal_render($subtree);
 
     }
