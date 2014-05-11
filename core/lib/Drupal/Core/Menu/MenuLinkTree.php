@@ -457,7 +457,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
       $element['#below'] = $data['below'] ? $this->buildRenderTree($data['below']) : array();
       $element['#original_link'] = $link;
       // Index using the link's unique ID.
-      $build[$data['link']->getPluginId()] = $element;
+      $build[$link->getPluginId()] = $element;
     }
     if ($build) {
       // Make sure drupal_render() does not re-order the links.
