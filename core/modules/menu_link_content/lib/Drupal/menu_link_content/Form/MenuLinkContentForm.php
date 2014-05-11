@@ -275,6 +275,8 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
     $entity = parent::buildEntity($form, $form_state);
     $new_definition = $this->extractFormValues($form, $form_state);
 
+    $entity->parent->value = $new_definition['parent'];
+    $entity->menu_name->value = $new_definition['menu_name'];
     $entity->hidden->value = (bool) $new_definition['hidden'];
 
     $entity->url->value = $new_definition['url'];
