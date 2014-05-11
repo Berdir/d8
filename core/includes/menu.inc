@@ -341,6 +341,10 @@ function menu_navigation_links($menu_name, $level = 0) {
     /** @var \Drupal\Core\Menu\MenuLinkInterface $link */
     $link = $item['link'];
 
+    if ($link->isHidden()) {
+      continue;
+    }
+
     $class = '';
     $url = $link->getUrlObject();
     $l = $url->getOptions();
