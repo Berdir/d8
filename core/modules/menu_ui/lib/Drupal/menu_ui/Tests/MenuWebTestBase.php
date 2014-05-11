@@ -45,12 +45,24 @@ class MenuWebTestBase extends WebTestBase {
       /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $link */
       $link = reset($links);
       $url_object = $link->getUrlObject();
-      $url = $url_object->toString();
+
+      // Force to not convert to aliases for the test.
+      if ($url_object->isExternal()) {
+        $url = \Drupal::urlGenerator()->generateFromPath($url_object->getPath(), $url_object->getOptions());
+      }
+      else {
+        $url = \Drupal::url($url_object->getRouteName(), $url_object->getRouteParameters(), $url_object->getOptions() + array('alias' => TRUE));
+      }
       if (!$url_object->isExternal()) {
         $base_url = \Drupal::service('router.request_context')->getBaseUrl();
         $url = substr($url, strlen($base_url) + 1);
       }
       $definition['url'] = $url;
+
+      // Replace
+      if (isset($expected_item['url']) && $expected_item['url'] == '<front>') {
+        $expected_item['url'] = '';
+      }
     }
 
     // The internal storage of the tree does use some INTs instead of the plugin

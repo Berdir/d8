@@ -70,7 +70,7 @@ class MenuTest extends MenuWebTestBase {
   /**
    * Tests menu functionality using the admin and user interfaces.
    */
-  function ptestMenu() {
+  function testMenu() {
     // Login the user.
     $this->drupalLogin($this->admin_user);
     $this->items = array();
@@ -449,7 +449,7 @@ class MenuTest extends MenuWebTestBase {
   /**
    * Tests that menu items pointing to unpublished nodes are editable.
    */
-  function ptestUnpublishedNodeMenuItem() {
+  function testUnpublishedNodeMenuItem() {
     $this->drupalLogin($this->drupalCreateUser(array('access administration pages', 'administer blocks', 'administer menu', 'create article content', 'bypass node access')));
     // Create an unpublished node.
     $node = $this->drupalCreateNode(array(
@@ -471,7 +471,7 @@ class MenuTest extends MenuWebTestBase {
   /**
    * Tests the contextual links on a menu block.
    */
-  public function ptestBlockContextualLinks() {
+  public function testBlockContextualLinks() {
     $this->drupalLogin($this->drupalCreateUser(array('administer menu', 'access contextual links', 'administer blocks')));
     $this->addMenuLink();
     $block = $this->drupalPlaceBlock('system_menu_block:tools', array('label' => 'Tools', 'provider' => 'system'));
@@ -714,7 +714,7 @@ class MenuTest extends MenuWebTestBase {
     $this->drupalPostForm("admin/structure/menu/item/$mlid/edit", $edit, t('Save'));
 
     // Clear the internal cache of the menu tree in the test.
-    \Drupal::menuTree()->resetDefinition($mlid);
+    \Drupal::menuTree()->resetDefinitions();
 
     // Unlike most other modules, there is no confirmation message displayed.
     // Verify in the database.
@@ -740,7 +740,7 @@ class MenuTest extends MenuWebTestBase {
    * Tests if administrative users other than user 1 can access the menu parents
    * AJAX callback.
    */
-  public function ptestMenuParentsJsAccess() {
+  public function testMenuParentsJsAccess() {
     $admin = $this->drupalCreateUser(array('administer menu'));
     $this->drupalLogin($admin);
     // Just check access to the callback overall, the POST data is irrelevant.

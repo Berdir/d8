@@ -90,7 +90,6 @@ class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterf
    * {@inheritdoc}
    */
   public function getUrlObject() {
-
     if ($route_name = $this->getRouteName()) {
       $url = new Url($route_name, $this->getRouteParameters(), $this->getOptions());
     }

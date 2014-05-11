@@ -166,6 +166,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
       '#default_value' => $this->entity->isExpanded(),
     );
 
+    // @todo Should we show the internal path of the path alias here?
     $url = $this->getEntity()->getUrlObject();
     $default_value = $url->toString();
     if (!$url->isExternal()) {
@@ -270,7 +271,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
       else {
         $options = $entity->getOptions();
         unset($options['fragment']);
-        $entity->set('options', $options);
+        $entity->setOptions($options);
       }
       if (isset($parsed_link['path']) && $entity->getUrl() != $parsed_link['path']) {
         $entity->url->value = $parsed_link['path'];
