@@ -209,10 +209,10 @@ class BreadcrumbTest extends MenuTestBase {
     );
     $trail = $home + $expected;
     $tree = $expected + array(
-      'node/' . $parent->id() => $parent->menu['link_title'],
+      'node/' . $parent->id() => $parent->menu->getTitle(),
     );
     $trail += array(
-      'node/' . $parent->id() => $parent->menu['link_title'],
+      'node/' . $parent->id() => $parent->menu->getTitle(),
     );
 
     // Add a taxonomy term/tag to last node, and add a link for that term to the
@@ -264,7 +264,7 @@ class BreadcrumbTest extends MenuTestBase {
       $link = $data['link'];
 
       $tree += array(
-        $link['link_path'] => $link['link_title'],
+        $link['link_path'] => $link->getTitle(),
       );
       $this->assertBreadcrumb($link['link_path'], $trail, $term->getName(), $tree);
       $this->assertRaw(check_plain($parent->getTitle()), 'Tagged node found.');
