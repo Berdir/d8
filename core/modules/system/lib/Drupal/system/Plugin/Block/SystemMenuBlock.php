@@ -10,7 +10,7 @@ namespace Drupal\system\Plugin\Block;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\block\BlockBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\menu_link\MenuTreeInterface;
+use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
@@ -29,7 +29,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
   /**
    * The menu tree.
    *
-   * @var \Drupal\menu_link\MenuTreeInterface
+   * @var \Drupal\Core\Menu\MenuLinkTreeInterface
    */
   protected $menuTree;
 
@@ -42,10 +42,10 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
    *   The plugin_id for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\menu_link\MenuTreeInterface $menu_tree
+   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree
    *   The menu tree.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MenuTreeInterface $menu_tree) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, MenuLinkTreeInterface $menu_tree) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->menuTree = $menu_tree;
   }
@@ -58,7 +58,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('menu_link.tree')
+      $container->get('plugin.manager.menu.link_tree')
     );
   }
 

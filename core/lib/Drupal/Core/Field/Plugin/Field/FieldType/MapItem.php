@@ -97,4 +97,27 @@ class MapItem extends FieldItemBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getValue($include_computed = FALSE) {
+    return isset($this->values['value']) ? $this->values['value'] : array();
+  }
+
+  /**
+   * Returns all values of a map
+   *
+   * @return array
+   */
+  public function getValues() {
+    return $this->values;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isEmpty() {
+    return empty($this->values);
+  }
+
 }

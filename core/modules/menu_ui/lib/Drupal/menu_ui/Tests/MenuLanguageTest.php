@@ -85,8 +85,8 @@ class MenuLanguageTest extends MenuWebTestBase {
     // Add a menu link.
     $link_title = $this->randomString();
     $edit = array(
-      'link_title' => $link_title,
-      'link_path' => $link_path,
+      'title[0][value]' => $link_title,
+      'url' => $link_path,
     );
     $this->drupalPostForm("admin/structure/menu/manage/$menu_name/add", $edit, t('Save'));
     // Check the link was added with the correct menu link default language.
@@ -94,7 +94,7 @@ class MenuLanguageTest extends MenuWebTestBase {
     $menu_link = reset($menu_links);
     $this->assertMenuLink($menu_link->id(), array(
       'menu_name' => $menu_name,
-      'link_path' => $link_path,
+      'url' => $link_path,
       'langcode' => 'bb',
     ));
 
@@ -110,8 +110,8 @@ class MenuLanguageTest extends MenuWebTestBase {
     // Add a menu link.
     $link_title = $this->randomString();
     $edit = array(
-      'link_title' => $link_title,
-      'link_path' => $link_path,
+      'title[0][value]' => $link_title,
+      'url' => $link_path,
     );
     $this->drupalPostForm("admin/structure/menu/manage/$menu_name/add", $edit, t('Save'));
     // Check the link was added with the correct new menu link default language.
@@ -119,7 +119,7 @@ class MenuLanguageTest extends MenuWebTestBase {
     $menu_link = reset($menu_links);
     $this->assertMenuLink($menu_link->id(), array(
       'menu_name' => $menu_name,
-      'link_path' => $link_path,
+      'url' => $link_path,
       'langcode' => 'cc',
     ));
 
@@ -130,7 +130,7 @@ class MenuLanguageTest extends MenuWebTestBase {
     $this->drupalPostForm('admin/structure/menu/item/' . $menu_link->id() . '/edit', $edit, t('Save'));
     $this->assertMenuLink($menu_link->id(), array(
       'menu_name' => $menu_name,
-      'link_path' => $link_path,
+      'url' => $link_path,
       'langcode' => 'bb',
     ));
 

@@ -7,18 +7,60 @@
 
 namespace Drupal\menu_ui\Form;
 
-use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Form\ConfirmFormBase;
+use Drupal\Core\Menu\MenuLinkTreeInterface;
+use Drupal\Core\Menu\MenuLinkInterface;
+use Drupal\Core\Routing\Access\AccessInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Defines a confirmation form for resetting a single modified menu link.
  */
-class MenuLinkResetForm extends EntityConfirmFormBase {
+class MenuLinkResetForm extends ConfirmFormBase {
+
+  /**
+   * The menu tree service.
+   *
+   * @var \Drupal\Core\Menu\MenuLinkTreeInterface
+   */
+  protected $menuTree;
+
+  /**
+   * The menu link.
+   *
+   * @var \Drupal\Core\Menu\MenuLinkInterface
+   */
+  protected $link;
+
+  /**
+   * Constructs a MenuLinkEditForm object.
+   *
+   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree
+   *   The menu tree service.
+   */
+  public function __construct(MenuLinkTreeInterface $menu_tree) {
+    $this->menuTree = $menu_tree;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('menu.link_tree')
+    );
+  }
+
+  public function getFormId() {
+    return 'menu_link_reset_confirm';
+  }
 
   /**
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return t('Are you sure you want to reset the link %item to its default values?', array('%item' => $this->entity->link_title));
+    return $this->t('Are you sure you want to reset the link %item to its default values?', array('%item' => $this->link->getTitle()));
   }
 
   /**
@@ -28,7 +70,7 @@ class MenuLinkResetForm extends EntityConfirmFormBase {
     return array(
       'route_name' => 'menu_ui.menu_edit',
       'route_parameters' => array(
-        'menu' => $this->entity->menu_name,
+        'menu' => $this->link->getMenuName(),
       ),
     );
   }
@@ -37,28 +79,47 @@ class MenuLinkResetForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getDescription() {
-    return t('Any customizations will be lost. This action cannot be undone.');
+    return $this->t('Any customizations will be lost. This action cannot be undone.');
   }
 
   /**
    * {@inheritdoc}
    */
   public function getConfirmText() {
-    return t('Reset');
+    return $this->t('Reset');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
-    $new_menu_link = $this->entity->reset();
-    drupal_set_message(t('The menu link was reset to its default settings.'));
-    $form_state['redirect_route'] = array(
-      'route_name' => 'menu_ui.menu_edit',
-      'route_parameters' => array(
-        'menu' => $new_menu_link->menu_name,
-      ),
-    );
+  public function buildForm(array $form, array &$form_state, MenuLinkInterface $menu_link_plugin = NULL) {
+    $this->link = $menu_link_plugin;
+
+    $form = parent::buildForm($form, $form_state);
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitForm(array &$form, array &$form_state) {
+    $this->link = $this->menuTree->resetLink($this->link->getPluginId());
+    drupal_set_message($this->t('The menu link was reset to its default settings.'));
+    $form_state['redirect_route'] = $this->getCancelRoute();
+  }
+
+  /**
+   * Checks access based on whether the link can be reset.
+   *
+   * @param \Drupal\Core\Menu\MenuLinkInterface $menu_link_plugin
+   *   The menu link plugin being checked.
+   *
+   * @return string
+   *   Returns AccessInterface::ALLOW when access was granted, otherwise
+   *   AccessInterface::DENY.
+   */
+  public function linkIsResetable(MenuLinkInterface $menu_link_plugin) {
+    return $menu_link_plugin->isResetable() ? AccessInterface::ALLOW : AccessInterface::DENY;
   }
 
 }

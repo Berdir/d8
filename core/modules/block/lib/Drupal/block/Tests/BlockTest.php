@@ -304,6 +304,7 @@ class BlockTest extends BlockTestBase {
       'block_view:1',
       'block:powered',
       'block_plugin:system_powered_by_block',
+      'menu:account',
     );
     $this->assertIdentical($cache_entry->tags, $expected_cache_tags);
     $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:en:stark');
@@ -345,6 +346,7 @@ class BlockTest extends BlockTestBase {
       'block:powered-2',
       'block:powered',
       'block_plugin:system_powered_by_block',
+      'menu:account',
     );
     $this->assertEqual($cache_entry->tags, $expected_cache_tags);
     $expected_cache_tags = array(

@@ -11,9 +11,8 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Render\Element;
-use Drupal\menu_link\MenuLinkStorageInterface;
-use Drupal\menu_link\MenuTreeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -29,16 +28,9 @@ class MenuForm extends EntityForm {
   protected $entityQueryFactory;
 
   /**
-   * The menu link storage.
-   *
-   * @var \Drupal\menu_link\MenuLinkStorageInterface
-   */
-  protected $menuLinkStorage;
-
-  /**
    * The menu tree service.
    *
-   * @var \Drupal\menu_link\MenuTreeInterface
+   * @var \Drupal\Core\Menu\MenuLinkTreeInterface
    */
   protected $menuTree;
 
@@ -54,14 +46,11 @@ class MenuForm extends EntityForm {
    *
    * @param \Drupal\Core\Entity\Query\QueryFactory $entity_query_factory
    *   The factory for entity queries.
-   * @param \Drupal\menu_link\MenuLinkStorageInterface $menu_link_storage
-   *   The menu link storage.
-   * @param \Drupal\menu_link\MenuTreeInterface $menu_tree
+   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree
    *   The menu tree service.
    */
-  public function __construct(QueryFactory $entity_query_factory, MenuLinkStorageInterface $menu_link_storage, MenuTreeInterface $menu_tree) {
+  public function __construct(QueryFactory $entity_query_factory, MenuLinkTreeInterface $menu_tree) {
     $this->entityQueryFactory = $entity_query_factory;
-    $this->menuLinkStorage = $menu_link_storage;
     $this->menuTree = $menu_tree;
   }
 
@@ -71,8 +60,7 @@ class MenuForm extends EntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.query'),
-      $container->get('entity.manager')->getStorage('menu_link'),
-      $container->get('menu_link.tree')
+      $container->get('menu.link_tree')
     );
   }
 
@@ -120,23 +108,6 @@ class MenuForm extends EntityForm {
       '#languages' => Language::STATE_ALL,
       '#default_value' => $menu->langcode,
     );
-    // Unlike the menu langcode, the default language configuration for menu
-    // links only works with language module installed.
-    if ($this->moduleHandler->moduleExists('language')) {
-      $form['default_menu_links_language'] = array(
-        '#type' => 'details',
-        '#title' => t('Menu links language'),
-        '#open' => TRUE,
-      );
-      $form['default_menu_links_language']['default_language'] = array(
-        '#type' => 'language_configuration',
-        '#entity_information' => array(
-          'entity_type' => 'menu_link',
-          'bundle' => $menu->id(),
-        ),
-        '#default_value' => language_get_default_configuration('menu_link', $menu->id()),
-      );
-    }
 
     // Add menu links administration form for existing menus.
     if (!$menu->isNew() || $menu->isLocked()) {
@@ -169,7 +140,7 @@ class MenuForm extends EntityForm {
     }
 
     // Check for a link assigned to this menu.
-    return $this->entityQueryFactory->get('menu_link')->condition('menu_name', $value)->range(0, 1)->count()->execute();
+    return $this->menuTree->menuNameExists($value);
   }
 
   /**
@@ -230,6 +201,16 @@ class MenuForm extends EntityForm {
     $form_state['redirect_route'] = $this->entity->urlInfo('edit-form');
   }
 
+  protected function countElements($tree, $count = 0) {
+    foreach ($tree as $element) {
+      $count++;
+      if (!empty($element['below'])) {
+        $this->countElements($element['below'], $count);
+      }
+    }
+    return $count;
+  }
+
   /**
    * Form constructor to edit an entire menu tree at once.
    *
@@ -253,22 +234,12 @@ class MenuForm extends EntityForm {
 
     $form['#attached']['css'] = array(drupal_get_path('module', 'menu') . '/css/menu.admin.css');
 
-    $links = array();
-    $query = $this->entityQueryFactory->get('menu_link')
-      ->condition('menu_name', $this->entity->id());
-    for ($i = 1; $i <= MENU_MAX_DEPTH; $i++) {
-      $query->sort('p' . $i, 'ASC');
-    }
-    $result = $query->execute();
+    $tree = $this->menuTree->buildAllData($this->entity->id());
 
-    if (!empty($result)) {
-      $links = $this->menuLinkStorage->loadMultiple($result);
-    }
-
-    $delta = max(count($links), 50);
+    $count = $this->countElements($tree);
+    $delta = max($count, 50);
     // We indicate that a menu administrator is running the menu access check.
     $this->getRequest()->attributes->set('_menu_admin', TRUE);
-    $tree = $this->menuTree->buildTreeData($links);
     $this->getRequest()->attributes->set('_menu_admin', FALSE);
 
     $form = array_merge($form, $this->buildOverviewTreeForm($tree, $delta));
@@ -291,62 +262,61 @@ class MenuForm extends EntityForm {
   protected function buildOverviewTreeForm($tree, $delta) {
     $form = &$this->overviewTreeForm;
     foreach ($tree as $data) {
+      /** @var \Drupal\Core\Menu\MenuLinkInterface $item */
       $item = $data['link'];
-      // Don't show callbacks; these have $item['hidden'] < 0.
-      if ($item && $item['hidden'] >= 0) {
-        $mlid = 'mlid:' . $item['mlid'];
-        $form[$mlid]['#item'] = $item;
-        $form[$mlid]['#attributes'] = $item['hidden'] ? array('class' => array('menu-disabled')) : array('class' => array('menu-enabled'));
-        $form[$mlid]['title']['#markup'] = l($item['title'], $item['href'], $item['localized_options']);
-        if ($item['hidden']) {
-          $form[$mlid]['title']['#markup'] .= ' (' . t('disabled') . ')';
+      if ($item) {
+        $id = 'menu_plugin_id:' . $item->getPluginId();
+        $form[$id]['#item'] = $data;
+        $form[$id]['#attributes'] = $item->isHidden() ? array('class' => array('menu-disabled')) : array('class' => array('menu-enabled'));
+        $form[$id]['title']['#markup'] = \Drupal::linkGenerator()->generateFromUrl($item->getTitle(), $item->getUrlObject(), $item->getOptions());
+        if ($item->isHidden()) {
+          $form[$id]['title']['#markup'] .= ' (' . t('disabled') . ')';
         }
-        elseif ($item['link_path'] == 'user' && $item['module'] == 'user') {
-          $form[$mlid]['title']['#markup'] .= ' (' . t('logged in users only') . ')';
+        elseif (($url = $item->getUrlObject()) && !$url->isExternal() && $url->getRouteName() == 'user.page') {
+          $form[$id]['title']['#markup'] .= ' (' . t('logged in users only') . ')';
         }
 
-        $form[$mlid]['hidden'] = array(
+        $form[$id]['enabled'] = array(
           '#type' => 'checkbox',
-          '#title' => t('Enable @title menu link', array('@title' => $item['title'])),
+          '#title' => t('Enable @title menu link', array('@title' => $item->getTitle())),
           '#title_display' => 'invisible',
-          '#default_value' => !$item['hidden'],
+          '#default_value' => !$item->isHidden(),
         );
-        $form[$mlid]['weight'] = array(
+        $form[$id]['weight'] = array(
           '#type' => 'weight',
           '#delta' => $delta,
-          '#default_value' => $item['weight'],
-          '#title' => t('Weight for @title', array('@title' => $item['title'])),
+          '#default_value' => $item->getWeight(),
+          '#title' => t('Weight for @title', array('@title' => $item->getTitle())),
           '#title_display' => 'invisible',
         );
-        $form[$mlid]['mlid'] = array(
+        $form[$id]['id'] = array(
           '#type' => 'hidden',
-          '#value' => $item['mlid'],
+          '#value' => $item->getPluginId(),
         );
-        $form[$mlid]['plid'] = array(
+        $form[$id]['parent'] = array(
           '#type' => 'hidden',
-          '#default_value' => $item['plid'],
+          '#default_value' => $item->getParent(),
         );
         // Build a list of operations.
         $operations = array();
         $operations['edit'] = array(
           'title' => t('Edit'),
-          'href' => 'admin/structure/menu/item/' . $item['mlid'] . '/edit',
+          'route_name' => 'menu_ui.link_edit',
+          'route_parameters' => array('menu_link_plugin' => $item->getPluginId()),
         );
-        // Only items created by the Menu UI module can be deleted.
-        if ($item->access('delete')) {
-          $operations['delete'] = array(
-            'title' => t('Delete'),
-            'href' => 'admin/structure/menu/item/' . $item['mlid'] . '/delete',
-          );
-        }
-        // Set the reset column.
-        elseif ($item->access('reset')) {
+        // Links can either be reset or deleted, not both.
+        if ($item->isResetable()) {
           $operations['reset'] = array(
             'title' => t('Reset'),
-            'href' => 'admin/structure/menu/item/' . $item['mlid'] . '/reset',
+            'route_name' => 'menu_ui.link_reset',
+            'route_parameters' => array('menu_link_plugin' => $item->getPluginId()),
           );
         }
-        $form[$mlid]['operations'] = array(
+        elseif ($delete_link = $item->getDeleteRoute()) {
+          $operations['delete'] = $delete_link;
+          $operations['delete']['title'] = t('Delete');
+        }
+        $form[$id]['operations'] = array(
           '#type' => 'operations',
           '#links' => $operations,
         );
@@ -384,31 +354,29 @@ class MenuForm extends EntityForm {
     // Update our original form with the new order.
     $form = array_intersect_key(array_merge($order, $form), $form);
 
-    $updated_items = array();
-    $fields = array('weight', 'plid');
-    foreach (Element::children($form) as $mlid) {
-      if (isset($form[$mlid]['#item'])) {
-        $element = $form[$mlid];
+    $fields = array('weight', 'parent', 'enabled');
+    foreach (Element::children($form) as $id) {
+      if (isset($form[$id]['#item'])) {
+        $element = $form[$id];
+        $updated_values = array();
         // Update any fields that have changed in this menu item.
         foreach ($fields as $field) {
           if ($element[$field]['#value'] != $element[$field]['#default_value']) {
-            $element['#item'][$field] = $element[$field]['#value'];
-            $updated_items[$mlid] = $element['#item'];
+            // Hidden is a special case, the form value needs to be reversed.
+            if ($field == 'enabled') {
+              $updated_values['hidden'] = $element['enabled']['#value'] ? 0 : 1;
+            }
+            else {
+              $updated_values[$field] = $element[$field]['#value'];
+            }
           }
         }
-        // Hidden is a special case, the value needs to be reversed.
-        if ($element['hidden']['#value'] != $element['hidden']['#default_value']) {
-          // Convert to integer rather than boolean due to PDO cast to string.
-          $element['#item']['hidden'] = $element['hidden']['#value'] ? 0 : 1;
-          $updated_items[$mlid] = $element['#item'];
+        if ($updated_values) {
+          // Use the ID from the actual plugin instance since the hidden value
+          // in the form could be tampered with.
+          $this->menuTree->updateLink($element['#item']['link']->getPLuginId(), $updated_values);
         }
       }
-    }
-
-    // Save all our changed items to the database.
-    foreach ($updated_items as $item) {
-      $item['customized'] = 1;
-      $item->save();
     }
   }
 

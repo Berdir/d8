@@ -225,7 +225,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
     $non_referencing_entity_path = $this->non_referencing_entity->getSystemPath();
     $listing_path = 'entity_test/list/' . $entity_type . '_reference/' . $entity_type . '/' . $this->entity->id();
 
-    $theme_cache_tags = array('content:1', 'theme:stark', 'theme_global_settings:1');
+    $theme_cache_tags = array('content:1', 'menu:account', 'theme:stark', 'theme_global_settings:1');
 
     // Generate the standardized entity cache tags.
     $cache_tag = $entity_type . ':' . $this->entity->id();

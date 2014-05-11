@@ -68,6 +68,7 @@ class PageCacheTest extends WebTestBase {
     sort($cache_entry->tags);
     $expected_tags = array(
       'content:1',
+      'menu:account',
       'pre_render:1',
       'system_test_cache_tags_page:1',
       'theme:stark',

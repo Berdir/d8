@@ -390,3 +390,7 @@ system.mail:
 system.theme.global:
   type: theme_settings
   label: 'Theme global settings'
+
+menu_link.static.overrides.definitions:
+  type: sequence
+  label: 'Menu link overrides'

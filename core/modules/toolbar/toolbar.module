@@ -323,8 +323,6 @@ function toolbar_pre_render_item($element) {
  * Implements hook_toolbar().
  */
 function toolbar_toolbar() {
-  $items = array();
-
   // The 'Home' tab is a simple link, with no corresponding tray.
   $items['home'] = array(
     '#type' => 'toolbar_item',
@@ -355,8 +353,8 @@ function toolbar_toolbar() {
   // Add attributes to the links before rendering.
   toolbar_menu_navigation_links($tree);
 
-  /** @var \Drupal\menu_link\MenuTreeInterface $menu_tree */
-  $menu_tree = \Drupal::service('menu_link.tree');
+  /** @var \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree */
+  $menu_tree = \Drupal::service('plugin.manager.menu.link_tree');
 
   $menu = array(
     '#heading' => t('Administration menu'),
@@ -416,22 +414,12 @@ function toolbar_toolbar() {
  *   An array containing a menu tree of top level items below the 'admin' path.
  */
 function toolbar_get_menu_tree() {
-  $tree = array();
-  /** @var \Drupal\menu_link\MenuTreeInterface $menu_tree */
-  $menu_tree = \Drupal::service('menu_link.tree');
-  $query = \Drupal::entityQuery('menu_link')
-    ->condition('menu_name', 'admin')
-    ->condition('module', 'system')
-    ->condition('link_path', 'admin');
-  $result = $query->execute();
-  if (!empty($result)) {
-    $admin_link = menu_link_load(reset($result));
-    $tree = $menu_tree->buildTree('admin', array(
-      'expanded' => array($admin_link['mlid']),
-      'min_depth' => $admin_link['depth'] + 1,
-      'max_depth' => $admin_link['depth'] + 1,
-    ));
-  }
+  /** @var \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree */
+  $menu_tree = \Drupal::service('plugin.manager.menu.link_tree');
+
+  $tree = $menu_tree->buildTree('admin', array(
+    'expanded' => array('system.admin')
+  ));
 
   return $tree;
 }
@@ -453,14 +441,18 @@ function toolbar_menu_navigation_links(&$tree) {
     }
     // Make sure we have a path specific ID in place, so we can attach icons
     // and behaviors to the items.
-    $tree[$key]['link']['localized_options']['attributes'] = array(
-      'id' => 'toolbar-link-' . str_replace(array('/', '<', '>'), array('-', '', ''), $item['link']['link_path']),
+    /** @var \Drupal\Core\Menu\MenuLinkInterface $link */
+    $link = $item['link'];
+    $options = $link->getOptions();
+    $options['attributes'] = array(
+      'id' => 'toolbar-link-' . str_replace(array('.', '<', '>'), array('-', '', ''), $link->getUrlObject()->getRouteName()),
       'class' => array(
         'toolbar-icon',
-        'toolbar-icon-' . strtolower(str_replace(' ', '-', $item['link']['link_title'])),
+        'toolbar-icon-' . strtolower(str_replace(' ', '-', $link->getTitle())),
       ),
-      'title' => check_plain($item['link']['description']),
+      'title' => check_plain($link->getDescription()),
     );
+    $link->setOptions($options);
   }
 }
 
@@ -468,32 +460,27 @@ function toolbar_menu_navigation_links(&$tree) {
  * Returns the rendered subtree of each top-level toolbar link.
  */
 function toolbar_get_rendered_subtrees() {
+  /** @var \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree */
+  $menu_tree = \Drupal::service('plugin.manager.menu.link_tree');
+  $top_tree = $menu_tree->buildSubtree('system.admin', 3);
+  $tree = !empty($top_tree['below']) ? $top_tree['below'] : array();
   $subtrees = array();
-  /** @var \Drupal\menu_link\MenuTreeInterface $menu_tree */
-  $menu_tree = \Drupal::service('menu_link.tree');
-  $tree = toolbar_get_menu_tree();
   foreach ($tree as $tree_item) {
+    /** @var \Drupal\Core\Menu\MenuLinkInterface $item */
     $item = $tree_item['link'];
-    if (!$item['hidden'] && $item['access']) {
-      if ($item['has_children']) {
-        $query = \Drupal::entityQuery('menu_link')
-          ->condition('has_children', 1);
-        for ($i=1; $i <= $item['depth']; $i++) {
-          $query->condition('p' . $i, $item['p' . $i]);
-        }
-        $parents = $query->execute();
-        $subtree = $menu_tree->buildTree($item['menu_name'], array('expanded' => $parents, 'min_depth' => $item['depth']+1));
-        toolbar_menu_navigation_links($subtree);
-        $subtree = $menu_tree->renderTree($subtree);
-        $subtree = drupal_render($subtree);
-      }
-      else {
-        $subtree = '';
-      }
+    if ($tree_item['below']) {
+      $subtree = $tree_item['below'];
+      toolbar_menu_navigation_links($subtree);
+      $subtree = $menu_tree->renderTree($subtree);
+      $subtree = drupal_render($subtree);
 
-      $id = str_replace(array('/', '<', '>'), array('-', '', ''), $item['link_path']);
-      $subtrees[$id] = $subtree;
     }
+    else {
+      $subtree = '';
+    }
+    $id = str_replace(array('.', '<', '>'), array('-', '', '' ), $item->getUrlObject()->getRouteName());
+
+    $subtrees[$id] = $subtree;
   }
   return $subtrees;
 }

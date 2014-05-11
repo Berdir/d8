@@ -5,6 +5,7 @@
  * Administrative page callbacks for Menu UI module.
  */
 
+use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Render\Element;
 
 /**
@@ -27,17 +28,17 @@ function theme_menu_overview_form($variables) {
   );
 
   $rows = array();
-  foreach (Element::children($form) as $mlid) {
-    if (isset($form[$mlid]['hidden'])) {
-      $element = &$form[$mlid];
+  foreach (Element::children($form) as $id) {
+    if (isset($form[$id]['#item'])) {
+      $element = &$form[$id];
 
       // Add special classes to be used for tabledrag.js.
-      $element['plid']['#attributes']['class'] = array('menu-plid');
-      $element['mlid']['#attributes']['class'] = array('menu-mlid');
+      $element['parent']['#attributes']['class'] = array('menu-parent');
+      $element['id']['#attributes']['class'] = array('menu-id');
       $element['weight']['#attributes']['class'] = array('menu-weight');
 
       // Change the parent field to a hidden. This allows any value but hides the field.
-      $element['plid']['#type'] = 'hidden';
+      $element['parent']['#type'] = 'hidden';
 
       $indent = array(
         '#theme' => 'indentation',
@@ -46,8 +47,8 @@ function theme_menu_overview_form($variables) {
 
       $row = array();
       $row[] = drupal_render($indent) . drupal_render($element['title']);
-      $row[] = array('data' => drupal_render($element['hidden']), 'class' => array('checkbox', 'menu-enabled'));
-      $row[] = drupal_render($element['weight']) . drupal_render($element['plid']) . drupal_render($element['mlid']);
+      $row[] = array('data' => drupal_render($element['enabled']), 'class' => array('checkbox', 'menu-enabled'));
+      $row[] = drupal_render($element['weight']) . drupal_render($element['parent']) . drupal_render($element['id']);
       $row[] = drupal_render($element['operations']);
 
       $row = array_merge(array('data' => $row), $element['#attributes']);
@@ -71,11 +72,11 @@ function theme_menu_overview_form($variables) {
       array(
         'action' => 'match',
         'relationship' => 'parent',
-        'group' => 'menu-plid',
-        'subgroup' => 'menu-plid',
-        'source' => 'menu-mlid',
+        'group' => 'menu-parent',
+        'subgroup' => 'menu-parent',
+        'source' => 'menu-id',
         'hidden' => TRUE,
-        'limit' => MENU_MAX_DEPTH - 1,
+        'limit' => \Drupal::service('menu.link_tree')->maxDepth() - 1,
       ),
       array(
         'action' => 'order',

@@ -1,0 +1,132 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the menu_link_content module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function menu_link_content_schema() {
+  $schema['menu_link_content'] = array(
+    'description' => 'Contains the individual links within a menu.',
+    'fields' => array(
+      'id' => array(
+        'description' => 'The menu link ID.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'uuid' => array(
+        'description' => 'Unique Key: Universally unique identifier for this entity.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+      ),
+      'bundle' => array(
+        'description' => 'The bundle',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+
+  $schema['menu_link_content_data'] = array(
+    'description' => 'Contains the individual links within a menu.',
+    'fields' => array(
+     'menu_name' => array(
+        'description' => "The menu name. All links with the same menu name (such as 'tools') are part of the same menu.",
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'id' => array(
+        'description' => 'The menu link ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'parent' => array(
+        'description' => 'The parent menu link ID.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+      ),
+      'url' => array(
+        'description' => 'The Drupal path or external path this link points to.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'langcode' => array(
+        'description' => 'The {language}.langcode of these menu link property values.',
+        'type' => 'varchar',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'default_langcode' => array(
+        'description' => 'Boolean indicating whether the property values are in the {language}.langcode of this menu link.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'title' => array(
+        'description' => 'The text displayed for the link.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'options' => array(
+        'description' => 'A serialized array of options to be passed to the url() or l() function, such as a query string or HTML attributes.',
+        'type' => 'blob',
+        'not null' => FALSE,
+        'serialize' => TRUE,
+      ),
+      'hidden' => array(
+        'description' => 'A flag for whether the link should be rendered in menus. (1 = a disabled menu link that may be shown on admin screens, 0 = a normal, visible link)',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'small',
+      ),
+      'expanded' => array(
+        'description' => 'Flag for whether this link should be rendered as expanded in menus - expanded links always have their child links displayed, instead of only when the link is in the active trail (1 = expanded, 0 = not expanded)',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'small',
+      ),
+      'weight' => array(
+        'description' => 'Link weight among links in the same menu at the same depth.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'route_name' => array(
+        'description' => 'The machine name of a defined Symfony Route this menu item represents.',
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'route_parameters' => array(
+        'description' => 'Serialized array of route parameters of this menu link.',
+        'type' => 'blob',
+        'size' => 'big',
+        'not null' => FALSE,
+        'serialize' => TRUE,
+      ),
+    ),
+    'primary key' => array('id', 'langcode'),
+    'indexes' => array(
+      'menu_name' => array('menu_name'),
+    ),
+  );
+
+  return $schema;
+}
