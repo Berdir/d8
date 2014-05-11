@@ -414,12 +414,12 @@ function toolbar_toolbar() {
  * @param array $render_tree
  *   A menu link tree render array. The contained url objects are modified.
  */
-function toolbar_menu_navigation_links($tree) {
-  foreach (Element::children($tree, FALSE) as $key) {
-    $element = $tree[$key];
+function toolbar_menu_navigation_links($render_tree) {
+  foreach (Element::children($render_tree, FALSE) as $key) {
+    $element = $render_tree[$key];
     // Configure sub-items.
     if (!empty($element['#below'])) {
-      toolbar_menu_navigation_links($tree[$key]['#below']);
+      toolbar_menu_navigation_links($render_tree[$key]['#below']);
     }
     /** @var \Drupal\Core\Url $url */
     $url = $element['#url'];
