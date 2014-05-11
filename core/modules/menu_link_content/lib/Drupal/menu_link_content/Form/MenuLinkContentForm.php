@@ -175,7 +175,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
     $new_definition['parent'] = isset($parent) ? $parent : '';
 
     $extracted = $this->extractUrl($form_state['values']['url']);
-    $new_definition['url'] = $extracted['path'];
+    $new_definition['url'] = $extracted['url'];
     $new_definition['route_name'] = $extracted['route_name'];
     $new_definition['route_parameters'] = $extracted['route_parameters'];
     $new_definition['options'] = array();
