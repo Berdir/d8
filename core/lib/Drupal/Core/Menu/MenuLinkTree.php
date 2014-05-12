@@ -595,7 +595,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
     if (!isset($this->menuPageTrees[$cid])) {
       // If the static variable doesn't have the data, check {cache_menu}.
       $cache = $this->treeCacheBackend->get($cid);
-      if ($cache && $cache->data) {
+      if ($cache && isset($cache->data)) {
         // If the cache entry exists, it contains the parameters for
         // menu_build_tree().
         $tree_parameters = $cache->data;
@@ -755,7 +755,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
     // If we do not have this tree in the static cache, check cache.menu.
     if (!isset($this->menuTree[$tree_cid])) {
       $cache = $this->treeCacheBackend->get($tree_cid);
-      if ($cache && $cache->data) {
+      if ($cache && isset($cache->data)) {
         $this->menuTree[$tree_cid] = $cache->data;
       }
     }
