@@ -722,7 +722,7 @@ class MenuLinkTreeStorage implements MenuLinkTreeStorageInterface {
       return $tree;
     }
     $query = $this->connection->select($this->table, $this->options);
-    $query->fields($this->table, $this->definitionFields());
+    $query->fields($this->table);
     for ($i = 1; $i <= $this->maxDepth(); $i++) {
       $query->orderBy('p' . $i, 'ASC');
     }
