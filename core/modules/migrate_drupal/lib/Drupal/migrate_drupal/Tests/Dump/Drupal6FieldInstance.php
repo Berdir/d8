@@ -179,72 +179,80 @@ class Drupal6FieldInstance extends Drupal6DumpBase {
       )),
       'description' => 'An example textfield.',
     ))
-      ->values(array(
-          'field_name' => 'field_test_two',
-          'type_name' => 'story',
-          'weight' => 2,
-          'label' => 'Integer Field',
-          'widget_type' => 'number',
-          'widget_settings' => 'a:2:{s:13:"default_value";a:1:{i:0;a:2:{s:5:"value";s:0:"";s:14:"_error_element";s:41:"default_value_widget][field_int][0][value";}}s:17:"default_value_php";N;}',
-          'display_settings' => serialize(array(
-              'weight' => 2,
-              'parent' => '',
-              'label' => array(
-                'format' => 'above',
-              ),
-              'teaser' => array(
-                'format' => 'unformatted',
-                'exclude' => 0,
-              ),
-              'full' => array(
-                'format' => 'us_0',
-                'exclude' => 0,
-              ),
-              4 => array(
-                'format' => 'unformatted',
-                'exclude' => 0,
-              ),
-              5 => array(
-                'format' => 'default',
-                'exclude' => 1,
-              ),
-            )),
-          'description' => 'An example integer field.',
-        ))
-      ->values(array(
-          'field_name' => 'field_test_two',
-          'type_name' => 'story',
-          'weight' => 2,
-          'label' => 'Integer Field',
-          'widget_type' => 'number',
-          'widget_settings' => 'a:2:{s:13:"default_value";a:1:{i:0;a:2:{s:5:"value";s:0:"";s:14:"_error_element";s:41:"default_value_widget][field_int][0][value";}}s:17:"default_value_php";N;}',
-          'display_settings' => serialize(array(
-              'weight' => 2,
-              'parent' => '',
-              'label' => array(
-                'format' => 'above',
-              ),
-              'teaser' => array(
-                'format' => 'unformatted',
-                'exclude' => 0,
-              ),
-              'full' => array(
-                'format' => 'us_0',
-                'exclude' => 0,
-              ),
-              4 => array(
-                'format' => 'unformatted',
-                'exclude' => 0,
-              ),
-              5 => array(
-                'format' => 'default',
-                'exclude' => 1,
-              ),
-            )),
-          'description' => 'An example integer field.',
-        ))
+    ->values(array(
+      'field_name' => 'field_test_two',
+      'type_name' => 'story',
+      'weight' => 2,
+      'label' => 'Integer Field',
+      'widget_type' => 'number',
+      'widget_settings' => 'a:2:{s:13:"default_value";a:1:{i:0;a:2:{s:5:"value";s:0:"";s:14:"_error_element";s:41:"default_value_widget][field_int][0][value";}}s:17:"default_value_php";N;}',
+      'display_settings' => serialize(array(
+        'weight' => 2,
+        'parent' => '',
+        'label' => array(
+          'format' => 'above',
+        ),
+        'teaser' => array(
+          'format' => 'unformatted',
+          'exclude' => 0,
+        ),
+        'full' => array(
+          'format' => 'us_0',
+          'exclude' => 0,
+        ),
+        4 => array(
+          'format' => 'unformatted',
+          'exclude' => 0,
+        ),
+        5 => array(
+          'format' => 'default',
+          'exclude' => 1,
+        ),
+      )),
+      'description' => 'An example integer field.',
+    ))
     ->values(array(
       'field_name' => 'field_test_three',
+      'type_name' => 'story',
+      'weight' => 3,
+      'label' => 'Decimal Field',
+      'widget_type' => 'number',
+      'widget_settings' => serialize(array(
+        'default_value' => array(
+          0 => array(
+            'value' => '101',
+            '_error_element' => 'default_value_widget][field_decimal][0][value',
+          ),
+        ),
+        'default_value_php' => NULL,
+      )),
+      'display_settings' => serialize(array(
+        'weight' => 3,
+        'parent' => '',
+        'label' => array(
+          'format' => 'above',
+        ),
+        'teaser' => array(
+          'format' => 'unformatted',
+          'exclude' => 0,
+        ),
+        'full' => array(
+          'format' => 'us_2',
+          'exclude' => 0,
+        ),
+        4 => array(
+          'format' => 'unformatted',
+          'exclude' => 0,
+        ),
+        5 => array(
+          'format' => 'default',
+          'exclude' => 1,
+        ),
+      )),
+      'description' => 'An example decimal field.',
+    ))
+    ->values(array(
+      'field_name' => 'field_test_four',
       'type_name' => 'story',
       'weight' => 3,
       'label' => 'Float Field',
@@ -713,6 +721,12 @@ class Drupal6FieldInstance extends Drupal6DumpBase {
           'sortable' => TRUE,
           'views' => TRUE,
         ),
+        'format' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
       )),
       'active' => 1,
     ))
@@ -733,7 +747,33 @@ class Drupal6FieldInstance extends Drupal6DumpBase {
       'global_settings' => '',
       'multiple' => 0,
       'db_storage' => 1,
-      'db_columns' => 'a:0:{}',
+      'db_columns' => serialize(array(
+        'value' => array(
+          'type' => 'numeric',
+          'precision' => 10,
+          'scale' => 2,
+          'not null' => FALSE,
+          'sortable' => TRUE,
+          'views' => TRUE,
+        ),
+      )),
+      'active' => 1,
+    ))
+    ->values(array(
+      'field_name' => 'field_test_four',
+      'module' => 'number',
+      'type' => 'number_float',
+      'global_settings' => serialize(array(
+        'prefix' => 'id-',
+        'suffix' => '',
+        'min' => '100',
+        'max' => '200',
+        'allowed_values' => '',
+        'allowed_values_php' => '',
+       )),
+      'multiple' => 0,
+      'db_storage' => 1,
+      'db_columns' => '',
       'active' => 1,
     ))
     ->values(array(
@@ -818,8 +858,8 @@ class Drupal6FieldInstance extends Drupal6DumpBase {
     ))
     ->execute();
 
-    $this->createTable('content_field_test_test', array(
-        'description' => 'Table for field_test_test',
+    $this->createTable('content_field_test', array(
+        'description' => 'Table for field_test',
         'fields' => array(
           'vid' => array(
             'description' => 'The primary identifier for this version.',
@@ -842,46 +882,25 @@ class Drupal6FieldInstance extends Drupal6DumpBase {
             'default' => '',
           ),
           'field_test_format' => array(
-            'description' => 'Test field format.',
-            'type' => 'int',
-            'size' => 255,
-            'not null' => FALSE,
-          ),
-          'delta' => array(
-            'type' => 'int',
-            'unsigned' => TRUE,
-            'not null' => TRUE,
-            'default' => 0,
-          ),
-          'field_test_two_format' => array(
             'type' => 'int',
             'unsigned' => TRUE,
             'not null' => TRUE,
             'default' => 0,
           ),
         ),
-        'primary key' => array('vid', 'delta'),
+        'primary key' => array('vid'),
       ));
-    $this->database->insert('content_field_test_two')->fields(array(
+    $this->database->insert('content_field_test')->fields(array(
         'vid',
         'nid',
-        'field_test_two_value',
-        'delta',
-        'field_test_two_format',
+        'field_test_value',
+        'field_test_format',
       ))
       ->values(array(
           'vid' => 1,
           'nid' => 1,
-          'field_test_two_value' => 10,
-          'delta' => 0,
-          'field_test_two_format' => 1,
-        ))
-      ->values(array(
-          'vid' => 1,
-          'nid' => 1,
-          'field_test_two_value' => 20,
-          'delta' => 1,
-          'field_test_two_format' => 1,
+          'field_test_value' => 'This is a shared text field',
+          'field_test_format' => 1,
         ))
       ->execute();
 
