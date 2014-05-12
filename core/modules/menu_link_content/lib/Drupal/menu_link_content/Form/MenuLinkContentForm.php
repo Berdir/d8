@@ -215,13 +215,15 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
       '#default_value' => $this->entity->isExpanded(),
     );
 
-    // @todo Should we show the internal path of the path alias here?
+    // @todo Should we show the internal path or the path alias here?
     $url = $this->getEntity()->getUrlObject();
     if ($url->isExternal()) {
       $default_value = $url->toString();
     }
     elseif($url->getRouteName() == '<front>') {
-      $default_value = '<front>';
+      // The default route for new entities is <front>, but we just want an
+      // empty form field.
+      $default_value = $this->getEntity()->isNew() ? '' : '<front>';
     }
     else {
       // @TODO Maybe support options in
