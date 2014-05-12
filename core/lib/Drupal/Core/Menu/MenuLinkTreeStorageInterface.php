@@ -139,9 +139,19 @@ interface MenuLinkTreeStorageInterface {
    * @param int $max_relative_depth
    *
    * @return array
-   *   Array of link definitions, keyed by ID.
+   *   Array of visible (not hidden) link definitions, keyed by ID.
    */
   public function loadAllChildLinks($id, $max_relative_depth = NULL);
+
+  /**
+   * Load all the IDs for links that are below the given ID.
+   *
+   * @param $id
+   *
+   * @return array
+   *   An unordered array of plugin IDs corresponding to all children.
+   */
+  public function getAllChildIds($id);
 
   /**
    * Load a subtree rooted by the given ID.

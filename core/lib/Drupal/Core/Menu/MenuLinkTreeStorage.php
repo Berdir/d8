@@ -775,6 +775,25 @@ class MenuLinkTreeStorage implements MenuLinkTreeStorageInterface {
   /**
    * {@inheritdoc}
    */
+  public function getAllChildIds($id) {
+    $root = $this->loadFull($id);
+    if (!$root) {
+      return array();
+    }
+    $query = $this->connection->select($this->table, $this->options);
+    $query->fields($this->table, array('id'));
+    $query->condition('menu_name', $root['menu_name']);
+    for ($i = 1; $i <= $root['depth']; $i++) {
+      $query->condition("p$i", $root["p$i"]);
+    }
+    // The next p column should not be empty. This excludes the root link.
+    $query->condition("p$i", 0, '>');
+    return $this->safeExecuteSelect($query)->fetchCol();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function loadAllChildLinks($id, $max_relative_depth = NULL) {
     $tree = array();
     $root = $this->loadFull($id);
