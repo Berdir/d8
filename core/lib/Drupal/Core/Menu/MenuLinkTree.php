@@ -342,7 +342,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
    */
   public function deleteLinksInMenu($menu_name) {
     $affected_menus = array($menu_name => $menu_name);
-    foreach ($this->treeStorage->loadByProperties(array('menu_tree')) as $plugin_id => $definition) {
+    foreach ($this->treeStorage->loadByProperties(array('menu_name' => $menu_name)) as $plugin_id => $definition) {
       // Setting the definition here means it will be used by getDefinition()
       // which is called by createInstance() from the factory.
       $this->definitions[$plugin_id] = $definition;
@@ -718,7 +718,17 @@ class MenuLinkTree implements MenuLinkTreeInterface {
     if ($this->getDefinition($id)) {
       return $this->treeStorage->getMaterializedPathIds($id);
     }
-    return array();
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function getChildIds($id) {
+    if ($this->getDefinition($id)) {
+      return $this->treeStorage->getAllChildIds($id);
+    }
+    return NULL;
   }
 
   /**
