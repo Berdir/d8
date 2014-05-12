@@ -107,8 +107,9 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   protected $treeStorage;
 
   /**
-   * @param \Drupal\Core\Menu\StaticMenuLinkOverridesInterface
-   *   Service providing overrides for static links
+   * Service providing overrides for static links
+   *
+   * @var \Drupal\Core\Menu\StaticMenuLinkOverridesInterface
    */
   protected $overrides;
 
@@ -229,15 +230,22 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Instanciates the discovery.
    */
-  public function getDefinitions() {
-    // Since this function is called rarely, instantiate the discovery here.
+  protected function getDiscovery() {
     if (empty($this->discovery)) {
       $yaml = new YamlDiscovery('menu_links', $this->moduleHandler->getModuleDirectories());
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($yaml);
     }
-    $definitions = $this->discovery->getDefinitions();
+    return $this->discovery;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinitions() {
+    // Since this function is called rarely, instantiate the discovery here.
+    $definitions = $this->getDiscovery()->getDefinitions();
 
     $this->moduleHandler->alter('menu_links', $definitions);
 
@@ -261,6 +269,9 @@ class MenuLinkTree implements MenuLinkTreeInterface {
     return $definitions;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function rebuild() {
     // Fetch the list of existing menus, in case some are not longer populated
     // after the rebuild.
@@ -1028,6 +1039,9 @@ class MenuLinkTree implements MenuLinkTreeInterface {
    */
   public function resetDefinitions() {
     $this->definitions = array();
+    $this->menuTree = array();
+    $this->buildAllDataParameters = array();
+    $this->menuPageTrees = array();
   }
 
   /**
