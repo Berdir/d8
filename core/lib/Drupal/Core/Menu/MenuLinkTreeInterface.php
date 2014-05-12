@@ -136,19 +136,19 @@ interface MenuLinkTreeInterface extends PluginManagerInterface {
    *
    * @param string $menu_name
    *   The named menu links to return
-   * @param array $link
-   *   A fully loaded menu link, or NULL. If a link is supplied, only the
+   * @param array $id
+   *   A menu link ID, or NULL. If a link ID is supplied, only the
    *   path to root will be included in the returned tree - as if this link
    *   represented the current page in a visible menu.
    * @param int $max_depth
    *   Optional maximum depth of links to retrieve. Typically useful if only one
    *   or two levels of a sub tree are needed in conjunction with a non-NULL
-   *   $link, in which case $max_depth should be greater than $link['depth'].
+   *   $id, in which case $max_depth should be greater than $link['depth'].
    *
    * @return array
    *   An tree of menu links in an array, in the order they should be rendered.
    */
-  public function buildAllData($menu_name, $link = NULL, $max_depth = NULL);
+  public function buildAllData($menu_name, $id = NULL, $max_depth = NULL);
 
   /**
    * Builds a menu tree, translates links, and checks access.
@@ -194,12 +194,30 @@ interface MenuLinkTreeInterface extends PluginManagerInterface {
    * @param string $id
    *   The menu link plugin ID.
    *
-   * @param null $max_relative_depth
+   * @param int $max_relative_depth
+   *   If provided, limit the maximum relative depth of children retrieved.
    *
    * @return \Drupal\Core\Menu\MenuLinkInterface[]
    *   An array of child links keyed by ID.
    */
   public function getChildLinks($id, $max_relative_depth = NULL);
+
+  /**
+   * Loads all parent link IDs of a given menu link.
+   *
+   * This method is very similar to getActiveTrailIds() but allows the link
+   * to be specified rather than being discovered based on the menu name
+   * and request.
+   *
+   * @param string $id
+   *   The menu link plugin ID.
+   *
+   * @return \Drupal\Core\Menu\MenuLinkInterface[]
+   *   An ordered array of IDs representing the path to the root of the tree.
+   *   The first element of the array will be equal to $id, unless $id is not
+   *   valid, in which case the array will be empty.
+   */
+  public function getParentIds($id);
 
   /**
    * Fetches a menu link which matches the route name, parameters and menu name.

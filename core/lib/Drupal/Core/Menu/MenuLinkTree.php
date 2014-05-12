@@ -670,12 +670,12 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   /**
    * @TODO should this accept a menu link instance or just the ID?
    */
-  public function buildAllData($menu_name, $link = NULL, $max_depth = NULL) {
+  public function buildAllData($menu_name, $id = NULL, $max_depth = NULL) {
     $language_interface = $this->languageManager->getCurrentLanguage();
 
     // Use ID as a flag for whether the data being loaded is for the whole
     // tree.
-    $id = isset($link['id']) ? $link['id'] : '%';
+    $id = isset($id) ? $id : '%';
     // Generate a cache ID (cid) specific for this $menu_name, $link, $language,
     // and depth.
     $cid = 'links:' . $menu_name . ':all:' . $id . ':' . $language_interface->id . ':' . (int) $max_depth;
@@ -709,6 +709,16 @@ class MenuLinkTree implements MenuLinkTreeInterface {
       }
     }
     return $links;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getParentIds($id) {
+    if ($this->getDefinition($id)) {
+      return $this->treeStorage->getMaterializedPathIds($id);
+    }
+    return array();
   }
 
   /**
