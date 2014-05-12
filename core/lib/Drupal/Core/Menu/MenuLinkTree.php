@@ -731,6 +731,11 @@ class MenuLinkTree implements MenuLinkTreeInterface {
       $instance = $this->menuLinkTranslate($subtree['definition']);
       if ($instance) {
         $subtree['link'] = $instance;
+        $route_names = $this->collectRoutes($subtree['below']);
+        // Pre-load all the route objects in the tree for access checks.
+        if ($route_names) {
+          $this->routeProvider->getRoutesByNames($route_names);
+        }
         $this->checkAccess($subtree['below']);
         return $subtree;
       }
@@ -762,16 +767,53 @@ class MenuLinkTree implements MenuLinkTreeInterface {
 
     if (!isset($this->menuTree[$tree_cid])) {
       // Rebuild the links which are stored
-      $tree = $this->treeStorage->loadTree($menu_name, $parameters);
+      $data['tree'] = $this->treeStorage->loadTree($menu_name, $parameters);
+      $data['route_names'] = $this->collectRoutes($data['tree']);
       // Cache the data, if it is not already in the cache.
-      $this->treeCacheBackend->set($tree_cid, $tree, Cache::PERMANENT, array('menu' => $menu_name));
-      $this->menuTree[$tree_cid] = $tree;
+      $this->treeCacheBackend->set($tree_cid, $data, Cache::PERMANENT, array('menu' => $menu_name));
+      $this->menuTree[$tree_cid] = $data;
     }
     else {
-      $tree = $this->menuTree[$tree_cid];
+      $data = $this->menuTree[$tree_cid];
     }
+
+    // Pre-load all the route objects in the tree for access checks.
+    if ($data['route_names']) {
+      $this->routeProvider->getRoutesByNames($data['route_names']);
+    }
+    $tree = $data['tree'];
     $this->checkAccess($tree);
     return $tree;
+  }
+
+  /**
+   * Traverses the menu tree and collects all the route names.
+   *
+   * @param array $tree
+   *   The menu tree you wish to operate on.
+   *
+   * @return array
+   *   Array of route names, with all values being unique.
+   */
+  protected function collectRoutes($tree) {
+    return array_values($this->doCollectRoutes($tree));
+  }
+
+  /**
+   * Recursive helper function to collect all the route names.
+   */
+  protected function doCollectRoutes($tree) {
+    $route_names = array();
+    foreach ($tree as $key => $v) {
+      $definition = $tree[$key]['definition'];
+      if (!empty($definition['route_name'])) {
+        $route_names[$definition['route_name']] = $definition['route_name'];
+      }
+      if ($tree[$key]['below']) {
+        $route_names += $this->doCollectRoutes($tree[$key]['below']);
+      }
+    }
+    return $route_names;
   }
 
   /**
