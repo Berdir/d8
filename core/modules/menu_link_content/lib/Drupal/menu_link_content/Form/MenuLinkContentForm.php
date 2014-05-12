@@ -217,12 +217,17 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
 
     // @todo Should we show the internal path of the path alias here?
     $url = $this->getEntity()->getUrlObject();
-    $default_value = $url->toString();
-    if (!$url->isExternal()) {
+    if ($url->isExternal()) {
+      $default_value = $url->toString();
+    }
+    elseif($url->getRouteName() == '<front>') {
+      $default_value = '<front>';
+    }
+    else {
       // @TODO Maybe support options in
       // \Drupal\Core\Routing\UrlGeneratorInterface::getInternalPath().
       $base_url = $this->requestContext->getBaseUrl();
-      $default_value = substr($default_value, strlen($base_url) + 1);
+      $default_value = substr($url->toString(), strlen($base_url) + 1);
     }
     $form['url'] = array(
       '#title' => $this->t('Link path'),
