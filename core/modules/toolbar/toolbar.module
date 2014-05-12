@@ -461,7 +461,7 @@ function toolbar_get_rendered_subtrees() {
     /** @var \Drupal\Core\Menu\MenuLinkInterface $item */
     $item = $tree_item['link'];
     if ($tree_item['below']) {
-      $subtree = $menu_tree->buildRenderTree($tree_item['below']);debug(array_keys($subtree));
+      $subtree = $menu_tree->buildRenderTree($tree_item['below']);
       toolbar_menu_navigation_links($subtree);
       $output = drupal_render($subtree);
     }
