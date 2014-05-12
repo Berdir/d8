@@ -139,7 +139,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
     $extracted = UrlHelper::parse($url);
     $external = UrlHelper::isExternal($url);
     if ($external) {
-      $extracted['url'] = $parsed_link['path'];
+      $extracted['url'] = $extracted['path'];
       $extracted['route_name'] = NULL;
       $extracted['route_parameters'] = array();
     }

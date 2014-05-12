@@ -619,7 +619,7 @@ class MenuLinkTreeStorage implements MenuLinkTreeStorageInterface {
     $ids = array_filter($result);
     $query = $this->connection->select($this->table, $this->options);
     $query->fields($this->table, array('id'));
-    $query->orderBy('depth', 'ASC');
+    $query->orderBy('depth', 'DESC');
     $query->condition('mlid', $ids, 'IN');
     // @todo: cache this result in memory if we find it's being used more
     //   than once per page load.
@@ -788,7 +788,7 @@ class MenuLinkTreeStorage implements MenuLinkTreeStorageInterface {
     }
     // The next p column should not be empty. This excludes the root link.
     $query->condition("p$i", 0, '>');
-    return $this->safeExecuteSelect($query)->fetchCol();
+    return $this->safeExecuteSelect($query)->fetchAllKeyed(0, 0);
   }
 
   /**
