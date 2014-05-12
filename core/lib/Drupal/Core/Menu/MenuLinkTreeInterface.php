@@ -335,6 +335,15 @@ interface MenuLinkTreeInterface extends PluginManagerInterface {
 
   public function menuNameExists($menu_name);
 
+  /**
+   * Returns the maximum depth of the possible parents of the menu link.
+   *
+   * @param string $id
+   *   The menu link plugin ID.
+   *
+   * @return int
+   *   The depth related to the depth of the given menu link.
+   */
   public function getParentDepthLimit($id);
 
   /**

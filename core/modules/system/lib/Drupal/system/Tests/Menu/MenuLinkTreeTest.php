@@ -77,5 +77,33 @@ class MenuLinkTreeTest extends DrupalUnitTestBase {
     $this->assertEqual(count($output), 1);
   }
 
+  public function testGetParentDepthLimit() {
+    \Drupal::service('router.builder')->rebuild();
+
+    $storage = \Drupal::entityManager()->getStorage('menu_link_content');
+
+    // root
+    // - child1
+    // -- child2
+    // --- child3
+    // ---- child4
+    $root = $storage->create(array('route_name' => 'menu_test.menu_name_test', 'menu_name' => 'menu1', 'bundle' => 'menu_link_content'));
+    $root->save();
+    $child1 = $storage->create(array('route_name' => 'menu_test.menu_name_test', 'menu_name' => 'menu1', 'bundle' => 'menu_link_content', 'parent' => $root->getPluginId()));
+    $child1->save();
+    $child2 = $storage->create(array('route_name' => 'menu_test.menu_name_test', 'menu_name' => 'menu1', 'bundle' => 'menu_link_content', 'parent' => $child1->getPluginId()));
+    $child2->save();
+    $child3 = $storage->create(array('route_name' => 'menu_test.menu_name_test', 'menu_name' => 'menu1', 'bundle' => 'menu_link_content', 'parent' => $child2->getPluginId()));
+    $child3->save();
+    $child4 = $storage->create(array('route_name' => 'menu_test.menu_name_test', 'menu_name' => 'menu1', 'bundle' => 'menu_link_content', 'parent' => $child3->getPluginId()));
+    $child4->save();
+
+    $this->assertEqual($this->linkTree->getParentDepthLimit($root->getPluginId()), 4);
+    $this->assertEqual($this->linkTree->getParentDepthLimit($child1->getPluginId()), 5);
+    $this->assertEqual($this->linkTree->getParentDepthLimit($child2->getPluginId()), 6);
+    $this->assertEqual($this->linkTree->getParentDepthLimit($child3->getPluginId()), 7);
+    $this->assertEqual($this->linkTree->getParentDepthLimit($child4->getPluginId()), 8);
+  }
+
 }
 

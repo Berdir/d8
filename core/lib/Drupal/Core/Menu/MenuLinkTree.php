@@ -959,6 +959,9 @@ class MenuLinkTree implements MenuLinkTreeInterface {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getParentDepthLimit($id) {
     $limit = $this->treeStorage->maxDepth() - 1;
     if ($id) {
