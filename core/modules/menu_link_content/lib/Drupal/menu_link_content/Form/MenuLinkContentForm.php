@@ -147,7 +147,8 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
       $extracted['url'] = '';
       try {
         // Find the route_name.
-        $url_obj = Url::createFromPath($extracted['path']);
+        $normal_path = $this->pathAliasManager->getPathByAlias($extracted['path']);
+        $url_obj = Url::createFromPath($normal_path);
         $extracted['route_name'] = $url_obj->getRouteName();
         $extracted['route_parameters'] = $url_obj->getRouteParameters();
       }
