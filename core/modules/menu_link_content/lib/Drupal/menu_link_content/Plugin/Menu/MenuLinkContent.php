@@ -98,6 +98,7 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
         $links = $storage->loadByProperties(array('uuid' => $uuid));
         $this->entity = reset($links);
       }
+      $this->entity->setInsidePlugin();
     }
     return $this->entity;
   }

@@ -43,6 +43,20 @@ use Drupal\Core\Url;
 class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterface {
 
   /**
+   * A flag for whether this entity is wrapped in a plugin instance.
+   *
+   * @var bool
+   */
+  protected $insidePlugin = FALSE;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setInsidePlugin() {
+    $this->insidePlugin = TRUE;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getTitle() {
@@ -219,11 +233,15 @@ class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterf
     /** @var \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree */
     $menu_tree = \Drupal::menuTree();
 
-    if (!$update) {
-      $menu_tree->createLink($this->getPluginId(), $this->getMenuDefinition());
+    if ($update) {
+      // When the entity is saved via a plugin instance, we should not call
+      // the menu tree manager to update the definition a second time.
+      if (!$this->insidePlugin) {
+        $menu_tree->updateLink($this->getPluginId(), $this->getMenuDefinition(), FALSE);
+      }
     }
     else {
-      $menu_tree->updateLink($this->getPluginId(), $this->getMenuDefinition(), FALSE);
+      $menu_tree->createLink($this->getPluginId(), $this->getMenuDefinition());
     }
   }
 

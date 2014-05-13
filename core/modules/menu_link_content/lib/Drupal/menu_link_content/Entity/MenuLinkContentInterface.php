@@ -15,6 +15,11 @@ use Drupal\Core\Entity\ContentEntityInterface;
 interface MenuLinkContentInterface extends ContentEntityInterface {
 
   /**
+   * Flag this instance as being wrapped in a menu link plugin instance.
+   */
+  public function setInsidePlugin();
+
+  /**
    * Gets the title of the menu link.
    *
    * @return mixed
