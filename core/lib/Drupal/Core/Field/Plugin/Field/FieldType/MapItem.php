@@ -50,6 +50,16 @@ class MapItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
+  public function toArray() {
+    // The default implementation of toArray() only returns known properties
+    // return everything instead for a map as the properties are not defined.
+    return $this->getValue();
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
   public function setValue($values, $notify = TRUE) {
     $this->values = array();
     if (!isset($values)) {
