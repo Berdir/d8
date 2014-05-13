@@ -17,6 +17,7 @@ use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Path\AliasManagerInterface;
 use Drupal\Core\Routing\MatchingRouteNotFoundException;
+use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RequestContext;
 
@@ -145,6 +146,9 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
     }
     else {
       $extracted['url'] = '';
+      // If the path doesn't match a Drupal path, the route should end up empty.
+      $extracted['route_name'] = NULL;
+      $extracted['route_parameters'] = array();
       try {
         // Find the route_name.
         $normal_path = $this->pathAliasManager->getPathByAlias($extracted['path']);
@@ -153,9 +157,11 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
         $extracted['route_parameters'] = $url_obj->getRouteParameters();
       }
       catch (MatchingRouteNotFoundException $e) {
-        // If the path doesn't match a Drupal path, set the route empty too.
-        $extracted['route_name'] = NULL;
-        $extracted['route_parameters'] = array();
+        // The path doesn't match a Drupal path.
+      }
+      catch (ParamNotConvertedException $e) {
+        // A path like node/99 matched a route, but the route parameter was
+        // invalid (e.g. node with ID 99 does not exist)
       }
     }
     return $extracted;
