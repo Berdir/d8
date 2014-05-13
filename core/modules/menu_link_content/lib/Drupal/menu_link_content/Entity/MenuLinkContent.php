@@ -123,15 +123,7 @@ class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterf
    * {@inheritdoc}
    */
   public function getOptions() {
-    // @TODO WTF. there need to be an easier way.
-    if ($values = $this->get('options')->first()->value) {
-      return $values;
-    }
-    else {
-      $values = $this->get('options')->first()->getValues();
-      unset($values['value']);
-      return $values;
-    }
+    return $this->get('options')->first()->getValue();
   }
 
   /**
