@@ -100,8 +100,9 @@ class MapItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public function getValue($include_computed = FALSE) {
-    return isset($this->values['value']) ? $this->values['value'] : array();
+  public static function mainPropertyName() {
+    // A map item has no main property.
+    return NULL;
   }
 
   /**

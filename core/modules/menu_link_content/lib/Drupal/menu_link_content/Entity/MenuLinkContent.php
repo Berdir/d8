@@ -74,22 +74,14 @@ class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterf
    * {@inheritdoc}
    */
   public function getRouteParameters() {
-    // @TODO WTF. there need to be an easier way.
-    if ($values = $this->get('route_parameters')->first()->value) {
-      return $values;
-    }
-    else {
-      $values = $this->get('route_parameters')->first()->getValues();
-      unset($values['value']);
-      return $values;
-    }
+    return $this->get('route_parameters')->first()->getValue();
   }
 
   /**
    * {@inheritdoc}
    */
   public function setRouteParameters(array $route_parameters) {
-    $this->set('route_parameters', array('value' => $route_parameters));
+    $this->set('route_parameters', array($route_parameters));
     return $this;
   }
 
@@ -146,7 +138,7 @@ class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterf
    * {@inheritdoc}
    */
   public function setOptions(array $options) {
-    $this->set('options', array('value' => $options));
+    $this->set('options', array($options));
     return $this;
   }
 

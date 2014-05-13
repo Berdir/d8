@@ -597,7 +597,7 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
    * @return \stdClass
    *   The record to store.
    */
-  protected function mapToStorageRecord(EntityInterface $entity, $table_key = 'base_table') {
+  protected function mapToStorageRecord(ContentEntityInterface $entity, $table_key = 'base_table') {
     $record = new \stdClass();
     $values = array();
     $definitions = $entity->getFieldDefinitions();
@@ -612,7 +612,17 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
         $multi_column_fields[$field] = TRUE;
         continue;
       }
-      $values[$name] = isset($definitions[$name]) && isset($entity->$name->value) ? $entity->$name->value : NULL;
+      $values[$name] = NULL;
+      if (isset($definitions[$name])) {
+        $main_property = $definitions[$name]->getMainPropertyName();
+        if ($main_property && isset($entity->get($name)->$main_property)) {
+          $values[$name] = $entity->get($name)->$main_property;
+        }
+        else {
+          // If there is no main property, get all values.
+          $values[$name] = $entity->get($name)->first()->getValue();
+        }
+      }
     }
 
     // Handle fields that store multiple properties and match each property name
