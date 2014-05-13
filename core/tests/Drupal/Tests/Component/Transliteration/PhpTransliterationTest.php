@@ -60,7 +60,7 @@ class PhpTransliterationTest extends UnitTestCase {
    *   An array of arrays, each containing the parameters for
    *   self::testPhpTransliteration().
    */
-  public static function providerTestPhpTransliteration() {
+  public function providerTestPhpTransliteration() {
 
     $random_generator = new Random();
     $random = $random_generator->String(10);
