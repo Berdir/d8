@@ -618,7 +618,7 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
         if ($main_property && isset($entity->get($name)->$main_property)) {
           $values[$name] = $entity->get($name)->$main_property;
         }
-        else {
+        elseif (!$main_property) {
           // If there is no main property, get all values.
           $values[$name] = $entity->get($name)->first()->getValue();
         }
