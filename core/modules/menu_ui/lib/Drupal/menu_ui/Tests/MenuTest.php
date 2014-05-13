@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\menu_ui\Tests\MenuTest.
+ * Contains \Drupal\menu_ui\Tests\MenuTest.
  */
 
 namespace Drupal\menu_ui\Tests;
@@ -77,7 +77,6 @@ class MenuTest extends MenuWebTestBase {
 
     $this->menu = $this->addCustomMenu();
     $this->doMenuTests();
-    return;
     $this->addInvalidMenuLink();
     $this->addCustomMenuCRUD();
 
