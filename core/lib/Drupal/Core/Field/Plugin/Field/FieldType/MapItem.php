@@ -27,20 +27,9 @@ class MapItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
-    // The properties are dynamic and can not be defined statically.
-    return array();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getPropertyDefinitions() {
-    // Return the definitions for the currently set values.
-    $definitions = array();
-    foreach ($this->values as $name => $value) {
-      $definitions[$name] = DataDefinition::create('any');
-    }
-    return $definitions;
+    // The properties are dynamic and can not be defined statically, but we
+    // allow to set some properties on the field definition if they are known.
+    return $field_definition->getSetting('property_definitions') ?: array();
   }
 
   /**
