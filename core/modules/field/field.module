@@ -64,10 +64,6 @@ require_once __DIR__ . '/field.deprecated.inc';
  *   data connected to individual entities. Fieldable entity types like node and
  *   user use this API to make themselves fieldable.
  *
- * - @link field_info Field Info API @endlink: Exposes information about all
- *   fields, instances, widgets, and related information defined by or with the
- *   Field API.
- *
  * - @link field_purge Field API bulk data deletion @endlink: Cleans up after
  *   bulk deletion operations such as deletion of field or field_instance.
  *
