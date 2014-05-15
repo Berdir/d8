@@ -381,7 +381,7 @@ class ManageDisplayTest extends FieldUiTestBase {
   function assertNodeViewTextHelper(EntityInterface $node, $view_mode, $text, $message, $not_exists) {
     // Make sure caches on the tester side are refreshed after changes
     // submitted on the tested side.
-    field_info_cache_clear();
+    \Drupal::entityManager()->clearCachedFieldDefinitions();
 
     // Save current content so that we can restore it when we're done.
     $old_content = $this->drupalGetContent();

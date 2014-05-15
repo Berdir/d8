@@ -1,22 +1,9 @@
 <?php
-use Drupal\Core\Entity\EntityInterface;
 
 /**
  * @file
  * Defines an entity type.
  */
-
-/**
- * Implements hook_entity_type_build().
- */
-function field_test_entity_type_build() {
-  /** @var $entity_info \Drupal\Core\Entity\EntityTypeInterface[] */
-  // If requested, clear the field cache while this is being called. See
-  // Drupal\field\Tests\FieldInfoTest::testFieldInfoCache().
-  if (\Drupal::state()->get('field_test.clear_info_cache_in_hook_entity_type_build')) {
-    field_info_cache_clear();
-  }
-}
 
 /**
  * Implements hook_entity_type_alter().
