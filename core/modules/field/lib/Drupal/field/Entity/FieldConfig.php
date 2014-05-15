@@ -498,7 +498,7 @@ class FieldConfig extends ConfigEntityBase implements FieldConfigInterface {
    */
   public function getBundles() {
     if (empty($this->deleted)) {
-      $map = field_info_field_map();
+      $map = \Drupal::entityManager()->getFieldMap();
       if (isset($map[$this->entity_type][$this->name]['bundles'])) {
         return $map[$this->entity_type][$this->name]['bundles'];
       }
