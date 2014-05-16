@@ -576,7 +576,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     }
     if (empty($this->defaultLangcode)) {
       // Make sure we return a proper language object.
-      $this->defaultLangcode = Language::LANGCODE_NOT_SPECIFIED;
+      $this->defaultLangcode = $this->languageManager()->getCurrentLanguage()->getId();
     }
     // This needs to be initialized manually as it is skipped when instantiating
     // the language field object to avoid infinite recursion.

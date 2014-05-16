@@ -9,6 +9,7 @@ namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Language\Language;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -123,6 +124,11 @@ class ContentEntityDatabaseStorageTest extends UnitTestCase {
     $entity_manager->expects($this->atLeastOnce())
       ->method('getFieldDefinitions')
       ->will($this->returnValue(array()));
+
+    $language = new Language(array('id' => 'en'));
+    $language_manager->expects($this->any())
+      ->method('getCurrentLanguage')
+      ->will($this->returnValue($language));
 
     $container = new ContainerBuilder();
     $container->set('language_manager', $language_manager);
