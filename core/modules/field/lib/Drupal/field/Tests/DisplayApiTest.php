@@ -149,7 +149,7 @@ class DisplayApiTest extends FieldUnitTestBase {
     $setting = $display['settings']['test_formatter_setting_multiple'];
     $this->assertNoText($this->label, 'Label was not displayed.');
     $this->assertText('field_test_entity_display_build_alter', 'Alter fired, display passed.');
-    $this->assertText('entity language is ' . Language::LANGCODE_NOT_SPECIFIED, 'Language is placed onto the context.');
+    $this->assertText('entity language is en', 'Language is placed onto the context.');
     $array = array();
     foreach ($this->values as $delta => $value) {
       $array[] = $delta . ':' . $value['value'];
