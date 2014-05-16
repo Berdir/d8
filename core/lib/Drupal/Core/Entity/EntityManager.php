@@ -605,6 +605,7 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface,
     $this->fieldDefinitions = array();
     $this->fieldStorageDefinitions = array();
     $this->fieldMap = array();
+    $this->bundleInfo = array();
     Cache::deleteTags(array('entity_field_info' => TRUE));
   }
 
@@ -643,7 +644,7 @@ class EntityManager extends PluginManagerBase implements EntityManagerInterface,
           }
         }
         $this->moduleHandler->alter('entity_bundle_info', $this->bundleInfo);
-        $this->cache->set("entity_bundle_info:$langcode", $this->bundleInfo, Cache::PERMANENT, array('entity_types' => TRUE));
+        $this->cache->set("entity_bundle_info:$langcode", $this->bundleInfo, Cache::PERMANENT, array('entity_types' => TRUE, 'entity_field_info' => TRUE));
       }
     }
 
