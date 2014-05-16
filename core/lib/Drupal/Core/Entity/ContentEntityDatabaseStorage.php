@@ -599,7 +599,6 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   protected function mapToStorageRecord(ContentEntityInterface $entity, $table_key = 'base_table') {
     $record = new \stdClass();
     $values = array();
-    $definitions = $entity->getFieldDefinitions();
     $schema = drupal_get_schema($this->entityType->get($table_key));
     $is_new = $entity->isNew();
 
@@ -612,13 +611,18 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
         continue;
       }
       $values[$name] = NULL;
-      if (isset($definitions[$name])) {
-        $main_property = $definitions[$name]->getMainPropertyName();
+      if ($entity->hasField($name)) {
+        $main_property = $entity->getFieldDefinition($name)->getMainPropertyName();
         if ($main_property && isset($entity->get($name)->$main_property)) {
+          // If the field has a main property, store the value of that, this
+          // defaults to the first field item.
           $values[$name] = $entity->get($name)->$main_property;
         }
         elseif (!$main_property) {
-          // If there is no main property, get all values.
+          // If there is no main property, get all values from the first field
+          // item and assume that they will be stored serialized.
+          // @todo: Give field types more control over this behavior in
+          //   https://drupal.org/node/2232427.
           $values[$name] = $entity->get($name)->first()->getValue();
         }
       }
