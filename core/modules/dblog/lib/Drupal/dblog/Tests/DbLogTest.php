@@ -220,10 +220,10 @@ class DbLogTest extends WebTestBase {
     // Add a user using the form to generate an add user event (which is not
     // triggered by drupalCreateUser).
     $edit = array();
-    $edit['name'] = $name;
-    $edit['mail'] = $name . '@example.com';
-    $edit['pass[pass1]'] = $pass;
-    $edit['pass[pass2]'] = $pass;
+    $edit['name[0][value]'] = $name;
+    $edit['mail[0][value]'] = $name . '@example.com';
+    $edit['pass[0][value][pass1]'] = $pass;
+    $edit['pass[0][value][pass2]'] = $pass;
     $edit['status'] = 1;
     $this->drupalPostForm('admin/people/create', $edit, t('Create new account'));
     $this->assertResponse(200);

@@ -94,25 +94,25 @@ class UserCreateTest extends WebTestBase {
     foreach (array(FALSE, TRUE) as $notify) {
       $name = $this->randomName();
       $edit = array(
-        'name' => $name,
-        'mail' => $this->randomName() . '@example.com',
-        'pass[pass1]' => $pass = $this->randomString(),
-        'pass[pass2]' => $pass,
+        'name[0][value]' => $name,
+        'mail[0][value]' => $this->randomName() . '@example.com',
+        'pass[0][value][pass1]' => $pass = $this->randomString(),
+        'pass[0][value][pass2]' => $pass,
         'notify' => $notify,
       );
       $this->drupalPostForm('admin/people/create', $edit, t('Create new account'));
 
       if ($notify) {
-        $this->assertText(t('A welcome message with further instructions has been e-mailed to the new user @name.', array('@name' => $edit['name'])), 'User created');
+        $this->assertText(t('A welcome message with further instructions has been e-mailed to the new user @name.', array('@name' => $edit['name[0][value]'])), 'User created');
         $this->assertEqual(count($this->drupalGetMails()), 1, 'Notification e-mail sent');
       }
       else {
-        $this->assertText(t('Created a new user account for @name. No e-mail has been sent.', array('@name' => $edit['name'])), 'User created');
+        $this->assertText(t('Created a new user account for @name. No e-mail has been sent.', array('@name' => $edit['name[0][value]'])), 'User created');
         $this->assertEqual(count($this->drupalGetMails()), 0, 'Notification e-mail not sent');
       }
 
       $this->drupalGet('admin/people');
-      $this->assertText($edit['name'], 'User found in list of users');
+      $this->assertText($edit['name[0][value]'], 'User found in list of users');
       $user = user_load_by_name($name);
       $this->assertEqual($user->isActive(), 'User is not blocked');
     }

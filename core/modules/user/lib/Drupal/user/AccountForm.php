@@ -69,6 +69,9 @@ abstract class AccountForm extends ContentEntityForm {
   public function form(array $form, array &$form_state) {
     /** @var \Drupal\user\UserInterface $account */
     $account = $this->entity;
+
+    $form = parent::form($form, $form_state, $account);
+
     $user = $this->currentUser();
     $config = \Drupal::config('user.settings');
 
@@ -82,42 +85,13 @@ abstract class AccountForm extends ContentEntityForm {
       '#weight' => -10,
     );
 
-    // The mail field is NOT required if account originally had no mail set
-    // and the user performing the edit has 'administer users' permission.
-    // This allows users without e-mail address to be edited and deleted.
-    $form['account']['mail'] = array(
-      '#type' => 'email',
-      '#title' => $this->t('E-mail address'),
-      '#description' => $this->t('A valid e-mail address. All e-mails from the system will be sent to this address. The e-mail address is not made public and will only be used if you wish to receive a new password or wish to receive certain news or notifications by e-mail.'),
-      '#required' => !(!$account->getEmail() && $user->hasPermission('administer users')),
-      '#default_value' => (!$register ? $account->getEmail() : ''),
-    );
-
-    // Only show name field on registration form or user can change own username.
-    $form['account']['name'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Username'),
-      '#maxlength' => USERNAME_MAX_LENGTH,
-      '#description' => $this->t('Spaces are allowed; punctuation is not allowed except for periods, hyphens, apostrophes, and underscores.'),
-      '#required' => TRUE,
-      '#attributes' => array(
-        'class' => array('username'),
-        'autocorrect' => 'off',
-        'autocapitalize' => 'off',
-        'spellcheck' => 'false',
-      ),
-      '#default_value' => (!$register ? $account->getUsername() : ''),
-      '#access' => ($register || ($user->id() == $account->id() && $user->hasPermission('change own username')) || $admin),
-    );
+    $form['mail']['#group'] = 'account';
+    $form['name']['#group'] = 'account';
 
     // Display password field only for existing users or when user is allowed to
     // assign a password during registration.
     if (!$register) {
-      $form['account']['pass'] = array(
-        '#type' => 'password_confirm',
-        '#size' => 25,
-        '#description' => $this->t('To change the current user password, enter the new password in both fields.'),
-      );
+      $form['pass']['#group'] = 'account';
 
       // To skip the current password field, the user must have logged in via a
       // one-time link and have the token in the URL.
@@ -129,7 +103,7 @@ abstract class AccountForm extends ContentEntityForm {
       // The user may only change their own password without their current
       // password if they logged in via a one-time login link.
       if (!$pass_reset) {
-        $protected_values['mail'] = $form['account']['mail']['#title'];
+        $protected_values['mail'] = $this->t('E-mail address');
         $protected_values['pass'] = $this->t('Password');
         $request_new = l($this->t('Request new password'), 'user/password', array('attributes' => array('title' => $this->t('Request new password via e-mail.'))));
         $current_pass_description = $this->t('Required if you want to change the %mail or %pass below. !request_new.', array('%mail' => $protected_values['mail'], '%pass' => $protected_values['pass'], '!request_new' => $request_new));
@@ -160,12 +134,8 @@ abstract class AccountForm extends ContentEntityForm {
       }
     }
     elseif (!$config->get('verify_mail') || $admin) {
-      $form['account']['pass'] = array(
-        '#type' => 'password_confirm',
-        '#size' => 25,
-        '#description' => $this->t('Provide a password for the new account in both fields.'),
-        '#required' => TRUE,
-      );
+      $form['pass'][0]['value']['#description'] = $this->t('Provide a password for the new account in both fields.');
+      $form['pass'][0]['value']['#required'] = TRUE;
     }
 
     // When not building the user registration form, prevent web browsers from
@@ -302,7 +272,7 @@ abstract class AccountForm extends ContentEntityForm {
       '#weight' => 100,
     );
 
-    return parent::form($form, $form_state, $account);
+    return $form;
   }
 
   /**
@@ -326,49 +296,6 @@ abstract class AccountForm extends ContentEntityForm {
    */
   public function validate(array $form, array &$form_state) {
     parent::validate($form, $form_state);
-
-    $account = $this->entity;
-    // Validate new or changing username.
-    if (isset($form_state['values']['name'])) {
-      if ($error = user_validate_name($form_state['values']['name'])) {
-        $this->setFormError('name', $form_state, $error);
-      }
-      // Cast the user ID as an integer. It might have been set to NULL, which
-      // could lead to unexpected results.
-      else {
-        $name_taken = (bool) $this->entityQuery->get('user')
-          ->condition('uid', (int) $account->id(), '<>')
-          ->condition('name', $form_state['values']['name'])
-          ->range(0, 1)
-          ->count()
-          ->execute();
-
-        if ($name_taken) {
-          $this->setFormError('name', $form_state, $this->t('The name %name is already taken.', array('%name' => $form_state['values']['name'])));
-        }
-      }
-    }
-
-    $mail = $form_state['values']['mail'];
-
-    if (!empty($mail)) {
-      $mail_taken = (bool) $this->entityQuery->get('user')
-        ->condition('uid', (int) $account->id(), '<>')
-        ->condition('mail', $mail)
-        ->range(0, 1)
-        ->count()
-        ->execute();
-
-      if ($mail_taken) {
-        // Format error message dependent on whether the user is logged in or not.
-        if (\Drupal::currentUser()->isAuthenticated()) {
-          $this->setFormError('mail', $form_state, $this->t('The e-mail address %email is already taken.', array('%email' => $mail)));
-        }
-        else {
-          $this->setFormError('mail', $form_state, $this->t('The e-mail address %email is already registered. <a href="@password">Have you forgotten your password?</a>', array('%email' => $mail, '@password' => url('user/password'))));
-        }
-      }
-    }
 
     // Make sure the signature isn't longer than the size of the database field.
     // Signatures are disabled by default, so make sure it exists first.

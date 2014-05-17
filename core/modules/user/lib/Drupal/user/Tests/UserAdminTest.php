@@ -146,10 +146,10 @@ class UserAdminTest extends WebTestBase {
       ->save();
     // Register a new user account.
     $edit = array();
-    $edit['name'] = $name = $this->randomName();
-    $edit['mail'] = $mail = $edit['name'] . '@example.com';
+    $edit['name[0][value]'] = $name = $this->randomName();
+    $edit['mail[0][value]'] = $mail = $edit['name[0][value]'] . '@example.com';
     $this->drupalPostForm('user/register', $edit, t('Create new account'));
-    $subject = 'Account details for ' . $edit['name'] . ' at ' . $system->get('name') . ' (pending admin approval)';
+    $subject = 'Account details for ' . $edit['name[0][value]'] . ' at ' . $system->get('name') . ' (pending admin approval)';
     // Ensure that admin notification mail is sent to the configured
     // Notification E-mail address.
     $admin_mail = $this->drupalGetMails(array(
@@ -161,7 +161,7 @@ class UserAdminTest extends WebTestBase {
     // Ensure that user notification mail is sent from the configured
     // Notification E-mail address.
     $user_mail = $this->drupalGetMails(array(
-      'to' => $edit['mail'],
+      'to' => $edit['mail[0][value]'],
       'from' => $server_address,
       'reply-to' => $notify_address,
       'subject' => $subject,

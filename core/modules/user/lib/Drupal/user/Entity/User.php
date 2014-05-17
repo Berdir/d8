@@ -450,14 +450,17 @@ class User extends ContentEntityBase implements UserInterface {
       ->setDescription(t('The user UUID.'))
       ->setReadOnly(TRUE);
 
+    // @todo Use LanguageWidget once https://drupal.org/node/2226493 lands.
     $fields['langcode'] = FieldDefinition::create('language')
       ->setLabel(t('Language code'))
       ->setDescription(t('The user language code.'));
 
+    // @todo Use LanguageWidget once https://drupal.org/node/2226493 lands.
     $fields['preferred_langcode'] = FieldDefinition::create('language')
       ->setLabel(t('Preferred admin language code'))
       ->setDescription(t("The user's preferred language code for receiving emails and viewing the site."));
 
+    // @todo Use LanguageWidget once https://drupal.org/node/2226493 lands.
     $fields['preferred_admin_langcode'] = FieldDefinition::create('language')
       ->setLabel(t('Preferred language code'))
       ->setDescription(t("The user's preferred language code for viewing administration pages."));
@@ -465,25 +468,43 @@ class User extends ContentEntityBase implements UserInterface {
     // The name should not vary per language. The username is the visual
     // identifier for a user and needs to be consistent in all languages.
     $fields['name'] = FieldDefinition::create('string')
-      ->setLabel(t('Name'))
+      ->setLabel(t('Username'))
       ->setDescription(t('The name of this user.'))
-      ->setSetting('default_value', '')
+      ->setRequired(TRUE)
+      ->setSettings(array(
+        'default_value' => '',
+        'max_length' => USERNAME_MAX_LENGTH,
+      ))
       ->setPropertyConstraints('value', array(
-        // No Length constraint here because the UserName constraint also covers
-        // that.
         'UserName' => array(),
         'UserNameUnique' => array(),
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'username',
+        'weight' => -10,
       ));
 
     $fields['pass'] = FieldDefinition::create('string')
       ->setLabel(t('Password'))
-      ->setDescription(t('The password of this user (hashed).'));
+      ->setDescription(t('The password of this user (hashed).'))
+      ->setDisplayOptions('form', array(
+        'type' => 'password',
+        'weight' => 0,
+        'settings' => array(
+          'size' => 25,
+        ),
+      ));
 
     $fields['mail'] = FieldDefinition::create('email')
-      ->setLabel(t('Email'))
+      ->setLabel(t('E-mail address'))
       ->setDescription(t('The email of this user.'))
       ->setSetting('default_value', '')
-      ->setPropertyConstraints('value', array('UserMailUnique' => array()));
+      ->setPropertyConstraints('value', array('UserMailUnique' => array()))
+      ->setDisplayOptions('form', array(
+        'type' => 'email_user',
+        'weight' => -20,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     // @todo Convert to a text field in https://drupal.org/node/1548204.
     $fields['signature'] = FieldDefinition::create('string')

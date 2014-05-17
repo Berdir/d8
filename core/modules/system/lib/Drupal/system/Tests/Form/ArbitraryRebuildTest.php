@@ -59,13 +59,13 @@ class ArbitraryRebuildTest extends WebTestBase {
    */
   function testUserRegistrationRebuild() {
     $edit = array(
-      'name' => 'foo',
-      'mail' => 'bar@example.com',
+      'name[0][value]' => 'foo',
+      'mail[0][value]' => 'bar@example.com',
     );
     $this->drupalPostForm('user/register', $edit, 'Rebuild');
     $this->assertText('Form rebuilt.');
-    $this->assertFieldByName('name', 'foo', 'Entered user name has been kept.');
-    $this->assertFieldByName('mail', 'bar@example.com', 'Entered mail address has been kept.');
+    $this->assertFieldByName('name[0][value]', 'foo', 'Entered user name has been kept.');
+    $this->assertFieldByName('mail[0][value]', 'bar@example.com', 'Entered mail address has been kept.');
   }
 
   /**
@@ -73,12 +73,12 @@ class ArbitraryRebuildTest extends WebTestBase {
    */
   function testUserRegistrationMultipleField() {
     $edit = array(
-      'name' => 'foo',
-      'mail' => 'bar@example.com',
+      'name[0][value]' => 'foo',
+      'mail[0][value]' => 'bar@example.com',
     );
     $this->drupalPostForm('user/register', $edit, t('Add another item'));
     $this->assertText('Test a multiple valued field', 'Form has been rebuilt.');
-    $this->assertFieldByName('name', 'foo', 'Entered user name has been kept.');
-    $this->assertFieldByName('mail', 'bar@example.com', 'Entered mail address has been kept.');
+    $this->assertFieldByName('name[0][value]', 'foo', 'Entered user name has been kept.');
+    $this->assertFieldByName('mail[0][value]', 'bar@example.com', 'Entered mail address has been kept.');
   }
 }

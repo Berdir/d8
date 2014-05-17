@@ -50,6 +50,10 @@ class RegisterForm extends AccountForm {
     // Start with the default user account fields.
     $form = parent::form($form, $form_state, $account);
 
+    $form['pass'][0]['value']['#description'] = $this->t('Provide a password for the new account in both fields.');
+    $form['pass'][0]['value']['#required'] = TRUE;
+    $form['pass']['#access'] = !\Drupal::config('user.settings')->get('verify_mail') || $admin;
+
     if ($admin) {
       // Redirect back to page which initiated the create request; usually
       // admin/people/create.
@@ -69,29 +73,21 @@ class RegisterForm extends AccountForm {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityForm::submit().
+   * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
-    $admin = $form_state['values']['administer_users'];
+  public function buildEntity(array $form, array &$form_state) {
+    $entity = parent::buildEntity($form, $form_state);
 
-    if (!\Drupal::config('user.settings')->get('verify_mail') || $admin) {
-      $pass = $form_state['values']['pass'];
+    if (\Drupal::config('user.settings')->get('verify_mail') && $this->currentUser()->hasPermission('administer users')) {
+      $entity->setPassword(user_password());
     }
-    else {
-      $pass = user_password();
-    }
+    $entity->init->value = $entity->getEmail();
 
-    // Remove unneeded values.
-    form_state_values_clean($form_state);
-
-    $form_state['values']['pass'] = $pass;
-    $form_state['values']['init'] = $form_state['values']['mail'];
-
-    parent::submit($form, $form_state);
+    return $entity;
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityForm::submit().
+   * {@inheritdoc}
    */
   public function save(array $form, array &$form_state) {
     $account = $this->entity;
@@ -99,14 +95,12 @@ class RegisterForm extends AccountForm {
     $admin = $form_state['values']['administer_users'];
     $notify = !empty($form_state['values']['notify']);
 
-    // Save has no return value so this cannot be tested.
-    // Assume save has gone through correctly.
     $account->save();
 
     $form_state['user'] = $account;
     $form_state['values']['uid'] = $account->id();
 
-    watchdog('user', 'New user: %name %email.', array('%name' => $form_state['values']['name'], '%email' => '<' . $form_state['values']['mail'] . '>'), WATCHDOG_NOTICE, l($this->t('Edit'), 'user/' . $account->id() . '/edit'));
+    watchdog('user', 'New user: %name %email.', array('%name' => $account->getUserName(), '%email' => '<' . $account->getEmail() . '>'), WATCHDOG_NOTICE, l($this->t('Edit'), 'user/' . $account->id() . '/edit'));
 
     // Add plain text password into user account to generate mail tokens.
     $account->password = $pass;

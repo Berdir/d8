@@ -33,14 +33,14 @@ class UserEditedOwnAccountTest extends WebTestBase {
 
     // Change own username.
     $edit = array();
-    $edit['name'] = $this->randomName();
+    $edit['name[0][value]'] = $this->randomName();
     $this->drupalPostForm('user/' . $account->id() . '/edit', $edit, t('Save'));
 
     // Log out.
     $this->drupalLogout();
 
     // Set the new name on the user account and attempt to log back in.
-    $account->name = $edit['name'];
+    $account->name = $edit['name[0][value]'];
     $this->drupalLogin($account);
   }
 }

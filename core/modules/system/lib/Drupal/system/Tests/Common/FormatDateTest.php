@@ -124,7 +124,7 @@ class FormatDateTest extends WebTestBase {
     // Create a test user to carry out the tests.
     $test_user = $this->drupalCreateUser();
     $this->drupalLogin($test_user);
-    $edit = array('preferred_langcode' => self::LANGCODE, 'mail' => $test_user->getEmail(), 'timezone' => 'America/Los_Angeles');
+    $edit = array('preferred_langcode' => self::LANGCODE, 'mail[0][value]' => $test_user->getEmail(), 'timezone' => 'America/Los_Angeles');
     $this->drupalPostForm('user/' . $test_user->id() . '/edit', $edit, t('Save'));
 
     // Disable session saving as we are about to modify the global $user.

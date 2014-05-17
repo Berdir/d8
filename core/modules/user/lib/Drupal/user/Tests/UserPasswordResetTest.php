@@ -85,7 +85,7 @@ class UserPasswordResetTest extends WebTestBase {
 
     // Change the forgotten password.
     $password = user_password();
-    $edit = array('pass[pass1]' => $password, 'pass[pass2]' => $password);
+    $edit = array('pass[0][value][pass1]' => $password, 'pass[0][value][pass2]' => $password);
     $this->drupalPostForm(NULL, $edit, t('Save'));
     $this->assertText(t('The changes have been saved.'), 'Forgotten password changed.');
 

@@ -59,10 +59,10 @@ class UserLanguageCreationTest extends WebTestBase {
     // language is set.
     $username = $this->randomName(10);
     $edit = array(
-      'name' => $username,
-      'mail' => $this->randomName(4) . '@example.com',
-      'pass[pass1]' => $username,
-      'pass[pass2]' => $username,
+      'name[0][value]' => $username,
+      'mail[0][value]' => $this->randomName(4) . '@example.com',
+      'pass[0][value][pass1]' => $username,
+      'pass[0][value][pass2]' => $username,
     );
 
     $this->drupalPostForm($langcode . '/admin/people/create', $edit, t('Create new account'));
@@ -79,8 +79,8 @@ class UserLanguageCreationTest extends WebTestBase {
 
     $username = $this->randomName(10);
     $edit = array(
-      'name' => $username,
-      'mail' => $this->randomName(4) . '@example.com',
+      'name[0][value]' => $username,
+      'mail[0][value]' => $this->randomName(4) . '@example.com',
     );
 
     $this->drupalPostForm($langcode . '/user/register', $edit, t('Create new account'));
@@ -100,8 +100,8 @@ class UserLanguageCreationTest extends WebTestBase {
     // Set pass_raw so we can login the new user.
     $user->pass_raw = $this->randomName(10);
     $edit = array(
-      'pass[pass1]' => $user->pass_raw,
-      'pass[pass2]' => $user->pass_raw,
+      'pass[0][value][pass1]' => $user->pass_raw,
+      'pass[0][value][pass2]' => $user->pass_raw,
     );
 
     $this->drupalPostForm($user_edit, $edit, t('Save'));
