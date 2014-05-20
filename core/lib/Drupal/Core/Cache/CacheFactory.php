@@ -52,6 +52,7 @@ class CacheFactory implements CacheFactoryInterface,  ContainerAwareInterface {
    *   The cache backend object associated with the specified bin.
    */
   public function get($bin) {
+    $service_name = 'cache.backend.database';
     $cache_settings = $this->settings->get('cache');
     if (isset($cache_settings['bins'][$bin])) {
       $service_name = $cache_settings['bins'][$bin];
@@ -59,8 +60,8 @@ class CacheFactory implements CacheFactoryInterface,  ContainerAwareInterface {
     elseif (isset($cache_settings['default'])) {
       $service_name = $cache_settings['default'];
     }
-    else {
-      $service_name = 'cache.backend.database';
+    else if (function_exists('apc_fetch')) {
+      $service_name = 'cache.backend.apcu';
     }
     return $this->container->get($service_name)->get($bin);
   }
