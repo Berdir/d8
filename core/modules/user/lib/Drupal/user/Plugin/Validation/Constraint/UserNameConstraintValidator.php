@@ -47,8 +47,5 @@ class UserNameConstraintValidator extends ConstraintValidator {
     ) {
       $this->context->addViolation($constraint->illegalMessage);
     }
-    if (drupal_strlen($name) > USERNAME_MAX_LENGTH) {
-      $this->context->addViolation($constraint->tooLongMessage, array('%name' => $name, '%max' => USERNAME_MAX_LENGTH));
-    }
   }
 }

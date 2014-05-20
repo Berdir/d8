@@ -84,7 +84,7 @@ class UserValidationTest extends DrupalUnitTestBase {
     $violations = $user->validate();
     $this->assertEqual(count($violations), 1, 'Violation found when name is too long.');
     $this->assertEqual($violations[0]->getPropertyPath(), 'name.0.value');
-    $this->assertEqual($violations[0]->getMessage(), t('The username %name is too long: it must be %max characters or less.', array('%name' => $name, '%max' => 60)));
+    $this->assertEqual($violations[0]->getMessage(), t('<em class="placeholder">Username</em>: may not be longer than 60 characters.', array('%max' => 60)));
 
     // Create a second test user to provoke a name collision.
     $user2 = entity_create('user', array(

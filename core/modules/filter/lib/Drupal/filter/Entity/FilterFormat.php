@@ -266,7 +266,7 @@ class FilterFormat extends ConfigEntityBase implements FilterFormatInterface, En
   /**
    * {@inheritdoc}
    */
-  public function getPermissionName() {
+  public function   getPermissionName() {
     return !$this->isFallbackFormat() ? 'use text format ' . $this->id() : FALSE;
   }
 

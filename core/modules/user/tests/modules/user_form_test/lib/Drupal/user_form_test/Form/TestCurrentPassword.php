@@ -29,8 +29,10 @@ class TestCurrentPassword extends FormBase {
    *   The user account.
    */
   public function buildForm(array $form, array &$form_state, UserInterface $user = NULL) {
-    $form_state['user'] = $user ;
-    $form['user_form_test_field'] = array(
+    $form_state['user'] = $user;
+    $form['user_form_test_field']['#tree'] = TRUE;
+
+    $form['user_form_test_field'][0]['value'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Test field'),
       '#description' => $this->t('A field that would require a correct password to change.'),
