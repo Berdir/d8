@@ -9,6 +9,7 @@
  */
 
 use Drupal\Core\DrupalKernel;
+use Symfony\Component\HttpFoundation\Request;
 
 // Check for $_SERVER['argv'] instead of PHP_SAPI === 'cli' to allow this script
 // to be tested with the Simpletest UI test runner.
@@ -56,15 +57,11 @@ EOF;
 // Password list to be processed.
 $passwords = $_SERVER['argv'];
 
-$core = dirname(__DIR__);
-require_once $core . '/vendor/autoload.php';
-require_once $core . '/includes/bootstrap.inc';
+$autoloader = require __DIR__ . '/../vendor/autoload.php';
 
-// Bootstrap the code so we have the container.
-drupal_bootstrap(DRUPAL_BOOTSTRAP_CONFIGURATION);
-
-$kernel = new DrupalKernel('prod', drupal_classloader(), FALSE);
-$kernel->boot();
+$request = Request::createFromGlobals();
+$kernel = new DrupalKernel('prod', $autoloader, FALSE);
+$kernel->boot($request);
 
 $password_hasher = $kernel->getContainer()->get('password');
 
