@@ -11,6 +11,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\CacheDecorator\CacheDecoratorInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManager;
+use Drupal\Core\Language\LanguageManagerInterface;
 
 class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
 
@@ -40,7 +41,7 @@ class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
    *
    * @var boolean
    */
-  protected $cacheNeedsWriting = TRUE;
+  protected $cacheNeedsWriting = FALSE;
 
   /**
    * Language manager for retrieving the default langcode when none is specified.
@@ -101,12 +102,12 @@ class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
    *   The alias storage service.
    * @param \Drupal\Core\Path\AliasWhitelistInterface $whitelist
    *   The whitelist implementation to use.
-   * @param \Drupal\Core\Language\LanguageManager $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   Cache backend.
    */
-  public function __construct(AliasStorageInterface $storage, AliasWhitelistInterface $whitelist, LanguageManager $language_manager, CacheBackendInterface $cache) {
+  public function __construct(AliasStorageInterface $storage, AliasWhitelistInterface $whitelist, LanguageManagerInterface $language_manager, CacheBackendInterface $cache) {
     $this->storage = $storage;
     $this->languageManager = $language_manager;
     $this->whitelist = $whitelist;
@@ -128,7 +129,15 @@ class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
    * and load them in a single query during path alias lookup.
    */
   public function writeCache() {
-    $path_lookups = $this->getPathLookups();
+    // Start with the preloaded path lookups, so that cached entries for other
+    // languages will not be lost.
+    $path_lookups = $this->preloadedPathLookups ?: array();
+    foreach ($this->lookupMap as $langcode => $lookups) {
+      $path_lookups[$langcode] = array_keys($lookups);
+      if (!empty($this->noAlias[$langcode])) {
+        $path_lookups[$langcode] = array_merge($path_lookups[$langcode], array_keys($this->noAlias[$langcode]));
+      }
+    }
     // Check if the system paths for this page were loaded from cache in this
     // request to avoid writing to cache on every request.
     if ($this->cacheNeedsWriting && !empty($path_lookups) && !empty($this->cacheKey)) {
@@ -155,7 +164,6 @@ class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
       $cached = $this->cache->get($this->cacheKey);
       if ($cached) {
         $this->preloadedPathLookups = $cached->data;
-        $this->cacheNeedsWriting = FALSE;
       }
     }
 
@@ -206,10 +214,10 @@ class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
       $this->langcodePreloaded[$langcode] = TRUE;
       $this->lookupMap[$langcode] = array();
       // Load paths from cache.
-      if (!empty($this->preloadedPathLookups)) {
-        $this->lookupMap[$langcode] = $this->storage->preloadPathAlias($this->preloadedPathLookups, $langcode);
+      if (!empty($this->preloadedPathLookups[$langcode])) {
+        $this->lookupMap[$langcode] = $this->storage->preloadPathAlias($this->preloadedPathLookups[$langcode], $langcode);
         // Keep a record of paths with no alias to avoid querying twice.
-        $this->noAlias[$langcode] = array_flip(array_diff_key($this->preloadedPathLookups, array_keys($this->lookupMap[$langcode])));
+        $this->noAlias[$langcode] = array_flip(array_diff_key($this->preloadedPathLookups[$langcode], array_keys($this->lookupMap[$langcode])));
       }
     }
 
@@ -233,6 +241,7 @@ class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
     // We can't record anything into $this->lookupMap because we didn't find any
     // aliases for this path. Thus cache to $this->noAlias.
     $this->noAlias[$langcode][$path] = TRUE;
+    $this->cacheNeedsWriting = TRUE;
     return $path;
   }
 
@@ -254,17 +263,6 @@ class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
     $this->preloadedPathLookups = array();
     $this->cache->delete($this->cacheKey);
     $this->pathAliasWhitelistRebuild($source);
-  }
-
-  /**
-   * Implements \Drupal\Core\Path\AliasManagerInterface::getPathLookups().
-   */
-  public function getPathLookups() {
-    $current = current($this->lookupMap);
-    if ($current) {
-      return array_keys($current);
-    }
-    return array();
   }
 
   /**
