@@ -7,10 +7,12 @@
 
 namespace Drupal\Core\Path;
 
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\CacheDecorator\CacheDecoratorInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManager;
 
-class AliasManager implements AliasManagerInterface {
+class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
 
   /**
    * The alias storage service.
@@ -18,6 +20,27 @@ class AliasManager implements AliasManagerInterface {
    * @var \Drupal\Core\Path\AliasStorageInterface
    */
   protected $storage;
+
+  /**
+   * Cache backend service.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface;
+   */
+  protected $cache;
+
+  /**
+   * The cache key to use when caching paths.
+   *
+   * @var string
+   */
+  protected $cacheKey;
+
+  /**
+   * Whether the cache needs to be written.
+   *
+   * @var boolean
+   */
+  protected $cacheNeedsWriting = TRUE;
 
   /**
    * Language manager for retrieving the default langcode when none is specified.
@@ -69,7 +92,7 @@ class AliasManager implements AliasManagerInterface {
    *
    * @var array
    */
-  protected $preloadedPathLookups = array();
+  protected $preloadedPathLookups = FALSE;
 
   /**
    * Constructs an AliasManager.
@@ -80,11 +103,39 @@ class AliasManager implements AliasManagerInterface {
    *   The whitelist implementation to use.
    * @param \Drupal\Core\Language\LanguageManager $language_manager
    *   The language manager.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   *   Cache backend.
    */
-  public function __construct(AliasStorageInterface $storage, AliasWhitelistInterface $whitelist, LanguageManager $language_manager) {
+  public function __construct(AliasStorageInterface $storage, AliasWhitelistInterface $whitelist, LanguageManager $language_manager, CacheBackendInterface $cache) {
     $this->storage = $storage;
     $this->languageManager = $language_manager;
     $this->whitelist = $whitelist;
+    $this->cache = $cache;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCacheKey($key) {
+    $this->cacheKey = $key;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Cache an array of the paths available on each page. We assume that aliases
+   * will be needed for the majority of these paths during subsequent requests,
+   * and load them in a single query during path alias lookup.
+   */
+  public function writeCache() {
+    $path_lookups = $this->getPathLookups();
+    // Check if the system paths for this page were loaded from cache in this
+    // request to avoid writing to cache on every request.
+    if ($this->cacheNeedsWriting && !empty($path_lookups) && !empty($this->cacheKey)) {
+      // Set the path cache to expire in 24 hours.
+      $expire = REQUEST_TIME + (60 * 60 * 24);
+      $this->cache->set($this->cacheKey, $path_lookups, $expire);
+    }
   }
 
   /**
@@ -96,6 +147,17 @@ class AliasManager implements AliasManagerInterface {
     // requested URL, we might end up being unable to check if there is a path
     // alias matching the URL path.
     $langcode = $langcode ?: $this->languageManager->getCurrentLanguage(Language::TYPE_URL)->id;
+
+    // We need to load the list of previously cached system paths for this
+    // key for use in subsequent lookups.
+    if ($this->preloadedPathLookups === FALSE) {
+      $this->preloadedPathLookups = array();
+      $cached = $this->cache->get($this->cacheKey);
+      if ($cached) {
+        $this->preloadedPathLookups = $cached->data;
+        $this->cacheNeedsWriting = FALSE;
+      }
+    }
 
     // If we already know that there are no paths for this alias simply return.
     if (empty($alias) || !empty($this->noPath[$langcode][$alias])) {
@@ -110,12 +172,14 @@ class AliasManager implements AliasManagerInterface {
     // Look for path in storage.
     if ($path = $this->storage->lookupPathSource($alias, $langcode)) {
       $this->lookupMap[$langcode][$path] = $alias;
+      $this->cacheNeedsWriting = TRUE;
       return $path;
     }
 
     // We can't record anything into $this->lookupMap because we didn't find any
     // paths for this alias. Thus cache to $this->noPath.
     $this->noPath[$langcode][$alias] = TRUE;
+
     return $alias;
   }
 
@@ -162,6 +226,7 @@ class AliasManager implements AliasManagerInterface {
     // Try to load alias from storage.
     if ($alias = $this->storage->lookupPathAlias($path, $langcode)) {
       $this->lookupMap[$langcode][$path] = $alias;
+      $this->cacheNeedsWriting = TRUE;
       return $alias;
     }
 
@@ -187,6 +252,7 @@ class AliasManager implements AliasManagerInterface {
     $this->noAlias = array();
     $this->langcodePreloaded = array();
     $this->preloadedPathLookups = array();
+    $this->cache->delete($this->cacheKey);
     $this->pathAliasWhitelistRebuild($source);
   }
 
@@ -202,26 +268,19 @@ class AliasManager implements AliasManagerInterface {
   }
 
   /**
-   * Implements \Drupal\Core\Path\AliasManagerInterface::preloadPathLookups().
-   */
-  public function preloadPathLookups(array $path_list) {
-    $this->preloadedPathLookups = $path_list;
-  }
-
-  /**
    * Rebuild the path alias white list.
    *
-   * @param $source
-   *   An optional system path for which an alias is being inserted.
+   * @param string $path
+   *   An optional path for which an alias is being inserted.
    *
    * @return
    *   An array containing a white list of path aliases.
    */
-  protected function pathAliasWhitelistRebuild($source = NULL) {
-    // When paths are inserted, only rebuild the whitelist if the system path
-    // has a top level component which is not already in the whitelist.
-    if (!empty($source)) {
-      if ($this->whitelist->get(strtok($source, '/'))) {
+  protected function pathAliasWhitelistRebuild($path = NULL) {
+    // When paths are inserted, only rebuild the whitelist if the path has a top
+    // level component which is not already in the whitelist.
+    if (!empty($path)) {
+      if ($this->whitelist->get(strtok($path, '/'))) {
         return;
      }
     }
