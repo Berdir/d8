@@ -59,7 +59,19 @@ class AliasManagerTest extends UnitTestCase {
    */
   protected $cache;
 
-  protected $cacheKey = 'key';
+  /**
+   * The internal cache key used by the alias manager.
+   *
+   * @var string
+   */
+  protected $cacheKey = 'preload-paths:key';
+
+  /**
+   * The cache key passed to the alias manager.
+   *
+   * @var string
+   */
+  protected $path = 'key';
 
   /**
    * {@inheritdoc}
@@ -193,7 +205,7 @@ class AliasManagerTest extends UnitTestCase {
 
     $language = $this->setUpCurrentLanguage();
 
-    $this->aliasManager->setCacheKey($this->cacheKey);
+    $this->aliasManager->setCacheKey($this->path);
 
     $this->aliasWhitelist->expects($this->any())
       ->method('get')
@@ -231,7 +243,7 @@ class AliasManagerTest extends UnitTestCase {
 
     $language = $this->setUpCurrentLanguage();
 
-    $this->aliasManager->setCacheKey($this->cacheKey);
+    $this->aliasManager->setCacheKey($this->path);
 
     $this->aliasWhitelist->expects($this->any())
       ->method('get')
@@ -276,8 +288,7 @@ class AliasManagerTest extends UnitTestCase {
       ->will($this->returnValue((object) array('data' => $cached_paths)));
 
     // Simulate a request so that the preloaded paths are fetched.
-    $this->aliasManager->setCacheKey($this->cacheKey);
-    $this->aliasManager->getPathByAlias('alias');
+    $this->aliasManager->setCacheKey($this->path);
 
     $this->aliasWhitelist->expects($this->any())
       ->method('get')
@@ -325,8 +336,7 @@ class AliasManagerTest extends UnitTestCase {
       ->will($this->returnValue((object) array('data' => $cached_paths)));
 
     // Simulate a request so that the preloaded paths are fetched.
-    $this->aliasManager->setCacheKey($this->cacheKey);
-    $this->aliasManager->getPathByAlias('alias');
+    $this->aliasManager->setCacheKey($this->path);
 
     $this->aliasWhitelist->expects($this->any())
       ->method('get')
@@ -379,8 +389,7 @@ class AliasManagerTest extends UnitTestCase {
       ->will($this->returnValue((object) array('data' => $cached_paths)));
 
     // Simulate a request so that the preloaded paths are fetched.
-    $this->aliasManager->setCacheKey($this->cacheKey);
-    $this->aliasManager->getPathByAlias('alias');
+    $this->aliasManager->setCacheKey($this->path);
 
     $this->aliasWhitelist->expects($this->any())
       ->method('get')
@@ -428,8 +437,7 @@ class AliasManagerTest extends UnitTestCase {
       ->will($this->returnValue((object) array('data' => $cached_paths)));
 
     // Simulate a request so that the preloaded paths are fetched.
-    $this->aliasManager->setCacheKey($this->cacheKey);
-    $this->aliasManager->getPathByAlias('alias');
+    $this->aliasManager->setCacheKey($this->path);
 
     $this->aliasWhitelist->expects($this->any())
       ->method('get')
@@ -484,8 +492,7 @@ class AliasManagerTest extends UnitTestCase {
       ->will($this->returnValue((object) array('data' => $cached_paths)));
 
     // Simulate a request so that the preloaded paths are fetched.
-    $this->aliasManager->setCacheKey($this->cacheKey);
-    $this->aliasManager->getPathByAlias('alias');
+    $this->aliasManager->setCacheKey($this->path);
 
     $this->aliasWhitelist->expects($this->any())
       ->method('get')

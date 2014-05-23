@@ -88,8 +88,8 @@ class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
   /**
    * Holds an array of previously looked up paths for the current request path.
    *
-   * This will only ever get populated if the alias manager is being used in
-   * the context of a request.
+   * This will only get populated if a cache key has been set, which for example
+   * happens if the laias manager is used in the context of a request.
    *
    * @var array
    */
@@ -118,7 +118,8 @@ class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
    * {@inheritdoc}
    */
   public function setCacheKey($key) {
-    $this->cacheKey = $key;
+    // Prefix the cache key to avoid clashes with other caches.
+    $this->cacheKey = 'preload-paths:' . $key;
   }
 
   /**
@@ -156,16 +157,6 @@ class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
     // requested URL, we might end up being unable to check if there is a path
     // alias matching the URL path.
     $langcode = $langcode ?: $this->languageManager->getCurrentLanguage(Language::TYPE_URL)->id;
-
-    // We need to load the list of previously cached system paths for this
-    // key for use in subsequent lookups.
-    if ($this->preloadedPathLookups === FALSE) {
-      $this->preloadedPathLookups = array();
-      $cached = $this->cache->get($this->cacheKey);
-      if ($cached) {
-        $this->preloadedPathLookups = $cached->data;
-      }
-    }
 
     // If we already know that there are no paths for this alias simply return.
     if (empty($alias) || !empty($this->noPath[$langcode][$alias])) {
@@ -213,6 +204,16 @@ class AliasManager implements AliasManagerInterface, CacheDecoratorInterface {
     if (empty($this->langcodePreloaded[$langcode])) {
       $this->langcodePreloaded[$langcode] = TRUE;
       $this->lookupMap[$langcode] = array();
+
+      // Load the cached paths that should be used for preloading. This only
+      // happens if a cache key has been set.
+      if ($this->preloadedPathLookups === FALSE) {
+        $this->preloadedPathLookups = array();
+        if ($this->cacheKey && $cached = $this->cache->get($this->cacheKey)) {
+          $this->preloadedPathLookups = $cached->data;
+        }
+      }
+
       // Load paths from cache.
       if (!empty($this->preloadedPathLookups[$langcode])) {
         $this->lookupMap[$langcode] = $this->storage->preloadPathAlias($this->preloadedPathLookups[$langcode], $langcode);
