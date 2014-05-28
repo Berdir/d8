@@ -17,7 +17,7 @@ namespace Drupal\entity_test\Entity;
  *   base_table = "entity_test",
  *   entity_keys = {
  *     "id" = "id",
- *     "bundle" = "type"
+ *     "bundle" = "type",
  *   }
  * )
  */

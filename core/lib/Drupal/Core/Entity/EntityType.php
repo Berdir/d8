@@ -257,7 +257,11 @@ class EntityType implements EntityTypeInterface {
    * {@inheritdoc}
    */
   public function getKeys() {
-    return $this->entity_keys + array('revision' => '', 'bundle' => '');
+    return $this->entity_keys + array(
+      'revision' => '',
+      'bundle' => '',
+      'langcode' => '',
+    );
   }
 
   /**

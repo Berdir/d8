@@ -45,10 +45,11 @@ use Drupal\custom_block\CustomBlockInterface;
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "id",
+ *     "uuid" = "uuid",
  *     "revision" = "revision_id",
+ *     "langcode" = "langcode",
  *     "bundle" = "type",
  *     "label" = "info",
- *     "uuid" = "uuid"
  *   },
  *   bundle_entity_type = "custom_block_type"
  * )

@@ -33,8 +33,9 @@ use Drupal\entity_test\Entity\EntityTest;
  *   entity_keys = {
  *     "id" = "id",
  *     "uuid" = "uuid",
+ *     "langcode" = "langcode",
  *     "bundle" = "type",
- *     "label" = "name"
+ *     "label" = "name",
  *   },
  *   links = {
  *     "canonical" = "entity_test.edit_entity_test_mul",

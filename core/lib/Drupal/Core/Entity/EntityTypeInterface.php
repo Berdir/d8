@@ -83,24 +83,27 @@ interface EntityTypeInterface {
    *   - id: The name of the property that contains the primary ID of the
    *     entity. Every entity object passed to the Field API must have this
    *     property and its value must be numeric.
+   *   - uuid: (optional) The name of the property that contains the universally
+   *     unique identifier of the entity, which is used to distinctly identify
+   *     an entity across different systems.
    *   - revision: (optional) The name of the property that contains the
    *     revision ID of the entity. The Field API assumes that all revision IDs
    *     are unique across all entities of a type. If this entry is omitted
    *     the entities of this type are not revisionable.
+   *   - langcode: (optional) The name of the property that contains the
+   *     language code. For instance, if the entity's language is located in
+   *     $entity->language, then 'language' should be specified here.
    *   - bundle: (optional) The name of the property that contains the bundle
    *     name for the entity. The bundle name defines which set of fields are
    *     attached to the entity (e.g. what nodes call "content type"). This
    *     entry can be omitted if this entity type exposes a single bundle (such
    *     that all entities have the same collection of fields). The name of this
    *     single bundle will be the same as the entity type.
-   *   - label: The name of the property that contains the entity label. For
-   *     example, if the entity's label is located in $entity->subject, then
-   *     'subject' should be specified here. If complex logic is required to
-   *     build the label, a 'label_callback' should be defined instead (see the
-   *     $label_callback block above for details).
-   *   - uuid (optional): The name of the property that contains the universally
-   *     unique identifier of the entity, which is used to distinctly identify
-   *     an entity across different systems.
+   *   - label: (optional) The name of the property that contains the entity
+   *     label. For example, if the entity's label is located in
+   *     $entity->subject, then 'subject' should be specified here. If complex
+   *     logic is required to build the label, a 'label_callback' should be
+   *     defined instead (see the $label_callback block above for details).
    */
   public function getKeys();
 

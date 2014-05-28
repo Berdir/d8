@@ -20,7 +20,7 @@ namespace Drupal\entity_test\Entity;
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "id",
- *     "bundle" = "type"
+ *     "bundle" = "type",
  *   }
  * )
  */

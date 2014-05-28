@@ -27,6 +27,7 @@ use Drupal\Core\Field\FieldDefinition;
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "iid",
+ *     "langcode" = "langcode",
  *     "label" = "title",
  *   }
  * )

@@ -44,10 +44,11 @@ use Drupal\user\UserInterface;
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "nid",
+ *     "uuid" = "uuid",
  *     "revision" = "vid",
+ *     "langcode" = "langcode",
  *     "bundle" = "type",
  *     "label" = "title",
- *     "uuid" = "uuid"
  *   },
  *   bundle_entity_type = "node_type",
  *   permission_granularity = "bundle",

@@ -38,9 +38,10 @@ use Drupal\taxonomy\TermInterface;
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "tid",
+ *     "uuid" = "uuid",
+ *     "langcode" = "langcode",
  *     "bundle" = "vid",
  *     "label" = "name",
- *     "uuid" = "uuid"
  *   },
  *   bundle_entity_type = "taxonomy_vocabulary",
  *   links = {

@@ -682,7 +682,7 @@ class EntityManagerTest extends UnitTestCase {
    * @expectedException \LogicException
    */
   public function testGetBaseFieldDefinitionsInvalidDefinition() {
-    $langcode_definition = $this->setUpEntityWithFieldDefinition(FALSE, 'langcode');
+    $langcode_definition = $this->setUpEntityWithFieldDefinition(FALSE, 'langcode', 1, array('langcode' => 'langcode'));
     $langcode_definition->expects($this->once())
       ->method('isTranslatable')
       ->will($this->returnValue(TRUE));
@@ -734,11 +734,17 @@ class EntityManagerTest extends UnitTestCase {
    *   ModuleHandlerInterface::invokeAll() implementation. Defaults to FALSE.
    * @param string $field_definition_id
    *   (optional) The ID to use for the field definition. Defaults to 'id'.
+   * @param int $base_field_definition_calls
+   *   (optional) The number of times EntityInterface::baseFieldDefinitions() is
+   *   expected to be called. Defaults to 1.
+   * @param array $entity_keys
+   *   (optional) An array of entity keys for the mocked entity type. Defaults
+   *   to an empty array.
    *
    * @return \Drupal\Core\Field\FieldDefinition|\PHPUnit_Framework_MockObject_MockObject
    *   A field definition object.
    */
-  protected function setUpEntityWithFieldDefinition($custom_invoke_all = FALSE, $field_definition_id = 'id', $base_field_definition_calls = 1) {
+  protected function setUpEntityWithFieldDefinition($custom_invoke_all = FALSE, $field_definition_id = 'id', $base_field_definition_calls = 1, $entity_keys = array()) {
     $entity_type = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
     $entity = $this->getMock('Drupal\Tests\Core\Entity\TestContentEntityInterface');
     $entity_class = get_class($entity);
@@ -748,7 +754,7 @@ class EntityManagerTest extends UnitTestCase {
       ->will($this->returnValue($entity_class));
     $entity_type->expects($this->any())
       ->method('getKeys')
-      ->will($this->returnValue(array()));
+      ->will($this->returnValue($entity_keys));
     $entity_type->expects($this->any())
       ->method('isSubclassOf')
       ->with($this->equalTo('\Drupal\Core\Entity\ContentEntityInterface'))

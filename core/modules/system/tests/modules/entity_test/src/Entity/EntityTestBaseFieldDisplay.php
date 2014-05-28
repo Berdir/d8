@@ -29,7 +29,7 @@ use Drupal\Core\Field\FieldDefinition;
  *     "id" = "id",
  *     "uuid" = "uuid",
  *     "revision" = "revision_id",
- *     "bundle" = "type"
+ *     "bundle" = "type",
  *   },
  *   links = {
  *     "edit-form" = "entity_test.edit_entity_test",

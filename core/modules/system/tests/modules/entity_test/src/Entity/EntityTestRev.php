@@ -32,6 +32,7 @@ use Drupal\entity_test\Entity\EntityTest;
  *     "id" = "id",
  *     "uuid" = "uuid",
  *     "revision" = "revision_id",
+ *     "langcode" = "langcode",
  *     "bundle" = "type",
  *     "label" = "name",
  *   },

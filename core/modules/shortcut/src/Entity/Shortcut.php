@@ -37,8 +37,9 @@ use Drupal\shortcut\ShortcutInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "uuid" = "uuid",
+ *     "langcode" = "langcode",
  *     "bundle" = "shortcut_set",
- *     "label" = "title"
+ *     "label" = "title",
  *   },
  *   links = {
  *     "canonical" = "shortcut.link_edit",

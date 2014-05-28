@@ -51,6 +51,15 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
   protected $dataTable;
 
   /**
+   * Name of entity's default language database table field.
+   *
+   * Is only set if the entity has multilingual support.
+   *
+   * @var string
+   */
+  protected $defaultLangcodeKey;
+
+  /**
    * The table that stores revision field data if the entity supports revisions.
    *
    * @var string
@@ -109,6 +118,9 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
     // Check if the entity type has a dedicated table for fields.
     if ($data_table = $this->entityType->getDataTable()) {
       $this->dataTable = $data_table;
+      // Instead of hardcoding this value throughout this class, we store it in
+      // a member variable to allow subclasses to override this.
+      $this->defaultLangcodeKey = 'default_langcode';
       // Entity types having both revision and translation support should always
       // define a revision data table.
       if ($this->revisionTable && $revision_data_table = $this->entityType->getRevisionDataTable()) {
@@ -229,7 +241,7 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
 
         // Field values in default language are stored with
         // Language::LANGCODE_DEFAULT as key.
-        $langcode = empty($values['default_langcode']) ? $values['langcode'] : Language::LANGCODE_DEFAULT;
+        $langcode = empty($values[$this->defaultLangcodeKey]) ? $values[$this->langcodeKey] : Language::LANGCODE_DEFAULT;
         $translations[$id][$langcode] = TRUE;
 
         foreach (array_keys($field_definitions) as $field_name) {
@@ -306,13 +318,13 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase {
       //   apply to the default language. See http://drupal.org/node/1866330.
       // Default to the original entity language if not explicitly specified
       // otherwise.
-      if (!array_key_exists('default_langcode', $values)) {
-        $values['default_langcode'] = 1;
+      if (!array_key_exists($this->defaultLangcodeKey, $values)) {
+        $values[$this->defaultLangcodeKey] = 1;
       }
       // If the 'default_langcode' flag is explicitly not set, we do not care
       // whether the queried values are in the original entity language or not.
-      elseif ($values['default_langcode'] === NULL) {
-        unset($values['default_langcode']);
+      elseif ($values[$this->defaultLangcodeKey] === NULL) {
+        unset($values[$this->defaultLangcodeKey]);
       }
     }
 

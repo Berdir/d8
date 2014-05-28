@@ -35,7 +35,8 @@ use Drupal\entity_test\Entity\EntityTestRev;
  *     "id" = "id",
  *     "uuid" = "uuid",
  *     "revision" = "revision_id",
- *     "bundle" = "type"
+ *     "langcode" = "langcode",
+ *     "bundle" = "type",
  *   },
  *   links = {
  *     "canonical" = "entity_test.edit_entity_test_mulrev",

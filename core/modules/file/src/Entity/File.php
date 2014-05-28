@@ -28,8 +28,8 @@ use Drupal\user\UserInterface;
  *   base_table = "file_managed",
  *   entity_keys = {
  *     "id" = "fid",
+ *     "uuid" = "uuid",
  *     "label" = "filename",
- *     "uuid" = "uuid"
  *   }
  * )
  */

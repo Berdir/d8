@@ -38,7 +38,8 @@ use Symfony\Component\Routing\Route;
  *     "id" = "mlid",
  *     "label" = "link_title",
  *     "uuid" = "uuid",
- *     "bundle" = "bundle"
+ *     "bundle" = "bundle",
+ *     "langcode" = "langcode",
  *   },
  * )
  */

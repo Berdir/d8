@@ -40,9 +40,10 @@ use Drupal\user\UserInterface;
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "cid",
+ *     "uuid" = "uuid",
+ *     "langcode" = "langcode",
  *     "bundle" = "field_id",
  *     "label" = "subject",
- *     "uuid" = "uuid"
  *   },
  *   links = {
  *     "canonical" = "comment.permalink",

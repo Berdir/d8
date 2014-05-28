@@ -248,8 +248,19 @@ function _content_translation_menu_strip_loaders($path) {
  *   The entity whose translation overview should be displayed.
  */
 function content_translation_translate_access(EntityInterface $entity) {
-  return $entity instanceof ContentEntityInterface && empty($entity->getUntranslated()->language()->locked) && \Drupal::languageManager()->isMultilingual() && $entity->isTranslatable() &&
-    (user_access('create content translations') || user_access('update content translations') || user_access('delete content translations'));
+  $account = \Drupal::currentUser();
+
+  $access = $entity instanceof ContentEntityInterface;
+  $access = $access && empty($entity->getUntranslated()->language()->locked);
+  $access = $access && \Drupal::languageManager()->isMultilingual();
+  $access = $access && $entity->isTranslatable();
+  $access = $access && (
+    $account->hasPermission('create content translations') ||
+    $account->hasPermission('update content translations') ||
+    $account->hasPermission('delete content translations')
+  );
+
+  return $access;
 }
 
 /**

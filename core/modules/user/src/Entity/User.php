@@ -41,7 +41,8 @@ use Drupal\user\UserInterface;
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "uid",
- *     "uuid" = "uuid"
+ *     "uuid" = "uuid",
+ *     "langcode" = "langcode",
  *   },
  *   links = {
  *     "canonical" = "user.view",

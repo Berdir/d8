@@ -26,7 +26,7 @@ use Drupal\Core\Field\FieldDefinition;
  *     }
  *   },
  *   entity_keys = {
- *     "bundle" = "category"
+ *     "bundle" = "category",
  *   },
  *   bundle_entity_type = "contact_category",
  *   fieldable = TRUE,

@@ -10,6 +10,7 @@ namespace Drupal\aggregator\Entity;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Language\Language;
 use Symfony\Component\DependencyInjection\Container;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\aggregator\FeedInterface;
@@ -38,8 +39,9 @@ use Drupal\aggregator\FeedInterface;
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "fid",
- *     "label" = "title",
  *     "uuid" = "uuid",
+ *     "langcode" = "langcode",
+ *     "label" = "title",
  *   }
  * )
  */
