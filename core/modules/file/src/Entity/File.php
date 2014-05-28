@@ -29,7 +29,7 @@ use Drupal\user\UserInterface;
  *   entity_keys = {
  *     "id" = "fid",
  *     "uuid" = "uuid",
- *     "langcode" = "langcode"
+ *     "langcode" = "langcode",
  *     "label" = "filename",
  *   }
  * )
