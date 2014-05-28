@@ -143,7 +143,7 @@ function shortcut_set_switch_submit($form, &$form_state) {
     ));
     $set->save();
     $replacements = array(
-      '%user' => $account->getUsername(),
+      '%user' => $account->getDisplayName(),
       '%set_name' => $set->label(),
       '@switch-url' => url(current_path()),
     );
@@ -166,7 +166,7 @@ function shortcut_set_switch_submit($form, &$form_state) {
     // Switch to a different shortcut set.
     $set = ShortcutSet::load($form_state['values']['set']);
     $replacements = array(
-      '%user' => $account->getUsername(),
+      '%user' => $account->getDisplayName(),
       '%set_name' => $set->label(),
     );
     drupal_set_message($account->id() == $user->id() ? t('You are now using the %set_name shortcut set.', $replacements) : t('%user is now using the %set_name shortcut set.', $replacements));

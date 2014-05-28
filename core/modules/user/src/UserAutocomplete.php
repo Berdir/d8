@@ -91,7 +91,7 @@ class UserAutocomplete {
 
       $controller = $this->entityManager->getStorage('user');
       foreach ($controller->loadMultiple($uids) as $account) {
-        $matches[] = array('value' => $account->getUsername(), 'label' => String::checkPlain($account->getUsername()));
+        $matches[] = array('value' => $account->getUsername(), 'label' => String::checkPlain($account->getDisplayName()));
       }
     }
 

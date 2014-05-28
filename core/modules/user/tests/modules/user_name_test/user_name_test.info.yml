@@ -1,0 +1,7 @@
+name: 'User name tests'
+type: module
+description: 'Support module for user name testing.'
+package: Testing
+version: VERSION
+core: 8.x
+hidden: true

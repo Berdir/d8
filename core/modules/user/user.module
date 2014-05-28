@@ -589,7 +589,7 @@ function user_preprocess_block(&$variables) {
  *   Use \Drupal\Core\Session\Interface::getUsername().
  */
 function user_format_name(AccountInterface $account) {
-  return $account->getUsername();
+  return $account->getDisplayName();
 }
 
 /**
@@ -638,7 +638,7 @@ function template_preprocess_username(&$variables) {
   // unsanitized version, in case other preprocess functions want to implement
   // their own shortening logic or add markup. If they do so, they must ensure
   // that $variables['name'] is safe for printing.
-  $name = $variables['name_raw'] = $account->getUsername();
+  $name = $variables['name_raw'] = $account->getDisplayName();
   if (drupal_strlen($name) > 20) {
     $name = drupal_substr($name, 0, 15) . '...';
     $variables['truncated'] = TRUE;
@@ -964,8 +964,8 @@ function _user_cancel($edit, $account, $method) {
       }
       $account->block();
       $account->save();
-      drupal_set_message(t('%name has been disabled.', array('%name' => $account->getUsername())));
-      watchdog('user', 'Blocked user: %name %email.', array('%name' => $account->getUsername(), '%email' => '<' . $account->getEmail() . '>'), WATCHDOG_NOTICE);
+      drupal_set_message(t('%name has been disabled.', array('%name' => $account->getDisplayName())));
+      watchdog('user', 'Blocked user: %name %email.', array('%name' => $account->getDisplayName(), '%email' => '<' . $account->getEmail() . '>'), WATCHDOG_NOTICE);
       break;
 
     case 'user_cancel_reassign':
@@ -975,8 +975,8 @@ function _user_cancel($edit, $account, $method) {
         _user_mail_notify('status_canceled', $account);
       }
       $account->delete();
-      drupal_set_message(t('%name has been deleted.', array('%name' => $account->getUsername())));
-      watchdog('user', 'Deleted user: %name %email.', array('%name' => $account->getUsername(), '%email' => '<' . $account->getEmail() . '>'), WATCHDOG_NOTICE);
+      drupal_set_message(t('%name has been deleted.', array('%name' => $account->getDisplayName())));
+      watchdog('user', 'Deleted user: %name %email.', array('%name' => $account->getDisplayName(), '%email' => '<' . $account->getEmail() . '>'), WATCHDOG_NOTICE);
       break;
   }
 
@@ -1652,7 +1652,7 @@ function user_toolbar() {
     '#type' => 'toolbar_item',
     'tab' => array(
       '#type' => 'link',
-      '#title' => $user->getUsername(),
+      '#title' => $user->getDisplayName(),
       '#href' => 'user',
       '#attributes' => array(
         'title' => t('My account'),
@@ -1686,7 +1686,7 @@ function user_toolbar() {
 function user_logout() {
   $user = \Drupal::currentUser();
 
-  watchdog('user', 'Session closed for %name.', array('%name' => $user->getUsername()));
+  watchdog('user', 'Session closed for %name.', array('%name' => $user->getDisplayName()));
 
   \Drupal::moduleHandler()->invokeAll('user_logout', array($user));
 

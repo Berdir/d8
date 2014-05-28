@@ -422,7 +422,15 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function getUsername() {
-    $name = $this->get('name')->value ?: \Drupal::config('user.settings')->get('anonymous');
+    $name = $this->get('name')->value ?: '';
+    return $name;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDisplayName() {
+    $name = $this->getUsername() ?: \Drupal::config('user.settings')->get('anonymous');
     \Drupal::moduleHandler()->alter('user_format_name', $name, $this);
     return $name;
   }

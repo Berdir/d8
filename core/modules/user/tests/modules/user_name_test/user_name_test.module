@@ -1,0 +1,12 @@
+<?php
+/**
+ * @file
+ * User name tests bootstrap file.
+ */
+
+/**
+ * Implements hook_user_format_name_alter().
+ */
+function user_name_test_user_format_name_alter(&$name, $account) {
+  $name .= \Drupal::state()->get('user_name_test_altered_name');
+}

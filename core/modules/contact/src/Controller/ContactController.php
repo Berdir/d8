@@ -116,7 +116,7 @@ class ContactController extends ControllerBase {
     ));
 
     $form = $this->entityFormBuilder()->getForm($message);
-    $form['#title'] = $this->t('Contact @username', array('@username' => $user->getUsername()));
+    $form['#title'] = $this->t('Contact @username', array('@username' => $user->getDisplayName()));
     return $form;
   }
 

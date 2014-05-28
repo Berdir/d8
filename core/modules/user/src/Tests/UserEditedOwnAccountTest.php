@@ -14,6 +14,13 @@ use Drupal\simpletest\WebTestBase;
  */
 class UserEditedOwnAccountTest extends WebTestBase {
 
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('user_form_test');
+
   public static function getInfo() {
     return array(
       'name' => 'User edited own account',

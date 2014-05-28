@@ -112,7 +112,17 @@ interface AccountInterface {
   public function getPreferredAdminLangcode($default = NULL);
 
   /**
-   * Returns the username of this account.
+   * Returns the unique username of this account.
+   *
+   * @return string
+   *   An unsanitized string with the unique username. The code receiving this
+   *   result must ensure that \Drupal\Component\Utility\String::checkPlain()
+   *   is called on it before it is printed to the page.
+   */
+  public function getUsername();
+
+  /**
+   * Returns the display name of this account.
    *
    * By default, the passed-in object's 'name' property is used if it exists, or
    * else, the site-defined value for the 'anonymous' variable. However, a module
@@ -121,13 +131,13 @@ interface AccountInterface {
    *
    * @see hook_user_format_name_alter()
    *
-   * @return
-   *   An unsanitized string with the username to display. The code receiving
+   * @return string
+   *   An unsanitized string with the user name to display. The code receiving
    *   this result must ensure that \Drupal\Component\Utility\String::checkPlain()
    *   is called on it before it is
    *   printed to the page.
    */
-  public function getUsername();
+  public function getDisplayName();
 
   /**
    * Returns the e-mail address of this account.

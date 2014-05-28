@@ -139,7 +139,7 @@ class UserSearch extends SearchPluginBase implements AccessibleInterface {
 
     foreach ($accounts as $account) {
       $result = array(
-        'title' => $account->getUsername(),
+        'title' => $account->getDisplayName(),
         'link' => url('user/' . $account->id(), array('absolute' => TRUE)),
       );
       if ($this->currentUser->hasPermission('administer users')) {

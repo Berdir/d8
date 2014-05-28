@@ -19,12 +19,17 @@ class UserEntityCallbacksTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('user');
+  public static $modules = array('user', 'user_name_test');
 
   /**
    * @var \Drupal\user\UserInterface
    */
   protected $account;
+
+  /**
+   * @var \Drupal\user\UserInterface
+   */
+  protected $anonymous;
 
   public static function getInfo() {
     return array(
@@ -51,6 +56,13 @@ class UserEntityCallbacksTest extends WebTestBase {
     $name = $this->randomName();
     \Drupal::config('user.settings')->set('anonymous', $name)->save();
     $this->assertEqual($this->anonymous->label(), $name, 'The variable anonymous should be used for name of uid 0');
+    $this->assertEqual($this->anonymous->getUserName(), '', 'The raw anonymous user name should be empty string');
+
+    // Set to test the altered username.
+    \Drupal::state()->set('user_name_test_altered_name', 'altered');
+
+    $this->assertEqual($this->account->getDisplayName(), $this->account->name->value . 'altered', 'The user display name should be altered.');
+    $this->assertEqual($this->account->getUsername(), $this->account->name->value, 'The user name should not be altered.');
   }
 
   /**
