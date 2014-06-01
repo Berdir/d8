@@ -7,6 +7,7 @@
 
 namespace Drupal\field\Entity;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -298,8 +299,8 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
    * {@inheritdoc}
    */
   public function postCreate(EntityStorageInterface $storage) {
-    // Validate that we have a valid field for this instance. This an exception
-    // if the field is invalid.
+    // Validate that we have a valid field for this instance. This throws an
+    // exception if the field is invalid.
     $field = $this->getField();
 
     // Make sure the field_uuid is populated.
@@ -480,16 +481,16 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
           $field = current($fields);
         }
         else {
-          throw new FieldException(format_string('Attempt to create an instance of field @field_name that does not exist on entity type @entity_type.', array('@field_name' => $this->field_name, '@entity_type' => $this->entity_type)));
+          throw new FieldException(String::format('Attempt to create an instance of field @field_name that does not exist on entity type @entity_type.', array('@field_name' => $this->field_name, '@entity_type' => $this->entity_type)));
         }
       }
       else {
         $fields = \Drupal::entityManager()->getFieldStorageDefinitions($this->entity_type);
         if (!isset($fields[$this->field_name])) {
-          throw new FieldException(format_string('Attempt to create an instance of field @field_name that does not exist on entity type @entity_type.', array('@field_name' => $this->field_name, '@entity_type' => $this->entity_type)));
+          throw new FieldException(String::format('Attempt to create an instance of field @field_name that does not exist on entity type @entity_type.', array('@field_name' => $this->field_name, '@entity_type' => $this->entity_type)));
         }
         if (!$fields[$this->field_name] instanceof FieldConfigInterface) {
-          throw new FieldException(format_string('Attempt to create a configurable instance of non-configurable field @field_name.', array('@field_name' => $this->field_name, '@entity_type' => $this->entity_type)));
+          throw new FieldException(String::format('Attempt to create a configurable instance of non-configurable field @field_name.', array('@field_name' => $this->field_name, '@entity_type' => $this->entity_type)));
         }
         $field = $fields[$this->field_name];
       }
