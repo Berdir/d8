@@ -6,10 +6,12 @@
  */
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\block\BlockPluginInterface;
+use Drupal\system\Tests\KeyValueStore\DatabaseStorageExpirableTest;
 use Drupal\user\UserInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use GuzzleHttp\Exception\RequestException;
@@ -1536,6 +1538,11 @@ function system_cron() {
 
   foreach (Cache::getBins() as $cache_backend) {
     $cache_backend->garbageCollection();
+  }
+
+  // Cleanup the expirable key value database store.
+  if (\Drupal::service('keyvalue.expirable.database') instanceof KeyValueDatabaseExpirableFactory) {
+    \Drupal::service('keyvalue.expirable.database')->garbageCollection();
   }
 
   // Cleanup the queue for failed batches.
