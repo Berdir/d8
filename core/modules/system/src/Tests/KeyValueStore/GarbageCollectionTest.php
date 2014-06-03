@@ -10,12 +10,19 @@ namespace Drupal\system\Tests\KeyValueStore;
 use Drupal\Component\Serialization\PhpSerialize;
 use Drupal\Core\Database\Database;
 use Drupal\Core\KeyValueStore\DatabaseStorageExpirable;
-use Drupal\simpletest\UnitTestBase;
+use Drupal\simpletest\KernelTestBase;
 
 /**
  * Tests garbage collection for DatabaseStorageExpirable.
  */
-class GarbageCollectionTest extends UnitTestBase {
+class GarbageCollectionTest extends KernelTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('system');
 
   public static function getInfo() {
     return array(
@@ -27,14 +34,8 @@ class GarbageCollectionTest extends UnitTestBase {
 
   protected function setUp() {
     parent::setUp();
-    module_load_install('system');
-    $schema = system_schema();
-    db_create_table('key_value_expire', $schema['key_value_expire']);
-  }
-
-  protected function tearDown() {
-    db_drop_table('key_value_expire');
-    parent::tearDown();
+    // The additional tables are necessary due to the call to system_cron().
+    $this->installSchema('system', array('key_value_expire', 'flood', 'queue'));
   }
 
   /**
@@ -63,10 +64,10 @@ class GarbageCollectionTest extends UnitTestBase {
         ->execute();
     }
 
-    // Perform a new set operation and then manually destruct the object to
-    // trigger garbage collection.
+
+    // Perform a new set operation and then trigger garbage collection.
     $store->setWithExpire('autumn', 'winter', rand(500, 1000000));
-    $store->destruct();
+    system_cron();
 
     // Query the database and confirm that the stale records were deleted.
     $result = db_query(
@@ -74,7 +75,7 @@ class GarbageCollectionTest extends UnitTestBase {
       array(
         ':collection' => $collection,
       ))->fetchAll();
-    $this->assertIdentical(sizeof($result), 1, 'Only one item remains after garbage collection');
+    $this->assertIdentical(count($result), 1, 'Only one item remains after garbage collection');
 
   }
 
