@@ -59,6 +59,7 @@ abstract class CommentTestBase extends WebTestBase {
     $this->admin_user = $this->drupalCreateUser(array(
       'administer content types',
       'administer comments',
+      'administer comment types',
       'administer comment fields',
       'administer comment display',
       'skip comment approval',

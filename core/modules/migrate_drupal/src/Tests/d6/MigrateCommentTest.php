@@ -37,6 +37,12 @@ class MigrateCommentTest extends MigrateDrupalTestBase {
   public function setUp() {
     parent::setUp();
     entity_create('node_type', array('type' => 'page'))->save();
+    $this->container->get('entity.manager')->getStorage('comment_type')->create(array(
+      'id' => 'comment',
+      'label' => 'comment',
+      'target_entity_type_id' => 'node',
+    ))->save();
+
     $node = entity_create('node', array(
       'type' => 'page',
       'nid' => 1,

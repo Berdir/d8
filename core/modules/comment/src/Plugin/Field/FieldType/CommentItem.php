@@ -7,6 +7,8 @@
 
 namespace Drupal\comment\Plugin\Field\FieldType;
 
+use Drupal\comment\Entity\CommentType;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\Field\FieldItemBase;
@@ -30,7 +32,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
    */
   public static function defaultSettings() {
     return array(
-      'description' => '',
+      'comment_type' => 'new',
     ) + parent::defaultSettings();
   }
 
@@ -102,16 +104,12 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
 
     $settings = $this->getSettings();
 
-    $entity_type = $this->getEntity()->getEntityTypeId();
-    $field_name = $this->getFieldDefinition()->getName();
     $anonymous_user = new AnonymousUserSession();
 
     $element['comment'] = array(
       '#type' => 'details',
       '#title' => t('Comment form settings'),
       '#open' => TRUE,
-      '#bundle' => "{$entity_type}__{$field_name}",
-      '#process' => array(array(get_class($this), 'processSettingsElement')),
       '#attributes' => array(
         'class' => array('comment-instance-settings-form'),
       ),
@@ -194,41 +192,99 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
   }
 
   /**
-   * Process callback to add submit handler for instance settings form.
-   *
-   * Attaches the required translation entity handlers for the instance which
-   * correlates one to one with the comment bundle.
+   * {@inheritdoc}
    */
-  public static function processSettingsElement($element) {
-    // Settings should not be stored as nested.
-    $parents = $element['#parents'];
-    array_pop($parents);
-    $element['#parents'] = $parents;
-    // Add translation entity handlers.
-    if (\Drupal::moduleHandler()->moduleExists('content_translation')) {
-      $comment_form = $element;
-      $comment_form_state['content_translation']['key'] = 'language_configuration';
-      $element += content_translation_enable_widget('comment', $element['#bundle'], $comment_form, $comment_form_state);
-      $element['content_translation']['#parents'] = $element['content_translation']['#array_parents'] = array(
-        'content_translation'
-      );
+  public function settingsForm(array &$form, array &$form_state, $has_data) {
+    $element = array();
+
+    // @todo Inject entity storage once typed-data supports container injection.
+    $comment_types = CommentType::loadMultiple();
+    $options = array('' => t('Create new'));
+    $entity_type = $this->getEntity()->getEntityTypeId();
+    foreach ($comment_types as $comment_type) {
+      if ($comment_type->getTargetEntityTypeId() == $entity_type) {
+        $options[$comment_type->id()] = $comment_type->label();
+      }
     }
+    $element['comment_type'] = array(
+      '#type' => 'select',
+      '#title' => t('Comment type'),
+      '#options' => $options,
+      '#description' => t('Select the Comment type to use for this comment field.'),
+      '#default_value' => $this->getSetting('comment_type'),
+      '#disabled' => $has_data,
+    );
+    $element['new_comment_type'] = array(
+      '#tree' => TRUE,
+      '#type' => 'fieldset',
+      '#title' => t('Create new comment type'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name="field[settings][comment_type]"]' => array('value' => 'new'),
+        ),
+      ),
+    );
+    $element['new_comment_type']['label'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Label'),
+      '#maxlength' => 255,
+      '#default_value' => '',
+      '#description' => t("Provide a label for the new comment type to help identify it in the administration pages."),
+    );
+    $element['new_comment_type']['id'] = array(
+      '#type' => 'machine_name',
+      '#default_value' => '',
+      '#machine_name' => array(
+        'exists' => '\Drupal\comment\Entity\CommentType::load',
+        'source' => array(
+          'field', 'settings', 'new_comment_type', 'label',
+        ),
+      ),
+      '#required' => FALSE,
+      '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
+    );
+
+    $element['new_comment_type']['description'] = array(
+      '#type' => 'textarea',
+      '#default_value' => '',
+      '#description' => t('Enter a description for the new comment type.'),
+      '#title' => t('Description'),
+    );
+    $element['new_comment_type']['target_entity_type_id'] = array(
+      '#type' => 'value',
+      '#value' => $entity_type,
+    );
+    $form['#submit'][] = array($this, 'createNewCommentType');
+    $form['#validate'][] = array($this, 'validateNewCommentType');
     return $element;
   }
 
   /**
-   * {@inheritdoc}
+   * Submit handler to create a new comment type if required.
    */
-  public function settingsForm(array $form, array &$form_state, $has_data) {
-    $element = array();
+  public function createNewCommentType($form, &$form_state) {
+    $settings = $form_state['values']['field']['settings'];
+    if ($settings['comment_type'] === '') {
+      // @todo Inject this once typed-data supports ContainerInjectionInterface.
+      $comment_type = entity_create('comment_type', $settings['new_comment_type']);
+      $comment_type->save();
+      $form_state['values']['field']['settings']['comment_type'] = $comment_type->id();
+    }
+  }
 
-    $element['description'] = array(
-      '#type' => 'textarea',
-      '#title' => t('Field description'),
-      '#description' => t('Describe this comment field. The text will be displayed on the <em>Comments Forms</em> page.'),
-      '#default_value' => $this->getSetting('description'),
-    );
-    return $element;
+  /**
+   * Validation handler for creating a new comment type if required.
+   */
+  public function validateNewCommentType($form, &$form_state) {
+    $settings = $form_state['values']['field']['settings'];
+    if ($settings['comment_type'] == '') {
+      if (empty($settings['new_comment_type']['label'])) {
+        \Drupal::formBuilder()->setErrorByName('field][settings][new_comment_type][label', $form_state, t('Please provide a label for the new comment type'));
+      }
+      if (empty($settings['new_comment_type']['id'])) {
+        \Drupal::formBuilder()->setErrorByName('field][settings][new_comment_type][id', $form_state, t('Please provide a machine name for the new comment type'));
+      }
+    }
   }
 
 }

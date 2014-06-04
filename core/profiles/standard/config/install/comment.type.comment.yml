@@ -1,0 +1,9 @@
+id: comment
+label: Comment
+description: 'Default comment field'
+target_entity_type_id: node
+status: true
+langcode: en
+dependencies:
+  entity:
+    - comment.type.comment
