@@ -33,7 +33,8 @@ use Drupal\taxonomy\TermInterface;
  *     },
  *     "translation" = "Drupal\taxonomy\TermTranslationHandler"
  *   },
- *   base_table = "taxonomy_term_data",
+ *   base_table = "taxonomy_term",
+ *   data_table = "taxonomy_term_data",
  *   uri_callback = "taxonomy_term_uri",
  *   fieldable = TRUE,
  *   translatable = TRUE,
@@ -126,6 +127,7 @@ class Term extends ContentEntityBase implements TermInterface {
       ->setLabel(t('Name'))
       ->setDescription(t('The term name.'))
       ->setRequired(TRUE)
+      ->setTranslatable(TRUE)
       ->setSetting('max_length', 255)
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
@@ -142,6 +144,7 @@ class Term extends ContentEntityBase implements TermInterface {
       ->setLabel(t('Description'))
       ->setDescription(t('A description of the term.'))
       ->setSetting('text_processing', 1)
+      ->setTranslatable(TRUE)
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
         'type' => 'text_default',
