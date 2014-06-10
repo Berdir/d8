@@ -142,7 +142,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
     $this->languageManager = $language_manager;
     $this->cacheBackend = $cache_backend;
     $this->cacheKeyPrefix = $cache_key_prefix;
-    $this->cacheKey = $cache_key_prefix . ':' . $language_manager->getCurrentLanguage()->id;
+    $this->cacheKey = $cache_key_prefix;
     $this->cacheTags = $cache_tags;
   }
 
@@ -177,13 +177,6 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
       if ($this->cacheTags) {
         // Use the cache tags to clear the cache.
         Cache::deleteTags($this->cacheTags);
-      }
-      elseif ($this->languageManager) {
-        $cache_keys = array();
-        foreach ($this->languageManager->getLanguages() as $langcode => $language) {
-          $cache_keys[] = $this->cacheKeyPrefix . ':' . $langcode;
-        }
-        $this->cacheBackend->deleteMultiple($cache_keys);
       }
       else {
         $this->cacheBackend->delete($this->cacheKey);
