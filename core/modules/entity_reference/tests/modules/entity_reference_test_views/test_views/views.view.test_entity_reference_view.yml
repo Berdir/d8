@@ -41,7 +41,7 @@ display:
       relationships:
         test_relationship:
           id: field_test
-          table: field_data_field_test
+          table: entity_test__field_test
           field: field_test
           relationship: none
           plugin_id: standard
