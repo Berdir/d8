@@ -75,7 +75,7 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    * {@inheritdoc}
    */
   public function getLabel() {
-    return isset($this->definition['label']) ? $this->definition['label'] : NULL;
+    return isset($this->definition['label']) ? (string) $this->definition['label'] : NULL;
   }
 
   /**
@@ -96,7 +96,7 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    * {@inheritdoc}
    */
   public function getDescription() {
-    return isset($this->definition['description']) ? $this->definition['description'] : NULL;
+    return isset($this->definition['description']) ? (string) $this->definition['description'] : NULL;
   }
 
   /**
