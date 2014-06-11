@@ -19,7 +19,7 @@ class ShortcutSetAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function defaultAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     switch ($operation) {
       case 'update':
         if ($account->hasPermission('administer shortcuts')) {
@@ -46,7 +46,7 @@ class ShortcutSetAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
+  protected function defaultCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
     if ($account->hasPermission('administer shortcuts')) {
       return TRUE;
     }

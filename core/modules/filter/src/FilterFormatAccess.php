@@ -19,7 +19,7 @@ class FilterFormatAccess extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $filter_format, $operation, $langcode, AccountInterface $account) {
+  protected function defaultAccess(EntityInterface $filter_format, $operation, $langcode, AccountInterface $account) {
     /** @var \Drupal\filter\FilterFormatInterface $filter_format */
 
     // All users are allowed to use the fallback filter.
@@ -39,7 +39,7 @@ class FilterFormatAccess extends EntityAccessController {
     }
 
     if (in_array($operation, array('disable', 'update'))) {
-      return parent::checkAccess($filter_format, $operation, $langcode, $account);
+      return parent::defaultAccess($filter_format, $operation, $langcode, $account);
     }
   }
 

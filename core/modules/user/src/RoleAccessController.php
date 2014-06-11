@@ -19,7 +19,7 @@ class RoleAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function defaultAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     switch ($operation) {
       case 'delete':
         if ($entity->id() == DRUPAL_ANONYMOUS_RID || $entity->id() == DRUPAL_AUTHENTICATED_RID) {
@@ -27,7 +27,7 @@ class RoleAccessController extends EntityAccessController {
         }
 
       default:
-        return parent::checkAccess($entity, $operation, $langcode, $account);
+        return parent::defaultAccess($entity, $operation, $langcode, $account);
     }
   }
 

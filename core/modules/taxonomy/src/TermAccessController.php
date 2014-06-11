@@ -21,7 +21,7 @@ class TermAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function defaultAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     switch ($operation) {
       case 'view':
         return $account->hasPermission('access content');
@@ -40,7 +40,7 @@ class TermAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
+  protected function defaultCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
     return $account->hasPermission('administer taxonomy');
   }
 

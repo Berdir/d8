@@ -19,8 +19,8 @@ class ViewAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  public function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
-    return $operation == 'view' || parent::checkAccess($entity, $operation, $langcode, $account);
+  public function defaultAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+    return $operation == 'view' || parent::defaultAccess($entity, $operation, $langcode, $account);
   }
 
 }

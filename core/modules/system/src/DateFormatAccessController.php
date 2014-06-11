@@ -19,7 +19,7 @@ class DateFormatAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function defaultAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     // There are no restrictions on viewing a date format.
     if ($operation == 'view') {
       return TRUE;
@@ -29,7 +29,7 @@ class DateFormatAccessController extends EntityAccessController {
       return FALSE;
     }
 
-    return parent::checkAccess($entity, $operation, $langcode, $account);
+    return parent::defaultAccess($entity, $operation, $langcode, $account);
   }
 
 }

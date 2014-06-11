@@ -21,7 +21,7 @@ class CategoryAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  public function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  public function defaultAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     if ($operation == 'view') {
       // Do not allow access personal category via site-wide route.
       return $account->hasPermission('access site-wide contact form') && $entity->id() !== 'personal';
@@ -32,7 +32,7 @@ class CategoryAccessController extends EntityAccessController {
       return $account->hasPermission('administer contact forms') && $entity->id() !== 'personal';
     }
 
-    return parent::checkAccess($entity, $operation, $langcode, $account);
+    return parent::defaultAccess($entity, $operation, $langcode, $account);
   }
 
 }

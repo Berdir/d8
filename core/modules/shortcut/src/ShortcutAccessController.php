@@ -52,7 +52,7 @@ class ShortcutAccessController extends EntityAccessController implements EntityC
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function defaultAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     if ($shortcut_set = $this->shortcutSetStorage->load($entity->bundle())) {
       return shortcut_set_edit_access($shortcut_set, $account);
     }
@@ -61,7 +61,7 @@ class ShortcutAccessController extends EntityAccessController implements EntityC
   /**
    * {@inheritdoc}
    */
-  protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
+  protected function defaultCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
     if ($shortcut_set = $this->shortcutSetStorage->load($entity_bundle)) {
       return shortcut_set_edit_access($shortcut_set, $account);
     }

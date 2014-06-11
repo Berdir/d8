@@ -54,15 +54,15 @@ class NodeAccessController extends EntityAccessController implements NodeAccessC
     );
   }
 
-
   /**
    * {@inheritdoc}
    */
   public function access(EntityInterface $entity, $operation, $langcode = LanguageInterface::LANGCODE_DEFAULT, AccountInterface $account = NULL) {
-    if (user_access('bypass node access', $account)) {
+    $account = $this->prepareUser($account);
+    if ($account->hasPermission('bypass node access')) {
       return TRUE;
     }
-    if (!user_access('access content', $account)) {
+    if (!$account->hasPermission('access content')) {
       return FALSE;
     }
     return parent::access($entity, $operation, $langcode, $account);
@@ -73,21 +73,19 @@ class NodeAccessController extends EntityAccessController implements NodeAccessC
    */
   public function createAccess($entity_bundle = NULL, AccountInterface $account = NULL, array $context = array()) {
     $account = $this->prepareUser($account);
-
-    if (user_access('bypass node access', $account)) {
+    if ($account->hasPermission('bypass node access')) {
       return TRUE;
     }
-    if (!user_access('access content', $account)) {
+    if (!$account->hasPermission('access content')) {
       return FALSE;
     }
-
     return parent::createAccess($entity_bundle, $account, $context);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $node, $operation, $langcode, AccountInterface $account) {
+  protected function defaultAccess(EntityInterface $node, $operation, $langcode, AccountInterface $account) {
     /** @var \Drupal\node\NodeInterface $node */
     /** @var \Drupal\node\NodeInterface $translation */
     $translation = $node->getTranslation($langcode);
@@ -96,7 +94,7 @@ class NodeAccessController extends EntityAccessController implements NodeAccessC
     $uid = $translation->getOwnerId();
 
     // Check if authors can view their own unpublished nodes.
-    if ($operation === 'view' && !$status && user_access('view own unpublished content', $account)) {
+    if ($operation === 'view' && !$status && $account->hasPermission('view own unpublished content')) {
 
       if ($account->id() != 0 && $account->id() == $uid) {
         return TRUE;
@@ -119,10 +117,10 @@ class NodeAccessController extends EntityAccessController implements NodeAccessC
   /**
    * {@inheritdoc}
    */
-  protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
+  protected function defaultCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
     $configured_types = node_permissions_get_configured_types();
     if (isset($configured_types[$entity_bundle])) {
-      return user_access('create ' . $entity_bundle . ' content', $account);
+      return $account->hasPermission('create ' . $entity_bundle . ' content');
     }
   }
 

@@ -62,25 +62,24 @@ class EntityAccessController extends EntityControllerBase implements EntityAcces
       return $access;
     }
 
-    // Invoke hook_entity_access() and hook_ENTITY_TYPE_access(). Hook results
-    // take precedence over overridden implementations of
-    // EntityAccessController::checkAccess(). Entities that have checks that
-    // need to be done before the hook is invoked should do so by overriding
-    // this method.
-
-    // We grant access to the entity if both of these conditions are met:
-    // - No modules say to deny access.
-    // - At least one module says to grant access.
+    // Invoke hook_entity_access() and hook_ENTITY_TYPE_access() and combine it
+    // with the default implementation.
     $access = array_merge(
       $this->moduleHandler()->invokeAll('entity_access', array($entity, $operation, $account, $langcode)),
-      $this->moduleHandler()->invokeAll($entity->getEntityTypeId() . '_access', array($entity, $operation, $account, $langcode))
+      $this->moduleHandler()->invokeAll($entity->getEntityTypeId() . '_access', array($entity, $operation, $account, $langcode)),
+      array(':default' => $this->defaultAccess($entity, $operation, $langcode, $account))
     );
 
-    if (($return = $this->processAccessHookResults($access)) === NULL) {
-      // No module had an opinion about the access, so let's the access
-      // controller check create access.
-      $return = (bool) $this->checkAccess($entity, $operation, $langcode, $account);
-    }
+    // Allow modules to alter access.
+    $context = array(
+      'operation' => $operation,
+      'langcode' => $langcode,
+      'account' => $langcode,
+    );
+    $this->moduleHandler()->alter(array('entity_access', $entity->getEntityTypeId() . '_access'), $entity, $context);
+
+    // Check the result and return it.
+    $return = $this->processAccessHookResults($access);
     return $this->setCache($return, $entity->uuid(), $operation, $langcode, $account);
   }
 
@@ -104,7 +103,7 @@ class EntityAccessController extends EntityControllerBase implements EntityAcces
       return TRUE;
     }
     else {
-      return;
+      return FALSE;
     }
   }
 
@@ -128,7 +127,7 @@ class EntityAccessController extends EntityControllerBase implements EntityAcces
    *   TRUE if access was granted, FALSE if access was denied and NULL if access
    *   could not be determined.
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function defaultAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     if ($operation == 'delete' && $entity->isNew()) {
       return FALSE;
     }
@@ -212,25 +211,20 @@ class EntityAccessController extends EntityControllerBase implements EntityAcces
       return $access;
     }
 
-    // Invoke hook_entity_create_access() and hook_ENTITY_TYPE_create_access().
-    // Hook results take precedence over overridden implementations of
-    // EntityAccessController::checkAccess(). Entities that have checks that
-    // need to be done before the hook is invoked should do so by overriding
-    // this method.
-
-    // We grant access to the entity if both of these conditions are met:
-    // - No modules say to deny access.
-    // - At least one module says to grant access.
+    // Invoke hook_entity_create_access() and hook_ENTITY_TYPE_create_access()
+    // and combine it with the default implementation.
     $access = array_merge(
       $this->moduleHandler()->invokeAll('entity_create_access', array($account, $context['langcode'])),
-      $this->moduleHandler()->invokeAll($this->entityTypeId . '_create_access', array($account, $context['langcode']))
+      $this->moduleHandler()->invokeAll($this->entityTypeId . '_create_access', array($account, $context['langcode'])),
+      array(':default' => $this->defaultCreateAccess($account, $context, $entity_bundle))
     );
 
-    if (($return = $this->processAccessHookResults($access)) === NULL) {
-      // No module had an opinion about the access, so let's the access
-      // controller check create access.
-      $return = (bool) $this->checkCreateAccess($account, $context, $entity_bundle);
-    }
+    // Allow modules to alter access.
+    $context['entity_bundle'] = $entity_bundle;
+    $this->moduleHandler()->alter(array('entity_create_access', $this->entityTypeId . '_create_access'), $entity, $context);
+
+    // Check the result and return it.
+    $return = $this->processAccessHookResults($access);
     return $this->setCache($return, $cid, 'create', $context['langcode'], $account);
   }
 
@@ -252,7 +246,7 @@ class EntityAccessController extends EntityControllerBase implements EntityAcces
    *   TRUE if access was granted, FALSE if access was denied and NULL if access
    *   could not be determined.
    */
-  protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
+  protected function defaultCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
     if ($admin_permission = $this->entityType->getAdminPermission()) {
       return $account->hasPermission($admin_permission);
     }

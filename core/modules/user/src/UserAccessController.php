@@ -19,7 +19,7 @@ class UserAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function defaultAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     switch ($operation) {
       case 'view':
         return $this->viewAccess($entity, $langcode, $account);
@@ -54,7 +54,7 @@ class UserAccessController extends EntityAccessController {
       }
       elseif ($account->hasPermission('access user profiles')) {
         // Only allow view access if the account is active.
-        return $entity->status->value;
+        return $entity->isActive();
       }
     }
     return FALSE;

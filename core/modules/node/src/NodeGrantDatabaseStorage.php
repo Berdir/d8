@@ -86,7 +86,10 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
       $query->condition($grants);
     }
 
-    return $query->execute()->fetchField();
+    // Ensure that a boolean value is returned if there are any query results.
+    if ($result = $query->execute()) {
+      return (bool) $result->fetchField();
+    }
   }
 
   /**

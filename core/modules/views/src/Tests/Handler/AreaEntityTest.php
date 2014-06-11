@@ -8,6 +8,7 @@
 namespace Drupal\views\Tests\Handler;
 
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\user\Entity\Role;
 use Drupal\views\Tests\ViewTestBase;
 use Drupal\views\Views;
 
@@ -78,6 +79,11 @@ class AreaEntityTest extends ViewTestBase {
    * Tests the area handler.
    */
   public function testEntityArea() {
+
+    // Grant anonymous users access to viewing entity_test entities.
+    Role::load('anonymous')
+      ->grantPermission('view test entity')
+      ->save();
 
     $entities = array();
     for ($i = 0; $i < 3; $i++) {

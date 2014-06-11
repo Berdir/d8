@@ -89,7 +89,7 @@ function hook_block_view_BASE_BLOCK_ID_alter(array &$build, \Drupal\block\BlockP
  *   \Drupal\block\BlockAccessController::checkAccess() are used.
  *
  * @see \Drupal\Core\Entity\EntityAccessController::access()
- * @see \Drupal\block\BlockAccessController::checkAccess()
+ * @see \Drupal\block\BlockAccessController::defaultAccess()
  */
 function hook_block_access(\Drupal\block\Entity\Block $block, $operation, \Drupal\user\Entity\User $account, $langcode) {
   // Example code that would prevent displaying the 'Powered by Drupal' block in

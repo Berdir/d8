@@ -19,11 +19,11 @@ class BlockContentAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function defaultAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     if ($operation === 'view') {
       return TRUE;
     }
-    return parent::checkAccess($entity, $operation, $langcode, $account);
+    return parent::defaultAccess($entity, $operation, $langcode, $account);
   }
 
 }
