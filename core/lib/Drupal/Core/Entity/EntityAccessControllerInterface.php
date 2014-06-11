@@ -19,6 +19,11 @@ use Drupal\Core\Session\AccountInterface;
 interface EntityAccessControllerInterface {
 
   /**
+   * The array key the default access in the access checks.
+   */
+  const DEFAULT_ACCESS = ':default';
+
+  /**
    * Checks access to an operation on a given entity or entity translation.
    *
    * Use \Drupal\Core\Entity\EntityAccessControllerInterface::createAccess()

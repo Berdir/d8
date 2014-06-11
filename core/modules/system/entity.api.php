@@ -7,6 +7,7 @@
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityAccessControllerInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Render\Element;
 
@@ -38,6 +39,25 @@ function hook_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operat
 }
 
 /**
+ * Alter entity operation access.
+ *
+ * @param array $access
+ *   The entity access decisions, keyed by module name. The default
+ *   access is keyed by
+ *   \Drupal\Core\Entity\EntityAccessControllerInterface::DEFAULT_ACCESS.
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity on which access is checked.
+ * @param array $context
+ *   An array with the keys langcode, operation and and account.
+ *
+ * @see \Drupal\Core\Entity\EntityAccessController
+ */
+function hook_entity_access_alter(array &$access, \Drupal\Core\Entity\EntityInterface $entity, array $context) {
+  // Ignore the default access check.
+  $access[EntityAccessControllerInterface::DEFAULT_ACCESS] = NULL;
+}
+
+/**
  * Control entity operation access for a specific entity type.
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
@@ -57,6 +77,25 @@ function hook_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operat
  */
 function hook_ENTITY_TYPE_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account, $langcode) {
   return NULL;
+}
+
+/**
+ * Alter entity operation access for a specific entity type.
+ *
+ * @param array $access
+ *   The entity access decisions, keyed by module name. The default
+ *   access is keyed by
+ *   \Drupal\Core\Entity\EntityAccessControllerInterface::DEFAULT_ACCESS.
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity on which access is checked.
+ * @param array $context
+ *   An array with the keys langcode, operation and and account.
+ *
+ * @see \Drupal\Core\Entity\EntityAccessController
+ */
+function hook_ENTITY_TYPE_access_alter(array &$access, \Drupal\Core\Entity\EntityInterface $entity, array $context) {
+  // Ignore the default access check.
+  $access[EntityAccessControllerInterface::DEFAULT_ACCESS] = NULL;
 }
 
 /**

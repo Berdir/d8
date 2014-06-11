@@ -67,7 +67,7 @@ class EntityAccessController extends EntityControllerBase implements EntityAcces
     $access = array_merge(
       $this->moduleHandler()->invokeAll('entity_access', array($entity, $operation, $account, $langcode)),
       $this->moduleHandler()->invokeAll($entity->getEntityTypeId() . '_access', array($entity, $operation, $account, $langcode)),
-      array(':default' => $this->defaultAccess($entity, $operation, $langcode, $account))
+      array(static::DEFAULT_ACCESS => $this->defaultAccess($entity, $operation, $langcode, $account))
     );
 
     // Allow modules to alter access.
@@ -76,7 +76,7 @@ class EntityAccessController extends EntityControllerBase implements EntityAcces
       'langcode' => $langcode,
       'account' => $langcode,
     );
-    $this->moduleHandler()->alter(array('entity_access', $entity->getEntityTypeId() . '_access'), $entity, $context);
+    $this->moduleHandler()->alter(array('entity_access', $entity->getEntityTypeId() . '_access'), $access, $entity, $context);
 
     // Check the result and return it.
     $return = $this->processAccessHookResults($access);
@@ -113,6 +113,13 @@ class EntityAccessController extends EntityControllerBase implements EntityAcces
    * This method is supposed to be overwritten by extending classes that
    * do their own custom access checking.
    *
+   * The return value of this method will be keyed as
+   * \Drupal\Core\Entity\EntityAccessControllerInterface::DEFAULT_ACCESS
+   * together with the return values of the hook implementations.
+   *
+   * Access is granted if no implementations denies access and at least one
+   * grants access.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity for which to check 'create' access.
    * @param string $operation
@@ -126,6 +133,9 @@ class EntityAccessController extends EntityControllerBase implements EntityAcces
    * @return bool|null
    *   TRUE if access was granted, FALSE if access was denied and NULL if access
    *   could not be determined.
+   *
+   * @see hook_entity_access()
+   * @see hook_entity_access_alter()
    */
   protected function defaultAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
     if ($operation == 'delete' && $entity->isNew()) {
@@ -216,7 +226,7 @@ class EntityAccessController extends EntityControllerBase implements EntityAcces
     $access = array_merge(
       $this->moduleHandler()->invokeAll('entity_create_access', array($account, $context['langcode'])),
       $this->moduleHandler()->invokeAll($this->entityTypeId . '_create_access', array($account, $context['langcode'])),
-      array(':default' => $this->defaultCreateAccess($account, $context, $entity_bundle))
+      array(static::DEFAULT_ACCESS => $this->defaultCreateAccess($account, $context, $entity_bundle))
     );
 
     // Allow modules to alter access.
