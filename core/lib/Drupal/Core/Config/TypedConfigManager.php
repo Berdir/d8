@@ -141,7 +141,12 @@ class TypedConfigManager extends PluginManagerBase implements TypedConfigManager
     if (!isset($class)) {
       throw new PluginException(sprintf('The plugin (%s) did not specify an instance class.', $data_type));
     }
-    return new $class($data_definition, $configuration['name'], $configuration['parent']);
+    if (in_array('Drupal\Core\Plugin\ContainerFactoryPluginInterface', class_implements($class))) {
+      return $class::create(\Drupal::getContainer(), $data_definition, $configuration['name'], $configuration['parent']);
+    }
+    else {
+      return new $class($data_definition, $configuration['name'], $configuration['parent']);
+    }
   }
 
   /**

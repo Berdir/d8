@@ -31,7 +31,7 @@ abstract class DependencySerialization {
         // If a class member was instantiated by the dependency injection
         // container, only store its ID so it can be used to get a fresh object
         // on unserialization.
-        $this->_serviceIds[$key] = $value->_serviceId;
+        $this->_serviceIds += array($key => $value->_serviceId);
         unset($vars[$key]);
       }
       // Special case the container, which might not have a service ID.

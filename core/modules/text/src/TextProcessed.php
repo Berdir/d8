@@ -28,7 +28,7 @@ class TextProcessed extends TypedData {
   protected $processed = NULL;
 
   /**
-   * Overrides TypedData::__construct().
+   * {@inheritdoc}
    */
   public function __construct(DataDefinitionInterface $definition, $name = NULL, TypedDataInterface $parent = NULL) {
     parent::__construct($definition, $name, $parent);

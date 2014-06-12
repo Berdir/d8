@@ -8,6 +8,10 @@
 namespace Drupal\Core\TypedData;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\TypedData\TypedDataManager;
+use Drupal\Core\DependencyInjection\DependencySerialization;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The abstract base class for typed data.
@@ -15,7 +19,7 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
  * Classes deriving from this base class have to declare $value
  * or override getValue() or setValue().
  */
-abstract class TypedData implements TypedDataInterface, PluginInspectionInterface {
+abstract class TypedData extends DependencySerialization implements TypedDataInterface, PluginInspectionInterface, ContainerFactoryPluginInterface  {
 
   /**
    * The data definition.
@@ -39,6 +43,13 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
   protected $parent;
 
   /**
+   * The typed data plugin manager.
+   *
+   * @var \Drupal\Core\TypedData\TypedDataManager
+   */
+  protected $typedDataManager;
+
+  /**
    * Constructs a TypedData object given its definition and context.
    *
    * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
@@ -49,6 +60,8 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    * @param \Drupal\Core\TypedData\TypedDataInterface $parent
    *   (optional) The parent object of the data property, or NULL if it is the
    *   root of a typed data tree. Defaults to NULL.
+   * @param \Drupal\Core\TypedData\TypedDataManager $typed_data_manager
+   *   The typed data plugin manager.
    *
    * @see \Drupal\Core\TypedData\TypedDataManager::create()
    *
@@ -56,10 +69,38 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    *   class-based definitions, type-hint $definition to
    *   DataDefinitionInterface. https://drupal.org/node/1928868
    */
-  public function __construct($definition, $name = NULL, TypedDataInterface $parent = NULL) {
+  public function __construct($definition, $name = NULL, TypedDataInterface $parent = NULL, TypedDataManager $typed_data_manager = NULL) {
     $this->definition = $definition;
     $this->parent = $parent;
     $this->name = $name;
+    $this->typedDataManager = $typed_data_manager;
+  }
+
+  /**
+   * Creates an instance of the plugin.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The container to pull out services used in the plugin.
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin ID for the plugin instance.
+   * @param array $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\TypedData\TypedDataInterface $parent
+   *   (optional) The parent object of the data property, or NULL if it is the
+   *   root of a typed data tree. Defaults to NULL.
+   *
+   * @return static
+   *   Returns an instance of this plugin.
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, TypedDataInterface $parent = NULL) {
+    return new static(
+      $plugin_definition,
+      $plugin_id,
+      $parent,
+      $container->get('typed_data_manager')
+    );
   }
 
   /**
@@ -73,7 +114,7 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    * {@inheritdoc}
    */
   public function getPluginDefinition() {
-    return \Drupal::typedDataManager()->getDefinition($this->definition->getDataType());
+    return $this->typedDataManager->getDefinition($this->definition->getDataType());
   }
 
   /**
@@ -112,8 +153,7 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    * {@inheritdoc}
    */
   public function getConstraints() {
-    // @todo: Add the typed data manager as proper dependency.
-    $constraint_manager = \Drupal::typedDataManager()->getValidationConstraintManager();
+    $constraint_manager = $this->typedDataManager->getValidationConstraintManager();
     $constraints = array();
     foreach ($this->definition->getConstraints() as $name => $options) {
       $constraints[] = $constraint_manager->create($name, $options);
@@ -125,8 +165,7 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    * {@inheritdoc}
    */
   public function validate() {
-    // @todo: Add the typed data manager as proper dependency.
-    return \Drupal::typedDataManager()->getValidator()->validate($this);
+    return $this->typedDataManager->getValidator()->validate($this);
   }
 
   /**
@@ -188,4 +227,5 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
   public function getParent() {
     return $this->parent;
   }
+
 }
