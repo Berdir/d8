@@ -113,9 +113,8 @@ class EntityAccessController extends EntityControllerBase implements EntityAcces
    * This method is supposed to be overwritten by extending classes that
    * do their own custom access checking.
    *
-   * The return value of this method will be keyed as
-   * \Drupal\Core\Entity\EntityAccessControllerInterface::DEFAULT_ACCESS
-   * together with the return values of the hook implementations.
+   * The return value of this method will be processed together with the return
+   * values of the hook implementations.
    *
    * Access is granted if no implementations denies access and at least one
    * grants access.
@@ -224,14 +223,15 @@ class EntityAccessController extends EntityControllerBase implements EntityAcces
     // Invoke hook_entity_create_access() and hook_ENTITY_TYPE_create_access()
     // and combine it with the default implementation.
     $access = array_merge(
-      $this->moduleHandler()->invokeAll('entity_create_access', array($account, $context['langcode'])),
-      $this->moduleHandler()->invokeAll($this->entityTypeId . '_create_access', array($account, $context['langcode'])),
+      $this->moduleHandler()->invokeAll('entity_create_access', array($account, $this->entityTypeId, $context, $entity_bundle)),
+      $this->moduleHandler()->invokeAll($this->entityTypeId . '_create_access', array($account, $context, $entity_bundle)),
       array(static::DEFAULT_ACCESS => $this->defaultCreateAccess($account, $context, $entity_bundle))
     );
 
     // Allow modules to alter access.
     $context['entity_bundle'] = $entity_bundle;
-    $this->moduleHandler()->alter(array('entity_create_access', $this->entityTypeId . '_create_access'), $entity, $context);
+    $this->moduleHandler()->alter(array('entity_create_access', $this->entityTypeId . '_create_access'), $access, $this->entityTypeId, $context);
+    $this->moduleHandler()->alter($this->entityTypeId . '_create_access', $access, $context);
 
     // Check the result and return it.
     $return = $this->processAccessHookResults($access);
