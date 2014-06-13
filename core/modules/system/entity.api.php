@@ -103,6 +103,8 @@ function hook_ENTITY_TYPE_access_alter(array &$access, \Drupal\Core\Entity\Entit
  *
  * @param \Drupal\Core\Session\AccountInterface $account
  *    The account trying to access the entity.
+ * @param string $entity_type_id
+ *    The entity type ID that we are checking access for.
  * @param string $langcode
  *    The code of the language $entity is accessed in.
  *
@@ -112,7 +114,7 @@ function hook_ENTITY_TYPE_access_alter(array &$access, \Drupal\Core\Entity\Entit
  *
  * @see \Drupal\Core\Entity\EntityAccessController
  */
-function hook_entity_create_access(\Drupal\Core\Session\AccountInterface $account, $langcode) {
+function hook_entity_create_access(\Drupal\Core\Session\AccountInterface $account, $entity_type_id, $langcode) {
   return NULL;
 }
 
