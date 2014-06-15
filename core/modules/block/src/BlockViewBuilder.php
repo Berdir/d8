@@ -62,8 +62,7 @@ class BlockViewBuilder extends EntityViewBuilder {
         '#plugin_id' => $plugin_id,
         '#base_plugin_id' => $base_id,
         '#derivative_plugin_id' => $derivative_id,
-        // @todo Remove after fixing http://drupal.org/node/1989568.
-        '#block' => $entity,
+        '#id' => $entity->id(),
       );
       $build[$entity_id]['#configuration']['label'] = String::checkPlain($configuration['label']);
 
