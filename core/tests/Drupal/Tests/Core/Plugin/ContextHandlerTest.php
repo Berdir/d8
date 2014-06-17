@@ -273,6 +273,12 @@ class ContextHandlerTest extends UnitTestCase {
     $data[] = array(array(), $plugins, array());
 
     $typed_data = array(array('expected_data_type', TRUE, array('constraints' => array('mismatched_constraint_name' => 'mismatched_constraint_value'))));
+    $plugins = array('expected_plugin' => array('context' => array('context1' => array('type' => 'expected_data_type', 'required' => FALSE, 'constraints' => array('expected_constraint_name' => 'expected_constraint_value')))));
+    // Optional context, mismatched constraint from TypedData, all plugins
+    // available.
+    $data[] = array(array(), $plugins, $plugins, $typed_data);
+
+    $plugins = array('expected_plugin' => array('context' => array('context1' => array('type' => 'expected_data_type', 'required' => TRUE, 'constraints' => array('expected_constraint_name' => 'expected_constraint_value')))));
     // Required mismatched constraint from TypedData, no plugins available.
     $data[] = array(array(), $plugins, array(), $typed_data);
 
