@@ -66,9 +66,7 @@ class ContextHandler implements ContextHandlerInterface {
         }
 
         // Assume the requirement is required if unspecified.
-        if (!isset($definition['required'])) {
-          $definition['required'] = TRUE;
-        }
+        $definition['required'] = isset($plugin_context['required']) ? $plugin_context['required'] : TRUE;
 
         // @todo Use context definition objects after
         //   https://drupal.org/node/2281635.

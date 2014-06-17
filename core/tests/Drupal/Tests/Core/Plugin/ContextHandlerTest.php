@@ -16,7 +16,7 @@ use Drupal\Tests\UnitTestCase;
 /**
  * Tests the ContextHandler class.
  *
- * @coversDefaultClass \Drupal\Core\Plugin\ContextHandler
+ * @coversDefaultClass \Drupal\Core\Plugin\Context\ContextHandler
  *
  * @group Drupal
  * @group Plugin
@@ -264,19 +264,15 @@ class ContextHandlerTest extends UnitTestCase {
     // Satisfied context with constraint, all plugins available.
     $data[] = array(array($context), $plugins, $plugins);
 
-    $typed_data = array(array('expected_data_type', TRUE, array('required' => FALSE)));
-    // Optional unsatisfied context from TypedData, all plugins available.
-    $data[] = array(array(), $plugins, $plugins, $typed_data);
+    $plugins = array('expected_plugin' => array('context' => array('context1' => array('type' => 'expected_data_type', 'required' => FALSE, 'constraints' => array('expected_constraint_name' => 'expected_constraint_value')))));
+    // Optional unsatisfied context, all plugins available.
+    $data[] = array(array(), $plugins, $plugins);
 
-    $typed_data = array(array('expected_data_type', TRUE, array('required' => TRUE)));
-    // Required unsatisfied context from TypedData, no plugins available.
-    $data[] = array(array(), $plugins, array(), $typed_data);
+    $plugins = array('expected_plugin' => array('context' => array('context1' => array('type' => 'expected_data_type', 'required' => TRUE, 'constraints' => array('expected_constraint_name' => 'expected_constraint_value')))));
+    // Required unsatisfied context, no plugins available.
+    $data[] = array(array(), $plugins, array());
 
-    $typed_data = array(array('expected_data_type', TRUE, array('constraints' => array('mismatched_constraint_name' => 'mismatched_constraint_value'), 'required' => FALSE)));
-    // Optional mismatched constraint from TypedData, all plugins available.
-    $data[] = array(array(), $plugins, $plugins, $typed_data);
-
-    $typed_data = array(array('expected_data_type', TRUE, array('constraints' => array('mismatched_constraint_name' => 'mismatched_constraint_value'), 'required' => TRUE)));
+    $typed_data = array(array('expected_data_type', TRUE, array('constraints' => array('mismatched_constraint_name' => 'mismatched_constraint_value'))));
     // Required mismatched constraint from TypedData, no plugins available.
     $data[] = array(array(), $plugins, array(), $typed_data);
 
