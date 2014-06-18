@@ -7,6 +7,7 @@
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_token_info().
@@ -97,9 +98,9 @@ function node_tokens($type, $tokens, array $data = array(), array $options = arr
 
   $replacements = array();
 
-  if ($type == 'node' && !empty($data['node'])) {
+  if (!empty($data[$type]) && $data[$type] instanceof NodeInterface) {
     /** @var \Drupal\node\NodeInterface $node */
-    $node = $data['node'];
+    $node = $data[$type];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {
@@ -193,11 +194,13 @@ function node_tokens($type, $tokens, array $data = array(), array $options = arr
     }
 
     if ($created_tokens = $token_service->findWithPrefix($tokens, 'created')) {
-      $replacements += $token_service->generate('date', $created_tokens, array('date' => $node->getCreatedTime()), $options);
+      $date = DateTime::createFromFormat('U', $node->getCreatedTime());
+      $replacements += $token_service->generate('date', $created_tokens, array('date' => $date), $options);
     }
 
     if ($changed_tokens = $token_service->findWithPrefix($tokens, 'changed')) {
-      $replacements += $token_service->generate('date', $changed_tokens, array('date' => $node->getChangedTime()), $options);
+      $date = DateTime::createFromFormat('U', $node->getChangedTime());
+      $replacements += $token_service->generate('date', $changed_tokens, array('date' => $date), $options);
     }
   }
 

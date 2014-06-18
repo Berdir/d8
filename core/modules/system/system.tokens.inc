@@ -134,13 +134,8 @@ function system_tokens($type, $tokens, array $data = array(), array $options = a
     }
   }
 
-  elseif ($type == 'date') {
-    if (empty($data['date'])) {
-      $date = REQUEST_TIME;
-    }
-    else {
-      $date = $data['date'];
-    }
+  elseif (!empty($data[$type]) && $data[$type] instanceof \DateTime) {
+    $date = $data[$type]->getTimestamp();
 
     foreach ($tokens as $name => $original) {
       switch ($name) {
@@ -171,6 +166,19 @@ function system_tokens($type, $tokens, array $data = array(), array $options = a
         $replacements[$original] = format_date($date, 'custom', $name, NULL, $langcode);
       }
     }
+  }
+
+  // Support deprecated timestamp dates.
+  elseif ($type == 'date' && !empty($data['date']) && filter_var($data['date'], FILTER_VALIDATE_INT)) {
+    $date = DateTime::createFromFormat('U', $data['date']);
+    $replacements += $token_service->generate('date', $tokens, array('date' => $date), $options);
+  }
+
+  // Current date tokens.
+  // @todo Rename to 'current-date' type.
+  if ($type == 'date' && empty($data['date'])) {
+    $date = new DateTime();
+    $replacements += $token_service->generate('date', $tokens, array('date' => $date), $options);
   }
 
   return $replacements;

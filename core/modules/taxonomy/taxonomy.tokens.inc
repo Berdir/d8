@@ -7,6 +7,8 @@
 
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Xss;
+use Drupal\taxonomy\TermInterface;
+use Drupal\taxonomy\VocabularyInterface;
 
 /**
  * Implements hook_token_info().
@@ -97,8 +99,8 @@ function taxonomy_tokens($type, $tokens, array $data = array(), array $options =
   $replacements = array();
   $sanitize = !empty($options['sanitize']);
 
-  if ($type == 'term' && !empty($data['term'])) {
-    $term = $data['term'];
+  if (!empty($data[$type]) && $data[$type] instanceof TermInterface) {
+    $term = $data[$type];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {
@@ -151,8 +153,8 @@ function taxonomy_tokens($type, $tokens, array $data = array(), array $options =
     }
   }
 
-  elseif ($type == 'vocabulary' && !empty($data['vocabulary'])) {
-    $vocabulary = $data['vocabulary'];
+  elseif (!empty($data[$type]) && $data[$type] instanceof VocabularyInterface) {
+    $vocabulary = $data[$type];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {

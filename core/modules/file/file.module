@@ -13,6 +13,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Template\Attribute;
+use Drupal\file\FileInterface;
 use Drupal\file\FileUsage\FileUsageInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -1038,7 +1039,8 @@ function file_tokens($type, $tokens, array $data = array(), array $options = arr
 
   $replacements = array();
 
-  if ($type == 'file' && !empty($data['file'])) {
+  if (!empty($data[$type]) && $data[$type] instanceof FileInterface) {
+    $account = $data[$type];
     /** @var \Drupal\file\FileInterface $file */
     $file = $data['file'];
 
@@ -1087,11 +1089,13 @@ function file_tokens($type, $tokens, array $data = array(), array $options = arr
     }
 
     if ($date_tokens = $token_service->findWithPrefix($tokens, 'created')) {
-      $replacements += $token_service->generate('date', $date_tokens, array('date' => $file->getCreatedTime()), $options);
+      $date = DateTime::createFromFormat('U', $file->getCreatedTime());
+      $replacements += $token_service->generate('date', $date_tokens, array('date' => $date), $options);
     }
 
     if ($date_tokens = $token_service->findWithPrefix($tokens, 'changed')) {
-      $replacements += $token_service->generate('date', $date_tokens, array('date' => $file->getChangedTime()), $options);
+      $date = DateTime::createFromFormat('U', $file->getChangedTime());
+      $replacements += $token_service->generate('date', $date_tokens, array('date' => $date), $options);
     }
 
     if (($owner_tokens = $token_service->findWithPrefix($tokens, 'owner')) && $file->getOwner()) {

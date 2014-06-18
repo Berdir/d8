@@ -5,8 +5,10 @@
  * Builds placeholder replacement tokens for comment-related data.
  */
 
+use Drupal\comment\CommentInterface;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
  * Implements hook_token_info().
@@ -129,9 +131,9 @@ function comment_tokens($type, $tokens, array $data = array(), array $options = 
 
   $replacements = array();
 
-  if ($type == 'comment' && !empty($data['comment'])) {
+  if (!empty($data[$type]) && $data[$type] instanceof CommentInterface) {
     /** @var \Drupal\comment\CommentInterface $comment */
-    $comment = $data['comment'];
+    $comment = $data[$type];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {
@@ -230,11 +232,13 @@ function comment_tokens($type, $tokens, array $data = array(), array $options = 
     }
 
     if ($date_tokens = $token_service->findwithPrefix($tokens, 'created')) {
-      $replacements += $token_service->generate('date', $date_tokens, array('date' => $comment->getCreatedTime()), $options);
+      $date = DateTime::createFromFormat('U', $comment->getCreatedTime());
+      $replacements += $token_service->generate('date', $date_tokens, array('date' => $date), $options);
     }
 
     if ($date_tokens = $token_service->findwithPrefix($tokens, 'changed')) {
-      $replacements += $token_service->generate('date', $date_tokens, array('date' => $comment->getChangedTime()), $options);
+      $date = DateTime::createFromFormat('U', $comment->getChangedTime());
+      $replacements += $token_service->generate('date', $date_tokens, array('date' => $date), $options);
     }
 
     if (($parent_tokens = $token_service->findwithPrefix($tokens, 'parent')) && $parent = $comment->getParentComment()) {
@@ -245,10 +249,9 @@ function comment_tokens($type, $tokens, array $data = array(), array $options = 
       $replacements += $token_service->generate('user', $author_tokens, array('user' => $account), $options);
     }
   }
-  elseif (($type == 'entity' & !empty($data['entity'])) ||
-    ($type == 'node' & !empty($data['node']))) {
+  elseif (!empty($data[$type]) && $data[$type] instanceof ContentEntityInterface) {
     /** @var $entity \Drupal\Core\Entity\ContentEntityInterface */
-    $entity = !empty($data['entity']) ? $data['entity'] : $data['node'];
+    $entity = $data[$type];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {

@@ -5,6 +5,8 @@
  * Builds placeholder replacement tokens for node visitor statistics.
  */
 
+use Drupal\node\NodeInterface;
+
 /**
  * Implements hook_token_info().
  */
@@ -36,8 +38,8 @@ function statistics_tokens($type, $tokens, array $data = array(), array $options
 
   $replacements = array();
 
-  if ($type == 'node' & !empty($data['node'])) {
-    $node = $data['node'];
+  if (!empty($data[$type]) && $data[$type] instanceof NodeInterface) {
+    $node = $data[$type];
 
     foreach ($tokens as $name => $original) {
       if ($name == 'total-count') {
@@ -56,7 +58,8 @@ function statistics_tokens($type, $tokens, array $data = array(), array $options
 
     if ($created_tokens = $token_service->findWithPrefix($tokens, 'last-view')) {
       $statistics = statistics_get($node->id());
-      $replacements += $token_service->generate('date', $created_tokens, array('date' => $statistics['timestamp']), $options);
+      $date = DateTime::createFromFormat('U', $statistics['timestamp']);
+      $replacements += $token_service->generate('date', $created_tokens, array('date' => $date), $options);
     }
   }
 

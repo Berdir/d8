@@ -6,6 +6,8 @@
  */
 
 use Drupal\Component\Utility\String;
+use Drupal\views\ViewExecutable;
+use Drupal\views\ViewStorageInterface;
 
 /**
  * Implements hook_token_info().
@@ -79,8 +81,8 @@ function views_tokens($type, $tokens, array $data = array(), array $options = ar
 
   $replacements = array();
 
-  if ($type == 'view' && !empty($data['view'])) {
-    $view = $data['view'];
+  if (!empty($data[$type]) && $data[$type] instanceof ViewStorageInterface) {
+    $view = $data[$type];
 
     foreach ($tokens as $name => $original) {
       switch ($name) {

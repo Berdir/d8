@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Utility\String;
+use Drupal\user\UserInterface;
 
 /**
  * Implements hook_token_info().
@@ -78,8 +79,9 @@ function user_tokens($type, $tokens, array $data = array(), array $options = arr
 
   $replacements = array();
 
-  if ($type == 'user' && !empty($data['user'])) {
-    $account = $data['user'];
+  if (!empty($data[$type]) && $data[$type] instanceof UserInterface) {
+    $account = $data[$type];
+
     foreach ($tokens as $name => $original) {
       switch ($name) {
         // Basic user account information.
@@ -118,11 +120,13 @@ function user_tokens($type, $tokens, array $data = array(), array $options = arr
     }
 
     if ($login_tokens = $token_service->findWithPrefix($tokens, 'last-login')) {
-      $replacements += $token_service->generate('date', $login_tokens, array('date' => $account->getLastLoginTime()), $options);
+      $date = DateTime::createFromFormat('U', $account->getLastLoginTime());
+      $replacements += $token_service->generate('date', $login_tokens, array('date' => $date), $options);
     }
 
     if ($registered_tokens = $token_service->findWithPrefix($tokens, 'created')) {
-      $replacements += $token_service->generate('date', $registered_tokens, array('date' => $account->getCreatedTime()), $options);
+      $date = DateTime::createFromFormat('U', $account->getCreatedTime());
+      $replacements += $token_service->generate('date', $registered_tokens, array('date' => $date), $options);
     }
   }
 
