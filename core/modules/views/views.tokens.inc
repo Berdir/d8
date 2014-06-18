@@ -81,7 +81,7 @@ function views_tokens($type, $tokens, array $data = array(), array $options = ar
 
   $replacements = array();
 
-  if (!empty($data[$type]) && $data[$type] instanceof ViewStorageInterface) {
+  if (!empty($data[$type]) && $data[$type] instanceof ViewExecutable) {
     $view = $data[$type];
 
     foreach ($tokens as $name => $original) {
