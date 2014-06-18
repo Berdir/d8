@@ -1109,54 +1109,60 @@ function file_token_info() {
   $types['file'] = array(
     'name' => t("Files"),
     'description' => t("Tokens related to uploaded files."),
-    'needs-data' => 'file',
+    'needs-data' => 'entity:file',
   );
 
   // File related tokens.
   $file['fid'] = array(
     'name' => t("File ID"),
     'description' => t("The unique ID of the uploaded file."),
+    'type' => 'integer',
   );
   $file['name'] = array(
     'name' => t("File name"),
     'description' => t("The name of the file on disk."),
+    'type' => 'string',
   );
   $file['path'] = array(
     'name' => t("Path"),
     'description' => t("The location of the file relative to Drupal root."),
+    'type' => 'uri',
   );
   $file['mime'] = array(
     'name' => t("MIME type"),
     'description' => t("The MIME type of the file."),
+    'type' => 'string',
   );
   $file['size'] = array(
     'name' => t("File size"),
     'description' => t("The size of the file."),
+    'type' => 'float',
   );
   $file['url'] = array(
     'name' => t("URL"),
     'description' => t("The web-accessible URL for the file."),
+    'type' => 'uri',
   );
   $file['created'] = array(
     'name' => t("Created"),
     'description' => t("The date the file created."),
-    'type' => 'date',
+    'type' => 'timestamp',
   );
   $file['changed'] = array(
     'name' => t("Changed"),
     'description' => t("The date the file was most recently changed."),
-    'type' => 'date',
+    'type' => 'timestamp',
   );
   $file['owner'] = array(
     'name' => t("Owner"),
     'description' => t("The user who originally uploaded the file."),
-    'type' => 'user',
+    'type' => 'entity:user',
   );
 
   return array(
     'types' => $types,
     'tokens' => array(
-      'file' => $file,
+      'entity:file' => $file,
     ),
   );
 }

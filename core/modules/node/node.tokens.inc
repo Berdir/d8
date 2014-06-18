@@ -15,67 +15,78 @@ function node_token_info() {
   $type = array(
     'name' => t('Nodes'),
     'description' => t('Tokens related to individual content items, or "nodes".'),
-    'needs-data' => 'node',
+    'needs-data' => 'entity:node',
   );
 
   // Core tokens for nodes.
   $node['nid'] = array(
     'name' => t("Content ID"),
     'description' => t('The unique ID of the content item, or "node".'),
+    'type' => 'integer',
   );
   $node['vid'] = array(
     'name' => t("Revision ID"),
     'description' => t("The unique ID of the node's latest revision."),
+    'type' => 'integer',
   );
   $node['type'] = array(
     'name' => t("Content type"),
+    'type' => 'string',
   );
   $node['type-name'] = array(
     'name' => t("Content type name"),
     'description' => t("The human-readable name of the node type."),
+    'type' => 'string',
   );
   $node['title'] = array(
     'name' => t("Title"),
+    'type' => 'string',
   );
   $node['body'] = array(
     'name' => t("Body"),
     'description' => t("The main body text of the node."),
+    'type' => 'string',
   );
   $node['summary'] = array(
     'name' => t("Summary"),
     'description' => t("The summary of the node's main body text."),
+    'type' => 'string',
   );
   $node['langcode'] = array(
     'name' => t('Language code'),
     'description' => t('The language code of the language the node is written in.'),
+    'type' => 'language',
   );
   $node['url'] = array(
     'name' => t("URL"),
     'description' => t("The URL of the node."),
+    'type' => 'uri',
   );
   $node['edit-url'] = array(
     'name' => t("Edit URL"),
     'description' => t("The URL of the node's edit page."),
+    'type' => 'uri',
   );
 
   // Chained tokens for nodes.
   $node['created'] = array(
     'name' => t("Date created"),
     'type' => 'date',
+    'type' => 'timestamp',
   );
   $node['changed'] = array(
     'name' => t("Date changed"),
     'description' => t("The date the node was most recently updated."),
-    'type' => 'date',
+    'type' => 'timestamp',
   );
   $node['author'] = array(
     'name' => t("Author"),
-    'type' => 'user',
+    'type' => 'entity:user',
   );
 
   return array(
-    'types' => array('node' => $type),
-    'tokens' => array('node' => $node),
+    'types' => array('entity:node' => $type),
+    'tokens' => array('entity:node' => $node),
   );
 }
 

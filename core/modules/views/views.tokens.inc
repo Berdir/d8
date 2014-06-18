@@ -11,55 +11,65 @@ use Drupal\Component\Utility\String;
  * Implements hook_token_info().
  */
 function views_token_info() {
-  $info['types']['view'] = array(
+  $info['types']['entity:view'] = array(
     'name' => t('View'),
     'description' => t('Tokens related to views.'),
-    'needs-data' => 'view',
+    'needs-data' => 'entity:view',
   );
-  $info['tokens']['view']['label'] = array(
+  $info['tokens']['entity:view']['label'] = array(
     'name' => t('Label'),
     'description' => t('The label of the view.'),
+    'type' => 'string',
   );
-  $info['tokens']['view']['description'] = array(
+  $info['tokens']['entity:view']['description'] = array(
     'name' => t('Description'),
     'description' => t('The description of the view.'),
+    'type' => 'string',
   );
-  $info['tokens']['view']['id'] = array(
+  $info['tokens']['entity:view']['id'] = array(
     'name' => t('ID'),
     'description' => t('The machine-readable ID of the view.'),
+    'type' => 'string',
   );
-  $info['tokens']['view']['title'] = array(
+  $info['tokens']['entity:view']['title'] = array(
     'name' => t('Title'),
     'description' => t('The title of current display of the view.'),
+    'type' => 'string',
   );
-  $info['tokens']['view']['url'] = array(
+  $info['tokens']['entity:view']['url'] = array(
     'name' => t('URL'),
     'description' => t('The URL of the view.'),
-    'type' => 'url',
+    'type' => 'uri',
   );
-  $info['tokens']['view']['base-table'] = array(
+  $info['tokens']['entity:view']['base-table'] = array(
     'name' => t('Base table'),
     'description' => t('The base table used for this view.'),
+    'type' => 'string',
   );
-  $info['tokens']['view']['base-field'] = array(
+  $info['tokens']['entity:view']['base-field'] = array(
     'name' => t('Base field'),
     'description' => t('The base field used for this view.'),
+    'type' => 'string',
   );
-  $info['tokens']['view']['total-rows'] = array(
+  $info['tokens']['entity:view']['total-rows'] = array(
     'name' => t('Total rows'),
     'description' => t('The total amount of results returned from the view. The current display will be used.'),
+    'type' => 'integer',
   );
-  $info['tokens']['view']['items-per-page'] = array(
+  $info['tokens']['entity:view']['items-per-page'] = array(
     'name' => t('Items per page'),
     'description' => t('The number of items per page.'),
+    'type' => 'integer',
   );
-  $info['tokens']['view']['current-page'] = array(
+  $info['tokens']['entity:view']['current-page'] = array(
     'name' => t('Current page'),
     'description' => t('The current page of results the view is on.'),
+    'type' => 'integer',
   );
-  $info['tokens']['view']['page-count'] = array(
+  $info['tokens']['entity:view']['page-count'] = array(
     'name' => t('Page count'),
     'description' => t('The total page count.'),
+    'type' => 'integer',
   );
 
   return $info;

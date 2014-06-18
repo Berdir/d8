@@ -17,69 +17,83 @@ function system_token_info() {
   $types['site'] = array(
     'name' => t("Site information"),
     'description' => t("Tokens for site-wide settings and other global information."),
+    'type' => 'string',
   );
   $types['date'] = array(
     'name' => t("Dates"),
     'description' => t("Tokens related to times and dates."),
+    'type' => 'timestamp',
   );
 
   // Site-wide global tokens.
   $site['name'] = array(
     'name' => t("Name"),
     'description' => t("The name of the site."),
+    'type' => 'string',
   );
   $site['slogan'] = array(
     'name' => t("Slogan"),
     'description' => t("The slogan of the site."),
+    'type' => 'string',
   );
   $site['mail'] = array(
     'name' => t("Email"),
     'description' => t("The administrative email address for the site."),
+    'type' => 'email',
   );
   $site['url'] = array(
     'name' => t("URL"),
     'description' => t("The URL of the site's front page."),
+    'type' => 'uri',
   );
   $site['url-brief'] = array(
     'name' => t("URL (brief)"),
     'description' => t("The URL of the site's front page without the protocol."),
+    'type' => 'uri',
   );
   $site['login-url'] = array(
     'name' => t("Login page"),
     'description' => t("The URL of the site's login page."),
+    'type' => 'uri',
   );
 
   // Date related tokens.
   $date['short'] = array(
     'name' => t("Short format"),
     'description' => t("A date in 'short' format. (%date)", array('%date' => format_date(REQUEST_TIME, 'short'))),
+    'type' => 'string',
   );
   $date['medium'] = array(
     'name' => t("Medium format"),
     'description' => t("A date in 'medium' format. (%date)", array('%date' => format_date(REQUEST_TIME, 'medium'))),
+    'type' => 'string',
   );
   $date['long'] = array(
     'name' => t("Long format"),
     'description' => t("A date in 'long' format. (%date)", array('%date' => format_date(REQUEST_TIME, 'long'))),
+    'type' => 'string',
   );
   $date['custom'] = array(
     'name' => t("Custom format"),
     'description' => t("A date in a custom format. See !php-date for details.", array('!php-date' => l(t('the PHP documentation'), 'http://php.net/manual/function.date.php'))),
+    'type' => 'string',
   );
   $date['since'] = array(
     'name' => t("Time-since"),
     'description' => t("A date in 'time-since' format. (%date)", array('%date' => format_interval(REQUEST_TIME - 360, 2))),
+    'type' => 'string',
   );
   $date['raw'] = array(
     'name' => t("Raw timestamp"),
     'description' => t("A date in UNIX timestamp format (%date)", array('%date' => REQUEST_TIME)),
+    'type' => 'timestamp',
   );
 
   return array(
     'types' => $types,
     'tokens' => array(
       'site' => $site,
-      'date' => $date,
+      'timestamp' => $date,
     ),
   );
 }

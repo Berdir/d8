@@ -139,7 +139,7 @@ class AreaTest extends HandlerTestBase {
 
     // Test the list of available tokens.
     $available = $empty_handler->getAvailableGlobalTokens();
-    foreach (array('site', 'view') as $type) {
+    foreach (array('site', 'entity:view') as $type) {
       $this->assertTrue(!empty($available[$type]) && is_array($available[$type]));
       // Test that each item exists in the list.
       foreach ($available[$type] as $token => $info) {

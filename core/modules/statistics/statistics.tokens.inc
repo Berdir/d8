@@ -12,19 +12,21 @@ function statistics_token_info() {
   $node['total-count'] = array(
     'name' => t("Number of views"),
     'description' => t("The number of visitors who have read the node."),
+    'type' => 'integer',
   );
   $node['day-count'] = array(
     'name' => t("Views today"),
     'description' => t("The number of visitors who have read the node today."),
+    'type' => 'integer',
   );
   $node['last-view'] = array(
     'name' => t("Last view"),
     'description' => t("The date on which a visitor last read the node."),
-    'type' => 'date',
+    'type' => 'timestamp',
   );
 
   return array(
-    'tokens' => array('node' => $node),
+    'tokens' => array('entity:node' => $node),
   );
 }
 

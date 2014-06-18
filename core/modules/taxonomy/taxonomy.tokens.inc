@@ -15,75 +15,85 @@ function taxonomy_token_info() {
   $types['term'] = array(
     'name' => t("Taxonomy terms"),
     'description' => t("Tokens related to taxonomy terms."),
-    'needs-data' => 'term',
+    'needs-data' => 'entity:taxonomy_term',
   );
   $types['vocabulary'] = array(
     'name' => t("Vocabularies"),
     'description' => t("Tokens related to taxonomy vocabularies."),
-    'needs-data' => 'vocabulary',
+    'needs-data' => 'entity:taxonomy_vocabulary',
   );
 
   // Taxonomy term related variables.
   $term['tid'] = array(
     'name' => t("Term ID"),
     'description' => t("The unique ID of the taxonomy term."),
+    'type' => 'integer',
   );
   $term['name'] = array(
     'name' => t("Name"),
     'description' => t("The name of the taxonomy term."),
+    'type' => 'string',
   );
   $term['description'] = array(
     'name' => t("Description"),
     'description' => t("The optional description of the taxonomy term."),
+    'type' => 'string',
   );
   $term['node-count'] = array(
     'name' => t("Node count"),
     'description' => t("The number of nodes tagged with the taxonomy term."),
+    'type' => 'integer',
   );
   $term['url'] = array(
     'name' => t("URL"),
     'description' => t("The URL of the taxonomy term."),
+    'type' => 'uri',
   );
 
   // Taxonomy vocabulary related variables.
   $vocabulary['vid'] = array(
     'name' => t("Vocabulary ID"),
     'description' => t("The unique ID of the taxonomy vocabulary."),
+    'type' => 'integer',
   );
   $vocabulary['name'] = array(
     'name' => t("Name"),
     'description' => t("The name of the taxonomy vocabulary."),
+    'type' => 'string',
   );
   $vocabulary['description'] = array(
     'name' => t("Description"),
     'description' => t("The optional description of the taxonomy vocabulary."),
+    'type' => 'string',
   );
   $vocabulary['node-count'] = array(
     'name' => t("Node count"),
     'description' => t("The number of nodes tagged with terms belonging to the taxonomy vocabulary."),
+    'type' => 'integer',
   );
   $vocabulary['term-count'] = array(
     'name' => t("Term count"),
     'description' => t("The number of terms belonging to the taxonomy vocabulary."),
+    'type' => 'integer',
   );
 
   // Chained tokens for taxonomies
   $term['vocabulary'] = array(
     'name' => t("Vocabulary"),
     'description' => t("The vocabulary the taxonomy term belongs to."),
-    'type' => 'vocabulary',
+    'type' => 'entity:taxonomy_vocabulary',
   );
   $term['parent'] = array(
     'name' => t("Parent term"),
     'description' => t("The parent term of the taxonomy term, if one exists."),
-    'type' => 'term',
+    'type' => 'entity:taxonomy_term',
   );
 
   return array(
     'types' => $types,
     'tokens' => array(
-      'term' => $term,
-      'vocabulary' => $vocabulary,
+      'entity:taxonomy_term' => $term,
+      'entity:taxonomy_vocabulary' => $vocabulary,
     ),
   );
 }

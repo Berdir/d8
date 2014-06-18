@@ -15,72 +15,83 @@ function comment_token_info() {
   $type = array(
     'name' => t('Comments'),
     'description' => t('Tokens for comments posted on the site.'),
-    'needs-data' => 'comment',
+    'needs-data' => 'entity:comment',
   );
 
   // @todo Make this work per field. See http://drupal.org/node/2031903
   $entity['comment-count'] = array(
     'name' => t("Comment count"),
     'description' => t("The number of comments posted on an entity."),
+    'type' => 'integer',
   );
   $entity['comment-count-new'] = array(
     'name' => t("New comment count"),
     'description' => t("The number of comments posted on an entity since the reader last viewed it."),
+    'type' => 'integer',
   );
 
   // Core comment tokens
   $comment['cid'] = array(
     'name' => t("Comment ID"),
     'description' => t("The unique ID of the comment."),
+    'type' => 'integer',
   );
   $comment['hostname'] = array(
     'name' => t("IP Address"),
     'description' => t("The IP address of the computer the comment was posted from."),
+    'type' => 'string',
   );
   $comment['name'] = array(
     'name' => t("Name"),
     'description' => t("The name left by the comment author."),
+    'type' => 'string',
   );
   $comment['mail'] = array(
     'name' => t("Email address"),
     'description' => t("The email address left by the comment author."),
+    'type' => 'email',
   );
   $comment['homepage'] = array(
     'name' => t("Home page"),
     'description' => t("The home page URL left by the comment author."),
+    'type' => 'uri',
   );
   $comment['title'] = array(
     'name' => t("Title"),
     'description' => t("The title of the comment."),
+    'type' => 'string',
   );
   $comment['body'] = array(
     'name' => t("Content"),
     'description' => t("The formatted content of the comment itself."),
+    'type' => 'string',
   );
   $comment['url'] = array(
     'name' => t("URL"),
     'description' => t("The URL of the comment."),
+    'type' => 'uri',
   );
   $comment['edit-url'] = array(
     'name' => t("Edit URL"),
     'description' => t("The URL of the comment's edit page."),
+    'type' => 'uri',
   );
 
   // Chained tokens for comments
   $comment['created'] = array(
     'name' => t("Date created"),
     'description' => t("The date the comment was posted."),
-    'type' => 'date',
+    'type' => 'timestamp',
   );
   $comment['changed'] = array(
     'name' => t("Date changed"),
     'description' => t("The date the comment was most recently updated."),
-    'type' => 'date',
+    'type' => 'timestamp',
   );
   $comment['parent'] = array(
     'name' => t("Parent"),
     'description' => t("The comment's parent, if comment threading is active."),
-    'type' => 'comment',
+    'type' => 'entity:comment',
   );
   $comment['entity'] = array(
     'name' => t("Entity"),
@@ -92,21 +103,21 @@ function comment_token_info() {
   $comment['node'] = array(
     'name' => t("Node"),
     'description' => t("DEPRECATED: The node the comment was posted to."),
-    'type' => 'node',
+    'type' => 'entity:node',
   );
   $comment['author'] = array(
     'name' => t("Author"),
     'description' => t("The author of the comment, if they were logged in."),
-    'type' => 'user',
+    'type' => 'entity:user',
   );
 
   return array(
     'types' => array('comment' => $type),
     'tokens' => array(
       'entity' => $entity,
-      'comment' => $comment,
+      'entity:comment' => $comment,
       // Support deprecated node tokens.
-      'node' => $entity,
+      'entity:node' => $entity,
     ),
   );
 }
