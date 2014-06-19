@@ -71,6 +71,8 @@ class LanguageListTest extends WebTestBase {
       'site_default_language' => $langcode,
     );
     $this->drupalPostForm(NULL, $edit, t('Save configuration'));
+    // Clear cached urls in the local process too.
+    $this->container->get('url_generator')->clearCache();
     $this->assertNoOptionSelected('edit-site-default-language', 'en', 'Default language updated.');
     $this->assertEqual($this->getUrl(), url($langcode . '/' . $path, array('absolute' => TRUE)), 'Correct page redirection.');
 
@@ -96,6 +98,8 @@ class LanguageListTest extends WebTestBase {
       'site_default_language' => 'en',
     );
     $this->drupalPostForm($path, $edit, t('Save configuration'));
+    // Clear cached urls in the local process too.
+    $this->container->get('url_generator')->clearCache();
     // Ensure 'delete' link works.
     $this->drupalGet('admin/config/regional/language');
     $this->clickLink(t('Delete'));
@@ -118,6 +122,8 @@ class LanguageListTest extends WebTestBase {
     $this->assertResponse(404, 'Language no longer found.');
     // Make sure the "language_count" state has been updated correctly.
     $this->container->get('language_manager')->reset();
+    // Clear cached urls in the local process too.
+    $this->container->get('url_generator')->clearCache();
     // Delete French.
     $this->drupalPostForm('admin/config/regional/language/delete/fr', array(), t('Delete'));
     $this->container->get('language_manager')->reset();
@@ -142,6 +148,8 @@ class LanguageListTest extends WebTestBase {
       'direction' => '0',
     );
     $this->drupalPostForm('admin/config/regional/language/add', $edit, t('Add custom language'));
+    // Clear cached urls in the local process too.
+    $this->container->get('url_generator')->clearCache();
     $this->assertEqual($this->getUrl(), url('admin/config/regional/language', array('absolute' => TRUE)), 'Correct page redirection.');
     $this->assertText($name, 'Name found.');
 
@@ -154,6 +162,8 @@ class LanguageListTest extends WebTestBase {
       'site_default_language' => $langcode,
     );
     $this->drupalPostForm(NULL, $edit, t('Save configuration'));
+    // Clear cached urls in the local process too.
+    $this->container->get('url_generator')->clearCache();
     $this->assertNoOptionSelected('edit-site-default-language', 'en', 'Default language updated.');
     $this->assertEqual($this->getUrl(), url($langcode . '/' . $path, array('absolute' => TRUE)), 'Correct page redirection.');
 

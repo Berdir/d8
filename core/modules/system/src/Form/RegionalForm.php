@@ -10,6 +10,8 @@ namespace Drupal\system\Form;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Locale\CountryManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Routing\CachedUrlGeneratorInterface;
+use Drupal\Core\Routing\UrlGeneratorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -25,16 +27,26 @@ class RegionalForm extends ConfigFormBase {
   protected $countryManager;
 
   /**
+   * The URL generator.
+   *
+   * @var \Drupal\Core\Routing\UrlGeneratorInterface
+   */
+  protected $urlGenerator;
+
+  /**
    * Constructs a RegionalForm object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
    * @param \Drupal\Core\Locale\CountryManagerInterface $country_manager
    *   The country manager.
+   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   *   The url generator.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, CountryManagerInterface $country_manager) {
+  public function __construct(ConfigFactoryInterface $config_factory, CountryManagerInterface $country_manager, UrlGeneratorInterface $url_generator) {
     parent::__construct($config_factory);
     $this->countryManager = $country_manager;
+    $this->urlGenerator = $url_generator;
   }
 
   /**
@@ -43,7 +55,8 @@ class RegionalForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
-      $container->get('country_manager')
+      $container->get('country_manager'),
+      $container->get('url_generator')
     );
   }
 
@@ -150,6 +163,10 @@ class RegionalForm extends ConfigFormBase {
       ->set('timezone.user.warn', $form_state['values']['empty_timezone_message'])
       ->set('timezone.user.default', $form_state['values']['user_default_timezone'])
       ->save();
+
+    if ($this->urlGenerator instanceof CachedUrlGeneratorInterface) {
+      $this->urlGenerator->clearCache();
+    }
 
     parent::submitForm($form, $form_state);
   }

@@ -11,7 +11,8 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Path\AliasManagerInterface;
-use Drupal\Core\Routing\UrlGenerator;
+use Drupal\Core\Routing\UrlGeneratorInterface;
+use Drupal\menu_link\MenuLinkStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -36,7 +37,7 @@ class MenuLinkForm extends EntityForm {
   /**
    * The URL generator.
    *
-   * @var \Drupal\Core\Routing\UrlGenerator
+   * @var \Drupal\Core\Routing\UrlGeneratorInterface
    */
   protected $urlGenerator;
 
@@ -47,10 +48,10 @@ class MenuLinkForm extends EntityForm {
    *   The menu link storage.
    * @param \Drupal\Core\Path\AliasManagerInterface $path_alias_manager
    *   The path alias manager.
-   * @param \Drupal\Core\Routing\UrlGenerator $url_generator
+   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
    *   The URL generator.
    */
-  public function __construct(MenuLinkStorageInterface $menu_link_storage, AliasManagerInterface $path_alias_manager, UrlGenerator $url_generator) {
+  public function __construct(MenuLinkStorageInterface $menu_link_storage, AliasManagerInterface $path_alias_manager, UrlGeneratorInterface $url_generator) {
     $this->menuLinkStorage = $menu_link_storage;
     $this->pathAliasManager = $path_alias_manager;
     $this->urlGenerator = $url_generator;

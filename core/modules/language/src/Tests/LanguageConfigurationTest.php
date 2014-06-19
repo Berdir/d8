@@ -70,6 +70,8 @@ class LanguageConfigurationTest extends WebTestBase {
       'site_default_language' => 'fr',
     );
     $this->drupalPostForm(NULL, $edit, t('Save configuration'));
+    // Clear cached urls in the local process too.
+    $this->container->get('url_generator')->clearCache();
     $this->assertOptionSelected('edit-site-default-language', 'fr', 'Default language updated.');
     $this->assertEqual($this->getUrl(), url('fr/admin/config/regional/settings', array('absolute' => TRUE)), 'Correct page redirection.');
 

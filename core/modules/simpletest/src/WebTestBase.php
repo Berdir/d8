@@ -17,6 +17,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\ConnectionNotDefinedException;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Routing\CachedUrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Session\UserSession;
@@ -3837,6 +3838,12 @@ abstract class WebTestBase extends TestBase {
 
     $request = Request::create($request_path, 'GET', array(), array(), array(), $server);
     $generator->setRequest($request);
+
+    // Ensure any internal caches of the URL generator are cleared.
+    if ($generator instanceof CachedUrlGeneratorInterface) {
+      $generator->clearCache();
+    }
+
     return $request;
   }
 }

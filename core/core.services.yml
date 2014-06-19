@@ -79,6 +79,13 @@ services:
     factory_method: get
     factory_service: cache_factory
     arguments: [discovery]
+  cache.url_generator:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory_method: get
+    factory_service: cache_factory
+    arguments: [url_generator]
   config.manager:
     class: Drupal\Core\Config\ConfigManager
     arguments: ['@entity.manager', '@config.factory', '@config.typed', '@string_translation', '@config.storage', '@event_dispatcher']
@@ -352,12 +359,16 @@ services:
       - [setFinalMatcher, ['@router.matcher.final_matcher']]
     tags:
       - { name: service_collector, tag: route_filter, call: addRouteFilter }
-  url_generator:
+  url_generator.uncached:
     class: Drupal\Core\Routing\UrlGenerator
+    public: false
     arguments: ['@router.route_provider', '@path_processor_manager', '@route_processor_manager', '@config.factory', '@settings', '@logger.channel.default']
     calls:
       - [setRequest, ['@?request']]
       - [setContext, ['@?router.request_context']]
+  url_generator:
+    class: Drupal\Core\Routing\CachedUrlGenerator
+    arguments: ['@url_generator.uncached', '@cache.url_generator', '@language_manager']
   link_generator:
     class: Drupal\Core\Utility\LinkGenerator
     arguments: ['@url_generator', '@module_handler']
