@@ -11,6 +11,7 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\PluginBag;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
  * Provides a default plugin bag for a plugin type.
@@ -20,6 +21,8 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
  * key containing the plugin ID is specified by self::$pluginKey.
  */
 class DefaultPluginBag extends PluginBag {
+
+  use DependencySerializationTrait;
 
   /**
    * The manager used to instantiate the plugins.

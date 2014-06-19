@@ -10,6 +10,7 @@ namespace Drupal\Core\Plugin;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Plugin\PluginBag;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
  * Provides a default plugin bag for a plugin type.
@@ -21,6 +22,8 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
  * self::initializePlugin().
  */
 class DefaultSinglePluginBag extends PluginBag {
+
+  use DependencySerializationTrait;
 
   /**
    * The manager used to instantiate the plugins.
