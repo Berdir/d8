@@ -9,7 +9,7 @@ use Drupal\Component\Utility\String;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\Element;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldInstanceConfigInterface;
 
 /**
@@ -348,8 +348,8 @@ function _content_translation_update_field_translatability($settings) {
         foreach ($bundle_settings['fields'] as $field_name => $translatable) {
           // If translatability changes for at least one field instance we need
           // to switch field translatability.
-          $field = FieldConfig::loadByName($entity_type, $field_name);
-          if ($field && $field->isTranslatable() !== $translatable) {
+          $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
+          if ($field_storage && $field_storage->isTranslatable() !== $translatable) {
             $fields[$field_name] = $translatable;
           }
         }
@@ -357,9 +357,9 @@ function _content_translation_update_field_translatability($settings) {
     }
     // Store updated fields.
     foreach ($fields as $field_name => $translatable) {
-      $field = FieldConfig::loadByName($entity_type, $field_name);
-      $field->translatable = $translatable;
-      $field->save();
+      $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
+      $field_storage->translatable = $translatable;
+      $field_storage->save();
     }
   }
 

@@ -10,7 +10,7 @@ namespace Drupal\system\Tests\Entity;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Tests entity translation.
@@ -55,7 +55,7 @@ class FieldTranslationSqlStorageTest extends EntityLanguageTestBase {
 
     // Test that after switching field translatability things keep working as
     // before.
-    $this->toggleFieldTranslatability($entity_type);
+    $this->toggleFieldStorageTranslatability($entity_type);
     $entity = $this->reloadEntity($entity);
     foreach (array($this->field_name, $this->untranslatable_field_name) as $field_name) {
       $this->assertEqual($entity->get($field_name)->value, $values[$field_name], 'Field language works as expected after switching translatability.');
@@ -63,14 +63,14 @@ class FieldTranslationSqlStorageTest extends EntityLanguageTestBase {
 
     // Test that after disabling field translatability translated values are not
     // loaded.
-    $this->toggleFieldTranslatability($entity_type);
+    $this->toggleFieldStorageTranslatability($entity_type);
     $entity = $this->reloadEntity($entity);
     $entity->langcode->value = $this->langcodes[0];
     $translation = $entity->addTranslation($this->langcodes[1]);
     $translated_value = $this->randomName();
     $translation->get($this->field_name)->value = $translated_value;
     $translation->save();
-    $this->toggleFieldTranslatability($entity_type);
+    $this->toggleFieldStorageTranslatability($entity_type);
     $entity = $this->reloadEntity($entity);
     $this->assertEqual($entity->getTranslation($this->langcodes[1])->get($this->field_name)->value, $values[$this->field_name], 'Existing field translations are not loaded for untranslatable fields.');
   }
@@ -91,10 +91,10 @@ class FieldTranslationSqlStorageTest extends EntityLanguageTestBase {
     $fields = array($this->field_name, $this->untranslatable_field_name);
 
     foreach ($fields as $field_name) {
-      $field = FieldConfig::loadByName($entity_type, $field_name);
+      $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
       $tables = array(
-        ContentEntityDatabaseStorage::_fieldTableName($field),
-        ContentEntityDatabaseStorage::_fieldRevisionTableName($field),
+        ContentEntityDatabaseStorage::_fieldTableName($field_storage),
+        ContentEntityDatabaseStorage::_fieldRevisionTableName($field_storage),
       );
 
       foreach ($tables as $table) {

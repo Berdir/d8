@@ -16,4 +16,4 @@ process:
   type: constants.type
   settings: constants.settings
 destination:
-  plugin: entity:field_config
+  plugin: entity:field_storage_config

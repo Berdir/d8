@@ -51,7 +51,7 @@ class UserCreateTest extends WebTestBase {
         'uri_scheme' => 'public',
       ),
     );
-    entity_create('field_config', $field)->save();
+    entity_create('field_storage_config', $field)->save();
 
     $instance = array(
       'field_name' => $field_name,

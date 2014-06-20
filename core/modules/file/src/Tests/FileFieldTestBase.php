@@ -7,7 +7,7 @@
 
 namespace Drupal\file\Tests;
 
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldInstanceConfig;
 use Drupal\file\FileInterface;
 use Drupal\simpletest\WebTestBase;
@@ -78,7 +78,7 @@ abstract class FileFieldTestBase extends WebTestBase {
       'cardinality' => !empty($field_settings['cardinality']) ? $field_settings['cardinality'] : 1,
     );
     $field_definition['settings'] = array_merge($field_definition['settings'], $field_settings);
-    $field = entity_create('field_config', $field_definition);
+    $field = entity_create('field_storage_config', $field_definition);
     $field->save();
 
     $this->attachFileField($name, $entity_type, $bundle, $instance_settings, $widget_settings);
@@ -161,9 +161,9 @@ abstract class FileFieldTestBase extends WebTestBase {
     }
 
     // Attach a file to the node.
-    $field = FieldConfig::loadByName('node', $field_name);
+    $field_storage = FieldStorageConfig::loadByName('node', $field_name);
     $name = 'files[' . $field_name . '_0]';
-    if ($field->getCardinality() != 1) {
+    if ($field_storage->getCardinality() != 1) {
       $name .= '[]';
     }
     $edit[$name] = drupal_realpath($file->getFileUri());

@@ -57,7 +57,7 @@ class EntityFormDisplayTest extends DrupalUnitTestBase {
 
     // Create a field and an instance.
     $field_name = 'test_field';
-    $field = entity_create('field_config', array(
+    $field = entity_create('field_storage_config', array(
       'name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'test_field'
@@ -187,7 +187,7 @@ class EntityFormDisplayTest extends DrupalUnitTestBase {
 
     $field_name = 'test_field';
     // Create a field and an instance.
-    $field = entity_create('field_config', array(
+    $field = entity_create('field_storage_config', array(
       'name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'test_field'

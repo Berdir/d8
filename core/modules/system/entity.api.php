@@ -830,12 +830,12 @@ function hook_entity_field_storage_info(\Drupal\Core\Entity\EntityTypeInterface 
   if ($entity_type->isFieldable()) {
     // Query by filtering on the ID as this is more efficient than filtering
     // on the entity_type property directly.
-    $ids = \Drupal::entityQuery('field_config')
+    $ids = \Drupal::entityQuery('field_storage_config')
       ->condition('id', $entity_type->id() . '.', 'STARTS_WITH')
       ->execute();
 
     // Fetch all fields and key them by field name.
-    $field_configs = entity_load_multiple('field_config', $ids);
+    $field_configs = entity_load_multiple('field_storage_config', $ids);
     $result = array();
     foreach ($field_configs as $field_config) {
       $result[$field_config->getName()] = $field_config;

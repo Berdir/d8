@@ -86,7 +86,7 @@ abstract class EntityWithUriCacheTagsTestBase extends EntityCacheTagsTestBase {
       // is a cache miss.
       $this->pass("Test modification of entity's configurable field.", 'Debug');
       $field_name = $this->entity->getEntityTypeId() . '.configurable_field';
-      $field = entity_load('field_config', $field_name);
+      $field = entity_load('field_storage_config', $field_name);
       $field->save();
       $this->verifyPageCache($entity_path, 'MISS');
 

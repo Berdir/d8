@@ -65,7 +65,7 @@ class EntityQueryTest extends EntityUnitTestBase {
     $figures = drupal_strtolower($this->randomName());
     $greetings = drupal_strtolower($this->randomName());
     foreach (array($figures => 'shape', $greetings => 'text') as $field_name => $field_type) {
-      $field = entity_create('field_config', array(
+      $field = entity_create('field_storage_config', array(
         'name' => $field_name,
         'entity_type' => 'entity_test_mulrev',
         'type' => $field_type,
@@ -431,7 +431,7 @@ class EntityQueryTest extends EntityUnitTestBase {
   protected function testCount() {
     // Create a field with the same name in a different entity type.
     $field_name = $this->figures;
-    $field = entity_create('field_config', array(
+    $field = entity_create('field_storage_config', array(
       'name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'shape',

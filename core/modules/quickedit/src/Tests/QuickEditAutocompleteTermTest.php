@@ -80,7 +80,7 @@ class QuickEditAutocompleteTermTest extends WebTestBase {
     ));
     $this->vocabulary->save();
     $this->field_name = 'field_' . $this->vocabulary->id();
-    entity_create('field_config', array(
+    entity_create('field_storage_config', array(
       'name' => $this->field_name,
       'entity_type' => 'node',
       'type' => 'taxonomy_term_reference',

@@ -8,7 +8,7 @@
 namespace Drupal\image\Tests;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Test class to check that formatters and display settings are working.
@@ -298,8 +298,8 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->drupalPostForm("admin/structure/types/manage/article/fields/node.article.$field_name/field", $edit, t('Save field settings'));
     // Clear field definition cache so the new default image is detected.
     \Drupal::entityManager()->clearCachedFieldDefinitions();
-    $field = FieldConfig::loadByName('node', $field_name);
-    $default_image = $field->getSetting('default_image');
+    $field_storage = FieldStorageConfig::loadByName('node', $field_name);
+    $default_image = $field_storage->getSetting('default_image');
     $file = file_load($default_image['fid']);
     $this->assertTrue($file->isPermanent(), 'The default image status is permanent.');
     $image = array(
@@ -340,8 +340,8 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->drupalPostForm("admin/structure/types/manage/article/fields/node.article.$field_name/field", $edit, t('Save field settings'));
     // Clear field definition cache so the new default image is detected.
     \Drupal::entityManager()->clearCachedFieldDefinitions();
-    $field = FieldConfig::loadByName('node', $field_name);
-    $default_image = $field->getSetting('default_image');
+    $field_storage = FieldStorageConfig::loadByName('node', $field_name);
+    $default_image = $field_storage->getSetting('default_image');
     $this->assertFalse($default_image['fid'], 'Default image removed from field.');
     // Create an image field that uses the private:// scheme and test that the
     // default image works as expected.
@@ -357,8 +357,8 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     // Clear field definition cache so the new default image is detected.
     \Drupal::entityManager()->clearCachedFieldDefinitions();
 
-    $private_field = FieldConfig::loadByName('node', $private_field_name);
-    $default_image = $private_field->getSetting('default_image');
+    $private_field_storage = FieldStorageConfig::loadByName('node', $private_field_name);
+    $default_image = $private_field_storage->getSetting('default_image');
     $file = file_load($default_image['fid']);
     $this->assertEqual('private', file_uri_scheme($file->getFileUri()), 'Default image uses private:// scheme.');
     $this->assertTrue($file->isPermanent(), 'The default image status is permanent.');

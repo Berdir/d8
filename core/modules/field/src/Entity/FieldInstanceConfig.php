@@ -14,7 +14,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
 use Drupal\field\FieldException;
-use Drupal\field\FieldConfigInterface;
+use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field\FieldInstanceConfigInterface;
 
 /**
@@ -186,9 +186,9 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
   /**
    * The field ConfigEntity object corresponding to $field_uuid.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var \Drupal\field\Entity\FieldStorageConfig
    */
-  protected $field;
+  protected $fieldStorage;
 
   /**
    * Flag indicating whether the bundle name can be renamed or not.
@@ -214,7 +214,7 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
    * @param array $values
    *   An array of field instance properties, keyed by property name. The field
    *   this is an instance of can be specified either with:
-   *   - field: the FieldConfigInterface object,
+   *   - field: the FieldStorageConfigInterface object,
    *   or by referring to an existing field in the current configuration with:
    *   - field_name: The field name.
    *   - entity_type: The entity type.
@@ -226,16 +226,16 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
    * @see entity_create()
    */
   public function __construct(array $values, $entity_type = 'field_instance_config') {
-    // Allow either an injected FieldConfig object, or a field_name and
+    // Allow either an injected FieldStorageConfig object, or a field_name and
     // entity_type.
     if (isset($values['field'])) {
-      if (!$values['field'] instanceof FieldConfigInterface) {
+      if (!$values['field'] instanceof FieldStorageConfigInterface) {
         throw new FieldException('Attempt to create a configurable instance of a non-configurable field.');
       }
       $field = $values['field'];
       $values['field_name'] = $field->getName();
       $values['entity_type'] = $field->getTargetEntityTypeId();
-      $this->field = $field;
+      $this->fieldStorage = $field;
     }
     else {
       if (empty($values['field_name'])) {
@@ -290,7 +290,7 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
     // 'Label' defaults to the field name (mostly useful for field instances
     // created in tests).
     if (empty($this->label)) {
-      $this->label = $this->field->name;
+      $this->label = $this->fieldStorage->name;
     }
   }
 
@@ -391,7 +391,7 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageInterface $storage, array $instances) {
-    $field_storage = \Drupal::entityManager()->getStorage('field_config');
+    $field_storage = \Drupal::entityManager()->getStorage('field_storage_config');
 
     // Clear the cache upfront, to refresh the results of getBundles().
     \Drupal::entityManager()->clearCachedFieldDefinitions();
@@ -429,11 +429,11 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
       if (!$instance->deleted) {
         $view_modes = \Drupal::entityManager()->getViewModeOptions($instance->entity_type, TRUE);
         foreach (array_keys($view_modes) as $mode) {
-          $displays_to_update['entity_view_display'][$instance->entity_type . '.' . $instance->bundle . '.' . $mode][] = $instance->field->name;
+          $displays_to_update['entity_view_display'][$instance->entity_type . '.' . $instance->bundle . '.' . $mode][] = $instance->getName();
         }
         $form_modes = \Drupal::entityManager()->getFormModeOptions($instance->entity_type, TRUE);
         foreach (array_keys($form_modes) as $mode) {
-          $displays_to_update['entity_form_display'][$instance->entity_type . '.' . $instance->bundle . '.' . $mode][] = $instance->field->name;
+          $displays_to_update['entity_form_display'][$instance->entity_type . '.' . $instance->bundle . '.' . $mode][] = $instance->getName();
         }
       }
     }
@@ -451,18 +451,18 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
    * {@inheritdoc}
    */
   public function getField() {
-    if (!$this->field) {
+    if (!$this->fieldStorage) {
       $fields = \Drupal::entityManager()->getFieldStorageDefinitions($this->entity_type);
       if (!isset($fields[$this->field_name])) {
         throw new FieldException(String::format('Attempt to create an instance of field @field_name that does not exist on entity type @entity_type.', array('@field_name' => $this->field_name, '@entity_type' => $this->entity_type)));
       }
-      if (!$fields[$this->field_name] instanceof FieldConfigInterface) {
+      if (!$fields[$this->field_name] instanceof FieldStorageConfigInterface) {
         throw new FieldException(String::format('Attempt to create a configurable instance of non-configurable field @field_name.', array('@field_name' => $this->field_name, '@entity_type' => $this->entity_type)));
       }
-      $this->field = $fields[$this->field_name];
+      $this->fieldStorage = $fields[$this->field_name];
     }
 
-    return $this->field;
+    return $this->fieldStorage;
   }
 
   /**

@@ -22,9 +22,9 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldInstanceConfigInterface;
-use Drupal\field\FieldConfigInterface;
+use Drupal\field\FieldStorageConfigInterface;
 use Drupal\file\FileInterface;
 use Drupal\user\EntityOwnerInterface;
 use Drupal\node\NodeInterface;
@@ -200,12 +200,12 @@ function comment_field_instance_config_update(FieldInstanceConfigInterface $inst
 }
 
 /**
- * Implements hook_ENTITY_TYPE_insert() for 'field_config'.
+ * Implements hook_ENTITY_TYPE_insert() for 'field_storage_config'.
  */
-function comment_field_config_insert(FieldConfigInterface $field) {
-  if ($field->getType() == 'comment') {
+function comment_field_storage_config_insert(FieldStorageConfigInterface $field_storage) {
+  if ($field_storage->getType() == 'comment') {
     // Check that the target entity type uses an integer ID.
-    $entity_type_id = $field->getTargetEntityTypeId();
+    $entity_type_id = $field_storage->getTargetEntityTypeId();
     if (!_comment_entity_uses_integer_id($entity_type_id)) {
       throw new \UnexpectedValueException('You cannot attach a comment field to an entity with a non-integer ID field');
     }
@@ -532,12 +532,12 @@ function comment_node_view_alter(array &$build, EntityInterface $node, EntityVie
  *   The renderable array for the comment addition form.
  */
 function comment_add(EntityInterface $entity, $field_name = 'comment', $pid = NULL) {
-  $field = Fieldconfig::loadByName($entity->getEntityTypeId(), $field_name);
+  $field_storage = FieldStorageConfig::loadByName($entity->getEntityTypeId(), $field_name);
   $values = array(
     'entity_type' => $entity->getEntityTypeId(),
     'entity_id' => $entity->id(),
     'field_name' => $field_name,
-    'comment_type' => $field->getSetting('bundle'),
+    'comment_type' => $field_storage->getSetting('bundle'),
     'pid' => $pid,
   );
   $comment = entity_create('comment', $values);

@@ -957,12 +957,12 @@ class ContentEntityDatabaseStorageTest extends UnitTestCase {
       ->will($this->returnValue($this->fieldDefinitions));
 
     // Define a field definition for a test_field field.
-    $field = $this->getMock('\Drupal\field\FieldConfigInterface');
-    $field->deleted = FALSE;
-    $field->entity_type = 'test_entity';
-    $field->name = 'test_field';
+    $field_storage = $this->getMock('\Drupal\field\FieldStorageConfigInterface');
+    $field_storage->deleted = FALSE;
+    $field_storage->entity_type = 'test_entity';
+    $field_storage->name = 'test_field';
 
-    $field->expects($this->any())
+    $field_storage->expects($this->any())
       ->method('getName')
       ->will($this->returnValue('test'));
 
@@ -978,11 +978,11 @@ class ContentEntityDatabaseStorageTest extends UnitTestCase {
       'indexes' => array(),
       'foreign keys' => array(),
     );
-    $field->expects($this->any())
+    $field_storage->expects($this->any())
       ->method('getSchema')
       ->will($this->returnValue($field_schema));
 
-    $schema = ContentEntityDatabaseStorage::_fieldSqlSchema($field);
+    $schema = ContentEntityDatabaseStorage::_fieldSqlSchema($field_storage);
 
     // Make sure that the entity_id schema field if of type varchar.
     $this->assertEquals($schema['test_entity__test_field']['fields']['entity_id']['type'], 'varchar');

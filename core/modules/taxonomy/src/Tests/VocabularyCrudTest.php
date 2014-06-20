@@ -147,7 +147,7 @@ class VocabularyCrudTest extends TaxonomyTestBase {
    */
   function testTaxonomyVocabularyChangeMachineName() {
     // Add a field instance to the vocabulary.
-    entity_create('field_config', array(
+    entity_create('field_storage_config', array(
       'name' => 'field_test',
       'entity_type' => 'taxonomy_term',
       'type' => 'test_field',
@@ -186,7 +186,7 @@ class VocabularyCrudTest extends TaxonomyTestBase {
       'type' => 'text',
       'cardinality' => 4
     );
-    entity_create('field_config', $this->field_definition)->save();
+    entity_create('field_storage_config', $this->field_definition)->save();
     $this->instance_definition = array(
       'field_name' => $this->field_name,
       'entity_type' => 'taxonomy_term',
@@ -205,7 +205,7 @@ class VocabularyCrudTest extends TaxonomyTestBase {
     // an instance of this field on the same bundle name should be successful.
     $this->vocabulary->enforceIsNew();
     $this->vocabulary->save();
-    entity_create('field_config', $this->field_definition)->save();
+    entity_create('field_storage_config', $this->field_definition)->save();
     entity_create('field_instance_config', $this->instance_definition)->save();
   }
 }

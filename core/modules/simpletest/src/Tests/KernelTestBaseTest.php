@@ -256,7 +256,7 @@ class KernelTestBaseTest extends KernelTestBase {
       'bundle' => 'entity_test',
       'mode' => 'default',
     ));
-    $field = entity_create('field_config', array(
+    $field = entity_create('field_storage_config', array(
       'name' => 'test_field',
       'entity_type' => 'entity_test',
       'type' => 'test_field'

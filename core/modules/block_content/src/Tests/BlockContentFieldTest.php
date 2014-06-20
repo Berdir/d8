@@ -25,9 +25,9 @@ class BlockContentFieldTest extends BlockContentTestBase {
   /**
    * The created field.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var \Drupal\field\Entity\FieldStorageConfig
    */
-  protected $field;
+  protected $fieldStorage;
 
   /**
    * The created instance.
@@ -64,15 +64,15 @@ class BlockContentFieldTest extends BlockContentTestBase {
     $this->blockType = $this->createBlockContentType('link');
 
     // Create a field with settings to validate.
-    $this->field = entity_create('field_config', array(
+    $this->fieldStorage = entity_create('field_storage_config', array(
       'name' => drupal_strtolower($this->randomName()),
       'entity_type' => 'block_content',
       'type' => 'link',
       'cardinality' => 2,
     ));
-    $this->field->save();
+    $this->fieldStorage->save();
     $this->instance = entity_create('field_instance_config', array(
-      'field' => $this->field,
+      'field' => $this->fieldStorage,
       'bundle' => 'link',
       'settings' => array(
         'title' => DRUPAL_OPTIONAL,
@@ -80,12 +80,12 @@ class BlockContentFieldTest extends BlockContentTestBase {
     ));
     $this->instance->save();
     entity_get_form_display('block_content', 'link', 'default')
-      ->setComponent($this->field->getName(), array(
+      ->setComponent($this->fieldStorage->getName(), array(
         'type' => 'link_default',
       ))
       ->save();
     entity_get_display('block_content', 'link', 'default')
-      ->setComponent($this->field->getName(), array(
+      ->setComponent($this->fieldStorage->getName(), array(
         'type' => 'link',
         'label' => 'hidden',
       ))
@@ -95,8 +95,8 @@ class BlockContentFieldTest extends BlockContentTestBase {
     $this->drupalGet('block/add/link');
     $edit = array(
       'info[0][value]' => $this->randomName(8),
-      $this->field->getName() . '[0][url]' => 'http://example.com',
-      $this->field->getName() . '[0][title]' => 'Example.com'
+      $this->fieldStorage->getName() . '[0][url]' => 'http://example.com',
+      $this->fieldStorage->getName() . '[0][title]' => 'Example.com'
     );
     $this->drupalPostForm(NULL, $edit, t('Save'));
     $block = entity_load('block_content', 1);

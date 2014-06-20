@@ -115,7 +115,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
     );
     for ($i = 1; $i <= 3; $i++) {
       $field_names[$i] = 'field_' . $i;
-      $field = entity_create('field_config', array(
+      $field = entity_create('field_storage_config', array(
         'name' => $field_names[$i],
         'entity_type' => $entity_type,
         'type' => 'test_field',
@@ -357,7 +357,7 @@ class FieldAttachStorageTest extends FieldUnitTestBase {
       'type' => 'test_field',
       'cardinality' => 1,
     );
-    entity_create('field_config', $field)->save();
+    entity_create('field_storage_config', $field)->save();
     $instance = array(
       'field_name' => $field_name,
       'entity_type' => $entity_type,

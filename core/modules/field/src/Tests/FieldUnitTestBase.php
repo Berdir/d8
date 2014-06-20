@@ -68,7 +68,7 @@ abstract class FieldUnitTestBase extends DrupalUnitTestBase {
     $instance_definition = 'instance_definition' . $suffix;
 
     $this->$field_name = drupal_strtolower($this->randomName() . '_field_name' . $suffix);
-    $this->$field = entity_create('field_config', array(
+    $this->$field = entity_create('field_storage_config', array(
       'name' => $this->$field_name,
       'entity_type' => $entity_type,
       'type' => 'test_field',

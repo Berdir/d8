@@ -7,8 +7,6 @@
 
 namespace Drupal\entity_reference\Tests;
 
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldInstanceConfig;
 use Drupal\system\Tests\Entity\EntityUnitTestBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
 
@@ -46,20 +44,6 @@ class EntityReferenceFieldTest extends EntityUnitTestBase {
   protected $fieldName = 'field_test';
 
   /**
-   * A field array.
-   *
-   * @var array
-   */
-  protected $field;
-
-  /**
-   * An associative array of field instance data.
-   *
-   * @var array
-   */
-  protected $instance;
-
-  /**
    * Modules to enable.
    *
    * @var array
@@ -91,8 +75,6 @@ class EntityReferenceFieldTest extends EntityUnitTestBase {
       FieldDefinitionInterface::CARDINALITY_UNLIMITED
     );
 
-    $this->field = FieldConfig::loadByName($this->entityType, $this->fieldName);
-    $this->instance = FieldInstanceConfig::loadByName($this->entityType, $this->bundle, $this->fieldName);
   }
 
   /**

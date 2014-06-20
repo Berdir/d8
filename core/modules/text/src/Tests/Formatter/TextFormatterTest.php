@@ -64,7 +64,7 @@ class TextFormatterTest extends EntityUnitTestBase {
     ))->save();
 
     // Set up two fields: one with text processing enabled, the other disabled.
-    entity_create('field_config', array(
+    entity_create('field_storage_config', array(
       'name' => 'processed_text',
       'entity_type' => $this->entityType,
       'type' => 'text',
@@ -79,7 +79,7 @@ class TextFormatterTest extends EntityUnitTestBase {
         'text_processing' => TRUE,
       ),
     ))->save();
-    entity_create('field_config', array(
+    entity_create('field_storage_config', array(
       'name' => 'unprocessed_text',
       'entity_type' => $this->entityType,
       'type' => 'text',

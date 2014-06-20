@@ -15,7 +15,7 @@ use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Render\Element;
 use Drupal\field_ui\OverviewBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldInstanceConfigInterface;
 
 /**
@@ -186,7 +186,7 @@ class FieldOverview extends OverviewBase {
           '#description' => $this->t('A unique machine-readable name containing letters, numbers, and underscores.'),
           // Calculate characters depending on the length of the field prefix
           // setting. Maximum length is 32.
-          '#maxlength' => FieldConfig::NAME_MAX_LENGTH - strlen($field_prefix),
+          '#maxlength' => FieldStorageConfig::NAME_MAX_LENGTH - strlen($field_prefix),
           '#prefix' => '<div class="add-new-placeholder">&nbsp;</div>',
           '#machine_name' => array(
             'source' => array('fields', $name, 'label'),
@@ -370,7 +370,7 @@ class FieldOverview extends OverviewBase {
     if (!empty($form_values['_add_new_field']['field_name'])) {
       $values = $form_values['_add_new_field'];
 
-      $field = array(
+      $field_storage = array(
         'name' => $values['field_name'],
         'entity_type' => $this->entity_type,
         'type' => $values['type'],
@@ -385,7 +385,7 @@ class FieldOverview extends OverviewBase {
 
       // Create the field and instance.
       try {
-        $this->entityManager->getStorage('field_config')->create($field)->save();
+        $this->entityManager->getStorage('field_storage_config')->create($field_storage)->save();
         $new_instance = $this->entityManager->getStorage('field_instance_config')->create($instance);
         $new_instance->save();
 
@@ -425,8 +425,8 @@ class FieldOverview extends OverviewBase {
     if (!empty($form_values['_add_existing_field']['field_name'])) {
       $values = $form_values['_add_existing_field'];
       $field_name = $values['field_name'];
-      $field = FieldConfig::loadByName($this->entity_type, $field_name);
-      if (!empty($field->locked)) {
+      $field_storage = FieldStorageConfig::loadByName($this->entity_type, $field_name);
+      if (!empty($field_storage->locked)) {
         drupal_set_message($this->t('The field %label cannot be added because it is locked.', array('%label' => $values['label'])), 'error');
       }
       else {

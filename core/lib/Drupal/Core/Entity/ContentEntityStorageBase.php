@@ -9,7 +9,7 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Cache\Cache;
-use Drupal\field\FieldConfigInterface;
+use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field\FieldInstanceConfigInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -267,17 +267,17 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Fie
   /**
    * {@inheritdoc}
    */
-  public function onFieldCreate(FieldConfigInterface $field) { }
+  public function onFieldCreate(FieldStorageConfigInterface $field_storage) { }
 
   /**
    * {@inheritdoc}
    */
-  public function onFieldUpdate(FieldConfigInterface $field) { }
+  public function onFieldUpdate(FieldStorageConfigInterface $field_storage) { }
 
   /**
    * {@inheritdoc}
    */
-  public function onFieldDelete(FieldConfigInterface $field) { }
+  public function onFieldDelete(FieldStorageConfigInterface $field_storage) { }
 
   /**
    * {@inheritdoc}
@@ -350,7 +350,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Fie
   /**
    * {@inheritdoc}
    */
-  public function onFieldPurge(FieldConfigInterface $field) { }
+  public function onFieldPurge(FieldStorageConfigInterface $field_storage) { }
 
   /**
    * Checks translation statuses and invoke the related hooks if needed.

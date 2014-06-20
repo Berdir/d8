@@ -8,7 +8,7 @@
 namespace Drupal\system\Tests\Entity;
 
 use Drupal\Core\Language\Language;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Base class for language-aware entity tests.
@@ -70,7 +70,7 @@ abstract class EntityLanguageTestBase extends EntityUnitTestBase {
 
     // Create field instances in all entity variations.
     foreach (entity_test_entity_types() as $entity_type) {
-      entity_create('field_config', array(
+      entity_create('field_storage_config', array(
         'name' => $this->field_name,
         'entity_type' => $entity_type,
         'type' => 'text',
@@ -84,7 +84,7 @@ abstract class EntityLanguageTestBase extends EntityUnitTestBase {
       ))->save();
       $this->instance[$entity_type] = entity_load('field_instance_config', $entity_type . '.' . $entity_type . '.' . $this->field_name);
 
-      entity_create('field_config', array(
+      entity_create('field_storage_config', array(
         'name' => $this->untranslatable_field_name,
         'entity_type' => $entity_type,
         'type' => 'text',
@@ -119,20 +119,20 @@ abstract class EntityLanguageTestBase extends EntityUnitTestBase {
   }
 
   /**
-   * Toggles field translatability.
+   * Toggles field storage translatability.
    *
    * @param string $entity_type
    *   The type of the entity fields are attached to.
    */
-  protected function toggleFieldTranslatability($entity_type) {
+  protected function toggleFieldStorageTranslatability($entity_type) {
     $fields = array($this->field_name, $this->untranslatable_field_name);
     foreach ($fields as $field_name) {
-      $field = FieldConfig::loadByName($entity_type, $field_name);
-      $translatable = !$field->isTranslatable();
-      $field->set('translatable', $translatable);
-      $field->save();
-      $field = FieldConfig::loadByName($entity_type, $field_name);
-      $this->assertEqual($field->isTranslatable(), $translatable, 'Field translatability changed.');
+      $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
+      $translatable = !$field_storage->isTranslatable();
+      $field_storage->set('translatable', $translatable);
+      $field_storage->save();
+      $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
+      $this->assertEqual($field_storage->isTranslatable(), $translatable, 'Field translatability changed.');
     }
     \Drupal::cache('entity')->deleteAll();
   }

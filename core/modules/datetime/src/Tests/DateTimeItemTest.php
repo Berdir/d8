@@ -35,7 +35,7 @@ class DateTimeItemTest extends FieldUnitTestBase {
     parent::setUp();
 
     // Create a field with settings to validate.
-    $this->field = entity_create('field_config', array(
+    $this->field = entity_create('field_storage_config', array(
       'name' => 'field_datetime',
       'type' => 'datetime',
       'entity_type' => 'entity_test',

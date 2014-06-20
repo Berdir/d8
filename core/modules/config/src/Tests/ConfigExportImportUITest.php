@@ -72,7 +72,7 @@ class ConfigExportImportUITest extends WebTestBase {
     $this->content_type = $this->drupalCreateContentType();
 
     // Create a field.
-    $this->field = entity_create('field_config', array(
+    $this->field = entity_create('field_storage_config', array(
       'name' => drupal_strtolower($this->randomName()),
       'entity_type' => 'node',
       'type' => 'text',
@@ -110,7 +110,7 @@ class ConfigExportImportUITest extends WebTestBase {
         $field_instance->delete();
       }
     }
-    $fields = entity_load_multiple('field_config');
+    $fields = entity_load_multiple('field_storage_config');
     foreach ($fields as $field) {
       if ($field->name == $this->field->name) {
         $field->delete();

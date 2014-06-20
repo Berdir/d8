@@ -64,8 +64,8 @@ class NestedFormTest extends FieldTestBase {
    */
   function testNestedFieldForm() {
     // Add two instances on the 'entity_test'
-    entity_create('field_config', $this->field_single)->save();
-    entity_create('field_config', $this->field_unlimited)->save();
+    entity_create('field_storage_config', $this->field_single)->save();
+    entity_create('field_storage_config', $this->field_unlimited)->save();
     $this->instance['field_name'] = 'field_single';
     $this->instance['label'] = 'Single field';
     entity_create('field_instance_config', $this->instance)->save();

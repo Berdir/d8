@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\field\Entity\FieldConfig.
+ * Contains \Drupal\field\Entity\FieldStorageConfig.
  */
 
 namespace Drupal\field\Entity;
@@ -13,25 +13,25 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\FieldException;
-use Drupal\field\FieldConfigInterface;
+use Drupal\field\FieldStorageConfigInterface;
 
 /**
- * Defines the Field entity.
+ * Defines the Field storage entity.
  *
  * @ConfigEntityType(
- *   id = "field_config",
+ *   id = "field_storage_config",
  *   label = @Translation("Field"),
  *   controllers = {
  *     "storage" = "Drupal\field\FieldConfigStorage"
  *   },
- *   config_prefix = "field",
+ *   config_prefix = "storage",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "id"
  *   }
  * )
  */
-class FieldConfig extends ConfigEntityBase implements FieldConfigInterface {
+class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigInterface {
 
   /**
    * The maximum length of the field name, in characters.
@@ -181,7 +181,7 @@ class FieldConfig extends ConfigEntityBase implements FieldConfigInterface {
   protected $propertyDefinitions;
 
   /**
-   * Constructs a FieldConfig object.
+   * Constructs a FieldStorageConfig object.
    *
    * @param array $values
    *   An array of field properties, keyed by property name. Most array
@@ -194,12 +194,12 @@ class FieldConfig extends ConfigEntityBase implements FieldConfigInterface {
    *   - type: required.
    *
    * In most cases, Field entities are created via
-   * entity_create('field_config', $values)), where $values is the same
+   * entity_create('field_storage_config', $values)), where $values is the same
    * parameter as in this constructor.
    *
    * @see entity_create()
    */
-  public function __construct(array $values, $entity_type = 'field_config') {
+  public function __construct(array $values, $entity_type = 'field_storage_config') {
     // Check required properties.
     if (empty($values['name'])) {
       throw new FieldException('Attempt to create an unnamed field.');
@@ -263,7 +263,7 @@ class FieldConfig extends ConfigEntityBase implements FieldConfigInterface {
     // Assign the ID.
     $this->id = $this->id();
 
-    // Field name cannot be longer than FieldConfig::NAME_MAX_LENGTH characters.
+    // Field name cannot be longer than FieldStorageConfig::NAME_MAX_LENGTH characters.
     // We use Unicode::strlen() because the DB layer assumes that column widths
     // are given in characters rather than bytes.
     if (Unicode::strlen($this->name) > static::NAME_MAX_LENGTH) {
@@ -333,8 +333,8 @@ class FieldConfig extends ConfigEntityBase implements FieldConfigInterface {
     $this->settings += $field_type_manager->getDefaultSettings($this->type);
 
     // See if any module forbids the update by throwing an exception. This
-    // invokes hook_field_config_update_forbid().
-    $module_handler->invokeAll('field_config_update_forbid', array($this, $this->original));
+    // invokes hook_field_storage_config_update_forbid().
+    $module_handler->invokeAll('field_storage_config_update_forbid', array($this, $this->original));
 
     // Notify the storage. The controller can reject the definition
     // update as invalid by raising an exception, which stops execution before
@@ -789,7 +789,7 @@ class FieldConfig extends ConfigEntityBase implements FieldConfigInterface {
    *   otherwise NULL.
    */
   public static function loadByName($entity_type_id, $field_name) {
-    return \Drupal::entityManager()->getStorage('field_config')->load($entity_type_id . '.' . $field_name);
+    return \Drupal::entityManager()->getStorage('field_storage_config')->load($entity_type_id . '.' . $field_name);
   }
 
 }

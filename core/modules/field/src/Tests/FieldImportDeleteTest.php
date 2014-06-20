@@ -35,8 +35,8 @@ class FieldImportDeleteTest extends FieldUnitTestBase {
   public function testImportDelete() {
     // At this point there are 5 field configuration objects in the active
     // storage.
-    // - field.field.entity_test.field_test_import
-    // - field.field.entity_test.field_test_import_2
+    // - field.storage.entity_test.field_test_import
+    // - field.storage.entity_test.field_test_import_2
     // - field.instance.entity_test.entity_test.field_test_import
     // - field.instance.entity_test.entity_test.field_test_import_2
     // - field.instance.entity_test.test_bundle.field_test_import_2
@@ -48,8 +48,8 @@ class FieldImportDeleteTest extends FieldUnitTestBase {
     $instance_id = "entity_test.entity_test.$field_name";
     $instance_id_2a = "entity_test.entity_test.$field_name_2";
     $instance_id_2b = "entity_test.test_bundle.$field_name_2";
-    $field_config_name = "field.field.$field_id";
-    $field_config_name_2 = "field.field.$field_id_2";
+    $field_config_name = "field.storage.$field_id";
+    $field_config_name_2 = "field.storage.$field_id_2";
     $instance_config_name = "field.instance.$instance_id";
     $instance_config_name_2a = "field.instance.$instance_id_2a";
     $instance_config_name_2b = "field.instance.$instance_id_2b";
@@ -61,8 +61,8 @@ class FieldImportDeleteTest extends FieldUnitTestBase {
     $this->installConfig(array('field_test_config'));
 
     // Get the uuid's for the fields.
-    $field_uuid = entity_load('field_config', $field_id)->uuid();
-    $field_uuid_2 = entity_load('field_config', $field_id_2)->uuid();
+    $field_uuid = entity_load('field_storage_config', $field_id)->uuid();
+    $field_uuid_2 = entity_load('field_storage_config', $field_id_2)->uuid();
 
     $active = $this->container->get('config.storage');
     $staging = $this->container->get('config.storage.staging');
@@ -80,9 +80,9 @@ class FieldImportDeleteTest extends FieldUnitTestBase {
     $this->configImporter()->import();
 
     // Check that the fields and instances are gone.
-    $field = entity_load('field_config', $field_id, TRUE);
+    $field = entity_load('field_storage_config', $field_id, TRUE);
     $this->assertFalse($field, 'The field was deleted.');
-    $field_2 = entity_load('field_config', $field_id_2, TRUE);
+    $field_2 = entity_load('field_storage_config', $field_id_2, TRUE);
     $this->assertFalse($field_2, 'The second field was deleted.');
     $instance = entity_load('field_instance_config', $instance_id, TRUE);
     $this->assertFalse($instance, 'The field instance was deleted.');

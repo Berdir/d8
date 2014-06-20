@@ -64,7 +64,7 @@ abstract class ImageFieldTestBase extends WebTestBase {
    *   A list of widget settings that will be added to the widget defaults.
    */
   function createImageField($name, $type_name, $field_settings = array(), $instance_settings = array(), $widget_settings = array()) {
-    entity_create('field_config', array(
+    entity_create('field_storage_config', array(
       'name' => $name,
       'entity_type' => 'node',
       'type' => 'image',

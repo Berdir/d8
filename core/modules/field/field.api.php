@@ -6,7 +6,7 @@
  */
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\field\FieldConfigUpdateForbiddenException;
+use Drupal\field\FieldStorageConfigUpdateForbiddenException;
 
 /**
  * @defgroup field_types Field Types API
@@ -238,7 +238,7 @@ function hook_field_info_max_weight($entity_type, $bundle, $context, $context_mo
  */
 
 /**
- * Forbid a field update from occurring.
+ * Forbid a field storage update from occurring.
  *
  * Any module may forbid any update for any reason. For example, the
  * field's storage module might forbid an update if it would change
@@ -248,29 +248,29 @@ function hook_field_info_max_weight($entity_type, $bundle, $context, $context_mo
  * that cannot be updated.
  *
  * To forbid the update from occurring, throw a
- * Drupal\field\FieldConfigUpdateForbiddenException.
+ * Drupal\field\FieldStorageConfigUpdateForbiddenException.
  *
- * @param \Drupal\field\FieldConfigInterface $field
- *   The field as it will be post-update.
- * @param \Drupal\field\FieldConfigInterface $prior_field
- *   The field as it is pre-update.
+ * @param \Drupal\field\FieldStorageConfigInterface $field_storage
+ *   The field storage as it will be post-update.
+ * @param \Drupal\field\FieldStorageConfigInterface $prior_field_storage
+ *   The field storage as it is pre-update.
  */
-function hook_field_config_update_forbid(\Drupal\field\FieldConfigInterface $field, \Drupal\field\FieldConfigInterface $prior_field) {
+function hook_field_storage_config_update_forbid(\Drupal\field\FieldStorageConfigInterface $field_storage, \Drupal\field\FieldStorageConfigInterface $prior_field_storage) {
   // A 'list' field stores integer keys mapped to display values. If
   // the new field will have fewer values, and any data exists for the
   // abandoned keys, the field will have no way to display them. So,
   // forbid such an update.
-  if ($field->hasData() && count($field['settings']['allowed_values']) < count($prior_field['settings']['allowed_values'])) {
+  if ($field_storage->hasData() && count($field_storage['settings']['allowed_values']) < count($prior_field_storage['settings']['allowed_values'])) {
     // Identify the keys that will be lost.
-    $lost_keys = array_diff(array_keys($field['settings']['allowed_values']), array_keys($prior_field['settings']['allowed_values']));
+    $lost_keys = array_diff(array_keys($field_storage['settings']['allowed_values']), array_keys($prior_field_storage['settings']['allowed_values']));
     // If any data exist for those keys, forbid the update.
     $query = new EntityFieldQuery();
     $found = $query
-      ->fieldCondition($prior_field['field_name'], 'value', $lost_keys)
+      ->fieldCondition($prior_field_storage['field_name'], 'value', $lost_keys)
       ->range(0, 1)
       ->execute();
     if ($found) {
-      throw new FieldConfigUpdateForbiddenException("Cannot update a list field not to include keys with existing data");
+      throw new FieldStorageConfigUpdateForbiddenException("Cannot update a list field not to include keys with existing data");
     }
   }
 }

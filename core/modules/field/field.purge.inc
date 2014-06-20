@@ -5,7 +5,7 @@
  * Provides support for field data purge after mass deletion.
  */
 
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldException;
 
 /**
@@ -124,11 +124,12 @@ function field_purge_batch($batch_size, $field_uuid = NULL) {
     }
   }
 
-  // Retrieve all deleted fields. Any that have no instances can be purged.
+  // Retrieve all deleted field storages. Any that have no instances can be
+  // purged.
   $deleted_fields = \Drupal::state()->get('field.field.deleted') ?: array();
-  foreach ($deleted_fields as $field) {
-    $field = new FieldConfig($field);
-    if ($field_uuid && $field->uuid() != $field_uuid) {
+  foreach ($deleted_fields as $field_storage) {
+    $field_storage = new FieldStorageConfig($field_storage);
+    if ($field_uuid && $field_storage->uuid() != $field_uuid) {
       // If a specific UUID is provided, only purge the corresponding field.
       continue;
     }
@@ -136,13 +137,13 @@ function field_purge_batch($batch_size, $field_uuid = NULL) {
     // We cannot purge anything if the entity type is unknown (e.g. the
     // providing module was uninstalled).
     // @todo Revisit after https://drupal.org/node/2080823.
-    if (!isset($info[$field->entity_type])) {
+    if (!isset($info[$field_storage->entity_type])) {
       continue;
     }
 
-    $instances = entity_load_multiple_by_properties('field_instance_config', array('field_id' => $field->uuid(), 'include_deleted' => TRUE));
+    $instances = entity_load_multiple_by_properties('field_instance_config', array('field_id' => $field_storage->uuid(), 'include_deleted' => TRUE));
     if (empty($instances)) {
-      field_purge_field($field);
+      field_purge_field($field_storage);
     }
   }
 }

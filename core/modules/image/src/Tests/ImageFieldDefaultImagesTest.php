@@ -77,19 +77,19 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
     $instance_field_settings = $instance->getSettings();
     $this->assertEqual($instance_field_settings['default_image']['fid'], $default_images['instance']->id());
 
-    $field = $instance->getField();
+    $field_storage = $instance->getField();
 
     // The field default image id should be 1.
-    $default_image = $field->getSetting('default_image');
+    $default_image = $field_storage->getSetting('default_image');
     $this->assertEqual($default_image['fid'], $default_images['field']->id());
 
-    // Also test \Drupal\field\Entity\FieldConfig::getSettings().
-    $field_field_settings = $field->getSettings();
+    // Also test \Drupal\field\Entity\FieldStorageConfig::getSettings().
+    $field_field_settings = $field_storage->getSettings();
     $this->assertEqual($field_field_settings['default_image']['fid'], $default_images['field']->id());
 
     // Add another instance with another default image to the page content type.
     $instance2 = entity_create('field_instance_config', array(
-      'field_name' => $field->name,
+      'field_name' => $field_storage->name,
       'entity_type' => 'node',
       'bundle' => 'page',
       'label' => $instance->label(),
@@ -182,9 +182,9 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
       )
     );
 
-    // Upload a new default for the field.
-    $field->settings['default_image']['fid'] = $default_images['field_new']->id();
-    $field->save();
+    // Upload a new default for the field storage.
+    $field_storage->settings['default_image']['fid'] = $default_images['field_new']->id();
+    $field_storage->save();
 
     // Confirm that the new default is used on the article field settings form.
     $this->drupalGet("admin/structure/types/manage/article/fields/$instance_id/field");
@@ -316,7 +316,7 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
         )
       ),
     );
-    $field_config = entity_create('field_config', $field);
+    $field_config = entity_create('field_storage_config', $field);
     $field_config->save();
     $settings = $field_config->getSettings();
     // The non-existent default image should not be saved.

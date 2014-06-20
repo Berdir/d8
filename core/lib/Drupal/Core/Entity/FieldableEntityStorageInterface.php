@@ -7,39 +7,39 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\field\FieldConfigInterface;
+use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field\FieldInstanceConfigInterface;
 
 interface FieldableEntityStorageInterface extends EntityStorageInterface {
 
   /**
-   * Allows reaction to the creation of a configurable field.
+   * Allows reaction to the creation of a configurable field storage.
    *
-   * @param \Drupal\field\FieldConfigInterface $field
-   *   The field being created.
+   * @param \Drupal\field\FieldStorageConfigInterface $field_storage
+   *   The field storage being created.
    */
-  public function onFieldCreate(FieldConfigInterface $field);
+  public function onFieldCreate(FieldStorageConfigInterface $field_storage);
 
   /**
    * Allows reaction to the update of a configurable field.
    *
-   * @param \Drupal\field\FieldConfigInterface $field
-   *   The field being updated.
+   * @param \Drupal\field\FieldStorageConfigInterface $field
+   *   The field storage being updated.
    */
-  public function onFieldUpdate(FieldConfigInterface $field);
+  public function onFieldUpdate(FieldStorageConfigInterface $field_storage);
 
   /**
-   * Allows reaction to the deletion of a configurable field.
+   * Allows reaction to the deletion of a configurable field storage.
    *
    * Stored values should not be wiped at once, but marked as 'deleted' so that
    * they can go through a proper purge process later on.
    *
-   * @param \Drupal\field\FieldConfigInterface $field
-   *   The field being deleted.
+   * @param \Drupal\field\FieldStorageConfigInterface $field_storage
+   *   The field storage being deleted.
    *
    * @see fieldPurgeData()
    */
-  public function onFieldDelete(FieldConfigInterface $field);
+  public function onFieldDelete(FieldStorageConfigInterface $field_storage);
 
   /**
    * Allows reaction to the creation of a configurable field instance.
@@ -117,9 +117,9 @@ interface FieldableEntityStorageInterface extends EntityStorageInterface {
   /**
    * Performs final cleanup after all data on all instances has been purged.
    *
-   * @param \Drupal\field\FieldConfigInterface $instance
-   *   The field being purged.
+   * @param \Drupal\field\FieldStorageConfigInterface $field_storage
+   *   The field storage being purged.
    */
-  public function onFieldPurge(FieldConfigInterface $field);
+  public function onFieldPurge(FieldStorageConfigInterface $field_storage);
 
 }

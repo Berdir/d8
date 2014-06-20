@@ -26,9 +26,9 @@ class LinkFieldTest extends WebTestBase {
   /**
    * A field to use in this test class.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var \Drupal\field\Entity\FieldStorageConfig
    */
-  protected $field;
+  protected $fieldStorage;
 
   /**
    * The instance used in this test class.
@@ -68,14 +68,14 @@ class LinkFieldTest extends WebTestBase {
   function testURLValidation() {
     $field_name = drupal_strtolower($this->randomName());
     // Create a field with settings to validate.
-    $this->field = entity_create('field_config', array(
+    $this->fieldStorage = entity_create('field_storage_config', array(
       'name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'link',
     ));
-    $this->field->save();
+    $this->fieldStorage->save();
     $this->instance = entity_create('field_instance_config', array(
-      'field' => $this->field,
+      'field' => $this->fieldStorage,
       'bundle' => 'entity_test',
       'settings' => array(
         'title' => DRUPAL_DISABLED,
@@ -192,14 +192,14 @@ class LinkFieldTest extends WebTestBase {
   function testLinkTitle() {
     $field_name = drupal_strtolower($this->randomName());
     // Create a field with settings to validate.
-    $this->field = entity_create('field_config', array(
+    $this->fieldStorage = entity_create('field_storage_config', array(
       'name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'link',
     ));
-    $this->field->save();
+    $this->fieldStorage->save();
     $this->instance = entity_create('field_instance_config', array(
-      'field' => $this->field,
+      'field' => $this->fieldStorage,
       'bundle' => 'entity_test',
       'label' => 'Read more about this entity',
       'settings' => array(
@@ -310,15 +310,15 @@ class LinkFieldTest extends WebTestBase {
   function testLinkFormatter() {
     $field_name = drupal_strtolower($this->randomName());
     // Create a field with settings to validate.
-    $this->field = entity_create('field_config', array(
+    $this->fieldStorage = entity_create('field_storage_config', array(
       'name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'link',
       'cardinality' => 2,
     ));
-    $this->field->save();
+    $this->fieldStorage->save();
     entity_create('field_instance_config', array(
-      'field' => $this->field,
+      'field' => $this->fieldStorage,
       'label' => 'Read more about this entity',
       'bundle' => 'entity_test',
       'settings' => array(
@@ -452,15 +452,15 @@ class LinkFieldTest extends WebTestBase {
   function testLinkSeparateFormatter() {
     $field_name = drupal_strtolower($this->randomName());
     // Create a field with settings to validate.
-    $this->field = entity_create('field_config', array(
+    $this->fieldStorage = entity_create('field_storage_config', array(
       'name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => 'link',
       'cardinality' => 2,
     ));
-    $this->field->save();
+    $this->fieldStorage->save();
     entity_create('field_instance_config', array(
-      'field' => $this->field,
+      'field' => $this->fieldStorage,
       'bundle' => 'entity_test',
       'settings' => array(
         'title' => DRUPAL_OPTIONAL,

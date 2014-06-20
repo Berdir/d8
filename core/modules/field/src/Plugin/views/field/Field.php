@@ -54,8 +54,10 @@ class Field extends FieldPluginBase {
 
   /**
    * The field config.
+   *
+   * @var \Drupal\field\FieldStorageConfigInterface
    */
-  protected $fieldConfig;
+  protected $fieldStorageConfig;
 
   /**
    * Does the field supports multiple field values.
@@ -152,8 +154,8 @@ class Field extends FieldPluginBase {
    */
   protected function getFieldDefinition() {
     if (!$this->fieldDefinition) {
-      $field_config = $this->getFieldConfig();
-      $this->fieldDefinition = FieldDefinition::createFromFieldStorageDefinition($field_config);
+      $field_storage_config = $this->getFieldStorageConfig();
+      $this->fieldDefinition = FieldDefinition::createFromFieldStorageDefinition($field_storage_config);
     }
     return $this->fieldDefinition;
   }
@@ -161,14 +163,14 @@ class Field extends FieldPluginBase {
   /**
    * Gets the field configuration.
    *
-   * @return \Drupal\field\FieldConfigInterface
+   * @return \Drupal\field\FieldStorageConfigInterface
    */
-  protected function getFieldConfig() {
-    if (!$this->fieldConfig) {
+  protected function getFieldStorageConfig() {
+    if (!$this->fieldStorageConfig) {
       $field_storage_definitions = \Drupal::entityManager()->getFieldStorageDefinitions($this->definition['entity_type']);
-      $this->fieldConfig = $field_storage_definitions[$this->definition['field_name']];
+      $this->fieldStorageConfig = $field_storage_definitions[$this->definition['field_name']];
     }
-    return $this->fieldConfig;
+    return $this->fieldStorageConfig;
   }
 
   /**
@@ -926,8 +928,8 @@ class Field extends FieldPluginBase {
    * {@inheritdoc}
    */
   public function getDependencies() {
-    // Add the module providing the configured field as a dependency.
-    return array('entity' => array($this->getFieldConfig()->getConfigDependencyName()));
+    // Add the module providing the configured field storage as a dependency.
+    return array('entity' => array($this->getFieldStorageConfig()->getConfigDependencyName()));
   }
 
 

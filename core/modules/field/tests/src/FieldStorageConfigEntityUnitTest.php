@@ -2,22 +2,22 @@
 
 /**
  * @file
- * Contains \Drupal\field\Tests\FieldConfigEntityUnitTest.
+ * Contains \Drupal\field\Tests\FieldStorageConfigEntityUnitTest.
  */
 
 namespace Drupal\field\Tests;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * @coversDefaultClass \Drupal\field\Entity\FieldConfig
+ * @coversDefaultClass \Drupal\field\Entity\FieldStorageConfig
  *
  * @group Drupal
  * @group Config
  */
-class FieldConfigEntityUnitTest extends UnitTestCase {
+class FieldStorageConfigEntityUnitTest extends UnitTestCase {
 
   /**
    * The entity type used for testing.
@@ -53,7 +53,7 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
   public static function getInfo() {
     return array(
       'description' => '',
-      'name' => '\Drupal\field\Entity\FieldConfig unit test',
+      'name' => '\Drupal\field\Entity\FieldStorageConfig unit test',
       'group' => 'Entity',
     );
   }
@@ -90,7 +90,7 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
 
     // Get definition is called three times. Twice in
     // ConfigEntityBase::addDependency() to get the provider of the field config
-    // entity type and once in FieldConfig::calculateDependencies() to get the
+    // entity type and once in FieldStorageConfig::calculateDependencies() to get the
     // provider of the entity type that field is attached to.
     $this->entityManager->expects($this->at(0))
       ->method('getDefinition')
@@ -106,9 +106,9 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
       ->will($this->returnValue($fieldConfigentityType));
 
     $values = array('name' => 'test_field', 'type' => 'test_field_type', 'entity_type' => $attached_entity_type_id, 'module' => 'test_module');
-    $field = new FieldConfig($values, 'fieldConfig');
+    $field_storage = new FieldStorageConfig($values, 'fieldConfig');
 
-    $dependencies = $field->calculateDependencies();
+    $dependencies = $field_storage->calculateDependencies();
     $this->assertContains('test_module', $dependencies['module']);
     $this->assertContains('entity_provider_module', $dependencies['module']);
   }

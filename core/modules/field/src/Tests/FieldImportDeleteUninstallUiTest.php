@@ -43,7 +43,7 @@ class FieldImportDeleteUninstallUiTest extends FieldTestBase {
    */
   public function testImportDeleteUninstall() {
     // Create a telephone field and instance.
-    $field = entity_create('field_config', array(
+    $field = entity_create('field_storage_config', array(
       'name' => 'field_tel',
       'entity_type' => 'entity_test',
       'type' => 'telephone',
@@ -56,7 +56,7 @@ class FieldImportDeleteUninstallUiTest extends FieldTestBase {
     ))->save();
 
     // Create a text field and instance.
-    $text_field = entity_create('field_config', array(
+    $text_field = entity_create('field_storage_config', array(
       'name' => 'field_text',
       'entity_type' => 'entity_test',
       'type' => 'text',
@@ -97,7 +97,7 @@ class FieldImportDeleteUninstallUiTest extends FieldTestBase {
     $staging->write('core.extension', $core_extension);
 
     // Stage the field deletion
-    $staging->delete('field.field.entity_test.field_tel');
+    $staging->delete('field.storage.entity_test.field_tel');
     $staging->delete('field.instance.entity_test.entity_test.field_tel');
     $this->drupalGet('admin/config/development/configuration');
     // Test that the message for one field being purged during a configuration
@@ -117,7 +117,7 @@ class FieldImportDeleteUninstallUiTest extends FieldTestBase {
     $this->assertNoText('Field data will be deleted by this synchronization.');
     $this->rebuildContainer();
     $this->assertFalse(\Drupal::moduleHandler()->moduleExists('telephone'));
-    $this->assertFalse(entity_load_by_uuid('field_config', $tel_field_uuid), 'The telephone field has been deleted by the configuration synchronization');
+    $this->assertFalse(entity_load_by_uuid('field_storage_config', $tel_field_uuid), 'The telephone field has been deleted by the configuration synchronization');
     $deleted_fields = \Drupal::state()->get('field.field.deleted') ?: array();
     $this->assertFalse(isset($deleted_fields[$tel_field_uuid]), 'Telephone field has been completed removed from the system.');
     $this->assertFalse(isset($deleted_fields[$text_field_uuid]), 'Text field has been completed removed from the system.');

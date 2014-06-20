@@ -72,7 +72,7 @@ abstract class FieldTestBase extends ViewTestBase {
         'type' => 'text',
       );
 
-      $this->fields[$i] = $field = entity_create('field_config', $field);
+      $this->fields[$i] = $field = entity_create('field_storage_config', $field);
       $field->save();
     }
     return $field_names;

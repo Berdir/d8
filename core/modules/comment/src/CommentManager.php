@@ -17,7 +17,7 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldInstanceConfig;
 
 /**
@@ -126,9 +126,9 @@ class CommentManager implements CommentManagerInterface {
       ))->save();
     }
     // Make sure the field doesn't already exist.
-    if (!FieldConfig::loadByName($entity_type, $field_name)) {
+    if (!FieldStorageConfig::loadByName($entity_type, $field_name)) {
       // Add a default comment field for existing node comments.
-      $field = $this->entityManager->getStorage('field_config')->create(array(
+      $field = $this->entityManager->getStorage('field_storage_config')->create(array(
         'entity_type' => $entity_type,
         'name' => $field_name,
         'type' => 'comment',
@@ -203,14 +203,14 @@ class CommentManager implements CommentManagerInterface {
    */
   public function addBodyField($comment_type_id) {
     // Create the field if needed.
-    $field = FieldConfig::loadByName('comment', 'comment_body');
-    if (!$field) {
-      $field = $this->entityManager->getStorage('field_config')->create(array(
+    $field_storage = FieldStorageConfig::loadByName('comment', 'comment_body');
+    if (!$field_storage) {
+      $field_storage = $this->entityManager->getStorage('field_storage_config')->create(array(
         'name' => 'comment_body',
         'type' => 'text_long',
         'entity_type' => 'comment',
       ));
-      $field->save();
+      $field_storage->save();
     }
     if (!FieldInstanceConfig::loadByName('comment', $comment_type_id, 'comment_body')) {
       // Attaches the body field by default.

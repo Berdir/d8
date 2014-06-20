@@ -9,6 +9,7 @@ namespace Drupal\field;
 
 use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Processes field purges before a configuration synchronization.
@@ -32,7 +33,7 @@ class ConfigImporterFieldPurger {
     }
 
     // Get the list of fields to purge.
-    $fields = static::getFieldsToPurge($context['sandbox']['field']['extensions'], $config_importer->getUnprocessedConfiguration('delete'));
+    $fields = static::getFieldStoragesToPurge($context['sandbox']['field']['extensions'], $config_importer->getUnprocessedConfiguration('delete'));
     // Get the first field to process.
     $field = reset($fields);
     if (!isset($context['sandbox']['field']['current_field_id']) || $context['sandbox']['field']['current_field_id'] != $field->id()) {
@@ -45,7 +46,7 @@ class ConfigImporterFieldPurger {
     }
     field_purge_batch($context['sandbox']['field']['purge_batch_size'], $field->uuid());
     $context['sandbox']['field']['current_progress']++;
-    $fields_to_delete_count = count(static::getFieldsToPurge($context['sandbox']['field']['extensions'], $config_importer->getUnprocessedConfiguration('delete')));
+    $fields_to_delete_count = count(static::getFieldStoragesToPurge($context['sandbox']['field']['extensions'], $config_importer->getUnprocessedConfiguration('delete')));
     if ($fields_to_delete_count == 0) {
       $context['finished'] = 1;
     }
@@ -73,7 +74,7 @@ class ConfigImporterFieldPurger {
     $context['sandbox']['field']['extensions'] = $config_importer->getStorageComparer()->getSourceStorage()->read('core.extension');
 
     $context['sandbox']['field']['steps_to_delete'] = 0;
-    $fields = static::getFieldsToPurge($context['sandbox']['field']['extensions'], $config_importer->getUnprocessedConfiguration('delete'));
+    $fields = static::getFieldStoragesToPurge($context['sandbox']['field']['extensions'], $config_importer->getUnprocessedConfiguration('delete'));
     foreach ($fields as $field) {
       $row_count = $field->entityCount();
       if ($row_count > 0) {
@@ -107,38 +108,39 @@ class ConfigImporterFieldPurger {
    *   The configuration that will be deleted by the configuration
    *   synchronization.
    *
-   * @return \Drupal\field\Entity\FieldConfig[]
-   *   An array of fields that need purging before configuration can be
+   * @return \Drupal\field\Entity\FieldStorageConfig[]
+   *   An array of field storages that need purging before configuration can be
    *   synchronized.
    */
-  public static function getFieldsToPurge(array $extensions, array $deletes) {
+  public static function getFieldStoragesToPurge(array $extensions, array $deletes) {
     $providers = array_keys($extensions['module']);
     $providers[] = 'Core';
     $fields_to_delete = array();
 
     // Gather fields that will be deleted during configuration synchronization
     // where the module that provides the field type is also being uninstalled.
-    $field_ids = array();
+    $field_storage_ids = array();
     foreach ($deletes as $config_name) {
-      if (strpos($config_name, 'field.field.') === 0) {
-        $field_ids[] = ConfigEntityStorage::getIDFromConfigName($config_name, 'field.field');
+      $field_storage_config_prefix = \Drupal::entityManager()->getDefinition('field_storage_config')->getConfigPrefix();
+      if (strpos($config_name, $field_storage_config_prefix . '.') === 0) {
+        $field_storage_ids[] = ConfigEntityStorage::getIDFromConfigName($config_name, $field_storage_config_prefix);
       }
     }
-    if (!empty($field_ids)) {
-      $fields = \Drupal::entityQuery('field_config')
-        ->condition('id', $field_ids, 'IN')
+    if (!empty($field_storage_ids)) {
+      $field_storages = \Drupal::entityQuery('field_storage_config')
+        ->condition('id', $field_storage_ids, 'IN')
         ->condition('module', $providers, 'NOT IN')
         ->execute();
-      if (!empty($fields)) {
-        $fields_to_delete = entity_load_multiple('field_config', $fields);
+      if (!empty($field_storages)) {
+        $fields_to_delete = FieldStorageConfig::loadMultiple($field_storages);
       }
     }
 
     // Gather deleted fields from modules that are being uninstalled.
-    $fields = entity_load_multiple_by_properties('field_config', array('deleted' => TRUE, 'include_deleted' => TRUE));
-    foreach ($fields as $field) {
-      if (!in_array($field->module, $providers)) {
-        $fields_to_delete[$field->id()] = $field;
+    $field_storages = entity_load_multiple_by_properties('field_storage_config', array('deleted' => TRUE, 'include_deleted' => TRUE));
+    foreach ($field_storages as $field_storage) {
+      if (!in_array($field_storage->module, $providers)) {
+        $fields_to_delete[$field_storage->id()] = $field_storage;
       }
     }
     return $fields_to_delete;

@@ -114,7 +114,7 @@ class MigrateUserProfileFieldInstanceTest extends MigrateDrupalTestBase {
       'profile_love_migrations' => 'list_boolean',
     );
     foreach ($fields as $name => $type) {
-      entity_create('field_config', array(
+      entity_create('field_storage_config', array(
         'name' => $name,
         'entity_type' => 'user',
         'type' => $type,

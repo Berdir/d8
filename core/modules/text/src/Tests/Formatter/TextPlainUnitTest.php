@@ -68,7 +68,7 @@ class TextPlainUnitTest extends DrupalUnitTestBase {
     $this->formatter_type = 'string';
     $this->formatter_settings = array();
 
-    $this->field = entity_create('field_config', array(
+    $this->field = entity_create('field_storage_config', array(
       'name' => $this->field_name,
       'entity_type' => $this->entity_type,
       'type' => $this->field_type,

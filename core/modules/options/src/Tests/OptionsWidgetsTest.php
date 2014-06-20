@@ -22,23 +22,23 @@ class OptionsWidgetsTest extends FieldTestBase {
   public static $modules = array('node', 'options', 'entity_test', 'options_test', 'taxonomy', 'field_ui');
 
   /**
-   * A field with cardinality 1 to use in this test class.
+   * A field storage with cardinality 1 to use in this test class.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var \Drupal\field\Entity\FieldStorageConfig
    */
   protected $card_1;
 
   /**
-   * A field with cardinality 2 to use in this test class.
+   * A field storage with cardinality 2 to use in this test class.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var \Drupal\field\Entity\FieldStorageConfig
    */
   protected $card_2;
 
   /**
-   * A boolean field to use in this test class.
+   * A boolean field storage to use in this test class.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var \Drupal\field\Entity\FieldStorageConfig
    */
   protected $bool;
 
@@ -61,8 +61,8 @@ class OptionsWidgetsTest extends FieldTestBase {
   function setUp() {
     parent::setUp();
 
-    // Field with cardinality 1.
-    $this->card_1 = entity_create('field_config', array(
+    // Field storage with cardinality 1.
+    $this->card_1 = entity_create('field_storage_config', array(
       'name' => 'card_1',
       'entity_type' => 'entity_test',
       'type' => 'list_integer',
@@ -81,8 +81,8 @@ class OptionsWidgetsTest extends FieldTestBase {
     ));
     $this->card_1->save();
 
-    // Field with cardinality 2.
-    $this->card_2 = entity_create('field_config', array(
+    // Field storage with cardinality 2.
+    $this->card_2 = entity_create('field_storage_config', array(
       'name' => 'card_2',
       'entity_type' => 'entity_test',
       'type' => 'list_integer',
@@ -99,8 +99,8 @@ class OptionsWidgetsTest extends FieldTestBase {
     ));
     $this->card_2->save();
 
-    // Boolean field.
-    $this->bool = entity_create('field_config', array(
+    // Boolean field storage.
+    $this->bool = entity_create('field_storage_config', array(
       'name' => 'bool',
       'entity_type' => 'entity_test',
       'type' => 'list_boolean',
@@ -546,7 +546,7 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     // Create a test field instance.
     $field_name = 'bool';
-    entity_create('field_config', array(
+    entity_create('field_storage_config', array(
       'name' => $field_name,
       'entity_type' => 'node',
       'type' => 'list_boolean',

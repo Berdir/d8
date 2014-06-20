@@ -9,8 +9,8 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\field\FieldConfigInterface;
-use Drupal\field\FieldConfigUpdateForbiddenException;
+use Drupal\field\FieldStorageConfigInterface;
+use Drupal\field\FieldStorageConfigUpdateForbiddenException;
 
 /**
  * Implements hook_field_widget_info_alter().
@@ -20,11 +20,11 @@ function field_test_field_widget_info_alter(&$info) {
 }
 
 /**
- * Implements hook_field_config_update_forbid().
+ * Implements hook_field_storage_config_update_forbid().
  */
-function field_test_field_config_update_forbid(FieldConfigInterface $field, FieldConfigInterface $prior_field) {
-  if ($field->getType() == 'test_field' && $field->getSetting('unchangeable') != $prior_field->getSetting('unchangeable')) {
-    throw new FieldConfigUpdateForbiddenException("field_test 'unchangeable' setting cannot be changed'");
+function field_test_field_storage_config_update_forbid(FieldStorageConfigInterface $field_storage, FieldStorageConfigInterface $prior_field_storage) {
+  if ($field_storage->getType() == 'test_field' && $field_storage->getSetting('unchangeable') != $prior_field_storage->getSetting('unchangeable')) {
+    throw new FieldStorageConfigUpdateForbiddenException("field_test 'unchangeable' setting cannot be changed'");
   }
 }
 

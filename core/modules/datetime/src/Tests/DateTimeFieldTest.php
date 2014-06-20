@@ -24,11 +24,11 @@ class DateTimeFieldTest extends WebTestBase {
   public static $modules = array('node', 'entity_test', 'datetime', 'field_ui');
 
   /**
-   * A field to use in this test class.
+   * A field storage to use in this test class.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var \Drupal\field\Entity\FieldStorageConfig
    */
-  protected $field;
+  protected $fieldStorage;
 
   /**
    * The instance used in this test class.
@@ -58,22 +58,22 @@ class DateTimeFieldTest extends WebTestBase {
     $this->drupalLogin($web_user);
 
     // Create a field with settings to validate.
-    $this->field = entity_create('field_config', array(
+    $this->fieldStorage = entity_create('field_storage_config', array(
       'name' => drupal_strtolower($this->randomName()),
       'entity_type' => 'entity_test',
       'type' => 'datetime',
       'settings' => array('datetime_type' => 'date'),
     ));
-    $this->field->save();
+    $this->fieldStorage->save();
     $this->instance = entity_create('field_instance_config', array(
-      'field' => $this->field,
+      'field' => $this->fieldStorage,
       'bundle' => 'entity_test',
       'required' => TRUE,
     ));
     $this->instance->save();
 
     entity_get_form_display($this->instance->entity_type, $this->instance->bundle, 'default')
-      ->setComponent($this->field->name, array(
+      ->setComponent($this->fieldStorage->name, array(
         'type' => 'datetime_default',
       ))
       ->save();
@@ -84,7 +84,7 @@ class DateTimeFieldTest extends WebTestBase {
       'settings' => array('format_type' => 'medium'),
     );
     entity_get_display($this->instance->entity_type, $this->instance->bundle, 'full')
-      ->setComponent($this->field->name, $this->display_options)
+      ->setComponent($this->fieldStorage->name, $this->display_options)
       ->save();
   }
 
@@ -92,7 +92,7 @@ class DateTimeFieldTest extends WebTestBase {
    * Tests date field functionality.
    */
   function testDateField() {
-    $field_name = $this->field->name;
+    $field_name = $this->fieldStorage->name;
 
     // Display creation form.
     $this->drupalGet('entity_test/add');
@@ -159,10 +159,10 @@ class DateTimeFieldTest extends WebTestBase {
    * Tests date and time field.
    */
   function testDatetimeField() {
-    $field_name = $this->field->name;
+    $field_name = $this->fieldStorage->name;
     // Change the field to a datetime field.
-    $this->field->settings['datetime_type'] = 'datetime';
-    $this->field->save();
+    $this->fieldStorage->settings['datetime_type'] = 'datetime';
+    $this->fieldStorage->save();
 
     // Display creation form.
     $this->drupalGet('entity_test/add');
@@ -226,10 +226,10 @@ class DateTimeFieldTest extends WebTestBase {
    * Tests Date List Widget functionality.
    */
   function testDatelistWidget() {
-    $field_name = $this->field->name;
+    $field_name = $this->fieldStorage->name;
     // Change the field to a datetime field.
-    $this->field->settings['datetime_type'] = 'datetime';
-    $this->field->save();
+    $this->fieldStorage->settings['datetime_type'] = 'datetime';
+    $this->fieldStorage->save();
 
     // Change the widget to a datelist widget.
     entity_get_form_display($this->instance->entity_type, $this->instance->bundle, 'default')
@@ -295,7 +295,7 @@ class DateTimeFieldTest extends WebTestBase {
     $this->drupalCreateContentType(array('type' => 'date_content'));
 
     // Create a field with settings to validate.
-    $field = entity_create('field_config', array(
+    $field = entity_create('field_storage_config', array(
       'name' => drupal_strtolower($this->randomName()),
       'entity_type' => 'node',
       'type' => 'datetime',
@@ -359,9 +359,9 @@ class DateTimeFieldTest extends WebTestBase {
   function testInvalidField() {
 
     // Change the field to a datetime field.
-    $this->field->settings['datetime_type'] = 'datetime';
-    $this->field->save();
-    $field_name = $this->field->name;
+    $this->fieldStorage->settings['datetime_type'] = 'datetime';
+    $this->fieldStorage->save();
+    $field_name = $this->fieldStorage->name;
 
     // Display creation form.
     $this->drupalGet('entity_test/add');

@@ -75,7 +75,7 @@ process:
       - widget_settings
 
 destination:
-  plugin: entity:field_config
+  plugin: entity:field_storage_config
 migration_dependencies:
   optional:
     # It is not possible to make this required as d6_field_settings has no

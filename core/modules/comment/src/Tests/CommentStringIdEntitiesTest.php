@@ -56,7 +56,7 @@ class CommentStringIdEntitiesTest extends KernelTestBase {
         'target_entity_type_id' => 'entity_test_string_id',
       ));
       $bundle->save();
-      $field = entity_create('field_config', array(
+      $field = entity_create('field_storage_config', array(
         'name' => 'foo',
         'entity_type' => 'entity_test_string_id',
         'settings' => array(

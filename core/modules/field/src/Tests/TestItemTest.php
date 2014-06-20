@@ -47,7 +47,7 @@ class TestItemTest extends FieldUnitTestBase {
       'entity_type' => 'entity_test',
       'type' => 'test_field',
     );
-    entity_create('field_config', $field)->save();
+    entity_create('field_storage_config', $field)->save();
     $instance = array(
       'entity_type' => 'entity_test',
       'field_name' => $this->field_name,

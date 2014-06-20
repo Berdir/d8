@@ -56,7 +56,7 @@ class FieldAccessTest extends FieldTestBase {
       'entity_type' => 'node',
       'type' => 'text',
     );
-    entity_create('field_config', $field)->save();
+    entity_create('field_storage_config', $field)->save();
     $instance = array(
       'field_name' => $field['name'],
       'entity_type' => 'node',

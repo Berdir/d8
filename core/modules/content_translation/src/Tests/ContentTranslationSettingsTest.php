@@ -9,7 +9,7 @@ namespace Drupal\content_translation\Tests;
 
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Language\Language;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -95,8 +95,8 @@ class ContentTranslationSettingsTest extends WebTestBase {
       'settings[comment][comment_article][fields][comment_body]' => TRUE,
     );
     $this->assertSettings('comment', 'comment_article', TRUE, $edit);
-    $field = FieldConfig::loadByName('comment', 'comment_body');
-    $this->assertTrue($field->isTranslatable(), 'Comment body is translatable.');
+    $field_storage = FieldStorageConfig::loadByName('comment', 'comment_body');
+    $this->assertTrue($field_storage->isTranslatable(), 'Comment body is translatable.');
 
     // Test that language settings are correctly stored.
     $language_configuration = language_get_default_configuration('comment', 'comment_article');
@@ -134,20 +134,20 @@ class ContentTranslationSettingsTest extends WebTestBase {
       // Test that configurable field translatability is correctly switched.
       $edit = array('settings[node][article][fields][body]' => $translatable);
       $this->assertSettings('node', 'article', TRUE, $edit);
-      $field = FieldConfig::loadByName('node', 'body');
+      $field_storage = FieldStorageConfig::loadByName('node', 'body');
       $definitions = \Drupal::entityManager()->getFieldDefinitions('node', 'article');
       $this->assertEqual($definitions['body']->isTranslatable(), $translatable, 'Field translatability correctly switched.');
-      $this->assertEqual($field->isTranslatable(), $definitions['body']->isTranslatable(), 'Configurable field translatability correctly switched.');
+      $this->assertEqual($field_storage->isTranslatable(), $definitions['body']->isTranslatable(), 'Configurable field translatability correctly switched.');
 
       // Test that also the Field UI form behaves correctly.
       $translatable = !$translatable;
       $edit = array('field[translatable]' => $translatable);
       $this->drupalPostForm('admin/structure/types/manage/article/fields/node.article.body/field', $edit, t('Save field settings'));
       \Drupal::entityManager()->clearCachedFieldDefinitions();
-      $field = FieldConfig::loadByName('node', 'body');
+      $field_storage = FieldStorageConfig::loadByName('node', 'body');
       $definitions = \Drupal::entityManager()->getFieldDefinitions('node', 'article');
       $this->assertEqual($definitions['body']->isTranslatable(), $translatable, 'Field translatability correctly switched.');
-      $this->assertEqual($field->isTranslatable(), $definitions['body']->isTranslatable(), 'Configurable field translatability correctly switched.');
+      $this->assertEqual($field_storage->isTranslatable(), $definitions['body']->isTranslatable(), 'Configurable field translatability correctly switched.');
     }
   }
 
@@ -186,7 +186,7 @@ class ContentTranslationSettingsTest extends WebTestBase {
       'entity_type' => 'node',
       'type' => 'text',
     );
-    entity_create('field_config', $field)->save();
+    entity_create('field_storage_config', $field)->save();
     $instance = array(
       'field_name' => 'article_text',
       'entity_type' => 'node',

@@ -37,7 +37,7 @@ class RssTest extends TaxonomyTestBase {
     $this->vocabulary = $this->createVocabulary();
     $this->field_name = 'taxonomy_' . $this->vocabulary->id();
 
-    $this->field = entity_create('field_config', array(
+    $this->field = entity_create('field_storage_config', array(
       'name' => $this->field_name,
       'entity_type' => 'node',
       'type' => 'taxonomy_term_reference',

@@ -122,7 +122,7 @@ class FieldInstanceConfigStorage extends ConfigEntityStorage {
       foreach ($deleted_instances as $id => $config) {
         // If the field itself is deleted, inject it directly in the instance.
         if (isset($deleted_fields[$config['field_uuid']])) {
-          $config['field'] = $this->entityManager->getStorage('field_config')->create($deleted_fields[$config['field_uuid']]);
+          $config['field'] = $this->entityManager->getStorage('field_storage_config')->create($deleted_fields[$config['field_uuid']]);
         }
         $instances[$id] = $this->create($config);
       }

@@ -23,7 +23,7 @@ class MigrateCommentVariableField extends MigrateDrupalTestBase {
   public static function getInfo() {
     return array(
       'name'  => 'Migrate comment variables to a field,',
-      'description'  => 'Upgrade comment variables  to field.field.node.comment.yml',
+      'description'  => 'Upgrade comment variables to field.storage.node.comment.yml',
       'group' => 'Migrate Drupal',
     );
   }
@@ -50,7 +50,7 @@ class MigrateCommentVariableField extends MigrateDrupalTestBase {
    * Tests comment variables migrated into a field entity.
    */
   public function testCommentField() {
-    $this->assertTrue(is_object(entity_load('field_config', 'node.comment')));
+    $this->assertTrue(is_object(entity_load('field_storage_config', 'node.comment')));
   }
 
 }

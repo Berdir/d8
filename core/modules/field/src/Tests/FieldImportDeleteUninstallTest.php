@@ -46,7 +46,7 @@ class FieldImportDeleteUninstallTest extends FieldUnitTestBase {
     // Create a field to delete to prove that
     // \Drupal\field\ConfigImporterFieldPurger does not purge fields that are
     // not related to the configuration synchronization.
-    $unrelated_field = entity_create('field_config', array(
+    $unrelated_field = entity_create('field_storage_config', array(
       'name' => 'field_int',
       'entity_type' => 'entity_test',
       'type' => 'integer',
@@ -59,7 +59,7 @@ class FieldImportDeleteUninstallTest extends FieldUnitTestBase {
     ))->save();
 
     // Create a telephone field and instance for validation.
-    $field = entity_create('field_config', array(
+    $field = entity_create('field_storage_config', array(
       'name' => 'field_test',
       'entity_type' => 'entity_test',
       'type' => 'telephone',
@@ -99,7 +99,7 @@ class FieldImportDeleteUninstallTest extends FieldUnitTestBase {
     $staging->write('core.extension', $core_extension);
 
     // Stage the field deletion
-    $staging->delete('field.field.entity_test.field_test');
+    $staging->delete('field.storage.entity_test.field_test');
     $staging->delete('field.instance.entity_test.entity_test.field_test');
 
     $steps = $this->configImporter()->initialize();
@@ -110,7 +110,7 @@ class FieldImportDeleteUninstallTest extends FieldUnitTestBase {
     $this->configImporter()->import();
 
     $this->assertFalse(\Drupal::moduleHandler()->moduleExists('telephone'));
-    $this->assertFalse(entity_load_by_uuid('field_config', $field_uuid), 'The test field has been deleted by the configuration synchronization');
+    $this->assertFalse(entity_load_by_uuid('field_storage_config', $field_uuid), 'The test field has been deleted by the configuration synchronization');
     $deleted_fields = \Drupal::state()->get('field.field.deleted') ?: array();
     $this->assertFalse(isset($deleted_fields[$field_uuid]), 'Telephone field has been completed removed from the system.');
     $this->assertTrue(isset($deleted_fields[$unrelated_field_uuid]), 'Unrelated field not purged by configuration synchronization.');
@@ -121,7 +121,7 @@ class FieldImportDeleteUninstallTest extends FieldUnitTestBase {
    */
   public function testImportAlreadyDeletedUninstall() {
     // Create a telephone field and instance for validation.
-    $field = entity_create('field_config', array(
+    $field = entity_create('field_storage_config', array(
       'name' => 'field_test',
       'entity_type' => 'entity_test',
       'type' => 'telephone',

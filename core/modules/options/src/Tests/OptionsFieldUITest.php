@@ -7,7 +7,7 @@
 
 namespace Drupal\options\Tests;
 
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Tests\FieldTestBase;
 
 /**
@@ -229,10 +229,10 @@ class OptionsFieldUITest extends FieldTestBase {
     $this->drupalGet($this->admin_path);
     $this->assertFieldByName('on', $on, t("The 'On' value is stored correctly."));
     $this->assertFieldByName('off', $off, t("The 'Off' value is stored correctly."));
-    $field = FieldConfig::loadByName('node', $this->field_name);
-    $this->assertEqual($field->getSetting('allowed_values'), $allowed_values, 'The allowed value is correct');
-    $this->assertNull($field->getSetting('on'), 'The on value is not saved into settings');
-    $this->assertNull($field->getSetting('off'), 'The off value is not saved into settings');
+    $field_storage = FieldStorageConfig::loadByName('node', $this->field_name);
+    $this->assertEqual($field_storage->getSetting('allowed_values'), $allowed_values, 'The allowed value is correct');
+    $this->assertNull($field_storage->getSetting('on'), 'The on value is not saved into settings');
+    $this->assertNull($field_storage->getSetting('off'), 'The off value is not saved into settings');
   }
 
   /**
@@ -256,7 +256,7 @@ class OptionsFieldUITest extends FieldTestBase {
    */
   protected function createOptionsField($type) {
     // Create a test field and instance.
-    entity_create('field_config', array(
+    entity_create('field_storage_config', array(
       'name' => $this->field_name,
       'entity_type' => 'node',
       'type' => $type,
@@ -292,8 +292,8 @@ class OptionsFieldUITest extends FieldTestBase {
       $this->assertText($result, $message);
     }
     else {
-      $field = FieldConfig::loadByName('node', $this->field_name);
-      $this->assertIdentical($field->getSetting('allowed_values'), $result, $message);
+      $field_storage = FieldStorageConfig::loadByName('node', $this->field_name);
+      $this->assertIdentical($field_storage->getSetting('allowed_values'), $result, $message);
     }
   }
 
