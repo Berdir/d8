@@ -44,7 +44,14 @@ class EntityTranslationTest extends EntityLanguageTestBase {
       'name' => 'test',
       'user_id' => $this->container->get('current_user')->id(),
     ));
-    $this->assertEqual($entity->language()->id, LanguageInterface::LANGCODE_NOT_SPECIFIED, format_string('%entity_type: Entity language not specified.', array('%entity_type' => $entity_type)));
+    $this->assertEqual($entity->language()->getId(), $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->id, format_string('%entity_type: Entity created with API has default language.', array('%entity_type' => $entity_type)));
+
+    $entity = entity_create($entity_type, array(
+      'name' => 'test',
+      'user_id' => \Drupal::currentUser()->id(),
+      'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+    ));
+    $this->assertEqual($entity->language()->getId(), LanguageInterface::LANGCODE_NOT_SPECIFIED, format_string('%entity_type: Entity language not specified.', array('%entity_type' => $entity_type)));
     $this->assertFalse($entity->getTranslationLanguages(FALSE), format_string('%entity_type: No translations are available', array('%entity_type' => $entity_type)));
 
     // Set the value in default language.
@@ -149,7 +156,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
 
     // Create a language neutral entity and check that properties are stored
     // as language neutral.
-    $entity = entity_create($entity_type, array('name' => $name, 'user_id' => $uid));
+    $entity = entity_create($entity_type, array('name' => $name, 'user_id' => $uid, 'langcode' => Language::LANGCODE_NOT_SPECIFIED));
     $entity->save();
     $entity = entity_load($entity_type, $entity->id());
     $default_langcode = $entity->language()->id;
@@ -234,6 +241,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     entity_create($entity_type, array(
       'user_id' => $properties[$langcode]['user_id'],
       'name' => 'some name',
+      'langcode' => Language::LANGCODE_NOT_SPECIFIED,
     ))->save();
 
     $entities = entity_load_multiple($entity_type);
@@ -296,7 +304,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     $langcode = $this->langcodes[1];
     $entity = $this->entityManager
       ->getStorage('entity_test_mul')
-      ->create(array('name' => $this->randomName()));
+      ->create(array('name' => $this->randomName(), 'langcode' => Language::LANGCODE_NOT_SPECIFIED));
 
     $entity->save();
     $hooks = $this->getHooksInfo();
