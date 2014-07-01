@@ -25,6 +25,8 @@ interface AliasStorageInterface {
    *   The language code of the alias.
    * @param int|null $pid
    *   Unique path alias identifier.
+   * @param array $options
+   *   Additional options to be passed on to hook implementations.
    *
    * @return mixed[]|bool
    *   FALSE if the path could not be saved or an associative array containing
@@ -34,7 +36,7 @@ interface AliasStorageInterface {
    *   - pid (int): Unique path alias identifier.
    *   - langcode (string): The language code of the alias.
    */
-  public function save($source, $alias, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED, $pid = NULL);
+  public function save($source, $alias, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED, $pid = NULL, array $options = array());
 
   /**
    * Fetches a specific URL alias from the database.

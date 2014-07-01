@@ -46,7 +46,7 @@ class AliasStorage implements AliasStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function save($source, $alias, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED, $pid = NULL) {
+  public function save($source, $alias, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED, $pid = NULL, array $options = array()) {
 
     $fields = array(
       'source' => $source,
@@ -72,7 +72,7 @@ class AliasStorage implements AliasStorageInterface {
     }
     if ($pid) {
       // @todo Switch to using an event for this instead of a hook.
-      $this->moduleHandler->invokeAll('path_' . $operation, array($fields));
+      $this->moduleHandler->invokeAll('path_' . $operation, array($fields, $options));
       return $fields;
     }
     return FALSE;

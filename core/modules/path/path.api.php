@@ -16,16 +16,20 @@
  * @param array $path
  *   The array structure is identical to that of the return value of
  *   \Drupal\Core\Path\PathInterface::save().
+ * @param array $options
+ *   An associative array containing miscellaneous related information.
  *
- * @see \Drupal\Core\Path\PathInterface::save()
+ * @see \Drupal\Core\Path\AliasStorageInterface::save()
  */
-function hook_path_insert($path) {
-  db_insert('mytable')
-    ->fields(array(
-      'alias' => $path['alias'],
-      'pid' => $path['pid'],
-    ))
-    ->execute();
+function hook_path_insert($path, array $options = array()) {
+  if ($path['alias'] != $options['original_alias']) {
+    db_insert('mytable')
+      ->fields(array(
+        'alias' => $path['alias'],
+        'pid' => $path['pid'],
+      ))
+      ->execute();
+  }
 }
 
 /**
@@ -34,14 +38,18 @@ function hook_path_insert($path) {
  * @param $path
  *   The array structure is identical to that of the return value of
  *   \Drupal\Core\Path\PathInterface::save().
+ * @param array $options
+ *   An associative array containing miscellaneous related information.
  *
- * @see \Drupal\Core\Path\PathInterface::save()
+ * @see \Drupal\Core\Path\AliasStorageInterface::save()
  */
-function hook_path_update($path) {
-  db_update('mytable')
-    ->fields(array('alias' => $path['alias']))
-    ->condition('pid', $path['pid'])
-    ->execute();
+function hook_path_update($path, array $options = array()) {
+  if ($path['alias'] != $options['original_alias']) {
+    db_update('mytable')
+      ->fields(array('alias' => $path['alias']))
+      ->condition('pid', $path['pid'])
+      ->execute();
+  }
 }
 
 /**

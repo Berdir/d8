@@ -66,6 +66,14 @@ class UrlAliasFixtures {
         'source' => 'node/1',
         'alias' => 'alias_for_node_1_und',
         'langcode' => 'und'
+      ),
+      array(
+        'source' => 'node/2',
+        'alias' => 'alias_for_node_2_fr',
+        'langcode' => 'fr',
+        'options' => array(
+          'skip_log' => TRUE
+        )
       )
     );
   }

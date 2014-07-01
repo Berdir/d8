@@ -38,7 +38,14 @@ class AliasTest extends PathUnitTestBase {
 
     //Create a few aliases
     foreach ($aliases as $idx => $alias) {
-      $aliasStorage->save($alias['source'], $alias['alias'], $alias['langcode']);
+      if (isset($alias['options'])) {
+        $options = $alias['options'];
+      }
+      else {
+        $options = array();
+      }
+      $aliasStorage->save($alias['source'], $alias['alias'], $alias['langcode'], NULL, $options);
+
 
       $result = $connection->query('SELECT * FROM {url_alias} WHERE source = :source AND alias= :alias AND langcode = :langcode', array(':source' => $alias['source'], ':alias' => $alias['alias'], ':langcode' => $alias['langcode']));
       $rows = $result->fetchAll();
@@ -49,10 +56,20 @@ class AliasTest extends PathUnitTestBase {
       $aliases[$idx]['pid'] = $rows[0]->pid;
     }
 
+    // See if the alias_for_node_2_fr alias has been skipped by the insert hook.
+    $hook_results = \Drupal::state()->get('path_test.results');
+    foreach ($hook_results['hook_path_insert'] as $alias) {
+      if ($alias['alias'] == 'alias_for_node_2_fr') {
+        $this->fail('hook_path_insert failed to use the skip_log option');
+      }
+    }
+
+
     //Load a few aliases
     foreach ($aliases as $alias) {
       $pid = $alias['pid'];
       $loadedAlias = $aliasStorage->load(array('pid' => $pid));
+      unset($alias['options']);
       $this->assertEqual($loadedAlias, $alias, format_string('Loaded the expected path with pid %pid.', array('%pid' => $pid)));
     }
 
