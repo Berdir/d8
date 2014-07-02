@@ -6,144 +6,8 @@
  */
 
 use Drupal\locale\Gettext;
-use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\file\FileInterface;
-
-/**
- * Form constructor for the translation import screen.
- *
- * @see locale_translate_import_form_submit()
- * @ingroup forms
- *
- * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\locale\Form\LocaleForm::import().
- */
-function locale_translate_import_form($form, &$form_state) {
-  Drupal::languageManager()->reset();
-  $languages = \Drupal::languageManager()->getLanguages();
-
-  // Initialize a language list to the ones available, including English if we
-  // are to translate Drupal to English as well.
-  $existing_languages = array();
-  foreach ($languages as $langcode => $language) {
-    if ($langcode != 'en' || locale_translate_english()) {
-      $existing_languages[$langcode] = $language->name;
-    }
-  }
-
-  // If we have no languages available, present the list of predefined languages
-  // only. If we do have already added languages, set up two option groups with
-  // the list of existing and then predefined languages.
-  form_load_include($form_state, 'inc', 'language', 'language.admin');
-  if (empty($existing_languages)) {
-    $language_options = language_admin_predefined_list();
-    $default = key($language_options);
-  }
-  else {
-    $default = key($existing_languages);
-    $language_options = array(
-      t('Existing languages') => $existing_languages,
-      t('Languages not yet added') => language_admin_predefined_list()
-    );
-  }
-
-  $validators = array(
-    'file_validate_extensions' => array('po'),
-    'file_validate_size' => array(file_upload_max_size()),
-  );
-  $file_description = array(
-    '#theme'             => 'file_upload_help',
-    '#description'       => t('A Gettext Portable Object file.'),
-    '#upload_validators' => $validators,
-  );
-
-  $form['file'] = array(
-    '#type' => 'file',
-    '#title' => t('Translation file'),
-    '#description' => drupal_render($file_description),
-    '#size' => 50,
-    '#upload_validators' => $validators,
-    '#attributes' => array('class' => array('file-import-input')),
-    '#attached' => array(
-      'js' => array(
-        drupal_get_path('module', 'locale') . '/locale.bulk.js' => array(),
-      ),
-    ),
-  );
-  $form['langcode'] = array(
-    '#type' => 'select',
-    '#title' => t('Language'),
-    '#options' => $language_options,
-    '#default_value' => $default,
-    '#attributes' => array('class' => array('langcode-input')),
-  );
-
-  $form['customized'] = array(
-    '#title' => t('Treat imported strings as custom translations'),
-    '#type' => 'checkbox',
-  );
-  $form['overwrite_options'] = array(
-    '#type' => 'container',
-    '#tree' => TRUE,
-  );
-  $form['overwrite_options']['not_customized'] = array(
-    '#title' => t('Overwrite non-customized translations'),
-    '#type' => 'checkbox',
-    '#states' => array(
-      'checked' => array(
-        ':input[name="customized"]' => array('checked' => TRUE),
-      ),
-    ),
-  );
-  $form['overwrite_options']['customized'] = array(
-    '#title' => t('Overwrite existing customized translations'),
-    '#type' => 'checkbox',
-  );
-
-  $form['actions'] = array(
-    '#type' => 'actions'
-  );
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Import')
-  );
-  return $form;
-}
-
-/**
- * Form submission handler for locale_translate_import_form().
- */
-function locale_translate_import_form_submit($form, &$form_state) {
-  // Ensure we have the file uploaded.
-  if ($file = file_save_upload('file', $form['file']['#upload_validators'], 'translations://', 0)) {
-
-    // Add language, if not yet supported.
-    $language = \Drupal::languageManager()->getLanguage($form_state['values']['langcode']);
-    if (empty($language)) {
-      $language = new Language(array(
-        'id' => $form_state['values']['langcode']
-      ));
-      $language = language_save($language);
-      drupal_set_message(t('The language %language has been created.', array('%language' => t($language->name))));
-    }
-    $options = array(
-      'langcode' => $form_state['values']['langcode'],
-      'overwrite_options' => $form_state['values']['overwrite_options'],
-      'customized' => $form_state['values']['customized'] ? LOCALE_CUSTOMIZED : LOCALE_NOT_CUSTOMIZED,
-    );
-    $file = locale_translate_file_attach_properties($file, $options);
-    $batch = locale_translate_batch_build(array($file->uri => $file), $options);
-    batch_set($batch);
-  }
-  else {
-    drupal_set_message(t('File to import not found.'), 'error');
-    $form_state['rebuild'] = TRUE;
-    return;
-  }
-
-  $form_state['redirect_route']['route_name'] = 'locale.translate_page';
-  return;
-}
 
 /**
  * Prepare a batch to import all translations.
@@ -181,7 +45,7 @@ function locale_translate_batch_import_files($options, $force = FALSE) {
   }
   else {
     // If langcode was not provided, make sure to only import files for the
-    // languages we have enabled.
+    // languages we have added.
     $langcodes = array_keys(\Drupal::languageManager()->getLanguages());
   }
 
@@ -303,8 +167,9 @@ function locale_translate_batch_build($files, $options) {
  *
  * @param object $file
  *   A file object of the gettext file to be imported. The file object must
- *   contain a language parameter (other than Language::LANGCODE_NOT_SPECIFIED). This
- *   is used as the language of the import.
+ *   contain a language parameter
+ *   (other than LanguageInterface::LANGCODE_NOT_SPECIFIED). This is used as
+ *   the language of the import.
  *
  * @param array $options
  *   An array with options that can have the following elements:
@@ -328,7 +193,7 @@ function locale_translate_batch_import($file, $options, &$context) {
     'customized' => LOCALE_NOT_CUSTOMIZED,
   );
 
-  if (isset($file->langcode) && $file->langcode != Language::LANGCODE_NOT_SPECIFIED) {
+  if (isset($file->langcode) && $file->langcode != LanguageInterface::LANGCODE_NOT_SPECIFIED) {
 
     try {
       if (empty($context['sandbox'])) {
@@ -391,7 +256,7 @@ function locale_translate_batch_import($file, $options, &$context) {
     catch (Exception $exception) {
       // Import failed. Store the data of the failing file.
       $context['results']['failed_files'][] = $file;
-      watchdog('locale', 'Unable to import translations file: @file', array('@file' => $file->uri));
+      \Drupal::logger('locale')->notice('Unable to import translations file: @file', array('@file' => $file->uri));
     }
   }
 }
@@ -478,6 +343,7 @@ function locale_translate_batch_refresh(array &$context) {
  * Finished callback of system page locale import batch.
  */
 function locale_translate_batch_finished($success, $results) {
+  $logger = \Drupal::logger('locale');
   if ($success) {
     $additions = $updates = $deletes = $skips = $config = 0;
     if (isset($results['failed_files'])) {
@@ -509,7 +375,7 @@ function locale_translate_batch_finished($success, $results) {
         '@count translation files imported. %number translations were added, %update translations were updated and %delete translations were removed.',
         array('%number' => $additions, '%update' => $updates, '%delete' => $deletes)
       ));
-      watchdog('locale', 'Translations imported: %number added, %update updated, %delete removed.', array('%number' => $additions, '%update' => $updates, '%delete' => $deletes));
+      $logger->notice('Translations imported: %number added, %update updated, %delete removed.', array('%number' => $additions, '%update' => $updates, '%delete' => $deletes));
 
       if ($skips) {
         if (\Drupal::moduleHandler()->moduleExists('dblog')) {
@@ -519,7 +385,7 @@ function locale_translate_batch_finished($success, $results) {
           $message = format_plural($skips, 'One translation string was skipped because of disallowed or malformed HTML. See the log for details.', '@count translation strings were skipped because of disallowed or malformed HTML. See the log for details.');
         }
         drupal_set_message($message, 'warning');
-        watchdog('locale', '@count disallowed HTML string(s) in files: @files.', array('@count' => $skips, '@files' => implode(',', $skipped_files)), WATCHDOG_WARNING);
+        $logger->warning('@count disallowed HTML string(s) in files: @files.', array('@count' => $skips, '@files' => implode(',', $skipped_files)));
       }
     }
   }
@@ -595,7 +461,7 @@ function locale_translate_file_attach_properties($file, $options = array()) {
     $file->langcode = isset($options['langcode']) ? $options['langcode'] : $matches[5];
   }
   else {
-    $file->langcode = Language::LANGCODE_NOT_SPECIFIED;
+    $file->langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED;
   }
   return $file;
 }
@@ -741,11 +607,11 @@ function locale_config_batch_finished($success, array $results) {
     $configuration = isset($results['stats']['config']) ? $results['stats']['config'] : 0;
     if ($configuration) {
       drupal_set_message(t('The configuration was successfully updated. There are %number configuration objects updated.', array('%number' => $configuration)));
-      watchdog('locale', 'The configuration was successfully updated. %number configuration objects updated.', array('%number' => $configuration));
+      \Drupal::logger('locale')->notice('The configuration was successfully updated. %number configuration objects updated.', array('%number' => $configuration));
     }
     else {
       drupal_set_message(t('No configuration objects have been updated.'));
-      watchdog('locale', 'No configuration objects have been updated.', array(), WATCHDOG_WARNING);
+      \Drupal::logger('locale')->warning('No configuration objects have been updated.');
     }
   }
 }

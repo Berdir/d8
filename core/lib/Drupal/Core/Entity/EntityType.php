@@ -10,11 +10,16 @@ namespace Drupal\Core\Entity;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\Exception\EntityTypeIdLengthException;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Provides an implementation of an entity type and its metadata.
+ *
+ * @ingroup entity_api
  */
 class EntityType implements EntityTypeInterface {
+
+  use StringTranslationTrait;
 
   /**
    * Indicates whether entities should be statically cached.
@@ -180,6 +185,16 @@ class EntityType implements EntityTypeInterface {
   protected $uri_callback;
 
   /**
+   * The machine name of the entity type group.
+   */
+  protected $group;
+
+  /**
+   * The human-readable name of the entity type group.
+   */
+  protected $group_label;
+
+  /**
    * Constructs a new EntityType.
    *
    * @param array $definition
@@ -202,6 +217,15 @@ class EntityType implements EntityTypeInterface {
     foreach ($definition as $property => $value) {
       $this->{$property} = $value;
     }
+
+    // Ensure defaults.
+    $this->entity_keys += array(
+      'revision' => '',
+      'bundle' => ''
+    );
+    $this->controllers += array(
+      'access' => 'Drupal\Core\Entity\EntityAccessController',
+    );
   }
 
   /**
@@ -244,7 +268,7 @@ class EntityType implements EntityTypeInterface {
    * {@inheritdoc}
    */
   public function getKeys() {
-    return $this->entity_keys + array('revision' => '', 'bundle' => '');
+    return $this->entity_keys;
   }
 
   /**
@@ -303,9 +327,7 @@ class EntityType implements EntityTypeInterface {
    * {@inheritdoc}
    */
   public function getControllerClasses() {
-    return $this->controllers + array(
-      'access' => 'Drupal\Core\Entity\EntityAccessHandler',
-    );
+    return $this->controllers;
   }
 
   /**
@@ -548,6 +570,14 @@ class EntityType implements EntityTypeInterface {
   /**
    * {@inheritdoc}
    */
+  public function isRevisionable() {
+    // Entity types are revisionable if a revision key has been specified.
+    return $this->hasKey('revision');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getConfigPrefix() {
     return FALSE;
   }
@@ -600,6 +630,21 @@ class EntityType implements EntityTypeInterface {
   public function setUriCallback($callback) {
     $this->uri_callback = $callback;
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getGroup() {
+    return $this->group;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getGroupLabel() {
+    return !empty($this->group_label) ? $this->group_label : $this->t('Other', array(), array('context' => 'Entity type group'));
   }
 
 }

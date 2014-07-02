@@ -11,11 +11,11 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Config\Entity\ImportableEntityStorageInterface;
-use Drupal\Core\Config\ConfigEvents;
-use Drupal\Core\DependencyInjection\DependencySerialization;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Lock\LockBackendInterface;
-use Drupal\Core\StringTranslation\TranslationManager;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -37,7 +37,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @see \Drupal\Core\Config\ConfigImporterEvent
  */
-class ConfigImporter extends DependencySerialization {
+class ConfigImporter {
+  use StringTranslationTrait;
+  use DependencySerializationTrait;
 
   /**
    * The name used to identify the lock.
@@ -122,13 +124,6 @@ class ConfigImporter extends DependencySerialization {
   protected $themeHandler;
 
   /**
-   * The string translation service.
-   *
-   * @var \Drupal\Core\StringTranslation\TranslationManager
-   */
-  protected $translationManager;
-
-  /**
    * Flag set to import system.theme during processing theme enable and disables.
    *
    * @var bool
@@ -164,24 +159,24 @@ class ConfigImporter extends DependencySerialization {
    * Constructs a configuration import object.
    *
    * @param \Drupal\Core\Config\StorageComparerInterface $storage_comparer
-   *   A storage comparer object used to determin configuration changes and
+   *   A storage comparer object used to determine configuration changes and
    *   access the source and target storage objects.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher used to notify subscribers of config import events.
    * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
    *   The configuration manager.
-   * @param \Drupal\Core\Lock\LockBackendInterface
+   * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock backend to ensure multiple imports do not occur at the same time.
-   * @param \Drupal\Core\Config\TypedConfigManager $typed_config
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler
-   * @param \Drupal\Core\StringTranslation\TranslationManager $translation_manager
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
    */
-  public function __construct(StorageComparerInterface $storage_comparer, EventDispatcherInterface $event_dispatcher, ConfigManagerInterface $config_manager, LockBackendInterface $lock, TypedConfigManagerInterface $typed_config, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, TranslationManager $translation_manager) {
+  public function __construct(StorageComparerInterface $storage_comparer, EventDispatcherInterface $event_dispatcher, ConfigManagerInterface $config_manager, LockBackendInterface $lock, TypedConfigManagerInterface $typed_config, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, TranslationInterface $string_translation) {
     $this->storageComparer = $storage_comparer;
     $this->eventDispatcher = $event_dispatcher;
     $this->configManager = $config_manager;
@@ -189,8 +184,10 @@ class ConfigImporter extends DependencySerialization {
     $this->typedConfigManager = $typed_config;
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;
-    $this->translationManager = $translation_manager;
-    $this->processedConfiguration = $this->storageComparer->getEmptyChangelist();
+    $this->stringTranslation = $string_translation;
+    foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
+      $this->processedConfiguration[$collection] = $this->storageComparer->getEmptyChangelist();
+    }
     $this->processedExtensions = $this->getEmptyExtensionsProcessedList();
   }
 
@@ -232,7 +229,9 @@ class ConfigImporter extends DependencySerialization {
    */
   public function reset() {
     $this->storageComparer->reset();
-    $this->processedConfiguration = $this->storageComparer->getEmptyChangelist();
+    foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
+      $this->processedConfiguration[$collection] = $this->storageComparer->getEmptyChangelist();
+    }
     $this->processedExtensions = $this->getEmptyExtensionsProcessedList();
     $this->createExtensionChangelist();
     $this->validated = FALSE;
@@ -262,17 +261,15 @@ class ConfigImporter extends DependencySerialization {
   /**
    * Checks if there are any unprocessed configuration changes.
    *
-   * @param array $ops
-   *   The operations to check for changes. Defaults to all operations, i.e.
-   *   array('delete', 'create', 'update', 'rename').
-   *
    * @return bool
    *   TRUE if there are changes to process and FALSE if not.
    */
-  public function hasUnprocessedConfigurationChanges($ops = array('delete', 'create', 'rename', 'update')) {
-    foreach ($ops as $op) {
-      if (count($this->getUnprocessedConfiguration($op))) {
-        return TRUE;
+  public function hasUnprocessedConfigurationChanges() {
+    foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
+      foreach (array('delete', 'create', 'rename', 'update') as $op) {
+        if (count($this->getUnprocessedConfiguration($op, $collection))) {
+          return TRUE;
+        }
       }
     }
     return FALSE;
@@ -281,23 +278,29 @@ class ConfigImporter extends DependencySerialization {
   /**
    * Gets list of processed changes.
    *
+   * @param string $collection
+   *   (optional) The configuration collection to get processed changes for.
+   *   Defaults to the default collection.
+   *
    * @return array
    *   An array containing a list of processed changes.
    */
-  public function getProcessedConfiguration() {
-    return $this->processedConfiguration;
+  public function getProcessedConfiguration($collection = StorageInterface::DEFAULT_COLLECTION) {
+    return $this->processedConfiguration[$collection];
   }
 
   /**
    * Sets a change as processed.
    *
+   * @param string $collection
+   *   The configuration collection to set a change as processed for.
    * @param string $op
    *   The change operation performed, either delete, create, rename, or update.
    * @param string $name
    *   The name of the configuration processed.
    */
-  protected function setProcessedConfiguration($op, $name) {
-    $this->processedConfiguration[$op][] = $name;
+  protected function setProcessedConfiguration($collection, $op, $name) {
+    $this->processedConfiguration[$collection][$op][] = $name;
   }
 
   /**
@@ -306,12 +309,15 @@ class ConfigImporter extends DependencySerialization {
    * @param string $op
    *   The change operation to get the unprocessed list for, either delete,
    *   create, rename, or update.
+   * @param string $collection
+   *   (optional) The configuration collection to get unprocessed changes for.
+   *   Defaults to the default collection.
    *
    * @return array
    *   An array of configuration names.
    */
-  public function getUnprocessedConfiguration($op) {
-    return array_diff($this->storageComparer->getChangelist($op), $this->processedConfiguration[$op]);
+  public function getUnprocessedConfiguration($op, $collection = StorageInterface::DEFAULT_COLLECTION) {
+    return array_diff($this->storageComparer->getChangelist($op, $collection), $this->processedConfiguration[$collection][$op]);
   }
 
   /**
@@ -322,17 +328,6 @@ class ConfigImporter extends DependencySerialization {
    */
   public function getProcessedExtensions() {
     return $this->processedExtensions;
-  }
-
-  /**
-   * Determines if the current import has processed extensions.
-   *
-   * @return bool
-   *   TRUE if the ConfigImporter has processed extensions.
-   */
-  protected function hasProcessedExtensions() {
-    $compare = array_diff($this->processedExtensions, getEmptyExtensionsProcessedList());
-    return !empty($compare);
   }
 
   /**
@@ -444,7 +439,7 @@ class ConfigImporter extends DependencySerialization {
    * @return array
    *   An array of extension names.
    */
-  public function getUnprocessedExtensions($type) {
+  protected function getUnprocessedExtensions($type) {
     $changelist = $this->getExtensionChangelist($type);
 
     if ($type == 'theme') {
@@ -560,7 +555,7 @@ class ConfigImporter extends DependencySerialization {
    * @param array $context.
    *   The batch context.
    */
-  public function processExtensions(array &$context) {
+  protected function processExtensions(array &$context) {
     $operation = $this->getNextExtensionOperation();
     if (!empty($operation)) {
       $this->processExtension($operation['type'], $operation['op'], $operation['name']);
@@ -580,26 +575,36 @@ class ConfigImporter extends DependencySerialization {
    * @param array $context.
    *   The batch context.
    */
-  public function processConfigurations(array &$context) {
+  protected function processConfigurations(array &$context) {
     // The first time this is called we need to calculate the total to process.
     // This involves recalculating the changelist which will ensure that if
     // extensions have been processed any configuration affected will be taken
     // into account.
     if ($this->totalConfigurationToProcess == 0) {
       $this->storageComparer->reset();
-      foreach (array('delete', 'create', 'rename', 'update') as $op) {
-        foreach ($this->getUnprocessedConfiguration($op) as $name) {
-          $this->totalConfigurationToProcess += count($this->getUnprocessedConfiguration($op));
+      foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
+        foreach (array('delete', 'create', 'rename', 'update') as $op) {
+          $this->totalConfigurationToProcess += count($this->getUnprocessedConfiguration($op, $collection));
         }
       }
     }
     $operation = $this->getNextConfigurationOperation();
     if (!empty($operation)) {
-      if ($this->checkOp($operation['op'], $operation['name'])) {
-        $this->processConfiguration($operation['op'], $operation['name']);
+      if ($this->checkOp($operation['collection'], $operation['op'], $operation['name'])) {
+        $this->processConfiguration($operation['collection'], $operation['op'], $operation['name']);
       }
-      $context['message'] = t('Synchronizing configuration: @op @name.', array('@op' => $operation['op'], '@name' => $operation['name']));
-      $processed_count = count($this->processedConfiguration['create']) + count($this->processedConfiguration['delete']) + count($this->processedConfiguration['update']);
+      if ($operation['collection'] == StorageInterface::DEFAULT_COLLECTION) {
+        $context['message'] = $this->t('Synchronizing configuration: @op @name.', array('@op' => $operation['op'], '@name' => $operation['name']));
+      }
+      else {
+        $context['message'] = $this->t('Synchronizing configuration: @op @name in @collection.', array('@op' => $operation['op'], '@name' => $operation['name'], '@collection' => $operation['collection']));
+      }
+      $processed_count = 0;
+      foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
+        foreach (array('delete', 'create', 'rename', 'update') as $op) {
+          $processed_count += count($this->processedConfiguration[$collection][$op]);
+        }
+      }
       $context['finished'] = $processed_count / $this->totalConfigurationToProcess;
     }
     else {
@@ -613,7 +618,7 @@ class ConfigImporter extends DependencySerialization {
    * @param array $context.
    *   The batch context.
    */
-  public function finish(array &$context) {
+  protected function finish(array &$context) {
     $this->eventDispatcher->dispatch(ConfigEvents::IMPORT, new ConfigImporterEvent($this));
     // The import is now complete.
     $this->lock->release(static::LOCK_ID);
@@ -663,13 +668,16 @@ class ConfigImporter extends DependencySerialization {
   protected function getNextConfigurationOperation() {
     // The order configuration operations is processed is important. Deletes
     // have to come first so that recreates can work.
-    foreach (array('delete', 'create', 'rename', 'update') as $op) {
-      $config_names = $this->getUnprocessedConfiguration($op);
-      if (!empty($config_names)) {
-        return array(
-          'op' => $op,
-          'name' => array_shift($config_names),
-        );
+    foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
+      foreach (array('delete', 'create', 'rename', 'update') as $op) {
+        $config_names = $this->getUnprocessedConfiguration($op, $collection);
+        if (!empty($config_names)) {
+          return array(
+            'op' => $op,
+            'name' => array_shift($config_names),
+            'collection' => $collection,
+          );
+        }
       }
     }
     return FALSE;
@@ -684,7 +692,7 @@ class ConfigImporter extends DependencySerialization {
    * @throws \Drupal\Core\Config\ConfigImporterException
    *   Exception thrown if the validate event logged any errors.
    */
-  public function validate() {
+  protected function validate() {
     if (!$this->validated) {
       // Validate renames.
       foreach ($this->getUnprocessedConfiguration('rename') as $name) {
@@ -713,6 +721,8 @@ class ConfigImporter extends DependencySerialization {
   /**
    * Processes a configuration change.
    *
+   * @param string $collection
+   *   The configuration collection to process changes for.
    * @param string $op
    *   The change operation.
    * @param string $name
@@ -723,17 +733,21 @@ class ConfigImporter extends DependencySerialization {
    *   set, otherwise the exception message is logged and the configuration
    *   is skipped.
    */
-  protected function processConfiguration($op, $name) {
+  protected function processConfiguration($collection, $op, $name) {
     try {
-      if (!$this->importInvokeOwner($op, $name)) {
-        $this->importConfig($op, $name);
+      $processed = FALSE;
+      if ($this->configManager->supportsConfigurationEntities($collection)) {
+        $processed = $this->importInvokeOwner($collection, $op, $name);
+      }
+      if (!$processed) {
+        $this->importConfig($collection, $op, $name);
       }
     }
     catch (\Exception $e) {
       $this->logError($this->t('Unexpected error during import with operation @op for @name: @message', array('@op' => $op, '@name' => $name, '@message' => $e->getMessage())));
       // Error for that operation was logged, mark it as processed so that
       // the import can continue.
-      $this->setProcessedConfiguration($op, $name);
+      $this->setProcessedConfiguration($collection, $op, $name);
     }
   }
 
@@ -770,7 +784,7 @@ class ConfigImporter extends DependencySerialization {
       // the default or admin theme is change this will be picked up whilst
       // processing configuration.
       if ($op == 'disable' && $this->processedSystemTheme === FALSE) {
-        $this->importConfig('update', 'system.theme');
+        $this->importConfig(StorageInterface::DEFAULT_COLLECTION, 'update', 'system.theme');
         $this->configManager->getConfigFactory()->reset('system.theme');
         $this->processedSystemTheme = TRUE;
       }
@@ -790,6 +804,8 @@ class ConfigImporter extends DependencySerialization {
    * This method checks that the operation is still valid before processing a
    * configuration change.
    *
+   * @param string $collection
+   *   The configuration collection.
    * @param string $op
    *   The change operation.
    * @param string $name
@@ -800,10 +816,10 @@ class ConfigImporter extends DependencySerialization {
    * @return bool
    *   TRUE is to continue processing, FALSE otherwise.
    */
-  protected function checkOp($op, $name) {
+  protected function checkOp($collection, $op, $name) {
     if ($op == 'rename') {
       $names = $this->storageComparer->extractRenameNames($name);
-      $target_exists = $this->storageComparer->getTargetStorage()->exists($names['new_name']);
+      $target_exists = $this->storageComparer->getTargetStorage($collection)->exists($names['new_name']);
       if ($target_exists) {
         // If the target exists, the rename has already occurred as the
         // result of a secondary configuration write. Change the operation
@@ -815,13 +831,13 @@ class ConfigImporter extends DependencySerialization {
       }
       return TRUE;
     }
-    $target_exists = $this->storageComparer->getTargetStorage()->exists($name);
+    $target_exists = $this->storageComparer->getTargetStorage($collection)->exists($name);
     switch ($op) {
       case 'delete':
         if (!$target_exists) {
           // The configuration has already been deleted. For example, a field
           // is automatically deleted if all the instances are.
-          $this->setProcessedConfiguration($op, $name);
+          $this->setProcessedConfiguration($collection, $op, $name);
           return FALSE;
         }
         break;
@@ -835,10 +851,10 @@ class ConfigImporter extends DependencySerialization {
             $entity_type = $this->configManager->getEntityManager()->getDefinition($entity_type_id);
             $entity = $entity_storage->load($entity_storage->getIDFromConfigName($name, $entity_type->getConfigPrefix()));
             $entity->delete();
-            $this->logError($this->translationManager->translate('Deleted and replaced configuration entity "@name"', array('@name' => $name)));
+            $this->logError($this->t('Deleted and replaced configuration entity "@name"', array('@name' => $name)));
           }
           else {
-            $this->storageComparer->getTargetStorage()->delete($name);
+            $this->storageComparer->getTargetStorage($collection)->delete($name);
             $this->logError($this->t('Deleted and replaced configuration "@name"', array('@name' => $name)));
           }
           return TRUE;
@@ -851,7 +867,7 @@ class ConfigImporter extends DependencySerialization {
           // Mark as processed so that the synchronisation continues. Once the
           // the current synchronisation is complete it will show up as a
           // create.
-          $this->setProcessedConfiguration($op, $name);
+          $this->setProcessedConfiguration($collection, $op, $name);
           return FALSE;
         }
         break;
@@ -862,22 +878,32 @@ class ConfigImporter extends DependencySerialization {
   /**
    * Writes a configuration change from the source to the target storage.
    *
+   * @param string $collection
+   *   The configuration collection.
    * @param string $op
    *   The change operation.
    * @param string $name
    *   The name of the configuration to process.
    */
-  protected function importConfig($op, $name) {
-    $config = new Config($name, $this->storageComparer->getTargetStorage(), $this->eventDispatcher, $this->typedConfigManager);
+  protected function importConfig($collection, $op, $name) {
+    // Allow config factory overriders to use a custom configuration object if
+    // they are responsible for the collection.
+    $overrider = $this->configManager->getConfigCollectionInfo()->getOverrideService($collection);
+    if ($overrider) {
+      $config = $overrider->createConfigObject($name, $collection);
+    }
+    else {
+      $config = new Config($name, $this->storageComparer->getTargetStorage($collection), $this->eventDispatcher, $this->typedConfigManager);
+    }
     if ($op == 'delete') {
       $config->delete();
     }
     else {
-      $data = $this->storageComparer->getSourceStorage()->read($name);
+      $data = $this->storageComparer->getSourceStorage($collection)->read($name);
       $config->setData($data ? $data : array());
       $config->save();
     }
-    $this->setProcessedConfiguration($op, $name);
+    $this->setProcessedConfiguration($collection, $op, $name);
   }
 
   /**
@@ -888,6 +914,8 @@ class ConfigImporter extends DependencySerialization {
    *
    * @todo Add support for other extension types; e.g., themes etc.
    *
+   * @param string $collection
+   *   The configuration collection.
    * @param string $op
    *   The change operation to get the unprocessed list for, either delete,
    *   create, rename, or update.
@@ -902,21 +930,21 @@ class ConfigImporter extends DependencySerialization {
    *   TRUE if the configuration was imported as a configuration entity. FALSE
    *   otherwise.
    */
-  protected function importInvokeOwner($op, $name) {
+  protected function importInvokeOwner($collection, $op, $name) {
     // Renames are handled separately.
     if ($op == 'rename') {
-      return $this->importInvokeRename($name);
+      return $this->importInvokeRename($collection, $name);
     }
     // Validate the configuration object name before importing it.
     // Config::validateName($name);
     if ($entity_type = $this->configManager->getEntityTypeIdByName($name)) {
-      $old_config = new Config($name, $this->storageComparer->getTargetStorage(), $this->eventDispatcher, $this->typedConfigManager);
-      if ($old_data = $this->storageComparer->getTargetStorage()->read($name)) {
+      $old_config = new Config($name, $this->storageComparer->getTargetStorage($collection), $this->eventDispatcher, $this->typedConfigManager);
+      if ($old_data = $this->storageComparer->getTargetStorage($collection)->read($name)) {
         $old_config->initWithData($old_data);
       }
 
-      $data = $this->storageComparer->getSourceStorage()->read($name);
-      $new_config = new Config($name, $this->storageComparer->getTargetStorage(), $this->eventDispatcher, $this->typedConfigManager);
+      $data = $this->storageComparer->getSourceStorage($collection)->read($name);
+      $new_config = new Config($name, $this->storageComparer->getTargetStorage($collection), $this->eventDispatcher, $this->typedConfigManager);
       if ($data !== FALSE) {
         $new_config->setData($data);
       }
@@ -929,7 +957,7 @@ class ConfigImporter extends DependencySerialization {
         throw new EntityStorageException(String::format('The entity storage "@storage" for the "@entity_type" entity type does not support imports', array('@storage' => get_class($entity_storage), '@entity_type' => $entity_type)));
       }
       $entity_storage->$method($name, $new_config, $old_config);
-      $this->setProcessedConfiguration($op, $name);
+      $this->setProcessedConfiguration($collection, $op, $name);
       return TRUE;
     }
     return FALSE;
@@ -938,9 +966,15 @@ class ConfigImporter extends DependencySerialization {
   /**
    * Imports a configuration entity rename.
    *
+   * @param string $collection
+   *   The configuration collection.
    * @param string $rename_name
    *   The rename configuration name, as provided by
    *   \Drupal\Core\Config\StorageComparer::createRenameName().
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   *   Thrown if the data is owned by an entity type, but the entity storage
+   *   does not support imports.
    *
    * @return bool
    *   TRUE if the configuration was imported as a configuration entity. FALSE
@@ -948,16 +982,16 @@ class ConfigImporter extends DependencySerialization {
    *
    * @see \Drupal\Core\Config\ConfigImporter::createRenameName()
    */
-  protected function importInvokeRename($rename_name) {
+  protected function importInvokeRename($collection, $rename_name) {
     $names = $this->storageComparer->extractRenameNames($rename_name);
     $entity_type_id = $this->configManager->getEntityTypeIdByName($names['old_name']);
-    $old_config = new Config($names['old_name'], $this->storageComparer->getTargetStorage(), $this->eventDispatcher, $this->typedConfigManager);
-    if ($old_data = $this->storageComparer->getTargetStorage()->read($names['old_name'])) {
+    $old_config = new Config($names['old_name'], $this->storageComparer->getTargetStorage($collection), $this->eventDispatcher, $this->typedConfigManager);
+    if ($old_data = $this->storageComparer->getTargetStorage($collection)->read($names['old_name'])) {
       $old_config->initWithData($old_data);
     }
 
-    $data = $this->storageComparer->getSourceStorage()->read($names['new_name']);
-    $new_config = new Config($names['new_name'], $this->storageComparer->getTargetStorage(), $this->eventDispatcher, $this->typedConfigManager);
+    $data = $this->storageComparer->getSourceStorage($collection)->read($names['new_name']);
+    $new_config = new Config($names['new_name'], $this->storageComparer->getTargetStorage($collection), $this->eventDispatcher, $this->typedConfigManager);
     if ($data !== FALSE) {
       $new_config->setData($data);
     }
@@ -969,7 +1003,7 @@ class ConfigImporter extends DependencySerialization {
       throw new EntityStorageException(String::format('The entity storage "@storage" for the "@entity_type" entity type does not support imports', array('@storage' => get_class($entity_storage), '@entity_type' => $entity_type_id)));
     }
     $entity_storage->importRename($names['old_name'], $new_config, $old_config);
-    $this->setProcessedConfiguration('rename', $rename_name);
+    $this->setProcessedConfiguration($collection, 'rename', $rename_name);
     return TRUE;
   }
 
@@ -984,16 +1018,6 @@ class ConfigImporter extends DependencySerialization {
   }
 
   /**
-   * Returns the identifier for events and locks.
-   *
-   * @return string
-   *   The identifier for events and locks.
-   */
-  public function getId() {
-    return static::LOCK_ID;
-  }
-
-  /**
    * Gets all the service dependencies from \Drupal.
    *
    * Since the ConfigImporter handles module installation the kernel and the
@@ -1002,37 +1026,12 @@ class ConfigImporter extends DependencySerialization {
    */
   protected function reInjectMe() {
     $this->eventDispatcher = \Drupal::service('event_dispatcher');
-    $this->configFactory = \Drupal::configFactory();
-    $this->entityManager = \Drupal::entityManager();
+    $this->configManager = \Drupal::service('config.manager');
     $this->lock = \Drupal::lock();
     $this->typedConfigManager = \Drupal::service('config.typed');
     $this->moduleHandler = \Drupal::moduleHandler();
     $this->themeHandler = \Drupal::service('theme_handler');
-    $this->translationManager = \Drupal::service('string_translation');
-  }
-
-  /**
-   * Translates a string to the current language or to a given language.
-   *
-   * @param string $string
-   *   A string containing the English string to translate.
-   * @param array $args
-   *   An associative array of replacements to make after translation. Based
-   *   on the first character of the key, the value is escaped and/or themed.
-   *   See \Drupal\Component\Utility\String::format() for details.
-   * @param array $options
-   *   An associative array of additional options, with the following elements:
-   *   - 'langcode': The language code to translate to a language other than
-   *      what is used to display the page.
-   *   - 'context': The context the source string belongs to.
-   *
-   * @return string
-   *   The translated string.
-   *
-   * @see \Drupal\Core\StringTranslation\TranslationManager::translate()
-   */
-  protected function t($string, array $args = array(), array $options = array()) {
-    return $this->translationManager->translate($string, $args, $options);
+    $this->stringTranslation = \Drupal::service('string_translation');
   }
 
 }

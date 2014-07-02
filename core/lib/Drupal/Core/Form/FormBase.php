@@ -9,23 +9,18 @@ namespace Drupal\Core\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\DependencyInjection\DependencySerialization;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Routing\UrlGeneratorInterface;
-use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Provides a base class for forms.
  */
-abstract class FormBase extends DependencySerialization implements FormInterface, ContainerInjectionInterface {
-
-  /**
-   * The translation manager service.
-   *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface
-   */
-  protected $translationManager;
+abstract class FormBase implements FormInterface, ContainerInjectionInterface {
+  use StringTranslationTrait;
+  use DependencySerializationTrait;
 
   /**
    * The current request.
@@ -43,6 +38,11 @@ abstract class FormBase extends DependencySerialization implements FormInterface
 
   /**
    * The config factory.
+   *
+   * Subclasses should use the self::config() method, which may be overridden to
+   * address specific needs when loading config, rather than this property
+   * directly. See \Drupal\Core\Form\ConfigFormBase::config() for an example of
+   * this.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
@@ -70,15 +70,6 @@ abstract class FormBase extends DependencySerialization implements FormInterface
   }
 
   /**
-   * Translates a string to the current language or to a given language.
-   *
-   * See the t() documentation for details.
-   */
-  protected function t($string, array $args = array(), array $options = array()) {
-    return $this->translationManager()->translate($string, $args, $options);
-  }
-
-  /**
    * Generates a URL or path for a specific route based on the given parameters.
    *
    * @see \Drupal\Core\Routing\UrlGeneratorInterface::generateFromRoute() for
@@ -89,19 +80,6 @@ abstract class FormBase extends DependencySerialization implements FormInterface
    */
   public function url($route_name, $route_parameters = array(), $options = array()) {
     return $this->urlGenerator()->generateFromRoute($route_name, $route_parameters, $options);
-  }
-
-  /**
-   * Gets the translation manager.
-   *
-   * @return \Drupal\Core\StringTranslation\TranslationInterface
-   *   The translation manager.
-   */
-  protected function translationManager() {
-    if (!$this->translationManager) {
-      $this->translationManager = $this->container()->get('string_translation');
-    }
-    return $this->translationManager;
   }
 
   /**
@@ -121,23 +99,22 @@ abstract class FormBase extends DependencySerialization implements FormInterface
    *   A configuration object.
    */
   protected function config($name) {
-    if (!$this->configFactory) {
-      $this->configFactory = $this->container()->get('config.factory');
-    }
-    return $this->configFactory->get($name);
+    return $this->configFactory()->get($name);
   }
 
   /**
-   * Sets the translation manager for this form.
+   * Gets the config factory for this form.
    *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
-   *   The translation manager.
+   * When accessing configuration values, use $this->config(). Only use this
+   * when the config factory needs to be manipulated directly.
    *
-   * @return $this
+   * @return \Drupal\Core\Config\ConfigFactoryInterface
    */
-  public function setTranslationManager(TranslationInterface $translation_manager) {
-    $this->translationManager = $translation_manager;
-    return $this;
+  protected function configFactory() {
+    if (!$this->configFactory) {
+      $this->configFactory = $this->container()->get('config.factory');
+    }
+    return $this->configFactory;
   }
 
   /**
@@ -151,6 +128,13 @@ abstract class FormBase extends DependencySerialization implements FormInterface
   public function setConfigFactory(ConfigFactoryInterface $config_factory) {
     $this->configFactory = $config_factory;
     return $this;
+  }
+
+  /**
+   * Resets the configuration factory.
+   */
+  public function resetConfigFactory() {
+    $this->configFactory = NULL;
   }
 
   /**

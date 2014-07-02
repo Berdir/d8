@@ -8,6 +8,8 @@
 namespace Drupal\Core\Plugin;
 
 use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
+use Drupal\Component\Plugin\Discovery\DiscoveryCachedTrait;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Component\Plugin\PluginManagerInterface;
@@ -16,21 +18,17 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
 
 /**
  * Base class for plugin managers.
+ *
+ * @ingroup plugin_api
  */
 class DefaultPluginManager extends PluginManagerBase implements PluginManagerInterface, CachedDiscoveryInterface {
 
-  /**
-   * Cached definitions array.
-   *
-   * @var array
-   */
-  protected $definitions;
+  use DiscoveryCachedTrait;
 
   /**
    * Cache backend instance.
@@ -40,14 +38,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   protected $cacheBackend;
 
   /**
-   * Provided cache key prefix.
-   *
-   * @var string
-   */
-  protected $cacheKeyPrefix;
-
-  /**
-   * Actually used cache key with the language code appended.
+   * The cache key.
    *
    * @var string
    */
@@ -81,13 +72,6 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
-
-  /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
 
   /**
    * A set of defaults to be referenced by $this->processDefinition() if
@@ -128,9 +112,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Language\LanguageManagerInterface
-   *   The language manager.
-   * @param string $cache_key_prefix
+   * @param string $cache_key
    *   Cache key prefix to use, the language code will be appended
    *   automatically.
    * @param array $cache_tags
@@ -142,11 +124,9 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    *   clearCachedDefinitions() method. Only use cache tags when cached plugin
    *   definitions should be cleared along with other, related cache entries.
    */
-  public function setCacheBackend(CacheBackendInterface $cache_backend, LanguageManagerInterface $language_manager, $cache_key_prefix, array $cache_tags = array()) {
-    $this->languageManager = $language_manager;
+  public function setCacheBackend(CacheBackendInterface $cache_backend, $cache_key, array $cache_tags = array()) {
     $this->cacheBackend = $cache_backend;
-    $this->cacheKeyPrefix = $cache_key_prefix;
-    $this->cacheKey = $cache_key_prefix . ':' . $language_manager->getCurrentLanguage()->id;
+    $this->cacheKey = $cache_key;
     $this->cacheTags = $cache_tags;
   }
 
@@ -159,20 +139,6 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    */
   protected function alterInfo($alter_hook) {
     $this->alterHook = $alter_hook;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDefinition($plugin_id) {
-    // Fetch definitions if they're not loaded yet.
-    if (!isset($this->definitions)) {
-      $this->getDefinitions();
-    }
-    // Avoid using a ternary that would create a copy of the array.
-    if (isset($this->definitions[$plugin_id])) {
-      return $this->definitions[$plugin_id];
-    }
   }
 
   /**
@@ -195,13 +161,6 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
       if ($this->cacheTags) {
         // Use the cache tags to clear the cache.
         Cache::deleteTags($this->cacheTags);
-      }
-      elseif ($this->languageManager) {
-        $cache_keys = array();
-        foreach ($this->languageManager->getLanguages() as $langcode => $language) {
-          $cache_keys[] = $this->cacheKeyPrefix . ':' . $langcode;
-        }
-        $this->cacheBackend->deleteMultiple($cache_keys);
       }
       else {
         $this->cacheBackend->delete($this->cacheKey);
@@ -270,6 +229,11 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
     // If this plugin was provided by a module that does not exist, remove the
     // plugin definition.
     foreach ($definitions as $plugin_id => $plugin_definition) {
+      // If the plugin definition is an object, attempt to convert it to an
+      // array, if that is not possible, skip further processing.
+      if (is_object($plugin_definition) && !($plugin_definition = (array) $plugin_definition)) {
+        continue;
+      }
       if (isset($plugin_definition['provider']) && !in_array($plugin_definition['provider'], array('Core', 'Component')) && !$this->moduleHandler->moduleExists($plugin_definition['provider'])) {
         unset($definitions[$plugin_id]);
       }

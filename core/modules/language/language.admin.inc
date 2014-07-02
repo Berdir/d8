@@ -6,98 +6,90 @@
  */
 
 use Drupal\Component\Utility\String;
-use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Render\Element;
 
 /**
- * Prepare a language code list for unused predefined languages.
- */
-function language_admin_predefined_list() {
-  $languages = \Drupal::languageManager()->getLanguages();
-  $predefined = LanguageManager::getStandardLanguageList();
-  foreach ($predefined as $key => $value) {
-    if (isset($languages[$key])) {
-      unset($predefined[$key]);
-      continue;
-    }
-    $predefined[$key] = t($value[0]);
-  }
-  asort($predefined);
-  return $predefined;
-}
-
-/**
- * Returns HTML for the language negotiation configuration form.
+ * Prepares variables for language negotiation configuration form.
  *
- * @param $variables
+ * Default template: language-content-configuration-form.html.twig.
+ *
+ * @param array $variables
  *   An associative array containing:
  *   - form: A render element representing the form.
- *
- * @ingroup themeable
  */
-function theme_language_negotiation_configure_form($variables) {
-  $form = $variables['form'];
-  $output = '';
+function template_preprocess_language_negotiation_configure_form(&$variables) {
+  $form =& $variables['form'];
+  $variables['language_types'] = array();
 
   foreach ($form['#language_types'] as $type) {
-    $rows = array();
-    $title = '<h2>' . $form[$type]['#title'] . '</h2>';
-    $description = '<div class="description">' . $form[$type]['#description'] . '</div>';
-
-    foreach ($form[$type]['title'] as $id => $element) {
-      // Do not take form control structures.
-      if (is_array($element) && Element::child($id)) {
-        $row = array(
-          'data' => array(
-            '<strong>' . drupal_render($form[$type]['title'][$id]) . '</strong>',
-            drupal_render($form[$type]['description'][$id]),
-            drupal_render($form[$type]['enabled'][$id]),
-            drupal_render($form[$type]['weight'][$id]),
-          ),
-          'class' => array('draggable'),
-        );
-        if ($form[$type]['#show_operations']) {
-          $row['data'][] = drupal_render($form[$type]['operation'][$id]);
-        }
-        $rows[] = $row;
-      }
-    }
-
     $header = array(
-      array('data' => t('Detection method')),
-      array('data' => t('Description')),
-      array('data' => t('Enabled')),
-      array('data' => t('Weight')),
+      t('Detection method'),
+      t('Description'),
+      t('Enabled'),
+      t('Weight'),
     );
 
     // If there is at least one operation enabled show the operation column.
     if ($form[$type]['#show_operations']) {
-      $header[] = array('data' => t('Operations'));
+      $header[] = t('Operations');
     }
 
-    $build = array(
+    $table = array(
       '#type' => 'table',
       '#header' => $header,
-      '#rows' => $rows,
-      '#attributes' => array('id' => "language-negotiation-methods-$type"),
+      '#attributes' => array('id' => 'language-negotiation-methods-' . $type),
       '#tabledrag' => array(
         array(
           'action' => 'order',
           'relationship' => 'sibling',
-          'group' => "language-method-weight-$type",
+          'group' => 'language-method-weight-' . $type,
         ),
       ),
     );
 
-    $table  = drupal_render($form[$type]['configurable']);
-    $table .= drupal_render($build);
-    $table .= drupal_render_children($form[$type]);
+    foreach ($form[$type]['title'] as $id => $element) {
+      // Do not take form control structures.
+      if (is_array($element) && element_child($id)) {
+        $table[$id]['#attributes']['class'][] = 'draggable';
+        $table[$id]['#weight'] = $element['#weight'];
 
-    $output .= '<div class="form-item table-language-group table-' . $type . '-wrapper">' . $title . $description . $table . '</div>';
+        $table[$id]['title'] = array(
+          '#prefix' => '<strong>',
+          $form[$type]['title'][$id],
+          '#suffix' => '</strong>',
+        );
+        $table[$id]['description'] = $form[$type]['description'][$id];
+        $table[$id]['enabled'] = $form[$type]['enabled'][$id];
+        $table[$id]['weight'] = $form[$type]['weight'][$id];
+        if ($form[$type]['#show_operations']) {
+          $table[$id]['operation'] = $form[$type]['operation'][$id];
+        }
+        // Unset to prevent rendering along with children.
+        unset($form[$type]['title'][$id]);
+        unset($form[$type]['description'][$id]);
+        unset($form[$type]['enabled'][$id]);
+        unset($form[$type]['weight'][$id]);
+        unset($form[$type]['operation'][$id]);
+      }
+    }
+
+    // Unset configurable to prevent rendering twice with children.
+    $configurable = isset($form[$type]['configurable']) ? $form[$type]['configurable'] : NULL;
+    unset($form[$type]['configurable']);
+
+    $variables['language_types'][] = array(
+      'type' => $type,
+      'title' => $form[$type]['#title'],
+      'description' => $form[$type]['#description'],
+      'configurable' => $configurable,
+      'table' => $table,
+      'children' => $form[$type],
+    );
+    // Prevent the type from rendering with the remaining form child elements.
+    unset($form[$type]);
   }
 
-  $output .= drupal_render_children($form);
-  return $output;
+  $variables['children'] = $form;
 }
 
 /**
@@ -149,105 +141,6 @@ function theme_language_negotiation_configure_browser_form_table($variables) {
   $output = drupal_render($table);
 
   return $output;
-}
-
-/**
- * Returns the content language settings form.
- *
- * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\language\Controller\LanguageController::contentSettings().
- */
-function language_content_settings_page() {
-  return \Drupal::formBuilder()->getForm('language_content_settings_form', language_entity_supported());
-}
-
-/**
- * Form constructor for the content language settings form.
- *
- * @param array $supported
- *   Entity types with language support.
- *
- * @see language_content_settings_form_submit()
- *
- * @ingroup forms
- */
-function language_content_settings_form(array $form, array $form_state, array $supported) {
-  $entity_types = \Drupal::entityManager()->getDefinitions();
-  $labels = array();
-  $default = array();
-
-  foreach ($supported as $entity_type_id) {
-    $labels[$entity_type_id] = $entity_types[$entity_type_id]->getLabel() ?: $entity_type_id;
-    $default[$entity_type_id] = FALSE;
-
-    // Check whether we have any custom setting.
-    foreach (entity_get_bundles($entity_type_id) as $bundle => $bundle_info) {
-      $conf = language_get_default_configuration($entity_type_id, $bundle);
-      if (!empty($conf['language_show']) || $conf['langcode'] != 'site_default') {
-        $default[$entity_type_id] = $entity_type_id;
-      }
-      $language_configuration[$entity_type_id][$bundle] = $conf;
-    }
-  }
-
-  asort($labels);
-
-  $path = drupal_get_path('module', 'language');
-  $form = array(
-    '#labels' => $labels,
-    '#attached' => array(
-      'css' => array($path . '/css/language.admin.css'),
-    ),
-  );
-
-  $form['entity_types'] = array(
-    '#title' => t('Custom language settings'),
-    '#type' => 'checkboxes',
-    '#options' => $labels,
-    '#default_value' => $default,
-  );
-
-  $form['settings'] = array('#tree' => TRUE);
-
-  foreach ($labels as $entity_type_id => $label) {
-    $entity_type = $entity_types[$entity_type_id];
-
-    $form['settings'][$entity_type_id] = array(
-      '#title' => $label,
-      '#type' => 'container',
-      '#entity_type' => $entity_type_id,
-      '#theme' => 'language_content_settings_table',
-      '#bundle_label' => $entity_type->getBundleLabel() ?: $label,
-      '#states' => array(
-        'visible' => array(
-          ':input[name="entity_types[' . $entity_type_id . ']"]' => array('checked' => TRUE),
-        ),
-      ),
-    );
-
-    foreach (entity_get_bundles($entity_type_id) as $bundle => $bundle_info) {
-      $form['settings'][$entity_type_id][$bundle]['settings'] = array(
-        '#type' => 'item',
-        '#label' => $bundle_info['label'],
-        'language' => array(
-          '#type' => 'language_configuration',
-          '#entity_information' => array(
-            'entity_type' => $entity_type_id,
-            'bundle' => $bundle,
-          ),
-          '#default_value' => $language_configuration[$entity_type_id][$bundle],
-        ),
-      );
-    }
-  }
-
-  $form['actions'] = array('#type' => 'actions');
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save'),
-  );
-
-  return $form;
 }
 
 /**
@@ -309,19 +202,6 @@ function template_preprocess_language_content_settings_table(&$variables) {
  */
 function theme_language_content_settings_table($variables) {
   return '<h4>' . $variables['build']['#title'] . '</h4>' . drupal_render($variables['build']);
-}
-
-/**
- * Form submission handler for language_content_settings_form().
- */
-function language_content_settings_form_submit(array $form, array &$form_state) {
-  $settings = &$form_state['values']['settings'];
-  foreach ($settings as $entity_type => $entity_settings) {
-    foreach ($entity_settings as $bundle => $bundle_settings) {
-      language_save_default_configuration($entity_type, $bundle, $bundle_settings['settings']['language']);
-    }
-  }
-  drupal_set_message(t('Settings successfully updated.'));
 }
 
 /**

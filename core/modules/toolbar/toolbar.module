@@ -5,9 +5,10 @@
  * Administration toolbar for quick access to top level administration items.
  */
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Component\Utility\Crypt;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,9 +19,9 @@ use Drupal\user\UserInterface;
 /**
  * Implements hook_help().
  */
-function toolbar_help($path, $arg) {
-  switch ($path) {
-    case 'admin/help#toolbar':
+function toolbar_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.toolbar':
       $output = '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('The Toolbar module displays links to top-level administration menu items and links from other modules at the top of the screen. For more information, see the online handbook entry for <a href="@toolbar">Toolbar module</a>.', array('@toolbar' => 'http://drupal.org/documentation/modules/toolbar')) . '</p>';
       $output .= '<h3>' . t('Uses') . '</h3>';
@@ -79,6 +80,7 @@ function toolbar_element_info() {
       'id' => 'toolbar-administration',
       'class' => array('toolbar'),
       'role' => 'navigation',
+      'aria-label' => t('Site administration'),
     ),
     // Metadata for the administration bar.
     '#bar' => array(
@@ -108,7 +110,7 @@ function toolbar_element_info() {
  * Use Drupal's page cache for toolbar/subtrees/*, even for authenticated users.
  *
  * This gets invoked after full bootstrap, so must duplicate some of what's
- * done by _drupal_bootstrap_page_cache().
+ * done by \Drupal\Core\DrupalKernel::handlePageCache().
  *
  * @todo Replace this hack with something better integrated with DrupalKernel
  *   once Drupal's page caching itself is properly integrated.
@@ -118,24 +120,19 @@ function _toolbar_initialize_page_cache() {
   drupal_page_is_cacheable(TRUE);
 
   // If we have a cache, serve it.
-  // @see _drupal_bootstrap_page_cache()
+  // @see \Drupal\Core\DrupalKernel::handlePageCache()
   $request = \Drupal::request();
-  $cache = drupal_page_get_cache($request);
-  if (is_object($cache)) {
-    $response = new Response();
+  $response = drupal_page_get_cache($request);
+  if ($response) {
     $response->headers->set('X-Drupal-Cache', 'HIT');
-    date_default_timezone_set(drupal_get_user_timezone());
 
-    drupal_serve_page_from_cache($cache, $response, $request);
+    drupal_serve_page_from_cache($response, $request);
 
     $response->prepare($request);
     $response->send();
     // We are done.
     exit;
   }
-
-  // Otherwise, create a new page response (that will be cached).
-  drupal_add_http_header('X-Drupal-Cache', 'MISS');
 
   // The Expires HTTP header is the heart of the client-side HTTP caching. The
   // additional server-side page cache only takes effect when the client
@@ -463,7 +460,7 @@ function toolbar_menu_navigation_links(&$tree) {
         'toolbar-icon',
         'toolbar-icon-' . strtolower(str_replace(' ', '-', $item['link']['link_title'])),
       ),
-      'title' => check_plain($item['link']['description']),
+      'title' => String::checkPlain($item['link']['description']),
     );
   }
 }
@@ -588,14 +585,11 @@ function _toolbar_get_user_cid($uid, $langcode) {
  *   (optional) The user ID whose toolbar cache entry to clear.
  */
 function _toolbar_clear_user_cache($uid = NULL) {
-  $cache = \Drupal::cache('toolbar');
-  if (!$cache->isEmpty()) {
-    // Clear by the 'user' tag in order to delete all caches, in any language,
-    // associated with this user.
-    if (isset($uid)) {
-      Cache::deleteTags(array('user' => array($uid)));
-    } else {
-      $cache->deleteAll();
-    }
+  // Clear by the 'user' tag in order to delete all caches, in any language,
+  // associated with this user.
+  if (isset($uid)) {
+    Cache::deleteTags(array('user' => array($uid)));
+  } else {
+    \Drupal::cache('toolbar')->deleteAll();
   }
 }

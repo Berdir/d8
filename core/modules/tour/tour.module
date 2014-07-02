@@ -4,15 +4,16 @@
  * @file
  * Main functions of the module.
  */
+
 use Drupal\Core\Cache\CacheBackendInterface;
-use Symfony\Cmf\Component\Routing\RouteObjectInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Implements hook_help().
  */
-function tour_help($path, $arg) {
-  switch ($path) {
-    case 'admin/help#tour':
+function tour_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.tour':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t("The Tour module provides users with guided tours of the site interface. Each tour consists of several tips that highlight elements of the user interface, guide the user through a workflow, or explain key concepts of the website. For more information, see <a href='!tour'>the online documentation for the Tour module</a>.", array('!tour' => 'https://drupal.org/documentation/modules/tour')) . '</p>';
@@ -82,8 +83,8 @@ function tour_preprocess_page(&$variables) {
   }
 
   // Load all of the items and match on route name.
-  $request = \Drupal::request();
-  $route_name = $request->attributes->get(RouteObjectInterface::ROUTE_NAME);
+  $route_match = \Drupal::routeMatch();
+  $route_name = $route_match->getRouteName();
 
   $results = \Drupal::entityQuery('tour')
     ->condition('routes.*.route_name', $route_name)
@@ -91,7 +92,7 @@ function tour_preprocess_page(&$variables) {
   if (!empty($results) && $tours = entity_load_multiple('tour', array_keys($results))) {
     foreach ($tours as $id => $tour) {
       // Match on params.
-      if (!$tour->hasMatchingRoute($route_name, $request->attributes->get('_raw_variables')->all())) {
+      if (!$tour->hasMatchingRoute($route_name, $route_match->getRawParameters()->all())) {
         unset($tours[$id]);
       }
     }

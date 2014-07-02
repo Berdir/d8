@@ -8,6 +8,7 @@
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\editor\Entity\Editor;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityInterface;
@@ -17,9 +18,9 @@ use Drupal\filter\Plugin\FilterInterface;
 /**
  * Implements hook_help().
  */
-function editor_help($path, $arg) {
-  switch ($path) {
-    case 'admin/help#editor':
+function editor_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.editor':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('The Text Editor module provides a framework that other modules (such as <a href="!ckeditor">CKEditor module</a>) can use to provide toolbars and other functionality that allow users to format text more easily than typing HTML tags directly. For more information, see the <a href="!documentation">online documentation for the Text Editor module</a>.', array('!documentation' => 'https://drupal.org/documentation/modules/editor', '!ckeditor' => \Drupal::url('help.page', array('name' => 'ckeditor')))) . '</p>';
@@ -60,7 +61,7 @@ function editor_menu_link_defaults_alter(array &$links) {
  */
 function editor_element_info() {
   $type['text_format'] = array(
-    '#pre_render' => array('editor_pre_render_format'),
+    '#pre_render' => array('element.editor:preRenderTextFormat'),
   );
   return $type;
 }
@@ -79,7 +80,7 @@ function editor_form_filter_admin_overview_alter(&$form, $form_state) {
   $editors = \Drupal::service('plugin.manager.editor')->getDefinitions();
   foreach (Element::children($form['formats']) as $format_id) {
     $editor = editor_load($format_id);
-    $editor_name = ($editor && isset($editors[$editor->editor])) ? $editors[$editor->editor]['label'] : drupal_placeholder('—');
+    $editor_name = ($editor && isset($editors[$editor->getEditor()])) ? $editors[$editor->getEditor()]['label'] : drupal_placeholder('—');
     $editor_column['editor'] = array('#markup' => $editor_name);
     $position = array_search('name', array_keys($form['formats'][$format_id])) + 1;
     $start = array_splice($form['formats'][$format_id], 0, $position, $editor_column);
@@ -110,7 +111,7 @@ function editor_form_filter_format_form_alter(&$form, &$form_state) {
     '#title' => t('Text editor'),
     '#options' => $editor_options,
     '#empty_option' => t('None'),
-    '#default_value' => $editor ? $editor->editor : '',
+    '#default_value' => $editor ? $editor->getEditor() : '',
     '#ajax' => array(
       'trigger_as' => array('name' => 'editor_configure'),
       'callback' => 'editor_form_filter_admin_form_ajax',
@@ -152,7 +153,7 @@ function editor_form_filter_format_form_alter(&$form, &$form_state) {
 
   // Add editor-specific validation and submit handlers.
   if ($editor) {
-    $plugin = $manager->createInstance($editor->editor);
+    $plugin = $manager->createInstance($editor->getEditor());
     $settings_form = array();
     $settings_form['#element_validate'][] = array($plugin, 'settingsFormValidate');
     $form['editor']['settings']['subform'] = $plugin->settingsForm($settings_form, $form_state, $editor);
@@ -173,7 +174,7 @@ function editor_form_filter_admin_format_editor_configure($form, &$form_state) {
     if ($form_state['values']['editor']['editor'] === '') {
       $form_state['editor'] = FALSE;
     }
-    elseif (empty($editor) || $form_state['values']['editor']['editor'] !== $editor->editor) {
+    elseif (empty($editor) || $form_state['values']['editor']['editor'] !== $editor->getEditor()) {
       $editor = entity_create('editor', array(
         'format' => $form_state['controller']->getEntity()->id(),
         'editor' => $form_state['values']['editor']['editor'],
@@ -216,7 +217,7 @@ function editor_form_filter_admin_format_submit($form, &$form_state) {
   // Delete the existing editor if disabling or switching between editors.
   $format_id = $form_state['controller']->getEntity()->id();
   $original_editor = editor_load($format_id);
-  if ($original_editor && $original_editor->editor != $form_state['values']['editor']) {
+  if ($original_editor && $original_editor->getEditor() != $form_state['values']['editor']) {
     $original_editor->delete();
   }
 
@@ -224,8 +225,8 @@ function editor_form_filter_admin_format_submit($form, &$form_state) {
   if (!empty($form_state['editor'])) {
     // Ensure the text format is set: when creating a new text format, this
     // would equal the empty string.
-    $form_state['editor']->format = $format_id;
-    $form_state['editor']->settings = $form_state['values']['editor']['settings'];
+    $form_state['editor']->set('format', $format_id);
+    $form_state['editor']->setSettings($form_state['values']['editor']['settings']);
     $form_state['editor']->save();
   }
 }
@@ -243,88 +244,6 @@ function editor_load($format_id) {
   // is more efficient than loading multiple editors individually.
   $editors = entity_load_multiple('editor');
   return isset($editors[$format_id]) ? $editors[$format_id] : NULL;
-}
-
-/**
- * Additional #pre_render callback for 'text_format' elements.
- */
-function editor_pre_render_format($element) {
-  // Allow modules to programmatically enforce no client-side editor by setting
-  // the #editor property to FALSE.
-  if (isset($element['#editor']) && !$element['#editor']) {
-    return $element;
-  }
-
-  // filter_process_format() copies properties to the expanded 'value' child
-  // element. Skip this text format widget, if it contains no 'format' or when
-  // the current user does not have access to edit the value.
-  if (!isset($element['format']) || !empty($element['value']['#disabled'])) {
-    return $element;
-  }
-  $format_ids = array_keys($element['format']['format']['#options']);
-
-  // Early-return if no text editor is associated with any of the text formats.
-  $editors = entity_load_multiple('editor', $format_ids);
-  if (count($editors) === 0) {
-    return $element;
-  }
-
-  // Use a hidden element for a single text format.
-  $field_id = $element['value']['#id'];
-  if (!$element['format']['format']['#access']) {
-    // Use the first (and only) available text format.
-    $format_id = $format_ids[0];
-    $element['format']['editor'] = array(
-      '#type' => 'hidden',
-      '#name' => $element['format']['format']['#name'],
-      '#value' => $format_id,
-      '#attributes' => array(
-        'class' => array('editor'),
-        'data-editor-for' => $field_id,
-      ),
-    );
-  }
-  // Otherwise, attach to text format selector.
-  else {
-    $element['format']['format']['#attributes']['class'][] = 'editor';
-    $element['format']['format']['#attributes']['data-editor-for'] = $field_id;
-  }
-
-  // Hide the text format's filters' guidelines of those text formats that have
-  // a text editor associated: they're rather useless when using a text editor.
-  foreach ($editors as $format_id => $editor) {
-    $element['format']['guidelines'][$format_id]['#access'] = FALSE;
-  }
-
-  // Attach Text Editor module's (this module) library.
-  $element['#attached']['library'][] = 'editor/drupal.editor';
-
-  // Attach attachments for all available editors.
-  $manager = \Drupal::service('plugin.manager.editor');
-  $element['#attached'] = NestedArray::mergeDeep($element['#attached'], $manager->getAttachments($format_ids));
-
-  // Apply XSS filters when editing content if necessary. Some types of text
-  // editors cannot guarantee that the end user won't become a victim of XSS.
-  if (!empty($element['value']['#value'])) {
-    $original = $element['value']['#value'];
-    $format = entity_load('filter_format', $element['format']['format']['#value']);
-
-    // Ensure XSS-safety for the current text format/editor.
-    $filtered = editor_filter_xss($original, $format);
-    if ($filtered !== FALSE) {
-      $element['value']['#value'] = $filtered;
-    }
-
-    // Only when the user has access to multiple text formats, we must add data-
-    // attributes for the original value and change tracking, because they are
-    // only necessary when the end user can switch between text formats/editors.
-    if ($element['format']['format']['#access']) {
-      $element['value']['#attributes']['data-editor-value-is-changed'] = 'false';
-      $element['value']['#attributes']['data-editor-value-original'] = $original;
-    }
-  }
-
-  return $element;
 }
 
 /**
@@ -359,7 +278,7 @@ function editor_filter_xss($html, FilterFormatInterface $format, FilterFormatInt
 
   // If the text editor associated with this text format guarantees security,
   // then we also don't need text editor XSS filtering.
-  $definition = \Drupal::service('plugin.manager.editor')->getDefinition($editor->editor);
+  $definition = \Drupal::service('plugin.manager.editor')->getDefinition($editor->getEditor());
   if ($definition['is_xss_safe'] === TRUE) {
     return FALSE;
   }

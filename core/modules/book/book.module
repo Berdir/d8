@@ -9,18 +9,19 @@ use Drupal\book\BookManagerInterface;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\node\NodeInterface;
 use Drupal\node\NodeTypeInterface;
-use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Template\Attribute;
 
 /**
  * Implements hook_help().
  */
-function book_help($path, $arg) {
-  switch ($path) {
-    case 'admin/help#book':
+function book_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.book':
       $output = '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('The Book module is used for creating structured, multi-page content, such as site resource guides, manuals, and wikis. It allows you to create content that has chapters, sections, subsections, or any similarly-tiered structure. For more information, see the <a href="!book">online documentation for the Book module</a>.', array('!book' => 'https://drupal.org/documentation/modules/book')) . '</p>';
       $output .= '<h3>' . t('Uses') . '</h3>';
@@ -35,9 +36,11 @@ function book_help($path, $arg) {
       $output .= '<dd>' . t("Users with the <em>View printer-friendly books</em> permission can select the <em>printer-friendly version</em> link visible at the bottom of a book page's content to generate a printer-friendly display of the page and all of its subsections.") . '</dd>';
       $output .= '</dl>';
       return $output;
-    case 'admin/structure/book':
+
+    case 'book.admin':
       return '<p>' . t('The book module offers a means to organize a collection of related content pages, collectively known as a book. When viewed, this content automatically displays links to adjacent book pages, providing a simple navigation system for creating and reviewing structured content.') . '</p>';
-    case 'node/%/outline':
+
+    case 'book.outline':
       return '<p>' . t('The outline feature allows you to include pages in the <a href="!book">Book hierarchy</a>, as well as move them within the hierarchy or to <a href="!book-admin">reorder an entire book</a>.', array('!book' => \Drupal::url('book.render'), '!book-admin' => \Drupal::url('book.admin'))) . '</p>';
   }
 }
@@ -247,11 +250,11 @@ function book_node_load($nodes) {
 /**
  * Implements hook_node_view().
  */
-function book_node_view(EntityInterface $node, EntityViewDisplayInterface $display, $view_mode) {
+function book_node_view(array &$build, EntityInterface $node, EntityViewDisplayInterface $display, $view_mode) {
   if ($view_mode == 'full') {
     if (!empty($node->book['bid']) && empty($node->in_preview)) {
       $book_navigation = array( '#theme' => 'book_navigation', '#book_link' => $node->book);
-      $node->content['book_navigation'] = array(
+      $build['book_navigation'] = array(
         '#markup' => drupal_render($book_navigation),
         '#weight' => 100,
         '#attached' => array(
@@ -359,15 +362,6 @@ function book_form_node_delete_confirm_alter(&$form, $form_state) {
 }
 
 /**
- * Implements hook_preprocess_HOOK() for block templates.
- */
-function book_preprocess_block(&$variables) {
-  if ($variables['configuration']['provider'] == 'book') {
-    $variables['attributes']['role'] = 'navigation';
-  }
-}
-
-/**
  * Prepares variables for book listing block templates.
  *
  * Default template: book-all-books-block.html.twig.
@@ -386,7 +380,11 @@ function template_preprocess_book_all_books_block(&$variables) {
   $elements = $variables['book_menus'];
   $variables['book_menus'] = array();
   foreach (Element::children($elements) as $index) {
-    $variables['book_menus'][$index] = $elements[$index];
+    $variables['book_menus'][] = array(
+      'id' => $index,
+      'menu' => $elements[$index],
+      'title' => $elements[$index]['#book_title'],
+    );
   }
 }
 
@@ -488,7 +486,7 @@ function template_preprocess_book_export_html(&$variables) {
   $variables['title'] = String::checkPlain($variables['title']);
   $variables['base_url'] = $base_url;
   $variables['language'] = $language_interface;
-  $variables['language_rtl'] = ($language_interface->direction == Language::DIRECTION_RTL);
+  $variables['language_rtl'] = ($language_interface->direction == LanguageInterface::DIRECTION_RTL);
   $variables['head'] = drupal_get_html_head();
 
   // HTML element attributes.

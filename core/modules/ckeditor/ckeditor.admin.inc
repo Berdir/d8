@@ -5,7 +5,6 @@
  * Callbacks and theming for the CKEditor toolbar configuration UI.
  */
 
-use Drupal\Core\Language\Language;
 use Drupal\Core\Template\Attribute;
 
 /**
@@ -39,7 +38,8 @@ function template_preprocess_ckeditor_settings_toolbar(&$variables) {
   }
   $button_groups = array();
   $active_buttons = array();
-  foreach ($editor->settings['toolbar']['rows'] as $row_number => $row) {
+  $settings = $editor->getSettings();
+  foreach ($settings['toolbar']['rows'] as $row_number => $row) {
     $button_groups[$row_number] = array();
     foreach ($row as $group) {
       foreach ($group['items'] as $button_name) {

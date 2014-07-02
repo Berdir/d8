@@ -8,10 +8,11 @@
 namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\String;
-use Drupal\Core\Config\Schema\SchemaIncompleteException;
+use Drupal\Core\Config\Schema\Ignore;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\Type\FloatInterface;
 use Drupal\Core\TypedData\Type\IntegerInterface;
+use Drupal\Core\Config\Schema\Undefined;
 
 /**
  * Provides a base class for configuration objects with storage support.
@@ -44,7 +45,7 @@ abstract class StorableConfigBase extends ConfigBase {
   /**
    * The typed config manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManager
+   * @var \Drupal\Core\Config\TypedConfigManagerInterface
    */
   protected $typedConfigManager;
 
@@ -126,7 +127,8 @@ abstract class StorableConfigBase extends ConfigBase {
   protected function getSchemaWrapper() {
     if (!isset($this->schemaWrapper)) {
       $definition = $this->typedConfigManager->getDefinition($this->name);
-      $this->schemaWrapper = $this->typedConfigManager->create($definition, $this->data);
+      $data_definition = $this->typedConfigManager->buildDataDefinition($definition, $this->data);
+      $this->schemaWrapper = $this->typedConfigManager->create($data_definition, $this->data);
     }
     return $this->schemaWrapper;
   }
@@ -134,8 +136,15 @@ abstract class StorableConfigBase extends ConfigBase {
   /**
    * Validate the values are allowed data types.
    *
-   * @throws UnsupportedDataTypeConfigException
-   *   If there is any invalid value.
+   * @param string $key
+   *   A string that maps to a key within the configuration data.
+   * @param string $value
+   *   Value to associate with the key.
+   *
+   * @return null
+   *
+   * @throws \Drupal\Core\Config\UnsupportedDataTypeConfigException
+   *   If the value is unsupported in configuration.
    */
   protected function validateValue($key, $value) {
     // Minimal validation. Should not try to serialize resources or non-arrays.
@@ -164,39 +173,32 @@ abstract class StorableConfigBase extends ConfigBase {
    *   The value cast to the type indicated in the schema.
    *
    * @throws \Drupal\Core\Config\UnsupportedDataTypeConfigException
-   *   Exception on unsupported/undefined data type deducted.
+   *   If the value is unsupported in configuration.
    */
   protected function castValue($key, $value) {
-    if ($value === NULL) {
-      $value = NULL;
+    $element = $this->getSchemaWrapper()->get($key);
+    // Do not cast value if it is unknown or defined to be ignored.
+    if ($element && ($element instanceof Undefined || $element instanceof Ignore)) {
+      // Do validate the value (may throw UnsupportedDataTypeConfigException)
+      // to ensure unsupported types are not supported in this case either.
+      $this->validateValue($key, $value);
+      return $value;
     }
-    elseif (is_scalar($value)) {
-      try {
-        $element = $this->getSchemaWrapper()->get($key);
-        if ($element instanceof PrimitiveInterface) {
-          // Special handling for integers and floats since the configuration
-          // system is primarily concerned with saving values from the Form API
-          // we have to special case the meaning of an empty string for numeric
-          // types. In PHP this would be casted to a 0 but for the purposes of
-          // configuration we need to treat this as a NULL.
-          if ($value === '' && ($element instanceof IntegerInterface || $element instanceof FloatInterface)) {
-            $value = NULL;
-          }
-          else {
-            $value = $element->getCastedValue();
-          }
+    if (is_scalar($value) || $value === NULL) {
+      if ($element && $element instanceof PrimitiveInterface) {
+        // Special handling for integers and floats since the configuration
+        // system is primarily concerned with saving values from the Form API
+        // we have to special case the meaning of an empty string for numeric
+        // types. In PHP this would be casted to a 0 but for the purposes of
+        // configuration we need to treat this as a NULL.
+        $empty_value =  $value === '' && ($element instanceof IntegerInterface || $element instanceof FloatInterface);
+
+        if ($value === NULL || $empty_value) {
+          $value = NULL;
         }
         else {
-          // Config only supports primitive data types. If the config schema
-          // does define a type $element will be an instance of
-          // \Drupal\Core\Config\Schema\Property. Convert it to string since it
-          // is the safest possible type.
-          $value = $element->getString();
+          $value = $element->getCastedValue();
         }
-      }
-      catch (SchemaIncompleteException $e) {
-        // @todo throw an exception due to an incomplete schema.
-        // Fix as part of https://drupal.org/node/2183983.
       }
     }
     else {

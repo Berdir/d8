@@ -52,7 +52,7 @@
 
               // Use link URL as text with a collapsed cursor.
               if (range.collapsed) {
-                // Shorten mailto URLs to just the e-mail address.
+                // Shorten mailto URLs to just the email address.
                 var text = new CKEDITOR.dom.text(returnValues.attributes.href.replace(/^mailto:/, ''), editor.document);
                 range.insertNode(text);
                 range.selectNodeContents(text);
@@ -132,12 +132,12 @@
         editor.ui.addButton('DrupalLink', {
           label: Drupal.t('Link'),
           command: 'drupallink',
-          icon: this.path.replace(/plugin\.js.*/, 'link.png')
+          icon: this.path + '/link.png'
         });
         editor.ui.addButton('DrupalUnlink', {
           label: Drupal.t('Unlink'),
           command: 'drupalunlink',
-          icon: this.path.replace(/plugin\.js.*/, 'unlink.png')
+          icon: this.path + '/unlink.png'
         });
       }
 

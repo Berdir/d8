@@ -6,11 +6,8 @@
  */
 
 use Drupal\Component\Utility\String;
-use Drupal\Core\Cache\Cache;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Template\Attribute;
-use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 
 /**
  * @defgroup menu Menu and routing system
@@ -100,26 +97,6 @@ use Symfony\Cmf\Component\Routing\RouteObjectInterface;
  * menu_links table holds the visible menu links. By default these are
  * derived from the same hook_menu definitions, however you are free to
  * add more with menu_link_save().
- */
-
-/**
- * @defgroup menu_status_codes Menu status codes
- * @{
- * Status codes for menu callbacks.
- */
-
-/**
- * Internal menu status code -- Menu item inaccessible because site is offline.
- */
-const MENU_SITE_OFFLINE = 4;
-
-/**
- * Internal menu status code -- Everything is working fine.
- */
-const MENU_SITE_ONLINE = 5;
-
-/**
- * @} End of "defgroup menu_status_codes".
  */
 
 /**
@@ -365,14 +342,6 @@ function theme_menu_local_action($variables) {
 }
 
 /**
- * Generates elements for the $arg array in the help hook.
- */
-function drupal_help_arg($arg = array()) {
-  // Note - the number of empty elements should be > MENU_MAX_PARTS.
-  return $arg + array('', '', '', '', '', '', '', '', '', '', '', '');
-}
-
-/**
  * Returns an array containing the names of system-defined (default) menus.
  */
 function menu_list_system_menus() {
@@ -472,13 +441,6 @@ function menu_navigation_links($menu_name, $level = 0) {
         $class = ' active-trail';
         $l['attributes']['class'][] = 'active-trail';
       }
-      // Normally, l() compares the href of every link with the current path and
-      // sets the active class accordingly. But local tasks do not appear in
-      // menu trees, so if the current path is a local task, and this link is
-      // its tab root, then we have to set the class manually.
-      if ($item['link']['href'] != current_path()) {
-        $l['attributes']['class'][] = 'active';
-      }
       // Keyed with the unique mlid to generate classes in links.html.twig.
       $links['menu-' . $item['link']['mlid'] . $class] = $l;
     }
@@ -516,7 +478,7 @@ function menu_local_tasks($level = 0) {
     $data['tabs'] = array();
     $data['actions'] = array();
 
-    $route_name = \Drupal::request()->attributes->get(RouteObjectInterface::ROUTE_NAME);
+    $route_name = \Drupal::routeMatch()->getRouteName();
     if (!empty($route_name)) {
       $manager = \Drupal::service('plugin.manager.menu.local_task');
       $local_tasks = $manager->getTasksBuild($route_name);
@@ -571,7 +533,7 @@ function menu_secondary_local_tasks() {
  */
 function menu_get_local_actions() {
   $links = menu_local_tasks();
-  $route_name = Drupal::request()->attributes->get(RouteObjectInterface::ROUTE_NAME);
+  $route_name = Drupal::routeMatch()->getRouteName();
   $manager = \Drupal::service('plugin.manager.menu.local_action');
   return $manager->getActionsForRoute($route_name) + $links['actions'];
 }
@@ -847,7 +809,7 @@ function menu_link_rebuild_defaults() {
       }
       else {
         if (empty($link['route_name']) && empty($link['link_path'])) {
-          watchdog('error', 'Menu_link %machine_name does neither provide a route_name nor a link_path, so it got skipped.', array('%machine_name' => $machine_name));
+          \Drupal::logger('menu_link')->error('Menu_link %machine_name does neither provide a route_name nor a link_path, so it got skipped.', array('%machine_name' => $machine_name));
           continue;
         }
         $menu_link = $menu_link_storage->createFromDefaultLink($link);
@@ -941,24 +903,22 @@ function menu_delete_links($menu_name) {
 }
 
 /**
- * Clears the page and block caches at most twice per page load.
+ * Updates the expanded menu item state at most twice per page load.
  */
-function _menu_clear_page_cache() {
-  $cache_cleared = &drupal_static(__FUNCTION__, 0);
+function _menu_update_expanded_menus() {
+  $expanded_menus_updated = &drupal_static(__FUNCTION__, 0);
 
-  // Clear the page and block caches, but at most twice, including at
+  // Update the expanded menu item state, but at most twice, including at
   //  the end of the page load when there are multiple links saved or deleted.
-  if ($cache_cleared == 0) {
-    Cache::invalidateTags(array('content' => TRUE));
+  if ($expanded_menus_updated == 0) {
     // Keep track of which menus have expanded items.
     _menu_set_expanded_menus();
-    $cache_cleared = 1;
+    $expanded_menus_updated = 1;
   }
-  elseif ($cache_cleared == 1) {
-    drupal_register_shutdown_function('Drupal\Core\Cache\Cache::invalidateTags', array('content' => TRUE));
+  elseif ($expanded_menus_updated == 1) {
     // Keep track of which menus have expanded items.
     drupal_register_shutdown_function('_menu_set_expanded_menus');
-    $cache_cleared = 2;
+    $expanded_menus_updated = 2;
   }
 }
 
@@ -978,47 +938,6 @@ function _menu_set_expanded_menus() {
   }
 
   \Drupal::state()->set('menu_expanded', $names);
-}
-
-
-/**
- * Checks whether the site is in maintenance mode.
- *
- * This function will log the current user out and redirect to front page
- * if the current user has no 'access site in maintenance mode' permission.
- *
- * @param $check_only
- *   If this is set to TRUE, the function will perform the access checks and
- *   return the site offline status, but not log the user out or display any
- *   messages.
- *
- * @return
- *   FALSE if the site is not in maintenance mode, the user login page is
- *   displayed, or the user has the 'access site in maintenance mode'
- *   permission. TRUE for anonymous users not being on the login page when the
- *   site is in maintenance mode.
- */
-function _menu_site_is_offline($check_only = FALSE) {
-  // Check if site is in maintenance mode.
-  if (\Drupal::state()->get('system.maintenance_mode')) {
-    if (user_access('access site in maintenance mode')) {
-      // Ensure that the maintenance mode message is displayed only once
-      // (allowing for page redirects) and specifically suppress its display on
-      // the maintenance mode settings page.
-      if (!$check_only && current_path() != 'admin/config/development/maintenance') {
-        if (user_access('administer site configuration')) {
-          drupal_set_message(t('Operating in maintenance mode. <a href="@url">Go online.</a>', array('@url' => url('admin/config/development/maintenance'))), 'status', FALSE);
-        }
-        else {
-          drupal_set_message(t('Operating in maintenance mode.'), 'status', FALSE);
-        }
-      }
-    }
-    else {
-      return TRUE;
-    }
-  }
-  return FALSE;
 }
 
 /**

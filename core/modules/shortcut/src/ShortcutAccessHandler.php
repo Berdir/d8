@@ -24,7 +24,7 @@ class ShortcutAccessHandler extends EntityAccessHandler implements EntityControl
   /**
    * The shortcut_set storage.
    *
-   * @var \Drupal\shortcut\ShortcutSetStorage
+   * @var \Drupal\shortcut\ShortcutSetStorageInterface
    */
   protected $shortcutSetStorage;
 
@@ -33,10 +33,10 @@ class ShortcutAccessHandler extends EntityAccessHandler implements EntityControl
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\shortcut\ShortcutSetStorage $shortcut_set_storage
+   * @param \Drupal\shortcut\ShortcutSetStorageInterface $shortcut_set_storage
    *   The shortcut_set storage.
    */
-  public function __construct(EntityTypeInterface $entity_type, ShortcutSetStorage $shortcut_set_storage) {
+  public function __construct(EntityTypeInterface $entity_type, ShortcutSetStorageInterface $shortcut_set_storage) {
     parent::__construct($entity_type);
     $this->shortcutSetStorage = $shortcut_set_storage;
   }

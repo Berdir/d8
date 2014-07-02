@@ -11,15 +11,15 @@
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
+use Drupal\Component\Utility\Bytes;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Number;
 use Drupal\Component\Utility\SortArray;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Tags;
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Component\Utility\Xss;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -237,12 +237,7 @@ function drupal_get_profile() {
  * @see drupal_pre_render_html_tag()
  */
 function drupal_add_html_head($data = NULL, $key = NULL) {
-  $stored_head = &drupal_static(__FUNCTION__);
-
-  if (!isset($stored_head)) {
-    // Make sure the defaults, including Content-Type, come first.
-    $stored_head = _drupal_default_html_head();
-  }
+  $stored_head = &drupal_static(__FUNCTION__, array());
 
   if (isset($data) && isset($key)) {
     if (!isset($data['#type'])) {
@@ -254,44 +249,23 @@ function drupal_add_html_head($data = NULL, $key = NULL) {
 }
 
 /**
- * Returns elements that are always displayed in the HEAD tag of the HTML page.
- */
-function _drupal_default_html_head() {
-  // Add default elements. Make sure the Content-Type comes first because the
-  // IE browser may be vulnerable to XSS via encoding attacks from any content
-  // that comes before this META tag, such as a TITLE tag.
-  $elements['system_meta_content_type'] = array(
-    '#type' => 'html_tag',
-    '#tag' => 'meta',
-    '#attributes' => array(
-      'charset' => 'utf-8',
-    ),
-    // Security: This always has to be output first.
-    '#weight' => -1000,
-  );
-  // Show Drupal and the major version number in the META GENERATOR tag.
-  // Get the major version.
-  list($version, ) = explode('.', \Drupal::VERSION);
-  $elements['system_meta_generator'] = array(
-    '#type' => 'html_tag',
-    '#tag' => 'meta',
-    '#attributes' => array(
-      'name' => 'Generator',
-      'content' => 'Drupal ' . $version . ' (http://drupal.org)',
-    ),
-  );
-  // Also send the generator in the HTTP header.
-  $elements['system_meta_generator']['#attached']['drupal_add_http_header'][] = array('X-Generator', $elements['system_meta_generator']['#attributes']['content']);
-  return $elements;
-}
-
-/**
  * Retrieves output to be displayed in the HEAD tag of the HTML page.
+ *
+ * @param bool $render
+ *   If TRUE render the HEAD elements, otherwise return just the elements.
+ *
+ * @return string|array
+ *   Return the rendered HTML head or the elements itself.
  */
-function drupal_get_html_head() {
+function drupal_get_html_head($render = TRUE) {
   $elements = drupal_add_html_head();
   \Drupal::moduleHandler()->alter('html_head', $elements);
-  return drupal_render($elements);
+  if ($render) {
+    return drupal_render($elements);
+  }
+  else {
+    return $elements;
+  }
 }
 
 /**
@@ -308,35 +282,17 @@ function drupal_add_feed($url = NULL, $title = '') {
   $stored_feed_links = &drupal_static(__FUNCTION__, array());
 
   if (isset($url)) {
-    $feed_icon = array(
-      '#theme' => 'feed_icon',
-      '#url' => $url,
-      '#title' => $title,
-    );
-
-    $feed_icon['#attached']['drupal_add_html_head_link'][][] = array(
-      'rel' => 'alternate',
-      'type' => 'application/rss+xml',
-      'title' => $title,
-      // Force the URL to be absolute, for consistency with other <link> tags
-      // output by Drupal.
-      'href' => url($url, array('absolute' => TRUE)),
-    );
-
-    $stored_feed_links[$url] = drupal_render($feed_icon);
+    $stored_feed_links[$url] = array('url' => $url, 'title' => $title);
   }
   return $stored_feed_links;
 }
 
 /**
  * Gets the feed URLs for the current page.
- *
- * @param $delimiter
- *   A delimiter to split feeds by.
  */
-function drupal_get_feeds($delimiter = "\n") {
+function drupal_get_feeds() {
   $feeds = drupal_add_feed();
-  return implode($feeds, $delimiter);
+  return $feeds;
 }
 
 /**
@@ -344,44 +300,6 @@ function drupal_get_feeds($delimiter = "\n") {
  * @{
  * Functions to properly handle HTTP responses.
  */
-
-/**
- * Processes a URL query parameter array to remove unwanted elements.
- *
- * @param $query
- *   (optional) An array to be processed. Defaults to \Drupal::request()->query
- *   parameters.
- * @param $exclude
- *   (optional) A list of $query array keys to remove. Use "parent[child]" to
- *   exclude nested items.
- * @param $parent
- *   Internal use only. Used to build the $query array key for nested items.
- *
- * @return
- *   An array containing query parameters, which can be used for url().
- *
- * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\UrlHelper::filterQueryParameters().
- */
-function drupal_get_query_parameters(array $query = NULL, array $exclude = array(), $parent = '') {
-  if (!isset($query)) {
-    $query = \Drupal::request()->query->all();
-  }
-  return UrlHelper::filterQueryParameters($query, $exclude, $parent);
-}
-
-/**
- * Parses an array into a valid, rawurlencoded query string.
- *
- * @see drupal_get_query_parameters()
- * @ingroup php_wrappers
- *
- * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\Component\Utility\UrlHelper::buildQuery().
- */
-function drupal_http_build_query(array $query, $parent = '') {
-  return UrlHelper::buildQuery($query, $parent);
-}
 
 /**
  * Prepares a 'destination' URL query parameter for use with url().
@@ -431,13 +349,13 @@ function drupal_get_destination() {
  */
 
 /**
- * Verifies the syntax of the given e-mail address.
+ * Verifies the syntax of the given email address.
  *
  * This uses the
- * @link http://php.net/manual/filter.filters.validate.php PHP e-mail validation filter. @endlink
+ * @link http://php.net/manual/filter.filters.validate.php PHP email validation filter. @endlink
  *
  * @param $mail
- *   A string containing an e-mail address.
+ *   A string containing an email address.
  *
  * @return
  *   TRUE if the address is in a valid format.
@@ -482,73 +400,6 @@ function check_url($uri) {
 }
 
 /**
- * Applies a very permissive XSS/HTML filter for admin-only use.
- *
- * Use only for fields where it is impractical to use the
- * whole filter system, but where some (mainly inline) mark-up
- * is desired (so \Drupal\Component\Utility\String::checkPlain() is not
- * acceptable).
- *
- * Allows all tags that can be used inside an HTML body, save
- * for scripts and styles.
- *
- * @param string $string
- *   The string to apply the filter to.
- *
- * @return string
- *   The filtered string.
- *
- * @see \Drupal\Component\Utility\Xss::filterAdmin()
- */
-function filter_xss_admin($string) {
-  return Xss::filterAdmin($string);
-}
-
-/**
- * Filters HTML to prevent cross-site-scripting (XSS) vulnerabilities.
- *
- * Based on kses by Ulf Harnhammar, see http://sourceforge.net/projects/kses.
- * For examples of various XSS attacks, see: http://ha.ckers.org/xss.html.
- *
- * This code does four things:
- * - Removes characters and constructs that can trick browsers.
- * - Makes sure all HTML entities are well-formed.
- * - Makes sure all HTML tags and attributes are well-formed.
- * - Makes sure no HTML tags contain URLs with a disallowed protocol (e.g.
- *   javascript:).
- *
- * @param $string
- *   The string with raw HTML in it. It will be stripped of everything that can
- *   cause an XSS attack.
- * @param $allowed_tags
- *   An array of allowed tags.
- *
- * @return
- *   An XSS safe version of $string, or an empty string if $string is not
- *   valid UTF-8.
- *
- * @see \Drupal\Component\Utility\Xss::filter()
- */
-function filter_xss($string, $allowed_tags = array('a', 'em', 'strong', 'cite', 'blockquote', 'code', 'ul', 'ol', 'li', 'dl', 'dt', 'dd')) {
-  return Xss::filter($string, $allowed_tags);
-}
-
-/**
- * Processes an HTML attribute value and strips dangerous protocols from URLs.
- *
- * @param string $string
- *   The string with the attribute value.
- *
- * @return string
- *   Cleaned up and HTML-escaped version of $string.
- *
- * @see \Drupal\Component\Utility\UrlHelper::filterBadProtocol()
- */
-function filter_xss_bad_protocol($string) {
-  return UrlHelper::filterBadProtocol($string);
-}
-
-/**
  * @} End of "defgroup sanitization".
  */
 
@@ -564,7 +415,7 @@ function filter_xss_bad_protocol($string) {
  * Arbitrary elements may be added using the $args associative array.
  */
 function format_rss_channel($title, $link, $description, $items, $langcode = NULL, $args = array()) {
-  $langcode = $langcode ? $langcode : \Drupal::languageManager()->getCurrentLanguage(Language::TYPE_CONTENT)->id;
+  $langcode = $langcode ? $langcode : \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->id;
 
   $output = "<channel>\n";
   $output .= ' <title>' . String::checkPlain($title) . "</title>\n";
@@ -699,17 +550,12 @@ function format_plural($count, $singular, $plural, array $args = array(), array 
  *
  * @return
  *   An integer representation of the size in bytes.
+ *
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
+ *   Use \Drupal\Component\Utility\Bytes::toInt().
  */
 function parse_size($size) {
-  $unit = preg_replace('/[^bkmgtpezy]/i', '', $size); // Remove the non-unit characters from the size.
-  $size = preg_replace('/[^0-9\.]/', '', $size); // Remove the non-numeric characters from the size.
-  if ($unit) {
-    // Find the position of the unit in the ordered string which is the power of magnitude to multiply a kilobyte by.
-    return round($size * pow(DRUPAL_KILOBYTE, stripos('bkmgtpezy', $unit[0])));
-  }
-  else {
-    return round($size);
-  }
+  return Bytes::toInt($size);
 }
 
 /**
@@ -725,11 +571,11 @@ function parse_size($size) {
  *   A translated string representation of the size.
  */
 function format_size($size, $langcode = NULL) {
-  if ($size < DRUPAL_KILOBYTE) {
+  if ($size < Bytes::KILOBYTE) {
     return format_plural($size, '1 byte', '@count bytes', array(), array('langcode' => $langcode));
   }
   else {
-    $size = $size / DRUPAL_KILOBYTE; // Convert bytes to kilobytes.
+    $size = $size / Bytes::KILOBYTE; // Convert bytes to kilobytes.
     $units = array(
       t('@size KB', array(), array('langcode' => $langcode)),
       t('@size MB', array(), array('langcode' => $langcode)),
@@ -741,8 +587,8 @@ function format_size($size, $langcode = NULL) {
       t('@size YB', array(), array('langcode' => $langcode)),
     );
     foreach ($units as $unit) {
-      if (round($size, 2) >= DRUPAL_KILOBYTE) {
-        $size = $size / DRUPAL_KILOBYTE;
+      if (round($size, 2) >= Bytes::KILOBYTE) {
+        $size = $size / Bytes::KILOBYTE;
       }
       else {
         break;
@@ -863,30 +709,6 @@ function _format_date_callback(array $matches = NULL, $new_langcode = NULL) {
 }
 
 /**
- * Retrieves the correct datetime format type for this system.
- *
- * This value is sometimes required when the format type needs to be determined
- * before a date can be created.
- *
- * @return string
- *   A string as defined in \DrupalComponent\Datetime\DateTimePlus.php: either
- *   'intl' or 'php', depending on whether IntlDateFormatter is available.
- */
-function datetime_default_format_type() {
-  static $drupal_static_fast;
-  if (!isset($drupal_static_fast)) {
-    $drupal_static_fast['format_type'] = &drupal_static(__FUNCTION__);
-  }
-  $format_type = &$drupal_static_fast['format_type'];
-
-  if (!isset($format_type)) {
-    $date = new DrupalDateTime();
-    $format_type = $date->canUseIntl() ? DrupalDateTime::INTL : DrupalDateTime::PHP;
-  }
-  return $format_type;
-}
-
-/**
  * @} End of "defgroup format".
  */
 
@@ -914,23 +736,6 @@ function url($path = NULL, array $options = array()) {
     $url = $generator->generateFromPath($path, $options);
   }
   return $url;
-}
-
-/**
- * Returns TRUE if a path is external to Drupal (e.g. http://example.com).
- *
- * If a path cannot be assessed by Drupal's menu handler, then we must
- * treat it as potentially insecure.
- *
- * @param $path
- *   The internal path or external URL being linked to, such as "node/34" or
- *   "http://example.com/foo".
- *
- * @return
- *   Boolean TRUE or FALSE, where TRUE indicates an external path.
- */
-function url_is_external($path) {
-  return UrlHelper::isExternal($path);
 }
 
 /**
@@ -1058,7 +863,7 @@ function l($text, $path, array $options = array()) {
     // Add a "data-drupal-link-system-path" attribute to let the
     // drupal.active-link library know the path in a standardized manner.
     if (!isset($variables['options']['attributes']['data-drupal-link-system-path'])) {
-      $variables['options']['attributes']['data-drupal-link-system-path'] = \Drupal::service('path.alias_manager.cached')->getSystemPath($path);
+      $variables['options']['attributes']['data-drupal-link-system-path'] = \Drupal::service('path.alias_manager')->getPathByAlias($path);
     }
   }
 
@@ -1968,7 +1773,7 @@ function _drupal_add_js($data = NULL, $options = NULL) {
             'currentPath' => $current_path,
             'currentPathIsAdmin' => $current_path_is_admin,
             'isFront' => drupal_is_front_page(),
-            'currentLanguage' => \Drupal::languageManager()->getCurrentLanguage(Language::TYPE_URL)->id,
+            'currentLanguage' => \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_URL)->id,
           );
           if (!empty($current_query)) {
             ksort($current_query);
@@ -2799,70 +2604,6 @@ function drupal_valid_token($token, $value = '') {
 }
 
 /**
- * Loads code for subsystems and modules, and registers stream wrappers.
- */
-function _drupal_bootstrap_code() {
-  require_once __DIR__ . '/../../' . Settings::get('path_inc', 'core/includes/path.inc');
-  require_once __DIR__ . '/module.inc';
-  require_once __DIR__ . '/theme.inc';
-  require_once __DIR__ . '/pager.inc';
-  require_once __DIR__ . '/../../' . Settings::get('menu_inc', 'core/includes/menu.inc');
-  require_once __DIR__ . '/tablesort.inc';
-  require_once __DIR__ . '/file.inc';
-  require_once __DIR__ . '/unicode.inc';
-  require_once __DIR__ . '/form.inc';
-  require_once __DIR__ . '/mail.inc';
-  require_once __DIR__ . '/ajax.inc';
-  require_once __DIR__ . '/errors.inc';
-  require_once __DIR__ . '/schema.inc';
-  require_once __DIR__ . '/entity.inc';
-
-  // Load all enabled modules
-  \Drupal::moduleHandler()->loadAll();
-
-  // Make sure all stream wrappers are registered.
-  file_get_stream_wrappers();
-  // Ensure mt_rand() is reseeded to prevent random values from one page load
-  // being exploited to predict random values in subsequent page loads.
-  $seed = unpack("L", Crypt::randomBytes(4));
-  mt_srand($seed[1]);
-
-  // Set the allowed protocols once we have the config available.
-  $allowed_protocols = \Drupal::config('system.filter')->get('protocols');
-  if (!isset($allowed_protocols)) {
-    // \Drupal\Component\Utility\UrlHelper::filterBadProtocol() is called by the
-    // installer and update.php, in which case the configuration may not exist
-    // (yet). Provide a minimal default set of allowed protocols for these
-    // cases.
-    $allowed_protocols = array('http', 'https');
-  }
-  UrlHelper::setAllowedProtocols($allowed_protocols);
-}
-
-/**
- * Temporary BC function for scripts not using DrupalKernel.
- *
- * DrupalKernel skips this and replicates it via event listeners.
- *
- * @see \Drupal\Core\EventSubscriber\PathSubscriber;
- * @see \Drupal\Core\EventSubscriber\LegacyRequestSubscriber;
- */
-function _drupal_bootstrap_full($skip = FALSE) {
-  static $called = FALSE;
-
-  if ($called || $skip) {
-    $called = TRUE;
-    return;
-  }
-
-  // Let all modules take action before the menu system handles the request.
-  // We do not want this while running update.php.
-  if (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != 'update') {
-    drupal_theme_initialize();
-  }
-}
-
-/**
  * Stores the current page in the cache.
  *
  * If page_compression is enabled, a gzipped version of the page is stored in
@@ -2873,55 +2614,37 @@ function _drupal_bootstrap_full($skip = FALSE) {
  * Page compression requires the PHP zlib extension
  * (http://php.net/manual/ref.zlib.php).
  *
- * @param $body
- *   The response body.
- * @return
- *   The cached object or NULL if the page cache was not set.
+ * @param \Symfony\Component\HttpFoundation\Response $response
+ *   The fully populated response.
+ * @param \Symfony\Component\HttpFoundation\Request $request
+ *   The request for this page.
  *
  * @see drupal_page_header()
  */
 function drupal_page_set_cache(Response $response, Request $request) {
-  if (drupal_page_is_cacheable()) {
+  // Check if the current page may be compressed.
+  if (\Drupal::config('system.performance')->get('response.gzip') &&
+    !$response->headers->get('Content-Encoding') && extension_loaded('zlib')) {
 
-    // Check if the current page may be compressed.
-    $page_compressed = \Drupal::config('system.performance')->get('response.gzip') && extension_loaded('zlib');
-
-    $cache = (object) array(
-      'cid' => drupal_page_cache_get_cid($request),
-      'data' => array(
-        'body' => $response->getContent(),
-        'headers' => array(),
-        // We need to store whether page was compressed or not,
-        // because by the time it is read, the configuration might change.
-        'page_compressed' => $page_compressed,
-      ),
-      'tags' => HtmlViewSubscriber::convertHeaderToCacheTags($response->headers->get('X-Drupal-Cache-Tags')),
-      'expire' => Cache::PERMANENT,
-      'created' => REQUEST_TIME,
-    );
-
-    $cache->data['headers'] = $response->headers->all();
-
-    // Hack: exclude the x-drupal-cache header; it may make it in here because
-    // of awkwardness in how we defer sending it over in _drupal_page_get_cache.
-    if (isset($cache->data['headers']['x-drupal-cache'])) {
-      unset($cache->data['headers']['x-drupal-cache']);
+    $content = $response->getContent();
+    if ($content) {
+      $response->setContent(gzencode($content, 9, FORCE_GZIP));
+      $response->headers->set('Content-Encoding', 'gzip');
     }
 
-     // Use the actual timestamp from an Expires header, if available.
-    if ($date = $response->getExpires()) {
-      $date = DrupalDateTime::createFromDateTime($date);
-      $cache->expire = $date->getTimestamp();
-    }
-
-    if ($cache->data['body']) {
-      if ($page_compressed) {
-        $cache->data['body'] = gzencode($cache->data['body'], 9, FORCE_GZIP);
-      }
-      \Drupal::cache('render')->set($cache->cid, $cache->data, $cache->expire, $cache->tags);
-    }
-    return $cache;
+    // When page compression is enabled, ensure that proxy caches will record
+    // and deliver different versions of a page depending on whether the
+    // client supports gzip or not.
+    $response->setVary('Accept-Encoding', FALSE);
   }
+
+  // Use the actual timestamp from an Expires header, if available.
+  $date = $response->getExpires();
+  $expire = ($date > (new DateTime())) ? $date->getTimestamp() : Cache::PERMANENT;
+
+  $cid = drupal_page_cache_get_cid($request);
+  $tags = HtmlViewSubscriber::convertHeaderToCacheTags($response->headers->get('X-Drupal-Cache-Tags'));
+  \Drupal::cache('render')->set($cid, $response, $expire, $tags);
 }
 
 /**
@@ -3158,7 +2881,7 @@ function drupal_pre_render_link($element) {
  * A typical example comes from node links, which are stored in a renderable
  * array similar to this:
  * @code
- * $node->content['links'] = array(
+ * $build['links'] = array(
  *   '#theme' => 'links__node',
  *   '#pre_render' => array('drupal_pre_render_links'),
  *   'comment' => array(
@@ -3193,7 +2916,7 @@ function drupal_pre_render_link($element) {
  * {{ content.links.comment }}
  * @endcode
  *
- * (where $node->content has been transformed into $content before handing
+ * (where a node's content has been transformed into $content before handing
  * control to the node.html.twig template).
  *
  * The pre_render function defined here allows the above flexibility, but also
@@ -3518,8 +3241,16 @@ function drupal_render(&$elements, $is_recursive_call = FALSE) {
   // Make any final changes to the element before it is rendered. This means
   // that the $element or the children can be altered or corrected before the
   // element is rendered into the final text.
+  /** @var \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver */
+  $controller_resolver = \Drupal::service('controller_resolver');
   if (isset($elements['#pre_render'])) {
     foreach ($elements['#pre_render'] as $callable) {
+      if (is_string($callable) && strpos($callable, '::') === FALSE) {
+        $callable = $controller_resolver->getControllerFromDefinition($callable);
+      }
+      else {
+        $callable = $callable;
+      }
       $elements = call_user_func($callable, $elements);
     }
   }
@@ -3527,16 +3258,6 @@ function drupal_render(&$elements, $is_recursive_call = FALSE) {
   // Allow #pre_render to abort rendering.
   if (!empty($elements['#printed'])) {
     return '';
-  }
-
-  // Collect all #post_render_cache callbacks associated with this element when:
-  // - about to store this element in the render cache, or when;
-  // - about to apply #post_render_cache callbacks.
-  if (isset($elements['#cache']) || !$is_recursive_call) {
-    $post_render_cache = drupal_render_collect_post_render_cache($elements);
-    if ($post_render_cache) {
-      $elements['#post_render_cache'] = $post_render_cache;
-    }
   }
 
   // Add any JavaScript state information associated with the element.
@@ -3630,6 +3351,12 @@ function drupal_render(&$elements, $is_recursive_call = FALSE) {
   // which allows the output'ed text to be filtered.
   if (isset($elements['#post_render'])) {
     foreach ($elements['#post_render'] as $callable) {
+      if (is_string($callable) && strpos($callable, '::') === FALSE) {
+        $callable = $controller_resolver->getControllerFromDefinition($callable);
+      }
+      else {
+        $callable = $callable;
+      }
       $elements['#children'] = call_user_func($callable, $elements['#children'], $elements);
     }
   }
@@ -3642,6 +3369,15 @@ function drupal_render(&$elements, $is_recursive_call = FALSE) {
   $suffix = isset($elements['#suffix']) ? $elements['#suffix'] : '';
   $elements['#markup'] = $prefix . $elements['#children'] . $suffix;
 
+  // Collect all #post_render_cache callbacks associated with this element when:
+  // - about to store this element in the render cache, or when;
+  // - about to apply #post_render_cache callbacks.
+  if (!$is_recursive_call || isset($elements['#cache'])) {
+    $post_render_cache = drupal_render_collect_post_render_cache($elements);
+    if ($post_render_cache) {
+      $elements['#post_render_cache'] = $post_render_cache;
+    }
+  }
   // Collect all cache tags. This allows the caller of drupal_render() to also
   // access the complete list of cache tags.
   if (!$is_recursive_call || isset($elements['#cache'])) {
@@ -3682,7 +3418,6 @@ function drupal_render(&$elements, $is_recursive_call = FALSE) {
  *
  * @return string
  *   The rendered HTML of all children of the element.
-
  * @see drupal_render()
  */
 function drupal_render_children(&$element, $children_keys = NULL) {
@@ -3720,6 +3455,10 @@ function render(&$element) {
     return NULL;
   }
   if (is_array($element)) {
+    // Early return if this element was pre-rendered (no need to re-render).
+    if (isset($element['#printed']) && $element['#printed'] == TRUE && isset($element['#markup']) && strlen($element['#markup']) > 0) {
+      return $element['#markup'];
+    }
     show($element);
     return drupal_render($element, TRUE);
   }
@@ -3855,14 +3594,17 @@ function drupal_render_cache_set(&$markup, array $elements) {
     $data['#post_render_cache'] = $elements['#post_render_cache'];
   }
 
+  // Tag every render cache item with the "rendered" cache tag. This allows us
+  // to invalidate the entire render cache, regardless of the cache bin.
+  $cache_tags = $elements['#cache']['tags'] ?: array();
+  $cache_tags['rendered'] = TRUE;
+
   // Persist cache tags associated with this element.
-  if (isset($elements['#cache']['tags'])) {
-    $data['#cache']['tags'] = $elements['#cache']['tags'];
-  }
+  $data['#cache']['tags'] = $cache_tags;
 
   $bin = isset($elements['#cache']['bin']) ? $elements['#cache']['bin'] : 'render';
   $expire = isset($elements['#cache']['expire']) ? $elements['#cache']['expire'] : Cache::PERMANENT;
-  \Drupal::cache($bin)->set($cid, $data, $expire, $elements['#cache']['tags']);
+  \Drupal::cache($bin)->set($cid, $data, $expire, $cache_tags);
 }
 
 /**
@@ -3872,57 +3614,41 @@ function drupal_render_cache_set(&$markup, array $elements) {
  * placeholders, but should also be called by #post_render_cache callbacks that
  * want to replace the placeholder with the final markup.
  *
- * @param callable $callback
+ * @param string $callback
  *   The #post_render_cache callback that will replace the placeholder with its
  *   eventual markup.
  * @param array $context
- *   An array providing context for the #post_render_cache callback.
- * @param string $token
- *   A unique token to uniquely identify the placeholder.
+ *   An array providing context for the #post_render_cache callback. This array
+ *   will be altered to provide a 'token' key/value pair, if not already
+ *   provided, to uniquely identify the generated placeholder.
+ *
+ * @return string
+ *   The generated placeholder HTML.
+ *
+ * @throws \Exception
  *
  * @see drupal_render_cache_get()
  */
-function drupal_render_cache_generate_placeholder($callback, array $context, $token) {
-  // Serialize the context into a HTML attribute; unserializing is unnecessary.
-  $context_attribute = '';
-  foreach ($context as $key => $value) {
-    $context_attribute .= $key . ':' . $value . ';';
+function drupal_render_cache_generate_placeholder($callback, array &$context) {
+  if (is_string($callback) && strpos($callback, '::') === FALSE) {
+    /** @var \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver */
+    $controller_resolver = \Drupal::service('controller_resolver');
+    $callable = \Drupal::service('controller_resolver')->getControllerFromDefinition($callback);
   }
-  return '<drupal:render-cache-placeholder callback="' . $callback . '" context="' . $context_attribute . '" token="' . $token . '" />';
-}
-
-/**
- * Pre-render callback: Renders a render cache placeholder into #markup.
- *
- * @param $elements
- *   A structured array whose keys form the arguments to l():
- *   - #callback: The #post_render_cache callback that will replace the
- *     placeholder with its eventual markup.
- *   - #context: An array providing context for the #post_render_cache callback.
- *
- * @return
- *   The passed-in element containing a render cache placeholder in '#markup'
- *   and a callback with context, keyed by a generated unique token in
- *   '#post_render_cache'.
- *
- * @see drupal_render_cache_generate_placeholder()
- */
-function drupal_pre_render_render_cache_placeholder($element) {
-  $callback = $element['#callback'];
-  if (!is_callable($callback)) {
-    throw new Exception(t('#callback must be a callable function.'));
+  else {
+   $callable = $callback;
   }
-  $context = $element['#context'];
-  if (!is_array($context)) {
-    throw new Exception(t('#context must be an array.'));
+
+  if (!is_callable($callable)) {
+    throw new Exception(t('$callable must be a callable function or of the form service_id:method.'));
   }
-  $token = \Drupal\Component\Utility\Crypt::randomBytesBase64(55);
 
-  // Generate placeholder markup and store #post_render_cache callback.
-  $element['#markup'] = drupal_render_cache_generate_placeholder($callback, $context, $token);
-  $element['#post_render_cache'][$callback][$token] = $context;
+  // Generate a unique token if one is not already provided.
+  $context += array(
+    'token' => \Drupal\Component\Utility\Crypt::randomBytesBase64(55),
+  );
 
-  return $element;
+  return '<drupal-render-cache-placeholder callback="' . $callback . '" token="' . $context['token'] . '"></drupal-render-cache-placeholder>';
 }
 
 /**
@@ -3944,46 +3670,21 @@ function drupal_pre_render_render_cache_placeholder($element) {
  */
 function _drupal_render_process_post_render_cache(array &$elements) {
   if (isset($elements['#post_render_cache'])) {
-    // Call all #post_render_cache callbacks, while passing the provided context
-    // and if keyed by a number, no token is passed, otherwise, the token string
-    // is passed to the callback as well. This token is used to uniquely
-    // identify the placeholder in the markup.
-    $modified_elements = $elements;
-    foreach ($elements['#post_render_cache'] as $callback => $options) {
-      foreach ($elements['#post_render_cache'][$callback] as $token => $context) {
-        // The advanced option, when setting #post_render_cache directly.
-        if (is_numeric($token)) {
-          $modified_elements = call_user_func_array($callback, array($modified_elements, $context));
-        }
-        // The simple option, when using the standard placeholders, and hence
-        // also when using #type => render_cache_placeholder.
-        else {
-          // Call #post_render_cache callback to generate the element that will
-          // fill in the placeholder.
-          $generated_element = call_user_func_array($callback, array($context));
+    /** @var \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver */
+    $controller_resolver = \Drupal::service('controller_resolver');
 
-          // Update #attached based on the generated element.
-          if (isset($generated_element['#attached'])) {
-            if (!isset($modified_elements['#attached'])) {
-              $modified_elements['#attached'] = array();
-            }
-            $modified_elements['#attached'] = drupal_merge_attached($modified_elements['#attached'], drupal_render_collect_attached($generated_element, TRUE));
-          }
-
-          // Replace the placeholder with the rendered markup of the generated
-          // element.
-          $placeholder = drupal_render_cache_generate_placeholder($callback, $context, $token);
-          $modified_elements['#markup'] = str_replace($placeholder, drupal_render($generated_element), $modified_elements['#markup']);
-        }
+    // Call all #post_render_cache callbacks, passing the provided context.
+    foreach (array_keys($elements['#post_render_cache']) as $callback) {
+      if (strpos($callback, '::') === FALSE) {
+        $callable = $controller_resolver->getControllerFromDefinition($callback);
+      }
+      else {
+        $callable = $callback;
+      }
+      foreach ($elements['#post_render_cache'][$callback] as $context) {
+        $elements = call_user_func_array($callable, array($elements, $context));
       }
     }
-    // Only retain changes to the #markup and #attached properties, as would be
-    // the case when the render cache was actually being used.
-    $elements['#markup'] = $modified_elements['#markup'];
-    if (isset($modified_elements['#attached'])) {
-      $elements['#attached'] = $modified_elements['#attached'];
-    }
-
     // Make sure that any attachments added in #post_render_cache callbacks are
     // also executed.
     if (isset($elements['#attached'])) {
@@ -4038,13 +3739,6 @@ function drupal_render_collect_post_render_cache(array &$elements, array $callba
       $elements['#post_render_cache'] = $cached_element['#post_render_cache'];
       $retrieved_from_cache = TRUE;
     }
-  }
-
-  // If this is a render cache placeholder that hasn't been rendered yet, then
-  // render it now, because we must be able to collect its #post_render_cache
-  // callback.
-  if (!isset($elements['#post_render_cache']) && isset($elements['#type']) && $elements['#type'] === 'render_cache_placeholder') {
-    $elements = drupal_pre_render_render_cache_placeholder($elements);
   }
 
   // Collect all #post_render_cache callbacks for this element.

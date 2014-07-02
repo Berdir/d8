@@ -31,7 +31,7 @@ class ShortcutSetForm extends EntityForm {
     $form['id'] = array(
       '#type' => 'machine_name',
       '#machine_name' => array(
-        'exists' => 'shortcut_set_load',
+        'exists' => '\Drupal\shortcut\Entity\ShortcutSet::load',
         'source' => array('label'),
         'replace_pattern' => '[^a-z0-9-]+',
         'replace' => '-',
@@ -45,16 +45,6 @@ class ShortcutSetForm extends EntityForm {
     $form['actions']['submit']['#value'] = t('Create new set');
 
     return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function actions(array $form, array &$form_state) {
-    // Disable delete of default shortcut set.
-    $actions = parent::actions($form, $form_state);
-    $actions['delete']['#access'] = $this->entity->access('delete');
-    return $actions;
   }
 
   /**

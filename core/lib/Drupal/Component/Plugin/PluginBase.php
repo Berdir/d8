@@ -33,6 +33,13 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
   /**
    * Configuration information passed into the plugin.
    *
+   * When using an interface like
+   * \Drupal\Component\Plugin\ConfigurablePluginInterface, this is where the
+   * configuration should be stored.
+   *
+   * Plugin configuration is optional, so plugin implementations must provide
+   * their own setters and getters.
+   *
    * @var array
    */
   protected $configuration;
@@ -63,7 +70,7 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
   /**
    * {@inheritdoc}
    */
-  public function getBasePluginId() {
+  public function getBaseId() {
     $plugin_id = $this->getPluginId();
     if (strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
       list($plugin_id) = explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
@@ -89,7 +96,4 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
   public function getPluginDefinition() {
     return $this->pluginDefinition;
   }
-
-  // Note: Plugin configuration is optional so its left to the plugin type to
-  // require a getter as part of its interface.
 }

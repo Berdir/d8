@@ -207,11 +207,9 @@
                 this.model.set('activeField', fieldModel);
                 accept = false;
               }
-              else {
-                // Do not reject: the field is either in the 'candidate' or
-                // 'highlighted' state and we allow it to enter the 'activating'
-                // state!
-              }
+              // Do not reject: the field is either in the 'candidate' or
+              // 'highlighted' state and we allow it to enter the 'activating'
+              // state!
             }
           }
           // Reject going from activating/active to candidate because of a
@@ -327,7 +325,7 @@
       var that = this;
       var discardDialog;
 
-      function closeDiscardDialog(action) {
+      function closeDiscardDialog (action) {
         discardDialog.close(action);
         // The active modal has been removed.
         that.model.set('activeModal', null);
@@ -361,7 +359,8 @@
               text: Drupal.t('Save'),
               click: function () {
                 closeDiscardDialog('save');
-              }
+              },
+              primary: true
             },
             {
               text: Drupal.t('Discard changes'),

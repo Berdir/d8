@@ -7,7 +7,7 @@
 
 namespace Drupal\Core\Page;
 
-use Drupal\Core\Language\Language;
+use Drupal\Core\Cache\CacheableInterface;
 use Drupal\Core\Language\LanguageManager;
 
 /**
@@ -35,14 +35,17 @@ class DefaultHtmlFragmentRenderer implements HtmlFragmentRendererInterface {
   /**
    * {@inheritdoc}
    */
-  public function render(HtmlFragment $fragment, $status_code = 200) {
+  public function render(HtmlFragmentInterface $fragment, $status_code = 200) {
     // Converts the given HTML fragment which represents the main content region
     // of the page into a render array.
     $page_content['main'] = array(
       '#markup' => $fragment->getContent(),
-      '#cache' => array('tags' => $fragment->getCacheTags()),
     );
     $page_content['#title'] = $fragment->getTitle();
+
+    if ($fragment instanceof CacheableInterface) {
+      $page_content['main']['#cache']['tags'] = $fragment->getCacheTags();
+    }
 
     // Build the full page array by calling drupal_prepare_page(), which invokes
     // hook_page_build(). This adds the other regions to the page.
@@ -54,13 +57,16 @@ class DefaultHtmlFragmentRenderer implements HtmlFragmentRendererInterface {
     $page->setBodyTop(drupal_render($page_array['page_top']));
     $page->setBodyBottom(drupal_render($page_array['page_bottom']));
     $page->setContent(drupal_render($page_array));
-    // Collect cache tags for all the content in all the regions on the page.
-    $tags = $page_array['#cache']['tags'];
-    // Enforce the generic "content" cache tag on all pages.
-    // @todo Remove the "content" cache tag. @see https://drupal.org/node/2124957
-    $tags['content'] = TRUE;
-    $page->setCacheTags($tags);
     $page->setStatusCode($status_code);
+
+    if ($fragment instanceof CacheableInterface) {
+      // Collect cache tags for all the content in all the regions on the page.
+      $tags = $page_array['#cache']['tags'];
+      // Tag every render cache item with the "rendered" cache tag. This allows us
+      // to invalidate the entire render cache, regardless of the cache bin.
+      $tags['rendered'] = TRUE;
+      $page->setCacheTags($tags);
+    }
 
     return $page;
   }
@@ -85,7 +91,43 @@ class DefaultHtmlFragmentRenderer implements HtmlFragmentRendererInterface {
     $html_attributes['lang'] = $language_interface->id;
     $html_attributes['dir'] = $language_interface->direction ? 'rtl' : 'ltr';
 
+    $this->setDefaultMetaTags($page);
+
+    // @todo: collect feed links from #attached rather than a static once
+    // http://drupal.org/node/2256365 is completed.
+    foreach (drupal_get_feeds() as $feed) {
+      // Force the URL to be absolute, for consistency with other <link> tags
+      // output by Drupal.
+      $link = new FeedLinkElement($feed['title'], url($feed['url'], array('absolute' => TRUE)));
+      $page->addLinkElement($link);
+    }
+
     return $page;
+  }
+
+  /**
+   * Apply the default meta tags to the page object.
+   *
+   * @param \Drupal\Core\Page\HtmlPage $page
+   *   The html page.
+   */
+  protected function setDefaultMetaTags(HtmlPage $page) {
+    // Add default elements. Make sure the Content-Type comes first because the
+    // IE browser may be vulnerable to XSS via encoding attacks from any content
+    // that comes before this META tag, such as a TITLE tag.
+    $page->addMetaElement(new MetaElement(NULL, array(
+      'name' => 'charset',
+      'charset' => 'utf-8',
+    )));
+    // Show Drupal and the major version number in the META GENERATOR tag.
+    // Get the major version.
+    list($version) = explode('.', \Drupal::VERSION, 2);
+    $page->addMetaElement(new MetaElement('Drupal ' . $version . ' (http://drupal.org)', array(
+      'name' => 'Generator',
+    )));
+
+    // Display the html.html.twig's default mobile metatags for responsive design.
+    $page->addMetaElement(new MetaElement(NULL, array('name' => 'viewport', 'content' => 'width=device-width, initial-scale=1.0')));
   }
 
 }

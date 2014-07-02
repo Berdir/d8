@@ -8,16 +8,6 @@
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Language\Language;
-
-/**
- * Resets the cached information about entity types.
- */
-function entity_info_cache_clear() {
-  // Clear all languages.
-  \Drupal::entityManager()->clearCachedDefinitions();
-  \Drupal::entityManager()->clearCachedFieldDefinitions();
-}
 
 /**
  * Clears the entity render cache for all entity types.
@@ -67,16 +57,22 @@ function entity_get_bundles($entity_type = NULL) {
  *   NULL.
  */
 function entity_invoke_bundle_hook($hook, $entity_type, $bundle, $bundle_new = NULL) {
-  entity_info_cache_clear();
+  $entity_manager = \Drupal::entityManager();
+
+  $entity_manager->clearCachedBundles();
 
   // Notify the entity storage.
   $method = 'onBundle' . ucfirst($hook);
-  $storage = \Drupal::entityManager()->getStorage($entity_type);
+  $storage = $entity_manager->getStorage($entity_type);
   if (method_exists($storage, $method)) {
     $storage->$method($bundle, $bundle_new);
   }
   // Invoke hook_entity_bundle_*() hooks.
   \Drupal::moduleHandler()->invokeAll('entity_bundle_' . $hook, array($entity_type, $bundle, $bundle_new));
+  // Clear the cached field definitions (not needed in case of 'create').
+  if ($hook == 'rename' || $hook == 'delete') {
+    $entity_manager->clearCachedFieldDefinitions();
+  }
 }
 
 /**
@@ -150,8 +146,6 @@ function entity_revision_delete($entity_type, $revision_id) {
  *   The entity type to load; e.g., 'node' or 'user'.
  * @param string $uuid
  *   The UUID of the entity to load.
- * @param bool $reset
- *   Whether to reset the internal cache for the requested entity type.
  *
  * @return EntityInterface|FALSE
  *   The entity object, or FALSE if there is no entity with the given UUID.
@@ -160,20 +154,11 @@ function entity_revision_delete($entity_type, $revision_id) {
  *   Thrown in case the requested entity type does not support UUIDs.
  *
  * @see \Drupal\Core\Entity\EntityManagerInterface
+ *
+ * @deprecated Use \Drupal::entityManager()->loadEntityByUuid();
  */
-function entity_load_by_uuid($entity_type_id, $uuid, $reset = FALSE) {
-  $entity_type = \Drupal::entityManager()->getDefinition($entity_type_id);
-
-  if (!$uuid_key = $entity_type->getKey('uuid')) {
-    throw new EntityStorageException("Entity type $entity_type_id does not support UUIDs.");
-  }
-
-  $controller = \Drupal::entityManager()->getStorage($entity_type_id);
-  if ($reset) {
-    $controller->resetCache();
-  }
-  $entities = $controller->loadByProperties(array($uuid_key => $uuid));
-  return reset($entities);
+function entity_load_by_uuid($entity_type_id, $uuid) {
+  return \Drupal::entityManager()->loadEntityByUuid($entity_type_id, $uuid);
 }
 
 /**
@@ -511,35 +496,4 @@ function entity_get_form_display($entity_type, $bundle, $form_mode) {
   }
 
   return $entity_form_display;
-}
-
-/**
- * Generic access callback for entity pages.
- *
- * @param \Drupal\Core\Entity\EntityInterface $entity
- *   The entity for which access is being checked.
- * @param string $operation
- *   (optional) The operation being performed on the entity. Defaults to 'view'.
- *
- * @return bool
- *   TRUE if the access is granted. FALSE if access is denied.
- */
-function entity_page_access(EntityInterface $entity, $operation = 'view') {
-  return $entity->access($operation);
-}
-
-/**
- * Generic access callback for create entity pages.
- *
- * @param string $entity_type
- *   The entity type.
- * @param string $bundle
- *   (optional) The bundle of the entity. Required if the entity supports
- *   bundles, defaults to NULL otherwise.
- *
- * @return bool
- *   TRUE if the access is granted. FALSE if access is denied.
- */
-function entity_page_create_access($entity_type, $bundle = NULL) {
-  return \Drupal::entityManager()->getAccessHandler($entity_type)->createAccess($bundle);
 }

@@ -8,12 +8,13 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\Utility\String;
 
 /**
  * Defines a generic implementation to build a listing of entities.
+ *
+ * @ingroup entity_api
  */
 class EntityListBuilder extends EntityControllerBase implements EntityListBuilderInterface, EntityControllerInterface {
 
@@ -199,15 +200,6 @@ class EntityListBuilder extends EntityControllerBase implements EntityListBuilde
       }
     }
     return $build;
-  }
-
-  /**
-   * Translates a string to the current language or to a given language.
-   *
-   * See the t() documentation for details.
-   */
-  protected function t($string, array $args = array(), array $options = array()) {
-    return $this->translationManager()->translate($string, $args, $options);
   }
 
   /**

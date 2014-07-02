@@ -36,9 +36,9 @@ class PathProcessorAliasTest extends UnitTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => t('Path Processor alias'),
-      'description' => t('Tests the path alias path processor.'),
-      'group' => t('Path API'),
+      'name' => 'Path Processor alias',
+      'description' => 'Tests the path alias path processor.',
+      'group' => 'Path API',
     );
   }
 
@@ -54,7 +54,7 @@ class PathProcessorAliasTest extends UnitTestCase {
    */
   public function testProcessInbound() {
     $this->aliasManager->expects($this->exactly(2))
-      ->method('getSystemPath')
+      ->method('getPathByAlias')
       ->will($this->returnValueMap(array(
         array('urlalias', NULL, 'internal-url'),
         array('url', NULL, 'url'),
@@ -73,7 +73,7 @@ class PathProcessorAliasTest extends UnitTestCase {
    */
   public function testProcessOutbound() {
     $this->aliasManager->expects($this->exactly(2))
-      ->method('getPathAlias')
+      ->method('getAliasByPath')
       ->will($this->returnValueMap(array(
         array('internal-url', NULL, 'urlalias'),
         array('url', NULL, 'url'),

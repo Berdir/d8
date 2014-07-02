@@ -7,7 +7,6 @@
 
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Xss;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Template\Attribute;
 use Drupal\views\Form\ViewsForm;
 use Drupal\views\ViewExecutable;
@@ -121,7 +120,7 @@ function template_preprocess_views_view(&$variables) {
     }
 
     $container = \Drupal::getContainer();
-    $form_object = new ViewsForm($container->get('controller_resolver'), $container->get('url_generator'), $container->get('request'), $view->storage->id(), $view->current_display);
+    $form_object = new ViewsForm($container->get('class_resolver'), $container->get('url_generator'), $container->get('request'), $view->storage->id(), $view->current_display);
     $form = \Drupal::formBuilder()->getForm($form_object, $view, $output);
     // The form is requesting that all non-essential views elements be hidden,
     // usually because the rendered step is not a view result.
@@ -499,8 +498,6 @@ function template_preprocess_views_view_table(&$variables) {
   $options = $view->style_plugin->options;
   $handler = $view->style_plugin;
 
-  $row_class_special = isset($options['row_class_special']) ? $options['row_class_special'] : TRUE;
-
   $fields = &$view->field;
   $columns = $handler->sanitizeColumns($options['columns'], $fields);
 
@@ -676,18 +673,8 @@ function template_preprocess_views_view_table(&$variables) {
     $variables['header'] = array();
   }
 
-  $count = 0;
   foreach ($variables['rows'] as $num => $row) {
     $variables['rows'][$num]['attributes'] = array();
-    if ($row_class_special) {
-      $variables['rows'][$num]['attributes']['class'][] = ($count++ % 2 == 0) ? 'odd' : 'even';
-      if ($num === 0) {
-        $variables['rows'][$num]['attributes']['class'][] = 'views-row-first';
-      }
-      elseif ($num === (count($variables['rows']) - 1)) {
-        $variables['rows'][$num]['attributes']['class'][] = 'views-row-last';
-      }
-    }
     if ($row_class = $handler->getRowClass($num)) {
       $variables['rows'][$num]['attributes']['class'][] = $row_class;
     }
@@ -878,27 +865,12 @@ function template_preprocess_views_view_unformatted(&$variables) {
   $options = $style->options;
 
   $default_row_class = isset($options['default_row_class']) ? $options['default_row_class'] : FALSE;
-  $row_class_special = isset($options['row_class_special']) ? $options['row_class_special'] : FALSE;
-  // Set up striping values.
-  $count = 0;
-  $max = count($rows);
   foreach ($rows as $id => $row) {
     $variables['rows'][$id] = array();
     $variables['rows'][$id]['content'] = $row;
     $variables['rows'][$id]['attributes'] = array();
-    $count++;
     if ($default_row_class) {
       $variables['rows'][$id]['attributes']['class'][] = 'views-row';
-      $variables['rows'][$id]['attributes']['class'][] = 'views-row-' . $count;
-    }
-    if ($row_class_special) {
-      $variables['rows'][$id]['attributes']['class'][] = 'views-row-' . ($count % 2 ? 'odd' : 'even');
-      if ($count == 1) {
-        $variables['rows'][$id]['attributes']['class'][] = 'views-row-first';
-      }
-      if ($count == $max) {
-        $variables['rows'][$id]['attributes']['class'][] = 'views-row-last';
-      }
     }
     if ($row_class = $view->style_plugin->getRowClass($id)) {
       $variables['rows'][$id]['attributes']['class'][] = $row_class;
@@ -1023,6 +995,57 @@ function template_preprocess_views_view_row_rss(&$variables) {
   $variables['link'] = check_url($item->link);
   $variables['description'] = String::checkPlain($item->description);
   $variables['item_elements'] = empty($item->elements) ? '' : format_xml_elements($item->elements);
+}
+
+/**
+ * Prepares variables for OPML feed templates.
+ *
+ * Default template: views-view-opml.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - view: A ViewExecutable object.
+ *   - rows: The raw row data.
+ */
+function template_preprocess_views_view_opml(&$variables) {
+  $view  = $variables['view'];
+  $items = $variables['rows'];
+
+  $config = \Drupal::config('system.site');
+
+  if ($view->display_handler->getOption('sitename_title')) {
+    $title = $config->get('name');
+    if ($slogan = $config->get('slogan')) {
+      $title .= ' - ' . $slogan;
+    }
+  }
+  else {
+    $title = $view->getTitle();
+  }
+  $variables['title'] = String::checkPlain($title);
+  $variables['items'] = $items;
+  $variables['updated'] = gmdate(DATE_RFC2822, REQUEST_TIME);
+
+  // During live preview we don't want to output the header since the contents
+  // of the feed are being displayed inside a normal HTML page.
+  if (empty($variables['view']->live_preview)) {
+    $variables['view']->getResponse()->headers->set('Content-Type', 'text/xml; charset=utf-8');
+  }
+}
+
+/**
+ * Prepares variables for views OPML item templates.
+ *
+ * Default template: views-view-row-opml.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - row: The raw results rows.
+ */
+function template_preprocess_views_view_row_opml(&$variables) {
+  $item = $variables['row'];
+
+  $variables['attributes'] = new Attribute($item);
 }
 
 /**

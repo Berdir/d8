@@ -69,35 +69,33 @@ views.settings:
           label: 'Element'
 
 views.view.*:
-  type: mapping
+  type: config_entity
   label: 'View'
   mapping:
-    langcode:
-      type: string
-      label: 'Default language'
-    status:
-      type: boolean
-      label: 'Status'
-    module:
-      label: 'Module'
     id:
-      label: 'Machine name'
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    module:
+      type: string
+      label: 'Module'
     description:
       type: text
       label: 'Administrative description'
     tag:
+      type: string
       label: 'Tag'
     base_table:
+      type: string
       label: 'Base table'
     base_field:
+      type: string
       label: 'Base field'
-    label:
-      type: label
-      label: 'Human readable name'
     core:
+      type: string
       label: 'Drupal version'
-    uuid:
-      label: 'UUID'
     display:
       type: sequence
       label: 'Displays'
@@ -106,17 +104,16 @@ views.view.*:
           label: 'Display settings'
           mapping:
             id:
+              type: string
               label: 'Machine name'
             display_title:
               type: text
               label: 'Title'
             display_plugin:
+              type: string
               label: 'Display plugin'
             position:
               type: integer
               label: 'Position'
             display_options:
               type: views.display.[%parent.display_plugin]
-    dependencies:
-      type: config_dependencies
-      label: 'Dependencies'

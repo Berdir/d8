@@ -2,10 +2,12 @@
 
 /**
  * @file
- * Definition of Drupal\shortcut\Tests\ShortcutLinksTest.
+ * Contains \Drupal\shortcut\Tests\ShortcutLinksTest.
  */
 
 namespace Drupal\shortcut\Tests;
+use Drupal\shortcut\Entity\Shortcut;
+use Drupal\shortcut\Entity\ShortcutSet;
 
 /**
  * Defines shortcut links test cases.
@@ -60,10 +62,22 @@ class ShortcutLinksTest extends ShortcutTestBase {
       );
       $this->drupalPostForm('admin/config/user-interface/shortcut/manage/' . $set->id() . '/add-link', $form_data, t('Save'));
       $this->assertResponse(200);
-      $saved_set = shortcut_set_load($set->id());
+      $saved_set = ShortcutSet::load($set->id());
       $paths = $this->getShortcutInformation($saved_set, 'path');
-      $this->assertTrue(in_array($this->container->get('path.alias_manager')->getSystemPath($test['path']), $paths), 'Shortcut created: ' . $test['path']);
+      $this->assertTrue(in_array($this->container->get('path.alias_manager')->getPathByAlias($test['path']), $paths), 'Shortcut created: ' . $test['path']);
       $this->assertLink($title, 0, 'Shortcut link found on the page.');
+    }
+    $saved_set = ShortcutSet::load($set->id());
+    // Test that saving and re-loading a shortcut preserves its values.
+    $shortcuts = $saved_set->getShortcuts();
+    foreach ($shortcuts as $entity) {
+      // Test the node routes with parameters.
+      if (strpos($entity->route_name->value, 'node.') === 0) {
+        $entity->save();
+        $loaded = Shortcut::load($entity->id());
+        $this->assertEqual($entity->route_name->value, $loaded->route_name->value);
+        $this->assertEqual($entity->get('route_parameters')->first()->getValue(), $loaded->get('route_parameters')->first()->getValue());
+      }
     }
   }
 
@@ -110,7 +124,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
     $shortcuts = $set->getShortcuts();
     $shortcut = reset($shortcuts);
     $this->drupalPostForm('admin/config/user-interface/shortcut/link/' . $shortcut->id(), array('title[0][value]' => $new_link_name, 'path' => $shortcut->path->value), t('Save'));
-    $saved_set = shortcut_set_load($set->id());
+    $saved_set = ShortcutSet::load($set->id());
     $titles = $this->getShortcutInformation($saved_set, 'title');
     $this->assertTrue(in_array($new_link_name, $titles), 'Shortcut renamed: ' . $new_link_name);
     $this->assertLink($new_link_name, 0, 'Renamed shortcut link appears on the page.');
@@ -128,7 +142,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
     $shortcuts = $set->getShortcuts();
     $shortcut = reset($shortcuts);
     $this->drupalPostForm('admin/config/user-interface/shortcut/link/' . $shortcut->id(), array('title[0][value]' => $shortcut->getTitle(), 'path' => $new_link_path), t('Save'));
-    $saved_set = shortcut_set_load($set->id());
+    $saved_set = ShortcutSet::load($set->id());
     $paths = $this->getShortcutInformation($saved_set, 'path');
     $this->assertTrue(in_array($new_link_path, $paths), 'Shortcut path changed: ' . $new_link_path);
     $this->assertLinkByHref($new_link_path, 0, 'Shortcut with new path appears on the page.');
@@ -156,7 +170,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
     $shortcuts = $set->getShortcuts();
     $shortcut = reset($shortcuts);
     $this->drupalPostForm('admin/config/user-interface/shortcut/link/' . $shortcut->id() . '/delete', array(), 'Delete');
-    $saved_set = shortcut_set_load($set->id());
+    $saved_set = ShortcutSet::load($set->id());
     $ids = $this->getShortcutInformation($saved_set, 'id');
     $this->assertFalse(in_array($shortcut->id(), $ids), 'Successfully deleted a shortcut.');
 
@@ -199,6 +213,64 @@ class ShortcutLinksTest extends ShortcutTestBase {
     $this->drupalGet('router_test/test2');
     $result = $this->xpath('//div[contains(@class, "add-shortcut")]');
     $this->assertTrue(!empty($result), 'Add to shortcuts link was shown on a page the user does have access to.');
+  }
+
+  /**
+   * Tests that the 'access shortcuts' permissions works properly.
+   */
+  public function testAccessShortcutsPermission() {
+    // Change to a theme that displays shortcuts.
+    \Drupal::service('theme_handler')->enable(array('seven'));
+    \Drupal::config('system.theme')
+      ->set('default', 'seven')
+      ->save();
+
+    // Add cron to the default shortcut set.
+    $this->drupalLogin($this->root_user);
+    $this->drupalGet('admin/config/system/cron');
+    $this->clickLink('Add to Default shortcuts');
+
+    // Verify that users without the 'access shortcuts' permission can't see the
+    // shortcuts.
+    $this->drupalLogin($this->drupalCreateUser(array('access toolbar')));
+    $this->assertNoLink('Shortcuts', 0, 'Shortcut link not found on page.');
+
+    // Verify that users with the 'access shortcuts' permission can see the
+    // shortcuts.
+    $this->drupalLogin($this->drupalCreateUser(array('access toolbar', 'access shortcuts')));
+    $this->clickLink('Shortcuts', 0, 'Shortcut link found on page.');
+    $this->assertLink('Cron', 0, 'Cron shortcut link found on page.');
+
+    $this->verifyAccessShortcutsPermissionForEditPages();
+  }
+
+  /**
+   * Tests that the 'access shortcuts' permission is required for shortcut set
+   * administration page access.
+   */
+  private function verifyAccessShortcutsPermissionForEditPages() {
+    // Create a user with customize links and switch sets permissions  but
+    // without the 'access shortcuts' permission.
+    $test_permissions = array(
+      'customize shortcut links',
+      'switch shortcut sets',
+    );
+    $noaccess_user = $this->drupalCreateUser($test_permissions);
+    $this->drupalLogin($noaccess_user);
+
+    // Verify that set administration pages are inaccessible without the
+    // 'access shortcuts' permission.
+    $edit_paths = array(
+      'admin/config/user-interface/shortcut/manage/default/customize',
+      'admin/config/user-interface/shortcut/manage/default',
+      'user/' . $noaccess_user->id() . '/shortcuts',
+    );
+
+    foreach ($edit_paths as $path) {
+      $this->drupalGet($path);
+      $message = format_string('Access is denied on %s', array('%s' => $path));
+      $this->assertResponse(403, $message);
+    }
   }
 
 }

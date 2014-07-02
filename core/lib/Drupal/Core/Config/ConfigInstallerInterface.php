@@ -38,20 +38,31 @@ interface ConfigInstallerInterface {
   public function installDefaultConfig($type, $name);
 
   /**
+   * Installs all default configuration in the specified collection.
+   *
+   * The function is useful if the site needs to respond to an event that has
+   * just created another collection and we need to check all the installed
+   * extensions for any matching configuration. For example, if a language has
+   * just been created.
+   *
+   * @param string $collection
+   *   The configuration collection.
+   */
+  public function installCollectionDefaultConfig($collection);
+
+  /**
    * Sets the configuration storage that provides the default configuration.
    *
    * @param \Drupal\Core\Config\StorageInterface $storage
    *
-   * @return self
-   *   The configuration installer.
+   * @return $this
    */
   public function setSourceStorage(StorageInterface $storage);
 
   /**
    * Resets the configuration storage that provides the default configuration.
    *
-   * @return self
-   *   The configuration installer.
+   * @return $this
    */
   public function resetSourceStorage();
 

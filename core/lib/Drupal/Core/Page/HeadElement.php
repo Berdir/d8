@@ -63,12 +63,21 @@ class HeadElement {
    * @param mixed $value
    *   The value to which to set it.
    *
-   * @return self
-   *   The invoked object.
+   * @return $this
    */
   public function setAttribute($key, $value) {
     $this->attributes[$key] = $value;
     return $this;
+  }
+
+  /**
+   * Gets all the attributes.
+   *
+   * @return array
+   *   An array of all the attributes keyed by name of attribute.
+   */
+  public function &getAttributes() {
+    return $this->attributes;
   }
 
   /**
@@ -78,8 +87,7 @@ class HeadElement {
    *   (optional) Whether or not this element should be wrapped in <noscript>.
    *   Defaults to TRUE.
    *
-   * @return self
-   *   The element..
+   * @return $this
    */
   public function setNoScript($value = TRUE) {
     $this->noScript = $value;

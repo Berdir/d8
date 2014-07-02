@@ -5,6 +5,7 @@
  * Hooks provided by Drupal core and the System module.
  */
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Utility\UpdateException;
 
 /**
@@ -168,6 +169,13 @@ function hook_queue_info_alter(&$queues) {
  *   The worker callback may throw an exception to indicate there was a problem.
  *   The cron process will log the exception, and leave the item in the queue to
  *   be processed again later.
+ * @throws \Drupal\Core\Queue\SuspendQueueException
+ *   More specifically, a SuspendQueueException should be thrown when the
+ *   callback is aware that the problem will affect all subsequent workers of
+ *   its queue. For example, a callback that makes HTTP requests may find that
+ *   the remote server is not responding. The cron process will behave as with a
+ *   normal Exception, and in addition will not attempt to process further items
+ *   from the current item's queue during the current cron run.
  *
  * @see \Drupal\Core\Cron::run()
  */
@@ -291,8 +299,6 @@ function hook_library_info_alter(&$libraries, $module) {
  *
  * @param array $library
  *   The JavaScript/CSS library that is being added.
- * @param string $extension
- *   The name of the extension that registered the library.
  * @param string $name
  *   The name of the library.
  *
@@ -307,7 +313,7 @@ function hook_library_alter(array &$library, $name) {
 
     $language_interface = \Drupal::languageManager()->getCurrentLanguage();
     $settings['jquery']['ui']['datepicker'] = array(
-      'isRTL' => $language_interface->direction == Language::DIRECTION_RTL,
+      'isRTL' => $language_interface->direction == LanguageInterface::DIRECTION_RTL,
       'firstDay' => \Drupal::config('system.date')->get('first_day'),
     );
     $library['js'][] = array(
@@ -889,16 +895,15 @@ function hook_module_implements_alter(&$implementations, $hook) {
  *   @code
  *     array('<a href="/">Home</a>');
  *   @endcode
- * @param array $attributes
- *   Attributes representing the current page, coming from
- *   \Drupal::request()->attributes.
+ * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+ *   The current route match.
  * @param array $context
  *   May include the following key:
  *   - builder: the instance of
  *     \Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface that constructed this
  *     breadcrumb, or NULL if no builder acted based on the current attributes.
  */
-function hook_system_breadcrumb_alter(array &$breadcrumb, array $attributes, array $context) {
+function hook_system_breadcrumb_alter(array &$breadcrumb, \Drupal\Core\Routing\RouteMatchInterface $route_match, array $context) {
   // Add an item to the end of the breadcrumb.
   $breadcrumb[] = Drupal::l(t('Text'), 'example_route_name');
 }
@@ -964,6 +969,8 @@ function hook_system_info_alter(array &$info, \Drupal\Core\Extension\Extension $
  *     is specific to the permission you are defining.
  *
  * @see theme_user_permission_description()
+ *
+ * @ingroup user_api
  */
 function hook_permission() {
   return array(
@@ -972,6 +979,49 @@ function hook_permission() {
       'description' => t('Perform administration tasks for my module.'),
     ),
   );
+}
+
+/**
+ * Provide online user help.
+ *
+ * By implementing hook_help(), a module can make documentation available to
+ * the user for the module as a whole, or for specific pages. Help for
+ * developers should usually be provided via function header comments in the
+ * code, or in special API example files.
+ *
+ * The page-specific help information provided by this hook appears as a system
+ * help block on that page. The module overview help information is displayed
+ * by the Help module. It can be accessed from the page at admin/help or from
+ * the Extend page.
+ *
+ * For detailed usage examples of:
+ * - Module overview help, see content_translation_help(). Module overview
+ *   help should follow
+ *   @link https://drupal.org/node/632280 the standard help template. @endlink
+ * - Page-specific help using only routes, see book_help().
+ * - Page-specific help using routes and $request, see block_help().
+ *
+ * @param string $route_name
+ *   For page-specific help, use the route name as identified in the
+ *   module's routing.yml file. For module overview help, the route name
+ *   will be in the form of "help.page.$modulename".
+ * @param Drupal\Core\Routing\RouteMatchInterface $route_match
+ *   The current route match. This can be used to generate different help
+ *   output for different pages that share the same route.
+ *
+ * @return string
+ *   A localized string containing the help text.
+ */
+function hook_help($route_name, \Drupal\Core\Routing\RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the block module.
+    case 'help.page.block':
+      return '<p>' . t('Blocks are boxes of content rendered into an area, or region, of a web page. The default theme Bartik, for example, implements the regions "Sidebar first", "Sidebar second", "Featured", "Content", "Header", "Footer", etc., and a block may appear in any one of these areas. The <a href="!blocks">blocks administration page</a> provides a drag-and-drop interface for assigning a block to a region, and for controlling the order of blocks within regions.', array('!blocks' => \Drupal::url('block.admin_display'))) . '</p>';
+
+    // Help for another path in the block module.
+    case 'block.admin_display':
+      return '<p>' . t('This page provides a drag-and-drop interface for assigning a block to a region, and for controlling the order of blocks within regions. Since not all themes implement the same regions, or display regions in the same way, blocks are positioned on a per-theme basis. Remember that your changes will not be saved until you click the <em>Save blocks</em> button at the bottom of the page.') . '</p>';
+  }
 }
 
 /**
@@ -1181,94 +1231,6 @@ function hook_template_preprocess_default_variables_alter(&$variables) {
 }
 
 /**
- * Log an event message.
- *
- * This hook allows modules to route log events to custom destinations, such as
- * SMS, Email, pager, syslog, ...etc.
- *
- * @param array $log_entry
- *   An associative array containing the following keys:
- *   - type: The type of message for this entry.
- *   - user: The user object for the user who was logged in when the event
- *     happened.
- *   - uid: The user ID for the user who was logged in when the event happened.
- *   - request_uri: The request URI for the page the event happened in.
- *   - referer: The page that referred the user to the page where the event
- *     occurred.
- *   - ip: The IP address where the request for the page came from.
- *   - timestamp: The UNIX timestamp of the date/time the event occurred.
- *   - severity: The severity of the message; one of the following values as
- *     defined in @link http://www.faqs.org/rfcs/rfc3164.html RFC 3164: @endlink
- *     - WATCHDOG_EMERGENCY: Emergency, system is unusable.
- *     - WATCHDOG_ALERT: Alert, action must be taken immediately.
- *     - WATCHDOG_CRITICAL: Critical conditions.
- *     - WATCHDOG_ERROR: Error conditions.
- *     - WATCHDOG_WARNING: Warning conditions.
- *     - WATCHDOG_NOTICE: Normal but significant conditions.
- *     - WATCHDOG_INFO: Informational messages.
- *     - WATCHDOG_DEBUG: Debug-level messages.
- *   - link: An optional link provided by the module that called the watchdog()
- *     function.
- *   - message: The text of the message to be logged. Variables in the message
- *     are indicated by using placeholder strings alongside the variables
- *     argument to declare the value of the placeholders. See t() for
- *     documentation on how the message and variable parameters interact.
- *   - variables: An array of variables to be inserted into the message on
- *     display. Will be NULL or missing if a message is already translated or if
- *     the message is not possible to translate.
- */
-function hook_watchdog(array $log_entry) {
-  global $base_url;
-  $language_interface = \Drupal::languageManager()->getCurrentLanguage();
-
-  $severity_list = array(
-    WATCHDOG_EMERGENCY     => t('Emergency'),
-    WATCHDOG_ALERT     => t('Alert'),
-    WATCHDOG_CRITICAL     => t('Critical'),
-    WATCHDOG_ERROR       => t('Error'),
-    WATCHDOG_WARNING   => t('Warning'),
-    WATCHDOG_NOTICE    => t('Notice'),
-    WATCHDOG_INFO      => t('Info'),
-    WATCHDOG_DEBUG     => t('Debug'),
-  );
-
-  $to = 'someone@example.com';
-  $params = array();
-  $params['subject'] = t('[@site_name] @severity_desc: Alert from your web site', array(
-    '@site_name' => \Drupal::config('system.site')->get('name'),
-    '@severity_desc' => $severity_list[$log_entry['severity']],
-  ));
-
-  $params['message']  = "\nSite:         @base_url";
-  $params['message'] .= "\nSeverity:     (@severity) @severity_desc";
-  $params['message'] .= "\nTimestamp:    @timestamp";
-  $params['message'] .= "\nType:         @type";
-  $params['message'] .= "\nIP Address:   @ip";
-  $params['message'] .= "\nRequest URI:  @request_uri";
-  $params['message'] .= "\nReferrer URI: @referer_uri";
-  $params['message'] .= "\nUser:         (@uid) @name";
-  $params['message'] .= "\nLink:         @link";
-  $params['message'] .= "\nMessage:      \n\n@message";
-
-  $params['message'] = t($params['message'], array(
-    '@base_url'      => $base_url,
-    '@severity'      => $log_entry['severity'],
-    '@severity_desc' => $severity_list[$log_entry['severity']],
-    '@timestamp'     => format_date($log_entry['timestamp']),
-    '@type'          => $log_entry['type'],
-    '@ip'            => $log_entry['ip'],
-    '@request_uri'   => $log_entry['request_uri'],
-    '@referer_uri'   => $log_entry['referer'],
-    '@uid'           => $log_entry['uid'],
-    '@name'          => $log_entry['user']->name,
-    '@link'          => strip_tags($log_entry['link']),
-    '@message'       => strip_tags($log_entry['message']),
-  ));
-
-  drupal_mail('emaillog', 'entry', $to, $language_interface->id, $params);
-}
-
-/**
  * Prepare a message based on parameters; called from drupal_mail().
  *
  * Note that hook_mail(), unlike hook_mail_alter(), is only called on the
@@ -1282,7 +1244,7 @@ function hook_watchdog(array $log_entry) {
  *     or drupal_mail() for possible id values.
  *   - to: The address or addresses the message will be sent to. The
  *     formatting of this string must comply with RFC 2822.
- *   - subject: Subject of the e-mail to be sent. This must not contain any
+ *   - subject: Subject of the email to be sent. This must not contain any
  *     newline characters, or the mail may not be sent properly. drupal_mail()
  *     sets this to an empty string when the hook is invoked.
  *   - body: An array of lines containing the message to be sent. Drupal will
@@ -1323,7 +1285,7 @@ function hook_mail($key, &$message, $params) {
     $node = $params['node'];
     $variables += array(
       '%uid' => $node->getOwnerId(),
-      '%node_url' => url('node/' . $node->id(), array('absolute' => TRUE)),
+      '%url' => url('node/' . $node->id(), array('absolute' => TRUE)),
       '%node_type' => node_get_type_label($node),
       '%title' => $node->getTitle(),
       '%teaser' => $node->teaser,
@@ -1978,25 +1940,32 @@ function hook_install() {
  * hooks. See @link update_api Update versions of API functions @endlink for
  * details.
  *
- * If your update task is potentially time-consuming, you'll need to implement a
- * multipass update to avoid PHP timeouts. Multipass updates use the $sandbox
- * parameter provided by the batch API (normally, $context['sandbox']) to store
- * information between successive calls, and the $sandbox['#finished'] value
- * to provide feedback regarding completion level.
+ * The $sandbox parameter should be used when a multipass update is needed, in
+ * circumstances where running the whole update at once could cause PHP to
+ * timeout. Each pass is run in a way that avoids PHP timeouts, provided each
+ * pass remains under the timeout limit. To signify that an update requires
+ * at least one more pass, set $sandbox['#finished'] to a number less than 1
+ * (you need to do this each pass). The value of $sandbox['#finished'] will be
+ * unset between passes but all other data in $sandbox will be preserved. The
+ * system will stop iterating this update when $sandbox['#finished'] is left
+ * unset or set to a number higher than 1. It is recommended that
+ * $sandbox['#finished'] is initially set to 0, and then updated each pass to a
+ * number between 0 and 1 that represents the overall % completed for this
+ * update, finishing with 1.
  *
- * See the batch operations page for more information on how to use the
- * @link http://drupal.org/node/180528 Batch API. @endlink
+ * See the @link batch Batch operations topic @endlink for more information on
+ * how to use the Batch API.
  *
- * @param $sandbox
+ * @param array $sandbox
  *   Stores information for multipass updates. See above for more information.
  *
- * @throws \Drupal\Core\Utility\UpdateException, PDOException
+ * @throws \Drupal\Core\Utility\UpdateException|PDOException
  *   In case of error, update hooks should throw an instance of
  *   Drupal\Core\Utility\UpdateException with a meaningful message for the user.
  *   If a database query fails for whatever reason, it will throw a
  *   PDOException.
  *
- * @return
+ * @return string|null
  *   Optionally, update hooks may return a translated string that will be
  *   displayed to the user after the update has completed. If no message is
  *   returned, no message will be presented to the user.
@@ -2310,27 +2279,6 @@ function hook_install_tasks(&$install_state) {
 }
 
 /**
- * Alter XHTML HEAD tags before they are rendered by drupal_get_html_head().
- *
- * Elements available to be altered are only those added using
- * drupal_add_html_head_link() or drupal_add_html_head(). CSS and JS files
- * are handled using _drupal_add_css() and _drupal_add_js(), so the head links
- * for those files will not appear in the $head_elements array.
- *
- * @param $head_elements
- *   An array of renderable elements. Generally the values of the #attributes
- *   array will be the most likely target for changes.
- */
-function hook_html_head_alter(&$head_elements) {
-  foreach ($head_elements as $key => $element) {
-    if (isset($element['#attributes']['rel']) && $element['#attributes']['rel'] == 'canonical') {
-      // I want a custom canonical URL.
-      $head_elements[$key]['#attributes']['href'] = mymodule_canonical_url();
-    }
-  }
-}
-
-/**
  * Alter the full list of installation tasks.
  *
  * You can use this hook to change or replace any part of the Drupal
@@ -2482,7 +2430,7 @@ function hook_tokens($type, $tokens, array $data = array(), array $options = arr
           break;
 
         case 'title':
-          $replacements[$original] = $sanitize ? check_plain($node->getTitle()) : $node->getTitle();
+          $replacements[$original] = $sanitize ? String::checkPlain($node->getTitle()) : $node->getTitle();
           break;
 
         case 'edit-url':
@@ -2492,7 +2440,7 @@ function hook_tokens($type, $tokens, array $data = array(), array $options = arr
         // Default values for the chained tokens handled below.
         case 'author':
           $account = $node->getOwner() ? $node->getOwner() : user_load(0);
-          $replacements[$original] = $sanitize ? check_plain($account->label()) : $account->label();
+          $replacements[$original] = $sanitize ? String::checkPlain($account->label()) : $account->label();
           break;
 
         case 'created':
@@ -2572,7 +2520,8 @@ function hook_tokens_alter(array &$replacements, array $context) {
  *   - types: An associative array of token types (groups). Each token type is
  *     an associative array with the following components:
  *     - name: The translated human-readable short name of the token type.
- *     - description: A translated longer description of the token type.
+ *     - description (optional): A translated longer description of the token
+ *       type.
  *     - needs-data: The type of data that must be provided to
  *       \Drupal\Core\Utility\Token::replace() in the $data argument (i.e., the
  *       key name in $data) in order for tokens of this type to be used in the
@@ -2588,7 +2537,7 @@ function hook_tokens_alter(array &$replacements, array $context) {
  *     tokens, each token item is keyed by the machine name of the token, and
  *     each token item has the following components:
  *     - name: The translated human-readable short name of the token.
- *     - description: A translated longer description of the token.
+ *     - description (optional): A translated longer description of the token.
  *     - type (optional): A 'needs-data' data type supplied by this token, which
  *       should match a 'needs-data' value from another token type. For example,
  *       the node author token provides a user object, which can then be used
@@ -2612,7 +2561,6 @@ function hook_token_info() {
   );
   $node['title'] = array(
     'name' => t("Title"),
-    'description' => t("The title of the node."),
   );
   $node['edit-url'] = array(
     'name' => t("Edit URL"),
@@ -2622,12 +2570,10 @@ function hook_token_info() {
   // Chained tokens for nodes.
   $node['created'] = array(
     'name' => t("Date created"),
-    'description' => t("The date the node was posted."),
     'type' => 'date',
   );
   $node['author'] = array(
     'name' => t("Author"),
-    'description' => t("The author of the node."),
     'type' => 'user',
   );
 

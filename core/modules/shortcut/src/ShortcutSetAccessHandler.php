@@ -27,6 +27,9 @@ class ShortcutSetAccessHandler extends EntityAccessHandler {
         if ($account->hasPermission('administer shortcuts')) {
           return TRUE;
         }
+        if (!$account->hasPermission('access shortcuts')) {
+          return FALSE;
+        }
         if ($account->hasPermission('customize shortcut links')) {
           return $entity == shortcut_current_displayed_set($account);
         }
@@ -46,7 +49,15 @@ class ShortcutSetAccessHandler extends EntityAccessHandler {
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return $account->hasPermission('administer shortcuts') || $account->hasPermission('customize shortcut links');
+    if ($account->hasPermission('administer shortcuts')) {
+      return TRUE;
+    }
+    if (!$account->hasPermission('access shortcuts')) {
+      return FALSE;
+    }
+    if ($account->hasPermission('customize shortcut links')) {
+      return TRUE;
+    }
   }
 
 }

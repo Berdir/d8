@@ -74,24 +74,6 @@ class TaggedHandlersPassTest extends UnitTestCase {
   }
 
   /**
-   * Tests consumer with missing interface in production environment.
-   *
-   * @covers ::process
-   */
-  public function testProcessMissingInterfaceProd() {
-    $container = $this->buildContainer('prod');
-    $container
-      ->register('consumer_id', __NAMESPACE__ . '\InvalidConsumer')
-      ->addTag('service_collector');
-
-    $handler_pass = new TaggedHandlersPass();
-    $handler_pass->process($container);
-
-    $this->assertCount(1, $container->getDefinitions());
-    $this->assertFalse($container->getDefinition('consumer_id')->hasMethodCall('addHandler'));
-  }
-
-  /**
    * Tests one consumer and two handlers.
    *
    * @covers ::process
@@ -181,6 +163,41 @@ class TaggedHandlersPassTest extends UnitTestCase {
   }
 
   /**
+   * Tests consumer method with an ID parameter.
+   *
+   * @covers ::process
+   */
+  public function testProcessWithIdParameter() {
+    $container = $this->buildContainer();
+    $container
+      ->register('consumer_id', __NAMESPACE__ . '\ValidConsumer')
+      ->addTag('service_collector', array(
+        'call' => 'addWithId',
+      ));
+
+    $container
+      ->register('handler1', __NAMESPACE__ . '\ValidHandler')
+      ->addTag('consumer_id');
+    $container
+      ->register('handler2', __NAMESPACE__ . '\ValidHandler')
+      ->addTag('consumer_id', array(
+        'priority' => 10,
+      ));
+
+    $handler_pass = new TaggedHandlersPass();
+    $handler_pass->process($container);
+
+    $method_calls = $container->getDefinition('consumer_id')->getMethodCalls();
+    $this->assertCount(2, $method_calls);
+    $this->assertEquals(new Reference('handler2'), $method_calls[0][1][0]);
+    $this->assertEquals('handler2', $method_calls[0][1][1]);
+    $this->assertEquals(10, $method_calls[0][1][2]);
+    $this->assertEquals(new Reference('handler1'), $method_calls[1][1][0]);
+    $this->assertEquals('handler1', $method_calls[1][1][1]);
+    $this->assertEquals(0, $method_calls[1][1][2]);
+  }
+
+  /**
    * Tests interface validation in non-production environment.
    *
    * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
@@ -205,35 +222,6 @@ class TaggedHandlersPassTest extends UnitTestCase {
     $handler_pass->process($container);
   }
 
-  /**
-   * Tests interface validation in production environment.
-   *
-   * @covers ::process
-   */
-  public function testProcessInterfaceMismatchProd() {
-    $container = $this->buildContainer('prod');
-
-    $container
-      ->register('consumer_id', __NAMESPACE__ . '\ValidConsumer')
-      ->addTag('service_collector');
-    $container
-      ->register('handler1', __NAMESPACE__ . '\InvalidHandler')
-      ->addTag('consumer_id');
-    $container
-      ->register('handler2', __NAMESPACE__ . '\ValidHandler')
-      ->addTag('consumer_id', array(
-        'priority' => 10,
-      ));
-
-    $handler_pass = new TaggedHandlersPass();
-    $handler_pass->process($container);
-
-    $method_calls = $container->getDefinition('consumer_id')->getMethodCalls();
-    $this->assertCount(1, $method_calls);
-    $this->assertEquals(new Reference('handler2'), $method_calls[0][1][0]);
-    $this->assertEquals(10, $method_calls[0][1][1]);
-  }
-
 }
 
 interface HandlerInterface {
@@ -242,6 +230,8 @@ class ValidConsumer {
   public function addHandler(HandlerInterface $instance, $priority = 0) {
   }
   public function addNoPriority(HandlerInterface $instance) {
+  }
+  public function addWithId(HandlerInterface $instance, $id, $priority = 0) {
   }
 }
 class InvalidConsumer {

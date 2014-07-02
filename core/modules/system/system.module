@@ -6,9 +6,11 @@
  */
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\TranslationWrapper;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\block\BlockPluginInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -61,7 +63,7 @@ const REGIONS_ALL = 'all';
 /**
  * Defines the max length for an email address
  *
- * The maximum length of an e-mail address is 254 characters. RFC 3696
+ * The maximum length of an email address is 254 characters. RFC 3696
  * specifies a total length of 320 characters, but mentions that
  * addresses longer than 256 characters are not normally useful. Erratum
  * 1690 was then released which corrected this value to 254 characters.
@@ -73,11 +75,11 @@ const EMAIL_MAX_LENGTH = 254;
 /**
  * Implements hook_help().
  */
-function system_help($path, $arg) {
+function system_help($route_name, RouteMatchInterface $route_match) {
   global $base_url;
 
-  switch ($path) {
-    case 'admin/help#system':
+  switch ($route_name) {
+    case 'help.page.system':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('The System module is integral to the site, and provides basic but extensible functionality for use by other modules and themes. Some integral elements of Drupal are contained in and managed by the System module, including caching, enabling and disabling modules and themes, preparing and displaying the administrative page, and configuring fundamental site settings. A number of key system maintenance operations are also part of the System module. For more information, see the online handbook entry for <a href="@system">System module</a>.', array('@system' => 'http://drupal.org/documentation/modules/system')) . '</p>';
@@ -93,20 +95,27 @@ function system_help($path, $arg) {
       $output .= '<dd>' . t('In order for the site and its modules to continue to operate well, a set of routine administrative operations must run on a regular basis. The System module manages this task by making use of a system cron job. You can verify the status of cron tasks by visiting the <a href="@status">Status report page</a>. For more information, see the online handbook entry for <a href="@handbook">configuring cron jobs</a>. You can set up cron job by visiting <a href="@cron">Cron configuration</a> page', array('@status' => url('admin/reports/status'), '@handbook' => 'http://drupal.org/cron', '@cron' => url('admin/config/system/cron'))) . '</dd>';
       $output .= '<dt>' . t('Configuring basic site settings') . '</dt>';
       $output .= '<dd>' . t('The System module also handles basic configuration options for your site, including <a href="@date-time-settings">Date and time settings</a>, <a href="@file-system">File system settings</a>, <a href="@site-info">Site name and other information</a>, and a <a href="@maintenance-mode">Maintenance mode</a> for taking your site temporarily offline.', array('@date-time-settings' => url('admin/config/regional/date-time'), '@file-system' => url('admin/config/media/file-system'), '@site-info' => url('admin/config/system/site-information'), '@maintenance-mode' => url('admin/config/development/maintenance'))) . '</dd>';
+      $output .= '<dt>' . t('Providing administrative help') . '</dt>';
+      $output .= '<dd>' . t('Page-specific administrative help text that is provided by the System module and other modules is displayed in the System Help block. This block can be placed and configured on the <a href="!blocks">Block layout page</a>.', array('!blocks' => (\Drupal::moduleHandler()->moduleExists('block')) ? \Drupal::url('block.admin_display') : '#')) . '</dd>';
       $output .= '</dl>';
       return $output;
-    case 'admin/index':
+
+    case 'system.admin_index':
       return '<p>' . t('This page shows you all available administration tasks for each module.') . '</p>';
-    case 'admin/appearance':
+
+    case 'system.themes_page':
       $output = '<p>' . t('Set and configure the default theme for your website.  Alternative <a href="@themes">themes</a> are available.', array('@themes' => 'http://drupal.org/project/themes')) . '</p>';
       return $output;
-    case 'admin/appearance/settings/' . $arg[3]:
+
+    case 'system.theme_settings_theme':
       $theme_list = list_themes();
-      $theme = $theme_list[$arg[3]];
+      $theme = $theme_list[$route_match->getParameter('theme')];
       return '<p>' . t('These options control the display settings for the %name theme. When your site is displayed using this theme, these settings will be used.', array('%name' => $theme->info['name'])) . '</p>';
-    case 'admin/appearance/settings':
+
+    case 'system.theme_settings':
       return '<p>' . t('These options control the default display settings for your entire site, across all themes. Unless they have been overridden by a specific theme, these settings will be used.') . '</p>';
-    case 'admin/modules':
+
+    case 'system.modules_list':
       $output = '<p>' . t('Download additional <a href="@modules">contributed modules</a> to extend Drupal\'s functionality.', array('@modules' => 'http://drupal.org/project/modules')) . '</p>';
       if (\Drupal::moduleHandler()->moduleExists('update')) {
         if (update_manager_access()) {
@@ -120,19 +129,29 @@ function system_help($path, $arg) {
         $output .= '<p>' . t('Regularly review available updates to maintain a secure and current site. Always run the <a href="@update-php">update script</a> each time a module is updated. Enable the Update Manager module to update and install modules and themes.', array('@update-php' => $base_url . '/core/update.php')) . '</p>';
       }
       return $output;
-    case 'admin/modules/uninstall':
+
+    case 'system.modules_uninstall':
       return '<p>' . t('The uninstall process removes all data related to a module.') . '</p>';
-    case 'admin/structure/block/manage':
-      if ($arg[4] == 'system' && $arg[5] == 'powered-by') {
+
+    case 'block.admin_edit':
+      if (($block = $route_match->getParameter('block')) && $block->get('plugin') == 'system_powered_by_block') {
         return '<p>' . t('The <em>Powered by Drupal</em> block is an optional link to the home page of the Drupal project. While there is absolutely no requirement that sites feature this link, it may be used to show support for Drupal.') . '</p>';
       }
       break;
-    case 'admin/config/development/maintenance':
+
+    case 'block.admin_add':
+      if ($route_match->getParameter('plugin_id') == 'system_powered_by_block') {
+        return '<p>' . t('The <em>Powered by Drupal</em> block is an optional link to the home page of the Drupal project. While there is absolutely no requirement that sites feature this link, it may be used to show support for Drupal.') . '</p>';
+      }
+      break;
+
+    case 'system.site_maintenance_mode':
       if (\Drupal::currentUser()->id() == 1) {
         return '<p>' . t('Use maintenance mode when making major updates, particularly if the updates could disrupt visitors or the update process. Examples include upgrading, importing or exporting content, modifying a theme, modifying content types, and making backups.') . '</p>';
       }
       break;
-    case 'admin/reports/status':
+
+    case 'system.status':
       return '<p>' . t("Here you can find a short overview of your site's parameters as well as any problems detected with your installation. It may be useful to copy and paste this information into support requests filed on drupal.org's support forums and project issue queues. Before filing a support request, ensure that your web server meets the <a href=\"@system-requirements\">system requirements.</a>", array('@system-requirements' => 'http://drupal.org/requirements')) . '</p>';
   }
 }
@@ -160,6 +179,7 @@ function system_theme() {
     ),
     'system_config_form' => array(
       'render element' => 'form',
+      'template' => 'system-config-form',
     ),
     'confirm_form' => array(
       'render element' => 'form',
@@ -196,6 +216,7 @@ function system_theme() {
     'system_admin_index' => array(
       'variables' => array('menu_items' => NULL),
       'file' => 'system.admin.inc',
+      'template' => 'system-admin-index',
     ),
     'system_compact_link' => array(
       'variables' => array(),
@@ -234,6 +255,7 @@ function system_permission() {
     ),
     'access site reports' => array(
       'title' => t('View site reports'),
+      'restrict access' => TRUE,
     ),
   );
 }
@@ -495,7 +517,7 @@ function system_element_info() {
   );
   $types['language_select'] = array(
     '#input' => TRUE,
-    '#default_value' => Language::LANGCODE_NOT_SPECIFIED,
+    '#default_value' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
   );
   $types['weight'] = array(
     '#input' => TRUE,
@@ -505,7 +527,8 @@ function system_element_info() {
   );
   $types['date'] = array(
     '#input' => TRUE,
-    '#theme' => 'date',
+    '#theme' => 'input__date',
+    '#pre_render' => array('form_pre_render_date'),
     '#theme_wrappers' => array('form_element'),
   );
   $types['file'] = array(
@@ -626,12 +649,6 @@ function system_element_info() {
     '#theme' => 'table',
   );
 
-  // Other elements.
-  $types['render_cache_placeholder'] = array(
-    '#callback' => '',
-    '#context' => array(),
-  );
-
   return $types;
 }
 
@@ -639,14 +656,16 @@ function system_element_info() {
  * Implements hook_theme_suggestions_HOOK().
  */
 function system_theme_suggestions_html(array $variables) {
-  return theme_get_suggestions(arg(), 'html');
+  $path_args = explode('/', current_path());
+  return theme_get_suggestions($path_args, 'html');
 }
 
 /**
  * Implements hook_theme_suggestions_HOOK().
  */
 function system_theme_suggestions_page(array $variables) {
-  return theme_get_suggestions(arg(), 'page');
+  $path_args = explode('/', current_path());
+  return theme_get_suggestions($path_args, 'page');
 }
 
 /**
@@ -705,15 +724,15 @@ function system_theme_suggestions_field(array $variables) {
 function system_stream_wrappers() {
   $wrappers = array(
     'public' => array(
-      'name' => t('Public files'),
+      'name' => new TranslationWrapper('Public files'),
       'class' => 'Drupal\Core\StreamWrapper\PublicStream',
-      'description' => t('Public local files served by the webserver.'),
+      'description' => new TranslationWrapper('Public local files served by the webserver.'),
       'type' => STREAM_WRAPPERS_LOCAL_NORMAL,
     ),
     'temporary' => array(
-      'name' => t('Temporary files'),
+      'name' => new TranslationWrapper('Temporary files'),
       'class' => 'Drupal\Core\StreamWrapper\TemporaryStream',
-      'description' => t('Temporary local files for upload and previews.'),
+      'description' => new TranslationWrapper('Temporary local files for upload and previews.'),
       'type' => STREAM_WRAPPERS_LOCAL_HIDDEN,
     ),
   );
@@ -721,9 +740,9 @@ function system_stream_wrappers() {
   // Only register the private file stream wrapper if a file path has been set.
   if (\Drupal::config('system.file')->get('path.private')) {
     $wrappers['private'] = array(
-      'name' => t('Private files'),
+      'name' => new TranslationWrapper('Private files'),
       'class' => 'Drupal\Core\StreamWrapper\PrivateStream',
-      'description' => t('Private local files served by Drupal.'),
+      'description' => new TranslationWrapper('Private local files served by Drupal.'),
       'type' => STREAM_WRAPPERS_LOCAL_NORMAL,
     );
   }
@@ -961,7 +980,7 @@ function system_page_build(&$page) {
       array(
         'path' => current_path(),
         'front' => drupal_is_front_page(),
-        'language' => \Drupal::languageManager()->getCurrentLanguage(\Drupal\Core\Language\Language::TYPE_URL)->id,
+        'language' => \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_URL)->id,
         'query' => \Drupal::service('request')->query->all(),
       )
     );
@@ -1088,16 +1107,17 @@ function system_check_directory($form_element) {
     return $form_element;
   }
 
+  $logger = \Drupal::logger('file system');
   if (!is_dir($directory) && !drupal_mkdir($directory, NULL, TRUE)) {
     // If the directory does not exists and cannot be created.
     form_set_error($form_element['#parents'][0], $form_state, t('The directory %directory does not exist and could not be created.', array('%directory' => $directory)));
-    watchdog('file system', 'The directory %directory does not exist and could not be created.', array('%directory' => $directory), WATCHDOG_ERROR);
+    $logger->error('The directory %directory does not exist and could not be created.', array('%directory' => $directory));
   }
 
   if (is_dir($directory) && !is_writable($directory) && !drupal_chmod($directory)) {
     // If the directory is not writable and cannot be made so.
     form_set_error($form_element['#parents'][0], $form_state, t('The directory %directory exists but is not writable and could not be made writable.', array('%directory' => $directory)));
-    watchdog('file system', 'The directory %directory exists but is not writable and could not be made writable.', array('%directory' => $directory), WATCHDOG_ERROR);
+    $logger->error('The directory %directory exists but is not writable and could not be made writable.', array('%directory' => $directory));
   }
   elseif (is_dir($directory)) {
     if ($form_element['#name'] == 'file_public_path') {
@@ -1295,7 +1315,7 @@ function system_rebuild_module_data() {
  * @return \Drupal\Core\Extension\Extension[]
  *   Array of all available themes and their data.
  *
- * @deprecated 8.x
+ * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
  *   Use \Drupal::service('theme_handler')->rebuildThemeData().
  */
 function system_rebuild_theme_data() {
@@ -1358,7 +1378,12 @@ function system_sort_modules_by_info_name($a, $b) {
 }
 
 /**
- * Array sorting callback; sorts modules or themes by their name.
+ * Sorts themes by their names, with the default theme listed first.
+ *
+ * Callback for uasort() within
+ * \Drupal\system\Controller\SystemController::themesPage().
+ *
+ * @see system_sort_modules_by_info_name().
  */
 function system_sort_themes($a, $b) {
   if ($a->is_default) {
@@ -1686,38 +1711,22 @@ function system_block_view_system_help_block_alter(array &$build, BlockPluginInt
 }
 
 /**
- * Returns HTML for a system settings form.
- *
- * By default this does not alter the appearance of a form at all,
- * but is provided as a convenience for themers.
- *
- * @param $variables
- *   An associative array containing:
- *   - form: A render element representing the form.
- *
- * @ingroup themeable
- */
-function theme_system_config_form($variables) {
-  return drupal_render_children($variables['form']);
-}
-
-/**
  * Implements hook_path_update().
  */
 function system_path_update() {
-  \Drupal::service('path.alias_manager.cached')->cacheClear();
+  \Drupal::service('path.alias_manager')->cacheClear();
 }
 
 /**
  * Implements hook_path_insert().
  */
 function system_path_insert() {
-  \Drupal::service('path.alias_manager.cached')->cacheClear();
+  \Drupal::service('path.alias_manager')->cacheClear();
 }
 
 /**
  * Implements hook_path_delete().
  */
 function system_path_delete($path) {
-  \Drupal::service('path.alias_manager.cached')->cacheClear();
+  \Drupal::service('path.alias_manager')->cacheClear();
 }

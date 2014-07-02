@@ -14,11 +14,15 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Provides a service to handler various date related functionality.
+ *
+ * @ingroup i18n
  */
 class Date {
+  use StringTranslationTrait;
 
   /**
    * The list of loaded timezones.
@@ -140,23 +144,19 @@ class Date {
     );
     $date = DrupalDateTime::createFromTimestamp($timestamp, $this->timezones[$timezone], $create_settings);
 
-    // Find the appropriate format type.
-    $key = $date->canUseIntl() ? DrupalDateTime::INTL : DrupalDateTime::PHP;
-
     // If we have a non-custom date format use the provided date format pattern.
     if ($date_format = $this->dateFormat($type, $langcode)) {
-      $format = $date_format->getPattern($key);
+      $format = $date_format->getPattern();
     }
 
     // Fall back to medium if a format was not found.
     if (empty($format)) {
-      $format = $this->dateFormat('fallback', $langcode)->getPattern($key);
+      $format = $this->dateFormat('fallback', $langcode)->getPattern();
     }
 
     // Call $date->format().
     $settings = array(
       'langcode' => $langcode,
-      'format_string_type' => $key,
     );
     return Xss::filter($date->format($format, $settings));
   }
@@ -181,7 +181,7 @@ class Date {
     foreach ($this->units as $key => $value) {
       $key = explode('|', $key);
       if ($interval >= $value) {
-        $output .= ($output ? ' ' : '') . $this->stringTranslation->formatPlural(floor($interval / $value), $key[0], $key[1], array(), array('langcode' => $langcode));
+        $output .= ($output ? ' ' : '') . $this->formatPlural(floor($interval / $value), $key[0], $key[1], array(), array('langcode' => $langcode));
         $interval %= $value;
         $granularity--;
       }
@@ -191,15 +191,6 @@ class Date {
       }
     }
     return $output ? $output : $this->t('0 sec', array(), array('langcode' => $langcode));
-  }
-
-  /**
-   * Translates a string to the current language or to a given language.
-   *
-   * See the t() documentation for details.
-   */
-  protected function t($string, array $args = array(), array $options = array()) {
-    return $this->stringTranslation->translate($string, $args, $options);
   }
 
   /**

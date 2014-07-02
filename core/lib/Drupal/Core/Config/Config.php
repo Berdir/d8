@@ -17,6 +17,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * specific configuration object, including support for runtime overrides. The
  * overrides are handled on top of the stored configuration so they are not
  * saved back to storage.
+ *
+ * @ingroup config_api
  */
 class Config extends StorableConfigBase {
 
@@ -61,10 +63,10 @@ class Config extends StorableConfigBase {
    *   configuration data.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   An event dispatcher instance to use for configuration events.
-   * @param \Drupal\Core\Config\TypedConfigManager $typed_config
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed configuration manager service.
    */
-  public function __construct($name, StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManager $typed_config) {
+  public function __construct($name, StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config) {
     $this->name = $name;
     $this->storage = $storage;
     $this->eventDispatcher = $event_dispatcher;
@@ -235,7 +237,6 @@ class Config extends StorableConfigBase {
    *   The configuration object.
    */
   public function delete() {
-    // @todo Consider to remove the pruning of data for Config::delete().
     $this->data = array();
     $this->storage->delete($this->name);
     $this->isNew = TRUE;

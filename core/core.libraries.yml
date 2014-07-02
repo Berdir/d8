@@ -17,9 +17,7 @@ classList:
 
 ckeditor:
   remote: https://github.com/ckeditor/ckeditor-dev
-  # @todo Stable release required for Drupal 8.0.
-  version: 4.2-dev
-  commit: 887d81ac1824008b690e439a1b29eb4f13b51212
+  version: 4.4.0
   js:
     assets/vendor/ckeditor/ckeditor.js: { preprocess: false }
 
@@ -113,8 +111,9 @@ drupal.debounce:
 drupal.dialog:
   version: VERSION
   js:
-    misc/dialog.js: {}
-    misc/dialog.position.js: {}
+    misc/dialog/dialog.js: {}
+    misc/dialog/dialog.position.js: {}
+    misc/dialog/dialog.jquery-ui.js: {}
   css:
     theme:
       misc/dialog.theme.css: {}
@@ -129,7 +128,7 @@ drupal.dialog:
 drupal.dialog.ajax:
   version: VERSION
   js:
-    misc/dialog.ajax.js: {}
+    misc/dialog/dialog.ajax.js: {}
   dependencies:
     - core/jquery
     - core/drupal

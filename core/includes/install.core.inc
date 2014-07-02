@@ -9,6 +9,7 @@ use Drupal\Core\Database\Install\TaskException;
 use Drupal\Core\Installer\Exception\AlreadyInstalledException;
 use Drupal\Core\Installer\Exception\InstallerException;
 use Drupal\Core\Installer\Exception\NoProfilesException;
+use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Page\DefaultHtmlPageRenderer;
@@ -272,12 +273,6 @@ function install_begin_request(&$install_state) {
   // Allow command line scripts to override server variables used by Drupal.
   require_once __DIR__ . '/bootstrap.inc';
 
-  // Initialize conf_path().
-  // This primes the site path to be used during installation. By not requiring
-  // settings.php, a bare site folder can be prepared in the /sites directory,
-  // which will be used for installing Drupal.
-  conf_path(FALSE);
-
   // If the hash salt leaks, it becomes possible to forge a valid testing user
   // agent, install a new copy of Drupal, and take over the original site.
   // The user agent header is used to pass a database prefix in the request when
@@ -288,7 +283,8 @@ function install_begin_request(&$install_state) {
     exit;
   }
 
-  drupal_bootstrap(DRUPAL_BOOTSTRAP_CONFIGURATION);
+  $site_path = DrupalKernel::findSitePath($request, FALSE);
+  Settings::initialize($site_path);
 
   // Ensure that procedural dependencies are loaded as early as possible,
   // since the error/exception handlers depend on them.
@@ -322,6 +318,9 @@ function install_begin_request(&$install_state) {
   $container
     ->register('string_translation', 'Drupal\Core\StringTranslation\TranslationManager')
     ->addArgument(new Reference('language_manager'));
+  $container
+    ->register('path.matcher', 'Drupal\Core\Path\PathMatcher')
+    ->addArgument(new Reference('config.factory'));
 
   \Drupal::setContainer($container);
 
@@ -356,29 +355,26 @@ function install_begin_request(&$install_state) {
     $environment = 'prod';
   }
 
-  $kernel = new DrupalKernel($environment, drupal_classloader(), FALSE);
+  $kernel = InstallerKernel::createFromRequest($request, drupal_classloader(), $environment);
+  $kernel->setSitePath($site_path);
   $kernel->boot();
-
-  // Enter the request scope and add the Request.
-  // @todo Remove this after converting all installer screens into controllers.
   $container = $kernel->getContainer();
-  $container->enterScope('request');
-  $container->set('request', $request, 'request');
-  $container->get('request_stack')->push($request);
 
   // Register the file translation service.
   if (isset($GLOBALS['config']['locale.settings']['translation.path'])) {
     $directory = $GLOBALS['config']['locale.settings']['translation.path'];
   }
   else {
-    $directory = conf_path() . '/files/translations';
+    $directory = $site_path . '/files/translations';
   }
   $container->set('string_translator.file_translation', new FileTranslation($directory));
   $container->get('string_translation')
     ->addTranslator($container->get('string_translator.file_translation'));
 
-  // Add in installation language if present.
+  // Set the default language to the selected language, if any.
   if (isset($install_state['parameters']['langcode'])) {
+    $default_language = new Language(array('id' => $install_state['parameters']['langcode']));
+    $container->get('language.default')->set($default_language);
     \Drupal::translation()->setDefaultLangcode($install_state['parameters']['langcode']);
   }
 
@@ -414,6 +410,8 @@ function install_begin_request(&$install_state) {
   // checked by other subsystems (e.g., the theme system).
   $module_handler->loadAll();
 
+  $kernel->prepareLegacyRequest($request);
+
   // Prepare for themed output. We need to run this at the beginning of the
   // page request to avoid a different theme accidentally getting set. (We also
   // need to run it even in the case of command-line installations, to prevent
@@ -429,7 +427,7 @@ function install_begin_request(&$install_state) {
     $task = NULL;
 
     // Do not install over a configured settings.php.
-    if (!empty($GLOBALS['databases'])) {
+    if (Database::getConnectionInfo()) {
       throw new AlreadyInstalledException($container->get('string_translation'));
     }
   }
@@ -1004,9 +1002,8 @@ function install_verify_completed_task() {
  * Verifies that settings.php specifies a valid database connection.
  */
 function install_verify_database_settings() {
-  global $databases;
-  if (!empty($databases)) {
-    $database = $databases['default']['default'];
+  if ($database = Database::getConnectionInfo()) {
+    $database = $database['default'];
     $settings_file = './' . conf_path(FALSE) . '/settings.php';
     $errors = install_database_errors($database, $settings_file);
     if (empty($errors)) {
@@ -1020,7 +1017,6 @@ function install_verify_database_settings() {
  * Checks a database connection and returns any errors.
  */
 function install_database_errors($database, $settings_file) {
-  global $databases;
   $errors = array();
 
   // Check database type.
@@ -1032,18 +1028,13 @@ function install_database_errors($database, $settings_file) {
   else {
     // Run driver specific validation
     $errors += $database_types[$driver]->validateDatabaseSettings($database);
-
+    if (!empty($errors)) {
+      // No point to try further.
+      return $errors;
+    }
     // Run tasks associated with the database type. Any errors are caught in the
     // calling function.
-    $databases['default']['default'] = $database;
-    // Just changing the global doesn't get the new information processed.
-    // We need to close any active connections and tell the Database class to
-    // re-parse $databases.
-    if (Database::isActiveConnection()) {
-      Database::closeConnection();
-    }
-    Database::parseConnectionInfo();
-
+    Database::addConnectionInfo('default', 'default', $database);
     try {
       db_run_tasks($driver);
     }
@@ -1362,7 +1353,7 @@ function install_get_localization_release($version = \Drupal::VERSION) {
 
       // Dev release: the previous point release (e.g., 8.2-dev falls back to
       // 8.1) or any unstable release (e.g., 8.0-dev falls back to 8.0-rc1,
-      // 8.0-beta1 or 8.0-alpha2)
+      // 8.0-beta1 or 8.0-alpha12)
       case 'dev':
         if ($info['minor'] >= 1) {
           $alternatives[] = $info['major'] . '.' . ($info['minor'] - 1);
@@ -1370,7 +1361,7 @@ function install_get_localization_release($version = \Drupal::VERSION) {
         else {
           $alternatives[] = $info['major'] . '.0-rc1';
           $alternatives[] = $info['major'] . '.0-beta1';
-          $alternatives[] = $info['major'] . '.0-alpha2';
+          $alternatives[] = $info['major'] . '.0-alpha12';
         }
         break;
 
@@ -1460,7 +1451,6 @@ function install_load_profile(&$install_state) {
  *   An array of information about the current installation state.
  */
 function install_bootstrap_full() {
-  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
   \Drupal::service('session_manager')->initialize();
 }
 
@@ -2046,12 +2036,16 @@ function install_display_requirements($install_state, $requirements) {
   // and indicating a desire to continue anyway. See drupal_requirements_url().
   if ($severity == REQUIREMENT_ERROR || ($severity == REQUIREMENT_WARNING && empty($install_state['parameters']['continue']))) {
     if ($install_state['interactive']) {
-      $build['#title'] = t('Requirements problem');
-      $build['report'] = array(
-        '#theme' => 'status_report',
-        '#requirements' => $requirements,
-        '#suffix' => t('Check the messages and <a href="!url">try again</a>.', array('!url' => check_url(drupal_requirements_url($severity)))),
-      );
+      $build['report']['#theme'] = 'status_report';
+      $build['report']['#requirements'] = $requirements;
+      if ($severity == REQUIREMENT_WARNING) {
+        $build['#title'] = t('Requirements review');
+        $build['#suffix'] = t('Check the messages and <a href="!retry">retry</a>, or you may choose to <a href="!cont">continue anyway</a>.', array('!retry' => check_url(drupal_requirements_url(REQUIREMENT_ERROR)), '!cont' => check_url(drupal_requirements_url($severity))));
+      }
+      else {
+        $build['#title'] = t('Requirements problem');
+        $build['#suffix'] = t('Check the messages and <a href="!url">try again</a>.', array('!url' => check_url(drupal_requirements_url($severity))));
+      }
       return $build;
     }
     else {

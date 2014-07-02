@@ -9,6 +9,8 @@ namespace Drupal\Core\Database\Query;
 
 /**
  * Interface definition for a Select Query object.
+ *
+ * @ingroup database
  */
 interface SelectInterface extends ConditionInterface, AlterableInterface, ExtendableInterface, PlaceholderInterface {
 
@@ -477,6 +479,14 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    *   TRUE if the validation was successful, FALSE if not.
    */
   public function preExecute(SelectInterface $query = NULL);
+
+  /**
+   * Runs the query against the database.
+   *
+   * @return \Drupal\Core\Database\StatementInterface|null
+   *   A prepared statement, or NULL if the query is not valid.
+   */
+  public function execute();
 
   /**
    * Helper function to build most common HAVING conditional clauses.

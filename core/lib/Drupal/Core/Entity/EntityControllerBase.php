@@ -7,8 +7,9 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\DependencyInjection\DependencySerialization;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
@@ -16,14 +17,9 @@ use Drupal\Core\StringTranslation\TranslationInterface;
  *
  * @todo Convert this to a trait.
  */
-abstract class EntityControllerBase extends DependencySerialization {
-
-  /**
-   * The translation manager service.
-   *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface
-   */
-  protected $translationManager;
+abstract class EntityControllerBase {
+  use StringTranslationTrait;
+  use DependencySerializationTrait;
 
   /**
    * The module handler to invoke hooks on.
@@ -31,32 +27,6 @@ abstract class EntityControllerBase extends DependencySerialization {
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
-
-  /**
-   * Gets the translation manager.
-   *
-   * @return \Drupal\Core\StringTranslation\TranslationInterface
-   *   The translation manager.
-   */
-  protected function translationManager() {
-    if (!$this->translationManager) {
-      $this->translationManager = \Drupal::translation();
-    }
-    return $this->translationManager;
-  }
-
-  /**
-   * Sets the translation manager for this controller.
-   *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
-   *   The translation manager.
-   *
-   * @return $this
-   */
-  public function setTranslationManager(TranslationInterface $translation_manager) {
-    $this->translationManager = $translation_manager;
-    return $this;
-  }
 
   /**
    * Returns the module handler.

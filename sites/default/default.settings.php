@@ -49,6 +49,11 @@
  *
  * @see example.sites.php
  * @see conf_path()
+ *
+ * In addition to customizing application settings through variables in
+ * settings.php, you can create a services.yml file in the same directory to
+ * register custom, site-specific service definitions and/or swap out default
+ * implementations with custom ones.
  */
 
 /**
@@ -93,22 +98,23 @@
  * For each database, you may optionally specify multiple "target" databases.
  * A target database allows Drupal to try to send certain queries to a
  * different database if it can but fall back to the default connection if not.
- * That is useful for master/slave replication, as Drupal may try to connect
- * to a slave server when appropriate and if one is not available will simply
- * fall back to the single master server.
+ * That is useful for primary/replica replication, as Drupal may try to connect
+ * to a replica server when appropriate and if one is not available will simply
+ * fall back to the single primary server (The terms primary/replica are
+ * traditionally referred to as master/slave in database server documentation).
  *
  * The general format for the $databases array is as follows:
  * @code
  * $databases['default']['default'] = $info_array;
- * $databases['default']['slave'][] = $info_array;
- * $databases['default']['slave'][] = $info_array;
+ * $databases['default']['replica'][] = $info_array;
+ * $databases['default']['replica'][] = $info_array;
  * $databases['extra']['default'] = $info_array;
  * @endcode
  *
  * In the above example, $info_array is an array of settings described above.
- * The first line sets a "default" database that has one master database
+ * The first line sets a "default" database that has one primary database
  * (the second level default).  The second and third lines create an array
- * of potential slave databases.  Drupal will select one at random for a given
+ * of potential replica databases.  Drupal will select one at random for a given
  * request as needed.  The fourth line creates a new database with a name of
  * "extra".
  *
@@ -216,12 +222,18 @@ $databases = array();
 /**
  * Location of the site configuration files.
  *
- * By default, Drupal configuration files are stored in a randomly named
- * directory under the default public files path. On install the
- * named directory is created in the default files directory. For enhanced
- * security, you may set this variable to a location outside your docroot.
+ * The $config_directories array specifies the location of file system
+ * directories used for configuration data. On install, "active" and "staging"
+ * directories are created for configuration. The staging directory is used for
+ * configuration imports; the active directory is not used by default, since the
+ * default storage for active configuration is the database rather than the file
+ * system (this can be changed; see "Active configuration settings" below).
  *
- * @todo Flesh this out, provide more details, etc.
+ * The default location for the active and staging directories is inside a
+ * randomly-named directory in the public files path; this setting allows you to
+ * override these locations. If you use files for the active configuration, you
+ * can enhance security by putting the active configuration outside your
+ * document root.
  *
  * Example:
  * @code
@@ -240,7 +252,7 @@ $config_directories = array();
  * directory and reverse proxy address, and temporary configuration, such as
  * turning on Twig debugging and security overrides.
  *
- * @see \Drupal\Component\Utility\Settings::get()
+ * @see \Drupal\Core\Site\Settings::get()
  */
 
 /**
@@ -251,9 +263,9 @@ $config_directories = array();
  * site is deployed on a cluster of web servers, you must ensure that this
  * variable has the same value on each server.
  *
- * For enhanced security, you may set this variable to a value using the
- * contents of a file outside your docroot that is never saved together
- * with any backups of your Drupal files and database.
+ * For enhanced security, you may set this variable to the contents of a file
+ * outside your document root; you should also ensure that this file is not
+ * stored with backups of your database.
  *
  * Example:
  * @code
@@ -274,59 +286,6 @@ $settings['hash_salt'] = '';
  * TRUE back to a FALSE!
  */
 $settings['update_free_access'] = FALSE;
-
-/**
- * Twig debugging:
- *
- * When debugging is enabled:
- * - The markup of each Twig template is surrounded by HTML comments that
- *   contain theming information, such as template file name suggestions.
- * - Note that this debugging markup will cause automated tests that directly
- *   check rendered HTML to fail. When running automated tests, 'twig_debug'
- *   should be set to FALSE.
- * - The dump() function can be used in Twig templates to output information
- *   about template variables.
- * - Twig templates are automatically recompiled whenever the source code
- *   changes (see twig_auto_reload below).
- *
- * Note: changes to this setting will only take effect once the cache is
- * cleared.
- *
- * For more information about debugging Twig templates, see
- * http://drupal.org/node/1906392.
- *
- * Not recommended in production environments (Default: FALSE).
- */
-# $settings['twig_debug'] = TRUE;
-
-/**
- * Twig auto-reload:
- *
- * Automatically recompile Twig templates whenever the source code changes. If
- * you don't provide a value for twig_auto_reload, it will be determined based
- * on the value of twig_debug.
- *
- * Note: changes to this setting will only take effect once the cache is
- * cleared.
- *
- * Not recommended in production environments (Default: NULL).
- */
-# $settings['twig_auto_reload'] = TRUE;
-
-/**
- * Twig cache:
- *
- * By default, Twig templates will be compiled and stored in the filesystem to
- * increase performance. Disabling the Twig cache will recompile the templates
- * from source each time they are used. In most cases the twig_auto_reload
- * setting above should be enabled rather than disabling the Twig cache.
- *
- * Note: changes to this setting will only take effect once the cache is
- * cleared.
- *
- * Not recommended in production environments (Default: TRUE).
- */
-# $settings['twig_cache'] = FALSE;
 
 /**
  * External access proxy settings:
@@ -491,7 +450,7 @@ $settings['update_free_access'] = FALSE;
  * Remove the leading hash signs to enable.
  *
  * The "en" part of the variable name, is dynamic and can be any langcode of
- * any enabled language. (eg locale_custom_strings_de for german).
+ * any added language. (eg locale_custom_strings_de for german).
  */
 # $settings['locale_custom_strings_en'][''] = array(
 #   'forum'      => 'Discussion board',
@@ -509,16 +468,6 @@ $settings['update_free_access'] = FALSE;
  * Note: This setting does not apply to installation and update pages.
  */
 # $settings['maintenance_theme'] = 'bartik';
-
-/**
- * Enable access to rebuild.php.
- *
- * This setting can be enabled to allow Drupal's php and database cached
- * storage to be cleared via the rebuild.php page. Access to this page can also
- * be gained by generating a query string from rebuild_token_calculator.sh and
- * using these parameters in a request to rebuild.php.
- */
-# $settings['rebuild_access'] = TRUE;
 
 /**
  * Base URL (optional).
@@ -548,8 +497,8 @@ $settings['update_free_access'] = FALSE;
  * To see what PHP settings are possible, including whether they can be set at
  * runtime (by using ini_set()), read the PHP documentation:
  * http://php.net/manual/ini.list.php
- * See drupal_environment_initialize() in core/includes/bootstrap.inc for
- * required runtime settings and the .htaccess file for non-runtime settings.
+ * See \Drupal\Core\DrupalKernel::bootEnvironment() for required runtime
+ * settings and the .htaccess file for non-runtime settings.
  * Settings defined there should not be duplicated here so as to avoid conflict
  * issues.
  */
@@ -604,14 +553,16 @@ ini_set('session.cookie_lifetime', 2000000);
  * Active configuration settings.
  *
  * By default, the active configuration is stored in the database in the
- * {config} table. To install Drupal with a different active configuration
- * storage, you need to override the setting here, in addition to overriding
- * the config.storage.active service definition in a module or profile.
- *
- * The 'bootstrap_config_storage' setting needs to be a callable that returns
- * core.services.yml.
+ * {config} table. To use a different storage mechanism for the active
+ * configuration, do the following prior to installing:
+ * - Override the 'bootstrap_config_storage' setting here. It must be set to a
+ *   callable that returns an object that implements
+ *   \Drupal\Core\Config\StorageInterface.
+ * - Override the service definition 'config.storage.active'. Put this
+ *   override in a services.yml file in the same directory as settings.php
+ *   (definitions in this file will override service definition defaults).
  */
- # $settings['bootstrap_config_storage'] = array('Drupal\Core\Config\BootstrapConfigStorageFactory', 'getFileStorage');
+# $settings['bootstrap_config_storage'] = array('Drupal\Core\Config\BootstrapConfigStorageFactory', 'getFileStorage');
 
 /**
  * Configuration overrides.
@@ -674,11 +625,11 @@ ini_set('session.cookie_lifetime', 2000000);
  *
  * Use settings.local.php to override variables on secondary (staging,
  * development, etc) installations of this site. Typically used to disable
- * caching, JavaScript/CSS compression, re-routing of outgoing e-mails, and
+ * caching, JavaScript/CSS compression, re-routing of outgoing emails, and
  * other things that should not happen on development and testing sites.
  *
  * Keep this code block at the end of this file to take full effect.
  */
-# if (file_exists(DRUPAL_ROOT . '/' . $conf_path . '/settings.local.php')) {
-#   include DRUPAL_ROOT . '/' . $conf_path . '/settings.local.php';
+# if (file_exists(__DIR__ . '/settings.local.php')) {
+#   include __DIR__ . '/settings.local.php';
 # }

@@ -140,8 +140,10 @@ class ExtensionDiscovery {
 
     // Unless an explicit value has been passed, manually check whether we are
     // in a test environment, in which case test extensions must be included.
+    // Test extensions can also be included for debugging purposes by setting a
+    // variable in settings.php.
     if (!isset($include_tests)) {
-      $include_tests = (bool) drupal_valid_test_ua();
+      $include_tests = drupal_valid_test_ua() || Settings::get('extension_discovery_scan_tests');
     }
 
     $files = array();
@@ -273,18 +275,7 @@ class ExtensionDiscovery {
     $files = array();
     // Duplicate files found in later search directories take precedence over
     // earlier ones; they replace the extension in the existing $files array.
-    // The exception to this is if the later extension is not compatible with
-    // the current version of Drupal core, which may occur during upgrades when
-    // e.g. new modules were introduced in core while older contrib modules with
-    // the same name still exist in a later search path.
     foreach ($all_files as $file) {
-      if (isset($files[$file->getName()])) {
-        // Skip the extension if it is incompatible with Drupal core.
-        $info = $this->getInfoParser()->parse($file->getPathname());
-        if (!isset($info['core']) || $info['core'] != \Drupal::CORE_COMPATIBILITY) {
-          continue;
-        }
-      }
       $files[$file->getName()] = $file;
     }
     return $files;

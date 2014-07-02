@@ -86,6 +86,13 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   protected $cacheBackend;
 
   /**
+   * The mocked typed config manager.
+   *
+   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $typedConfigManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function getInfo() {
@@ -129,11 +136,14 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
     $this->cacheBackend = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
 
+    $this->typedConfigManager = $this->getMock('Drupal\Core\Config\TypedConfigManagerInterface');
+
     $container = new ContainerBuilder();
     $container->set('entity.manager', $this->entityManager);
     $container->set('uuid', $this->uuid);
     $container->set('language_manager', $this->languageManager);
     $container->set('cache.test', $this->cacheBackend);
+    $container->set('config.typed', $this->typedConfigManager);
     $container->setParameter('cache_bins', array('cache.test' => 'test'));
     \Drupal::setContainer($container);
 
@@ -210,13 +220,13 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   /**
    * @covers ::calculateDependencies
    *
-   * @dataProvider providerCalculateDependenciesWithPluginBag
+   * @dataProvider providerCalculateDependenciesWithPluginBags
    */
-  public function testCalculateDependenciesWithPluginBag($definition, $expected_dependencies) {
+  public function testCalculateDependenciesWithPluginBags($definition, $expected_dependencies) {
     $values = array();
-    $this->entity = $this->getMockBuilder('\Drupal\Tests\Core\Config\Entity\Fixtures\ConfigEntityBaseWithPluginBag')
+    $this->entity = $this->getMockBuilder('\Drupal\Tests\Core\Config\Entity\Fixtures\ConfigEntityBaseWithPluginBags')
       ->setConstructorArgs(array($values, $this->entityTypeId))
-      ->setMethods(array('getPluginBag'))
+      ->setMethods(array('getPluginBags'))
       ->getMock();
 
     // Create a configurable plugin that would add a dependency.
@@ -236,18 +246,18 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
     // Return the mocked plugin bag.
     $this->entity->expects($this->once())
-      ->method('getPluginBag')
-      ->will($this->returnValue($pluginBag));
+      ->method('getPluginBags')
+      ->will($this->returnValue(array($pluginBag)));
 
     $this->assertEquals($expected_dependencies, $this->entity->calculateDependencies());
   }
 
   /**
-   * Data provider for testCalculateDependenciesWithPluginBag.
+   * Data provider for testCalculateDependenciesWithPluginBags.
    *
    * @return array
    */
-  public function providerCalculateDependenciesWithPluginBag() {
+  public function providerCalculateDependenciesWithPluginBags() {
     // Start with 'a' so that order of the dependency array is fixed.
     $instance_dependency_1 = 'a' . $this->randomName(10);
     $instance_dependency_2 = 'a' . $this->randomName(11);
@@ -431,14 +441,21 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
    * @covers ::toArray
    */
   public function testToArray() {
+    $this->typedConfigManager->expects($this->once())
+      ->method('getDefinition')
+      ->will($this->returnValue(array('mapping' => array('id' => '', 'dependencies' => ''))));
     $properties = $this->entity->toArray();
     $this->assertInternalType('array', $properties);
-    $class_info = new \ReflectionClass($this->entity);
-    foreach ($class_info->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
-      $name = $property->getName();
-      $this->assertArrayHasKey($name, $properties);
-      $this->assertSame($this->entity->get($name), $properties[$name]);
-    }
+    $this->assertEquals(array('id' => $this->entity->id(), 'dependencies' => array()), $properties);
+  }
+
+  /**
+   * @covers ::toArray
+   *
+   * @expectedException \Drupal\Core\Config\Schema\SchemaIncompleteException
+   */
+  public function testToArrayFallback() {
+    $this->entity->toArray();
   }
 
 }

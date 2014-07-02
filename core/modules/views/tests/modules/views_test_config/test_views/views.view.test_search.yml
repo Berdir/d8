@@ -87,7 +87,7 @@ display:
         options:
           disable_sql_rewrite: false
           distinct: false
-          slave: false
+          replica: false
           query_comment: false
           query_tags: {  }
       exposed_form:
@@ -111,7 +111,6 @@ display:
           grouping: {  }
           row_class: ''
           default_row_class: true
-          row_class_special: true
       row:
         type: fields
       fields:

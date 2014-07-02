@@ -7,8 +7,7 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\field\Entity\FieldInstanceConfig;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\file\Entity\File;
 use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldInstanceConfigInterface;
@@ -49,9 +48,9 @@ require_once __DIR__ . '/image.field.inc';
 /**
  * Implements hook_help().
  */
-function image_help($path, $arg) {
-  switch ($path) {
-    case 'admin/help#image':
+function image_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.image':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('The Image module allows you to manipulate images on your website. It exposes a setting for using the <em>Image toolkit</em>, allows you to configure <em>Image styles</em> that can be used for resizing or adjusting images on display, and provides an <em>Image</em> field for attaching images to content. For more information, see the online handbook entry for <a href="@image">Image module</a>.', array('@image' => 'http://drupal.org/documentation/modules/image')) . '</p>';
@@ -66,18 +65,16 @@ function image_help($path, $arg) {
       $output .= '<dd>' . t("Image module also allows you to attach images to content as fields. To add an image field to a <a href='@content-type'>content type</a>, go to the content type's <em>manage fields</em> page, and add a new field of type <em>Image</em>. Attaching images to content this way allows image styles to be applied and maintained, and also allows you more flexibility when theming.", array('@content-type' => url('admin/structure/types'))) . '</dd>';
       $output .= '</dl>';
       return $output;
-    case 'admin/config/media/image-styles':
+
+    case 'image.style_list':
       return '<p>' . t('Image styles commonly provide thumbnail sizes by scaling and cropping images, but can also add various effects before an image is displayed. When an image is displayed with a style, a new file is created and the original image is left unchanged.') . '</p>';
-    case 'admin/config/media/image-styles/manage/%/add/%':
-      $effect = \Drupal::service('plugin.manager.image.effect')->getDefinition($arg[7]);
+
+    case 'image.effect_add_form':
+      $effect = \Drupal::service('plugin.manager.image.effect')->getDefinition($route_match->getParameter('image_effect'));
       return isset($effect['description']) ? ('<p>' . $effect['description'] . '</p>') : NULL;
-    case 'admin/config/media/image-styles/manage/%/effects/%':
-      try {
-        $effect = entity_load('image_style', $arg[5])->getEffect($arg[7]);
-      }
-      catch (PluginNotFoundException $e) {
-        return NULL;
-      }
+
+    case 'image.effect_edit_form':
+      $effect = $route_match->getParameter('image_style')->getEffect($route_match->getParameter('image_effect'));
       $effect_definition = $effect->getPluginDefinition();
       return isset($effect_definition['description']) ? ('<p>' . $effect_definition['description'] . '</p>') : NULL;
   }
@@ -111,6 +108,7 @@ function image_theme() {
         'title' => NULL,
         'attributes' => array(),
       ),
+      'template' => 'image-style',
     ),
 
     // Theme functions in image.admin.inc.
@@ -121,36 +119,40 @@ function image_theme() {
     'image_style_preview' => array(
       'variables' => array('style' => NULL),
       'file' => 'image.admin.inc',
+      'template' => 'image-style-preview',
     ),
     'image_anchor' => array(
       'render element' => 'element',
       'file' => 'image.admin.inc',
+      'template' => 'image-anchor',
     ),
     'image_resize_summary' => array(
-      'variables' => array('data' => NULL),
-      'file' => 'image.admin.inc',
+      'variables' => array('data' => NULL, 'effect' => array()),
+      'template' => 'image-resize-summary',
     ),
     'image_scale_summary' => array(
-      'variables' => array('data' => NULL),
-      'file' => 'image.admin.inc',
+      'variables' => array('data' => NULL, 'effect' => array()),
+      'template' => 'image-scale-summary',
     ),
     'image_crop_summary' => array(
-      'variables' => array('data' => NULL),
-      'file' => 'image.admin.inc',
+      'variables' => array('data' => NULL, 'effect' => array()),
+      'template' => 'image-crop-summary',
     ),
     'image_rotate_summary' => array(
-      'variables' => array('data' => NULL),
-      'file' => 'image.admin.inc',
+      'variables' => array('data' => NULL, 'effect' => array()),
+      'template' => 'image-rotate-summary',
     ),
 
     // Theme functions in image.field.inc.
     'image_widget' => array(
       'render element' => 'element',
       'file' => 'image.field.inc',
+      'template' => 'image-widget',
     ),
     'image_formatter' => array(
       'variables' => array('item' => NULL, 'item_attributes' => NULL, 'path' => NULL, 'image_style' => NULL),
       'file' => 'image.field.inc',
+      'template' => 'image-formatter',
     ),
   );
 }
@@ -187,7 +189,7 @@ function image_file_download($uri) {
 
     // Check that the file exists and is an image.
     $image = \Drupal::service('image.factory')->get($uri);
-    if ($image->isSupported()) {
+    if ($image->isValid()) {
       // Check the permissions of the original to grant access to this image.
       $headers = \Drupal::moduleHandler()->invokeAll('file_download', array($original_uri));
       // Confirm there's at least one module granting access and none denying access.
@@ -247,16 +249,6 @@ function image_path_flush($path) {
 }
 
 /**
- * Loads an ImageStyle object.
- *
- * @param string $name
- *   The ID of the ImageStyle object to load.
- */
-function image_style_load($name) {
-  return entity_load('image_style', $name);
-}
-
-/**
  * Gets an array of image styles suitable for using as select list options.
  *
  * @param $include_empty
@@ -281,18 +273,17 @@ function image_style_options($include_empty = TRUE) {
 }
 
 /**
- * Returns HTML for an image using a specific image style.
+ * Prepares variables for image style templates.
  *
- * @param $variables
+ * Default template: image-style.html.twig.
+ *
+ * @param array $variables
  *   An associative array containing:
- *   - style_name: The name of the style to be used to alter the original image.
- *   - uri: The path of the image file relative to the Drupal files directory.
- *     This function does not work with images outside the files directory nor
- *     with remotely hosted images. This should be in a format such as
- *     'images/image.jpg', or using a stream wrapper such as
- *     'public://images/image.jpg'.
- *   - width: The width of the source image (if known).
- *   - height: The height of the source image (if known).
+ *   - width: The width of the image.
+ *   - height: The height of the image.
+ *   - style_name: The name of the image style to be applied.
+ *   - attributes: Additional attributes to apply to the image.
+ *   - uri: URI of the source image before styling.
  *   - alt: The alternative text for text-based browsers. HTML 4 and XHTML 1.0
  *     always require an alt attribute. The HTML 5 draft allows the alt
  *     attribute to be omitted in some cases. Therefore, this variable defaults
@@ -306,12 +297,8 @@ function image_style_options($include_empty = TRUE) {
  *   - title: The title text is displayed when the image is hovered in some
  *     popular browsers.
  *   - attributes: Associative array of attributes to be placed in the img tag.
- *
- * @ingroup themeable
  */
-function theme_image_style($variables) {
-  // @todo Image style loading will be moved outside theme in
-  //   https://drupal.org/node/2029649
+function template_preprocess_image_style(&$variables) {
   $style = entity_load('image_style', $variables['style_name']);
 
   // Determine the dimensions of the styled image.
@@ -325,7 +312,7 @@ function theme_image_style($variables) {
   // Add in the image style name as an HTML class.
   $variables['attributes']['class'][] = 'image-style-' . drupal_html_class($variables['style_name']);
 
-  $image = array(
+  $variables['image'] = array(
     '#theme' => 'image',
     '#width' => $dimensions['width'],
     '#height' => $dimensions['height'],
@@ -334,13 +321,12 @@ function theme_image_style($variables) {
   );
 
   if (isset($variables['alt']) || array_key_exists('alt', $variables)) {
-    $image['#alt'] = $variables['alt'];
+    $variables['image']['#alt'] = $variables['alt'];
   }
   if (isset($variables['title']) || array_key_exists('title', $variables)) {
-    $image['#title'] = $variables['title'];
+    $variables['image']['#title'] = $variables['title'];
   }
 
-  return drupal_render($image);
 }
 
 /**
@@ -375,7 +361,7 @@ function image_entity_presave(EntityInterface $entity) {
   $field = FALSE;
   $entity_type_id = $entity->getEntityTypeId();
   if ($entity_type_id == 'field_instance_config') {
-    $field = $entity->getField();
+    $field = $entity->getFieldStorageDefinition();
     $default_settings = \Drupal::service('plugin.manager.field.field_type')->getDefaultInstanceSettings('image');
   }
   elseif ($entity_type_id == 'field_config') {
@@ -433,12 +419,12 @@ function image_field_config_update(FieldConfigInterface $field) {
     if ($file_new) {
       $file_new->status = FILE_STATUS_PERMANENT;
       $file_new->save();
-      \Drupal::service('file.usage')->add($file_new, 'image', 'default_image', $field->uuid);
+      \Drupal::service('file.usage')->add($file_new, 'image', 'default_image', $field->uuid());
     }
 
     // Is there an old file?
     if ($fid_old && ($file_old = file_load($fid_old))) {
-      \Drupal::service('file.usage')->delete($file_old, 'image', 'default_image', $field->uuid);
+      \Drupal::service('file.usage')->delete($file_old, 'image', 'default_image', $field->uuid());
     }
   }
 
@@ -454,7 +440,7 @@ function image_field_config_update(FieldConfigInterface $field) {
  * Implements hook_ENTITY_TYPE_update() for 'field_instance_config'.
  */
 function image_field_instance_config_update(FieldInstanceConfigInterface $field_instance) {
-  $field = $field_instance->getField();
+  $field = $field_instance->getFieldStorageDefinition();
   if ($field->type != 'image') {
     // Only act on image fields.
     return;
@@ -472,11 +458,11 @@ function image_field_instance_config_update(FieldInstanceConfigInterface $field_
     if ($file_new) {
       $file_new->status = FILE_STATUS_PERMANENT;
       $file_new->save();
-      \Drupal::service('file.usage')->add($file_new, 'image', 'default_image', $field_instance->uuid);
+      \Drupal::service('file.usage')->add($file_new, 'image', 'default_image', $field_instance->uuid());
     }
     // Delete the old file, if present.
     if ($fid_old && ($file_old = file_load($fid_old))) {
-      \Drupal::service('file.usage')->delete($file_old, 'image', 'default_image', $field_instance->uuid);
+      \Drupal::service('file.usage')->delete($file_old, 'image', 'default_image', $field_instance->uuid());
     }
   }
 
@@ -500,7 +486,7 @@ function image_field_config_delete(FieldConfigInterface $field) {
   // The value of a managed_file element can be an array if #extended == TRUE.
   $fid = $field->settings['default_image']['fid'];
   if ($fid && ($file = file_load($fid))) {
-    \Drupal::service('file.usage')->delete($file, 'image', 'default_image', $field->uuid);
+    \Drupal::service('file.usage')->delete($file, 'image', 'default_image', $field->uuid());
   }
 }
 
@@ -508,7 +494,7 @@ function image_field_config_delete(FieldConfigInterface $field) {
  * Implements hook_ENTITY_TYPE_delete() for 'field_instance_config'.
  */
 function image_field_instance_config_delete(FieldInstanceConfigInterface $field_instance) {
-  $field = $field_instance->getField();
+  $field = $field_instance->getFieldStorageDefinition();
   if ($field->type != 'image') {
     // Only act on image fields.
     return;
@@ -519,6 +505,6 @@ function image_field_instance_config_delete(FieldInstanceConfigInterface $field_
 
   // Remove the default image when the instance is deleted.
   if ($fid && ($file = file_load($fid))) {
-    \Drupal::service('file.usage')->delete($file, 'image', 'default_image', $field_instance->uuid);
+    \Drupal::service('file.usage')->delete($file, 'image', 'default_image', $field_instance->uuid());
   }
 }

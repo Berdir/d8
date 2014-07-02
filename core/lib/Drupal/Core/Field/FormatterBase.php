@@ -9,6 +9,8 @@ namespace Drupal\Core\Field;
 
 /**
  * Base class for 'Field formatter' plugin implementations.
+ *
+ * @ingroup field_formatter
  */
 abstract class FormatterBase extends PluginSettingsBase implements FormatterInterface {
 
@@ -55,14 +57,17 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
    *   The formatter label display setting.
    * @param string $view_mode
    *   The view mode.
+   * @param array $third_party_settings
+   *   Any third party settings settings.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings) {
     parent::__construct(array(), $plugin_id, $plugin_definition);
 
     $this->fieldDefinition = $field_definition;
     $this->settings = $settings;
     $this->label = $label;
     $this->viewMode = $view_mode;
+    $this->thirdPartySettings = $third_party_settings;
   }
 
   /**
@@ -90,20 +95,7 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
         '#object' => $entity,
         '#items' => $items,
         '#formatter' => $this->getPluginId(),
-        '#cache' => array('tags' => array())
       );
-
-      // Gather cache tags from reference fields.
-      foreach ($items as $item) {
-        if (isset($item->format)) {
-          $info['#cache']['tags']['filter_format'] = $item->format;
-        }
-
-        if (isset($item->entity)) {
-          $info['#cache']['tags'][$item->entity->getEntityTypeId()][] = $item->entity->id();
-          $info['#cache']['tags'][$item->entity->getEntityTypeId() . '_view'] = TRUE;
-        }
-      }
 
       $addition = array_merge($info, $elements);
     }

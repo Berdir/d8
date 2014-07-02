@@ -9,14 +9,21 @@ use Drupal\menu_link\Entity\MenuLink;
 
 /**
  * Implements hook_menu_link_defaults_alter().
- *
- * Many of the machine names here are slightly different from the route name.
- * Since the machine name is arbitrary, this helps ensure that core does not
- * add mistaken assumptions about the correlation.
  */
 function menu_test_menu_link_defaults_alter(&$links) {
+  // Many of the machine names here are slightly different from the route name.
+  // Since the machine name is arbitrary, this helps ensure that core does not
+  // add mistaken assumptions about the correlation.
   $links['menu_test.menu_name_test']['menu_name'] = menu_test_menu_name();
   $links['menu_test.context']['title'] = \Drupal::config('menu_test.menu_item')->get('title');
+
+  // Adds a custom menu link.
+  $links['menu_test.custom'] = array(
+    'title' => 'Custom link',
+    'route_name' => 'menu_test.custom',
+    'description' => 'Custom link used to check the integrity of manually added menu links.',
+    'parent' => 'menu_test',
+  );
 }
 
 /**
@@ -132,7 +139,7 @@ function menu_test_theme_page_callback($inherited = FALSE) {
   // Initialize the theme system so that $theme_key will be populated.
   drupal_theme_initialize();
   // Now we check what the theme negotiator service returns.
-  $active_theme = \Drupal::service('theme.negotiator')->getActiveTheme('getActiveTheme');
+  $active_theme = \Drupal::service('theme.negotiator')->determineActiveTheme(\Drupal::routeMatch());
   $output = "Active theme: $active_theme. Actual theme: $theme_key.";
   if ($inherited) {
     $output .= ' Theme negotiation inheritance is being tested.';

@@ -40,13 +40,6 @@ class EntityDatabaseStorage extends EntityStorageBase {
   protected $database;
 
   /**
-   * The field info object.
-   *
-   * @var \Drupal\field\FieldInfo
-   */
-  protected $fieldInfo;
-
-  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
@@ -142,8 +135,8 @@ class EntityDatabaseStorage extends EntityStorageBase {
     try {
       parent::delete($entities);
 
-      // Ignore slave server temporarily.
-      db_ignore_slave();
+      // Ignore replica server temporarily.
+      db_ignore_replica();
     }
     catch (\Exception $e) {
       $transaction->rollback();
@@ -174,8 +167,8 @@ class EntityDatabaseStorage extends EntityStorageBase {
     try {
       $return = parent::save($entity);
 
-      // Ignore slave server temporarily.
-      db_ignore_slave();
+      // Ignore replica server temporarily.
+      db_ignore_replica();
       return $return;
     }
     catch (\Exception $e) {

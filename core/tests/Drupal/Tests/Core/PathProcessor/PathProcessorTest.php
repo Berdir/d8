@@ -7,7 +7,7 @@
 
 namespace Drupal\Tests\Core\PathProcessor;
 
-use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\PathProcessor\PathProcessorAlias;
 use Drupal\Core\PathProcessor\PathProcessorDecode;
 use Drupal\Core\PathProcessor\PathProcessorFront;
@@ -31,9 +31,9 @@ class PathProcessorTest extends UnitTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => t('Path Processor Unit Tests'),
-      'description' => t('Tests processing of the inbound path.'),
-      'group' => t('Path API'),
+      'name' => 'Path Processor Unit Tests',
+      'description' => 'Tests processing of the inbound path.',
+      'group' => 'Path API',
     );
   }
 
@@ -78,7 +78,7 @@ class PathProcessorTest extends UnitTestCase {
       ->will($this->returnValue($this->languages));
     $language_manager->expects($this->any())
       ->method('getLanguageTypes')
-      ->will($this->returnValue(array(Language::TYPE_INTERFACE)));
+      ->will($this->returnValue(array(LanguageInterface::TYPE_INTERFACE)));
     $language_manager->expects($this->any())
       ->method('getNegotiationMethods')
       ->will($this->returnValue($method_definitions));
@@ -110,7 +110,7 @@ class PathProcessorTest extends UnitTestCase {
     );
 
     $alias_manager->expects($this->any())
-      ->method('getSystemPath')
+      ->method('getPathByAlias')
       ->will($this->returnValueMap($system_path_map));
 
     // Create a stub config factory with all config settings that will be checked

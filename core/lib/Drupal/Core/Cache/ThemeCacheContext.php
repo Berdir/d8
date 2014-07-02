@@ -7,7 +7,7 @@
 
 namespace Drupal\Core\Cache;
 
-use Symfony\Component\HttpFoundation\Request;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Theme\ThemeNegotiatorInterface;
 
 /**
@@ -16,11 +16,11 @@ use Drupal\Core\Theme\ThemeNegotiatorInterface;
 class ThemeCacheContext implements CacheContextInterface {
 
   /**
-   * The current request.
+   * The current route match.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var \Drupal\Core\Routing\RouteMatch
    */
-  protected $request;
+  protected $routeMatch;
 
   /**
    * The theme negotiator.
@@ -32,13 +32,13 @@ class ThemeCacheContext implements CacheContextInterface {
   /**
    * Constructs a new ThemeCacheContext service.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The HTTP request object.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The route match.
    * @param \Drupal\Core\Theme\ThemeNegotiatorInterface $theme_negotiator
    *   The theme negotiator.
    */
-  public function __construct(Request $request, ThemeNegotiatorInterface $theme_negotiator) {
-    $this->request = $request;
+  public function __construct(RouteMatchInterface $route_match, ThemeNegotiatorInterface $theme_negotiator) {
+    $this->routeMatch = $route_match;
     $this->themeNegotiator = $theme_negotiator;
   }
 
@@ -53,7 +53,7 @@ class ThemeCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getContext() {
-    return $this->themeNegotiator->determineActiveTheme($this->request) ?: 'stark';
+    return $this->themeNegotiator->determineActiveTheme($this->routeMatch) ?: 'stark';
   }
 
 }
