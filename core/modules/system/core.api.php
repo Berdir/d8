@@ -301,7 +301,7 @@
  *     Configuration Translation module, without the need of a controller class.
  *   - access: If your configuration entity has complex permissions, you might
  *     need an access controller, implementing
- *     \Drupal\Core\Entity\EntityAccessControllerInterface, but most entities
+ *     \Drupal\Core\Entity\EntityAccessHandlerInterface, but most entities
  *     can just use the 'admin_permission' annotation instead.
  * - For content entities, the annotation will refer to a number of database
  *   tables and their fields. These annotation properties, such as 'base_table',

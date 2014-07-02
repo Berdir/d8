@@ -77,7 +77,7 @@ interface EntityAccessHandlerInterface {
    * This method does not determine whether access is granted to the entity
    * itself, only the specific field. Callers are responsible for ensuring that
    * entity access is also respected, for example by using
-   * \Drupal\Core\Entity\EntityAccessControllerInterface::access().
+   * \Drupal\Core\Entity\EntityAccessHandlerInterface::access().
    *
    * @param string $operation
    *   The operation access should be checked for.
@@ -92,7 +92,7 @@ interface EntityAccessHandlerInterface {
    *    is checked for the field definition, without any specific value
    *    available. Defaults to NULL.
    *
-   * @see \Drupal\Core\Entity\EntityAccessControllerInterface::access()
+   * @see \Drupal\Core\Entity\EntityAccessHandlerInterface::access()
    */
   public function fieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account = NULL, FieldItemListInterface $items = NULL);
 

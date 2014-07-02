@@ -224,7 +224,7 @@ class EntityType implements EntityTypeInterface {
       'bundle' => ''
     );
     $this->controllers += array(
-      'access' => 'Drupal\Core\Entity\EntityAccessController',
+      'access' => 'Drupal\Core\Entity\EntityAccessHandler',
     );
   }
 
