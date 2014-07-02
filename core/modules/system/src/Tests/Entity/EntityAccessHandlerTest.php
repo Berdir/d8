@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains Drupal\system\Tests\Entity\EntityAccessTest.
+ * Contains \Drupal\system\Tests\Entity\EntityAccessHandlerTest.
  */
 
 namespace Drupal\system\Tests\Entity;
@@ -13,9 +13,9 @@ use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Entity\EntityAccessHandler;
 
 /**
- * Tests the entity access controller.
+ * Tests the entity access handler.
  */
-class EntityAccessTest extends EntityLanguageTestBase  {
+class EntityAccessHandlerTest extends EntityLanguageTestBase  {
 
   public static function getInfo() {
     return array(

@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the content block entity type.
+ * Defines the access handler for the custom block entity type.
  *
  * @see \Drupal\block_content\Entity\BlockContent
  */

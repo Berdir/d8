@@ -14,7 +14,7 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Defines the access handler for the node type entity type.
  *
- * @see \Drupal\node\Entity\NodeType.
+ * @see \Drupal\node\Entity\NodeType
  */
 class NodeTypeAccessHandler extends EntityAccessHandler {
 

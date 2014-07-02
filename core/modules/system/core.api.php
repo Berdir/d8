@@ -300,7 +300,7 @@
  *     the content. Configuration translation is handled automatically by the
  *     Configuration Translation module, without the need of a controller class.
  *   - access: If your configuration entity has complex permissions, you might
- *     need an access controller, implementing
+ *     need an access handler, implementing
  *     \Drupal\Core\Entity\EntityAccessHandlerInterface, but most entities
  *     can just use the 'admin_permission' annotation instead.
  * - For content entities, the annotation will refer to a number of database
@@ -738,7 +738,7 @@
  *   to check access. See the @link menu Routing topic @endlink for more
  *   information.
  * - Entities: Access for various entity operations is designated either with
- *   simple permissions or access controller classes in the entity annotation.
+ *   simple permissions or access handler classes in the entity annotation.
  *   See the @link entity_api Entity API topic @endlink for more information.
  * - Other code: There is a 'current_user' service, which can be injected into
  *   classes to provide access to the current user account (see the

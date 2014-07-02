@@ -342,7 +342,7 @@ class EntityManagerTest extends UnitTestCase {
    *
    * @covers ::getAccessHandler()
    */
-  public function testGetAccess() {
+  public function testGetAccessHandler() {
     $class = $this->getTestControllerClass();
     $entity = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
     $entity->expects($this->once())

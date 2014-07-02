@@ -78,7 +78,7 @@ class EntityAccessHandler extends EntityControllerBase implements EntityAccessHa
 
     if (($return = $this->processAccessHookResults($access)) === NULL) {
       // No module had an opinion about the access, so let's the access
-      // controller check create access.
+      // handler check create access.
       $return = (bool) $this->checkAccess($entity, $operation, $langcode, $account);
     }
     return $this->setCache($return, $entity->uuid(), $operation, $langcode, $account);
@@ -228,7 +228,7 @@ class EntityAccessHandler extends EntityControllerBase implements EntityAccessHa
 
     if (($return = $this->processAccessHookResults($access)) === NULL) {
       // No module had an opinion about the access, so let's the access
-      // controller check create access.
+      // handler check create access.
       $return = (bool) $this->checkCreateAccess($account, $context, $entity_bundle);
     }
     return $this->setCache($return, $cid, 'create', $context['langcode'], $account);

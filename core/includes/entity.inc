@@ -313,13 +313,13 @@ function entity_page_label(EntityInterface $entity, $langcode = NULL) {
 }
 
 /**
- * Returns the entity access controller for the given entity type.
+ * Returns the entity access handler for the given entity type.
  *
  * @param string $entity_type
  *   The type of the entity.
  *
  * @return \Drupal\Core\Entity\EntityAccessHandlerInterface
- *   An entity access controller instance.
+ *   An entity access handler instance.
  *
  * @see \Drupal\Core\Entity\EntityManagerInterface::getAccessHandler().
  *

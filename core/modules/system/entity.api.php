@@ -31,7 +31,7 @@ use Drupal\Core\Render\Element;
  *   A boolean to explicitly allow or deny access, or NULL to neither allow nor
  *   deny access.
  *
- * @see \Drupal\Core\Entity\EntityAccess
+ * @see \Drupal\Core\Entity\EntityAccessHandler
  */
 function hook_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account, $langcode) {
   return NULL;
@@ -53,7 +53,7 @@ function hook_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operat
  *   A boolean to explicitly allow or deny access, or NULL to neither allow nor
  *   deny access.
  *
- * @see \Drupal\Core\Entity\EntityAccess
+ * @see \Drupal\Core\Entity\EntityAccessHandler
  */
 function hook_ENTITY_TYPE_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account, $langcode) {
   return NULL;
@@ -71,7 +71,7 @@ function hook_ENTITY_TYPE_access(\Drupal\Core\Entity\EntityInterface $entity, $o
  *   A boolean to explicitly allow or deny access, or NULL to neither allow nor
  *   deny access.
  *
- * @see \Drupal\Core\Entity\EntityAccess
+ * @see \Drupal\Core\Entity\EntityAccessHandler
  */
 function hook_entity_create_access(\Drupal\Core\Session\AccountInterface $account, $langcode) {
   return NULL;
@@ -89,7 +89,7 @@ function hook_entity_create_access(\Drupal\Core\Session\AccountInterface $accoun
  *   A boolean to explicitly allow or deny access, or NULL to neither allow nor
  *   deny access.
  *
- * @see \Drupal\Core\Entity\EntityAccess
+ * @see \Drupal\Core\Entity\EntityAccessHandler
  */
 function hook_ENTITY_TYPE_create_access(\Drupal\Core\Session\AccountInterface $account, $langcode) {
   return NULL;

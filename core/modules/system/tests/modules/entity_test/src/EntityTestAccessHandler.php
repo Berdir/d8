@@ -13,7 +13,15 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access controller for the test entity type.
+ * Defines the access handler for the test entity type.
+ *
+ * @see \Drupal\entity_test\Entity\EntityTest
+ * @see \Drupal\entity_test\Entity\EntityTestBaseFieldDisplay
+ * @see \Drupal\entity_test\Entity\EntityTestCache
+ * @see \Drupal\entity_test\Entity\EntityTestMul
+ * @see \Drupal\entity_test\Entity\EntityTestMulRev
+ * @see \Drupal\entity_test\Entity\EntityTestRev
+ * @see \Drupal\entity_test\Entity\EntityTestStringId
  */
 class EntityTestAccessHandler extends EntityAccessHandler {
 

@@ -13,6 +13,8 @@ use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Defines the access handler for the config_test entity type.
+ *
+ * @see \Drupal\config_test\Entity\ConfigTest
  */
 class ConfigTestAccessHandler extends EntityAccessHandler {
 
