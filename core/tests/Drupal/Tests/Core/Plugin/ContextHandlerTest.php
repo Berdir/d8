@@ -11,8 +11,6 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\ContextHandler;
-use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -65,7 +63,7 @@ class ContextHandlerTest extends UnitTestCase {
     $this->typedDataManager->expects($this->any())
       ->method('getDefaultConstraints')
       ->will($this->returnValue(array()));
-    $this->typedDataManager->expects($this->any())
+    /*$this->typedDataManager->expects($this->any())
       ->method('createDataDefinition')
       ->will($this->returnValueMap(array(
         array('expected_data_type', new DataDefinition(array('type' => 'expected_data_type'))),
@@ -75,12 +73,8 @@ class ContextHandlerTest extends UnitTestCase {
         array('foo', new DataDefinition(array('type' => 'foo'))),
         array('fuzzy', new DataDefinition(array('type' => 'fuzzy'))),
         array('specific', new DataDefinition(array('type' => 'foo'))),
-      )));
-    $this->contextHandler = new ContextHandler($this->typedDataManager);
-
-    $container = new ContainerBuilder();
-    $container->set('typed_data_manager', $this->typedDataManager);
-    \Drupal::setContainer($container);
+      )));*/
+    $this->contextHandler = new ContextHandler();
   }
 
   /**
@@ -96,12 +90,12 @@ class ContextHandlerTest extends UnitTestCase {
    * Provides data for testCheckRequirements().
    */
   public function providerTestCheckRequirements() {
-    $requirement_optional = $this->getMock('Drupal\Core\TypedData\DataDefinitionInterface');
+    $requirement_optional = $this->getMock('Drupal\Core\Plugin\Context\ContextDefinitionInterface');
     $requirement_optional->expects($this->atLeastOnce())
       ->method('isRequired')
       ->will($this->returnValue(FALSE));
 
-    $requirement_any = $this->getMock('Drupal\Core\TypedData\DataDefinitionInterface');
+    $requirement_any = $this->getMock('Drupal\Core\Plugin\Context\ContextDefinitionInterface');
     $requirement_any->expects($this->atLeastOnce())
       ->method('isRequired')
       ->will($this->returnValue(TRUE));
@@ -117,7 +111,7 @@ class ContextHandlerTest extends UnitTestCase {
       ->method('getContextDefinition')
       ->will($this->returnValue(new ContextDefinition('empty')));
 
-    $requirement_specific = $this->getMock('Drupal\Core\TypedData\DataDefinitionInterface');
+    $requirement_specific = $this->getMock('Drupal\Core\Plugin\Context\ContextDefinitionInterface');
     $requirement_specific->expects($this->atLeastOnce())
       ->method('isRequired')
       ->will($this->returnValue(TRUE));
@@ -173,7 +167,7 @@ class ContextHandlerTest extends UnitTestCase {
    * Provides data for testGetMatchingContexts().
    */
   public function providerTestGetMatchingContexts() {
-    $requirement_any = $this->getMock('Drupal\Core\TypedData\DataDefinitionInterface');
+    $requirement_any = $this->getMock('Drupal\Core\Plugin\Context\ContextDefinitionInterface');
     $requirement_any->expects($this->atLeastOnce())
       ->method('isRequired')
       ->will($this->returnValue(TRUE));
@@ -183,7 +177,7 @@ class ContextHandlerTest extends UnitTestCase {
     $requirement_any->expects($this->atLeastOnce())
       ->method('getConstraints')
       ->will($this->returnValue(array()));
-    $requirement_specific = $this->getMock('Drupal\Core\TypedData\DataDefinitionInterface');
+    $requirement_specific = $this->getMock('Drupal\Core\Plugin\Context\ContextDefinitionInterface');
     $requirement_specific->expects($this->atLeastOnce())
       ->method('isRequired')
       ->will($this->returnValue(TRUE));

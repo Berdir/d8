@@ -8,34 +8,15 @@
 namespace Drupal\Core\Plugin\Context;
 
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Core\Plugin\Context\ContextDefinitionInterface;
 use Drupal\Component\Plugin\ContextAwarePluginInterface;
 use Drupal\Component\Plugin\Exception\ContextException;
 use Drupal\Component\Utility\String;
-use Drupal\Core\TypedData\DataDefinitionInterface;
-use Drupal\Core\TypedData\DataDefinition;
-use Drupal\Core\TypedData\TypedDataManager;
 
 /**
  * Provides methods to handle sets of contexts.
  */
 class ContextHandler implements ContextHandlerInterface {
-
-  /**
-   * The typed data manager.
-   *
-   * @var \Drupal\Core\TypedData\TypedDataManager
-   */
-  protected $typedDataManager;
-
-  /**
-   * Constructs a new ContextHandler.
-   *
-   * @param \Drupal\Core\TypedData\TypedDataManager $typed_data
-   *   The typed data manager.
-   */
-  public function __construct(TypedDataManager $typed_data) {
-    $this->typedDataManager = $typed_data;
-  }
 
   /**
    * {@inheritdoc}
@@ -47,37 +28,8 @@ class ContextHandler implements ContextHandlerInterface {
         return TRUE;
       }
 
-      // Build an array of requirements out of the contexts specified by the
-      // plugin definition.
-      $requirements = array();
-      /** @var $plugin_context \Drupal\Core\Plugin\Context\ContextDefinitionInterface */
-      foreach ($plugin_definition['context'] as $context_id => $plugin_context) {
-        $definition = $this->typedDataManager->getDefinition($plugin_context->getDataType());
-        $definition['type'] = $plugin_context->getDataType();
-
-        // If the plugin specifies additional constraints, add them to the
-        // constraints defined by the plugin type.
-        if ($plugin_constraints = $plugin_context->getConstraints()) {
-          // Ensure the array exists before adding in constraints.
-          if (!isset($definition['constraints'])) {
-            $definition['constraints'] = array();
-          }
-
-          $definition['constraints'] += $plugin_constraints;
-        }
-
-        // Assume the requirement is required if unspecified.
-        if (!isset($definition['required'])) {
-          $definition['required'] = TRUE;
-        }
-
-        // @todo Use context definition objects after
-        //   https://drupal.org/node/2281635.
-        $requirements[$context_id] = new DataDefinition($definition);
-      }
-
       // Check the set of contexts against the requirements.
-      return $this->checkRequirements($contexts, $requirements);
+      return $this->checkRequirements($contexts, $plugin_definition['context']);
     });
   }
 
@@ -96,9 +48,9 @@ class ContextHandler implements ContextHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getMatchingContexts(array $contexts, DataDefinitionInterface $definition) {
+  public function getMatchingContexts(array $contexts, ContextDefinitionInterface $definition) {
     return array_filter($contexts, function (ContextInterface $context) use ($definition) {
-      $context_definition = $context->getContextDefinition()->getDataDefinition();
+      $context_definition = $context->getContextDefinition();
 
       // If the data types do not match, this context is invalid.
       if ($definition->getDataType() != $context_definition->getDataType()) {

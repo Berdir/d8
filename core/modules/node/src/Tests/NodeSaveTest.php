@@ -30,6 +30,10 @@ class NodeSaveTest extends NodeTestBase {
   function setUp() {
     parent::setUp();
 
+    debug(\Drupal::configFactory()->listAll());
+    \Drupal::moduleHandler()->install(array('views'));
+    debug(\Drupal::configFactory()->listAll());
+
     // Create a user that is allowed to post; we'll use this to test the submission.
     $web_user = $this->drupalCreateUser(array('create article content'));
     $this->drupalLogin($web_user);
