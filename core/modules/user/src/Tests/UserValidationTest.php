@@ -76,16 +76,14 @@ class UserValidationTest extends DrupalUnitTestBase {
     $user = entity_create('user', array('name' => 'test'));
     $violations = $user->validate();
     $this->assertEqual(count($violations), 0, 'No violations when validating a default user.');
-
     // Only test one example invalid name here, the rest is already covered in
     // the testUsernames() method in this class.
     $name = $this->randomName(61);
     $user->set('name', $name);
     $violations = $user->validate();
     $this->assertEqual(count($violations), 1, 'Violation found when name is too long.');
-    $this->assertEqual($violations[0]->getPropertyPath(), 'name.0.value');
+    $this->assertEqual($violations[0]->getPropertyPath(), 'name');
     $this->assertEqual($violations[0]->getMessage(), t('The username %name is too long: it must be %max characters or less.', array('%name' => $name, '%max' => 60)));
-
     // Create a second test user to provoke a name collision.
     $user2 = entity_create('user', array(
       'name' => 'existing',
@@ -95,7 +93,7 @@ class UserValidationTest extends DrupalUnitTestBase {
     $user->set('name', 'existing');
     $violations = $user->validate();
     $this->assertEqual(count($violations), 1, 'Violation found on name collision.');
-    $this->assertEqual($violations[0]->getPropertyPath(), 'name.0.value');
+    $this->assertEqual($violations[0]->getPropertyPath(), 'name');
     $this->assertEqual($violations[0]->getMessage(), t('The name %name is already taken.', array('%name' => 'existing')));
 
     // Make the name valid.
@@ -106,7 +104,6 @@ class UserValidationTest extends DrupalUnitTestBase {
     $this->assertEqual(count($violations), 1, 'Violation found when email is invalid');
     $this->assertEqual($violations[0]->getPropertyPath(), 'mail.0.value');
     $this->assertEqual($violations[0]->getMessage(), t('This value is not a valid email address.'));
-
     $mail = $this->randomName(EMAIL_MAX_LENGTH - 11) . '@example.com';
     $user->set('mail', $mail);
     $violations = $user->validate();
@@ -120,11 +117,11 @@ class UserValidationTest extends DrupalUnitTestBase {
     $this->assertEqual($violations[1]->getPropertyPath(), 'mail.0.value');
     $this->assertEqual($violations[1]->getMessage(), t('This value is not a valid email address.'));
 
-    // Provoke a email collision with an exsiting user.
+    // Provoke a email collision with an existing user.
     $user->set('mail', 'existing@example.com');
     $violations = $user->validate();
     $this->assertEqual(count($violations), 1, 'Violation found when email already exists.');
-    $this->assertEqual($violations[0]->getPropertyPath(), 'mail.0.value');
+    $this->assertEqual($violations[0]->getPropertyPath(), 'mail');
     $this->assertEqual($violations[0]->getMessage(), t('The email address %mail is already taken.', array('%mail' => 'existing@example.com')));
     $user->set('mail', NULL);
 
