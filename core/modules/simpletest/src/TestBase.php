@@ -23,6 +23,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Utility\Error;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -1108,7 +1109,10 @@ abstract class TestBase {
     $this->container->register('info_parser', 'Drupal\Core\Extension\InfoParser');
 
     $request = Request::create('/');
-    $this->container->set('request', $request);
+
+    $requestStack = new RequestStack();
+    $requestStack->push($request);
+    $this->container->set('request_stack', $requestStack);
 
     // Run all tests as a anonymous user by default, web tests will replace that
     // during the test set up.

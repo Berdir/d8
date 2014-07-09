@@ -122,7 +122,7 @@ class ContentTranslationSyncImageTest extends ContentTranslationTestBase {
     $langcode = $this->langcodes[1];
 
     // Populate the required contextual values.
-    $attributes = $this->container->get('request')->attributes;
+    $attributes = \Drupal::request()->attributes;
     $attributes->set('source_langcode', $default_langcode);
 
     // Populate the test entity with some random initial values.

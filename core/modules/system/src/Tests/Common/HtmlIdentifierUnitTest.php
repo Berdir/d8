@@ -29,8 +29,7 @@ class HtmlIdentifierUnitTest extends UnitTestBase {
     parent::setUp();
 
     $container = \Drupal::getContainer();
-    $request = new Request();
-    $container->set('request', $request);
+    $container->get('request_stack')->push(Request::create('/'));
     \Drupal::setContainer($container);
   }
 

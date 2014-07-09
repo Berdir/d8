@@ -9,6 +9,8 @@ namespace Drupal\comment\Tests\Entity;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Tests\UnitTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Unit tests for the comment entity lock behavior.
@@ -37,8 +39,10 @@ class CommentLockTest extends UnitTestCase {
     $container->set('module_handler', $this->getMock('Drupal\Core\Extension\ModuleHandlerInterface'));
     $container->set('current_user', $this->getMock('Drupal\Core\Session\AccountInterface'));
     $container->set('cache.test', $this->getMock('Drupal\Core\Cache\CacheBackendInterface'));
+    $requestStack = new RequestStack();
+    $requestStack->push(Request::create('/'));
+    $container->set('request_stack', $requestStack);
     $container->setParameter('cache_bins', array('cache.test' => 'test'));
-    $container->register('request', 'Symfony\Component\HttpFoundation\Request');
     $lock = $this->getMock('Drupal\Core\Lock\LockBackendInterface');
     $cid = 2;
     $lock_name = "comment:$cid:.00/";

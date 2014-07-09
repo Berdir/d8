@@ -16,6 +16,7 @@ use Drupal\simpletest\WebTestBase;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\language\LanguageNegotiatorInterface;
 
 /**
@@ -69,7 +70,9 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
     parent::setUp();
 
     $this->request = Request::createFromGlobals();
-    $this->container->set('request', $this->request);
+    $requestStack = new RequestStack();
+    $requestStack->push($this->request);
+    $this->container->set('request_stack', $requestStack);
 
     $admin_user = $this->drupalCreateUser(array('administer languages', 'translate interface', 'access administration pages', 'administer blocks'));
     $this->drupalLogin($admin_user);
@@ -452,9 +455,9 @@ class LanguageUILanguageNegotiationTest extends WebTestBase {
     $this->settingsSet('mixed_mode_sessions', FALSE);
 
     // Test HTTPS via current URL scheme.
-    $generator = $this->container->get('url_generator');
     $request = Request::create('', 'GET', array(), array(), array(), array('HTTPS' => 'on'));
-    $generator->setRequest($request);
+    $this->container->get('request_stack')->push($request);
+    $generator = $this->container->get('url_generator');
     $italian_url = url('admin', array('language' => $languages['it'], 'script' => ''));
     $correct_link = 'https://' . $link;
     $this->assertTrue($italian_url == $correct_link, format_string('The url() function returns the right URL (via current URL scheme) (@url) in accordance with the chosen language', array('@url' => $italian_url)));

@@ -11,6 +11,7 @@ use Drupal\Core\Logger\LoggerChannel;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 // @todo Remove once watchdog() is removed.
 if (!defined('WATCHDOG_EMERGENCY')) {
@@ -63,7 +64,7 @@ class LoggerChannelTest extends UnitTestCase {
    * @dataProvider providerTestLog
    * @covers ::log
    * @covers ::setCurrentUser
-   * @covers ::setRequest
+   * @covers ::setRequestStack
    */
   public function testLog(callable $expected, Request $request = NULL, AccountInterface $current_user = NULL) {
     $channel = new LoggerChannel('test');
@@ -74,7 +75,9 @@ class LoggerChannelTest extends UnitTestCase {
       ->with($this->anything(), $message, $this->callback($expected));
     $channel->addLogger($logger);
     if ($request) {
-      $channel->setRequest($request);
+      $requestStack = new RequestStack();
+      $requestStack->push($request);
+      $channel->setRequestStack($requestStack);
     }
     if ($current_user) {
       $channel->setCurrentUser($current_user);

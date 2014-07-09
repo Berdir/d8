@@ -128,7 +128,7 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
    */
   protected function getRequest() {
     if (!$this->request) {
-      $this->request = $this->container()->get('request');
+      $this->request = \Drupal::request();
     }
     return $this->request;
   }

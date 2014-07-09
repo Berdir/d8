@@ -42,7 +42,7 @@ class TableSortExtenderUnitTest extends UnitTestBase {
     );
     $request = Request::createFromGlobals();
     $request->query->replace(array());
-    \Drupal::getContainer()->set('request', $request);
+    \Drupal::getContainer()->get('request_stack')->push($request);
     $ts = tablesort_init($headers);
     $this->verbose(strtr('$ts: <pre>!ts</pre>', array('!ts' => String::checkPlain(var_export($ts, TRUE)))));
     $this->assertEqual($ts, $expected_ts, 'Simple table headers sorted correctly.');
@@ -55,7 +55,7 @@ class TableSortExtenderUnitTest extends UnitTestBase {
       // headers are overridable.
       'order' => 'bar',
     ));
-    \Drupal::getContainer()->set('request', $request);
+    \Drupal::getContainer()->get('request_stack')->push($request);
     $ts = tablesort_init($headers);
     $this->verbose(strtr('$ts: <pre>!ts</pre>', array('!ts' => String::checkPlain(var_export($ts, TRUE)))));
     $this->assertEqual($ts, $expected_ts, 'Simple table headers plus non-overriding $_GET parameters sorted correctly.');
@@ -69,7 +69,7 @@ class TableSortExtenderUnitTest extends UnitTestBase {
       // it in the links that it creates.
       'alpha' => 'beta',
     ));
-    \Drupal::getContainer()->set('request', $request);
+    \Drupal::getContainer()->get('request_stack')->push($request);
     $expected_ts['sort'] = 'desc';
     $expected_ts['query'] = array('alpha' => 'beta');
     $ts = tablesort_init($headers);
@@ -97,7 +97,7 @@ class TableSortExtenderUnitTest extends UnitTestBase {
     $request->query->replace(array(
       'order' => '2',
     ));
-    \Drupal::getContainer()->set('request', $request);
+    \Drupal::getContainer()->get('request_stack')->push($request);
     $ts = tablesort_init($headers);
     $expected_ts = array(
       'name' => '2',
@@ -116,7 +116,7 @@ class TableSortExtenderUnitTest extends UnitTestBase {
       // exist.
       'order' => 'bar',
     ));
-    \Drupal::getContainer()->set('request', $request);
+    \Drupal::getContainer()->get('request_stack')->push($request);
     $ts = tablesort_init($headers);
     $expected_ts = array(
       'name' => '1',
@@ -137,7 +137,7 @@ class TableSortExtenderUnitTest extends UnitTestBase {
       // it in the links that it creates.
       'alpha' => 'beta',
     ));
-    \Drupal::getContainer()->set('request', $request);
+    \Drupal::getContainer()->get('request_stack')->push($request);
     $expected_ts = array(
       'name' => '1',
       'sql' => 'one',

@@ -43,7 +43,7 @@ class LoggerChannelFactory implements LoggerChannelFactoryInterface, ContainerAw
       // the current user to the channel.
       if ($this->container) {
         try {
-          $instance->setRequest($this->container->get('request'));
+          $instance->setRequestStack($this->container->get('request_stack'));
           $instance->setCurrentUser($this->container->get('current_user'));
         }
         catch (RuntimeException $e) {

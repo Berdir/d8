@@ -356,7 +356,7 @@ class EntityQueryTest extends EntityUnitTestBase {
     $request->query->replace(array(
       'page' => '0,2',
     ));
-    \Drupal::getContainer()->set('request', $request);
+    \Drupal::getContainer()->get('request_stack')->push($request);
     $this->queryResults = $this->factory->get('entity_test_mulrev')
       ->sort("$figures.color")
       ->sort("$greetings.format")
@@ -388,7 +388,7 @@ class EntityQueryTest extends EntityUnitTestBase {
       'sort' => 'asc',
       'order' => 'Type',
     ));
-    \Drupal::getContainer()->set('request', $request);
+    \Drupal::getContainer()->get('request_stack')->push($request);
 
     $header = array(
       'id' => array('data' => 'Id', 'specifier' => 'id'),
@@ -403,7 +403,7 @@ class EntityQueryTest extends EntityUnitTestBase {
     $request->query->add(array(
       'sort' => 'desc',
     ));
-    \Drupal::getContainer()->set('request', $request);
+    \Drupal::getContainer()->get('request_stack')->push($request);
 
     $header = array(
       'id' => array('data' => 'Id', 'specifier' => 'id'),
@@ -418,7 +418,7 @@ class EntityQueryTest extends EntityUnitTestBase {
     $request->query->add(array(
       'order' => 'Id',
     ));
-    \Drupal::getContainer()->set('request', $request);
+    \Drupal::getContainer()->get('request_stack')->push($request);
     $this->queryResults = $this->factory->get('entity_test_mulrev')
       ->tableSort($header)
       ->execute();

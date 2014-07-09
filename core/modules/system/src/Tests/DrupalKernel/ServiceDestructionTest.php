@@ -37,7 +37,7 @@ class ServiceDestructionTest extends DrupalUnitTestBase {
     // Call the class and then terminate the kernel
     $this->container->get('service_provider_test_class');
     $response = new Response();
-    $this->container->get('kernel')->terminate($this->container->get('request'), $response);
+    $this->container->get('kernel')->terminate($this->container->get('request_stack')->getCurrentRequest(), $response);
     $this->assertTrue(\Drupal::state()->get('service_provider_test.destructed'));
   }
 
@@ -54,7 +54,7 @@ class ServiceDestructionTest extends DrupalUnitTestBase {
     // Terminate the kernel. The test class has not been called, so it should not
     // be destructed.
     $response = new Response();
-    $this->container->get('kernel')->terminate($this->container->get('request'), $response);
+    $this->container->get('kernel')->terminate($this->container->get('request_stack')->getCurrentRequest(), $response);
     $this->assertNull(\Drupal::state()->get('service_provider_test.destructed'));
   }
 }

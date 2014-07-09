@@ -55,7 +55,6 @@ class CollectRoutesTest extends UnitTestCase {
       ->getMock();
 
     $container->set('content_negotiation', $content_negotiation);
-    $container->set('request', $request);
 
     $this->view = $this->getMock('\Drupal\views\Entity\View', array('initHandlers'), array(
       array('id' => 'test_view'),

@@ -12,6 +12,7 @@ use Drupal\Core\Session\AnonymousUserSession;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Scope;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Tests the AnonymousUserSession class.
@@ -44,9 +45,9 @@ class AnonymousUserSessionTest extends UnitTestCase {
       ->method('getClientIp')
       ->will($this->returnValue('test'));
     $container = new ContainerBuilder();
-    $container->addScope(new Scope('request'));
-    $container->enterScope('request');
-    $container->set('request', $request, 'request');
+    $requestStack = new RequestStack();
+    $requestStack->push($request);
+    $container->set('request_stack', $requestStack);
     \Drupal::setContainer($container);
 
     $anonymous_user = new AnonymousUserSession();
@@ -62,11 +63,6 @@ class AnonymousUserSessionTest extends UnitTestCase {
   public function testAnonymousUserSessionWithNoRequest() {
     $container = new ContainerBuilder();
 
-    // Set a synthetic 'request' definition on the container.
-    $definition = new Definition();
-    $definition->setSynthetic(TRUE);
-
-    $container->setDefinition('request', $definition);
     \Drupal::setContainer($container);
 
     $anonymous_user = new AnonymousUserSession();
