@@ -532,7 +532,6 @@ class User extends ContentEntityBase implements UserInterface {
       ->setDefaultValue('');
 
     $fields['roles'] = BaseFieldDefinition::create('entity_reference')
-      ->setCustomStorage(TRUE)
       ->setLabel(t('Roles'))
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
       ->setDescription(t('The roles the user has.'))
