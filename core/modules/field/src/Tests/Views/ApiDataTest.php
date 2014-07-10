@@ -6,7 +6,6 @@
  */
 
 namespace Drupal\field\Tests\Views;
-use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 
 /**
  * Test the produced views_data.

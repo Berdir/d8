@@ -10,7 +10,6 @@ namespace Drupal\Core\Entity;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Entity\Schema\ContentEntitySchemaHandler;
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
@@ -18,7 +17,6 @@ use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\field\Entity\FieldConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -1192,6 +1190,9 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase implements S
       $table = $table_mapping->getDedicatedDataTableName($storage_definition);
       $revision_table = $table_mapping->getDedicatedRevisionTableName($storage_definition);
       $this->database->update($table)
+        ->fields(array('deleted' => 1))
+        ->execute();
+      $this->database->update($revision_table)
         ->fields(array('deleted' => 1))
         ->execute();
     }

@@ -7,7 +7,6 @@
 
 namespace Drupal\contact\Tests\Views;
 
-use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\views\Tests\ViewTestBase;
 
 /**

@@ -7,10 +7,8 @@
 
 namespace Drupal\field\Tests;
 
-use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\field\Entity\FieldInstanceConfig;
-use Drupal\field\FieldConfigInterface;
 
 
 /**

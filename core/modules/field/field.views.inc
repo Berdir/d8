@@ -69,8 +69,8 @@ function field_views_data_alter(&$data) {
 function _field_views_get_entity_type_storage(FieldConfigInterface $field) {
   $result = FALSE;
   $entity_manager = \Drupal::entityManager();
-  if ($entity_manager->hasDefinition($field->entity_type)) {
-    $storage = $entity_manager->getStorage($field->entity_type);
+  if ($entity_manager->hasDefinition($field->getEntityTypeId())) {
+    $storage = $entity_manager->getStorage($field->getEntityTypeId());
     $result = $storage instanceof ContentEntityDatabaseStorage ? $storage : FALSE;
   }
   return $result;
@@ -136,7 +136,7 @@ function field_views_field_default_views_data(FieldConfigInterface $field) {
 
   // Grab information about the entity type tables.
   $entity_manager = \Drupal::entityManager();
-  $entity_type_id = $field->entity_type;
+  $entity_type_id = $field->getEntityTypeId();
   $entity_type = $entity_manager->getDefinition($entity_type_id);
   if (!$entity_table = $entity_type->getBaseTable()) {
     return $data;

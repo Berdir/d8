@@ -5,7 +5,6 @@
  * Provide views data for file.module.
  */
 
-use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\field\FieldConfigInterface;
 
 /**

@@ -7,8 +7,6 @@
 
 namespace Drupal\system\Tests\Entity;
 
-use Drupal\Core\Entity\Sql\DefaultTableMappingInterface;
-
 /**
  * Tests adding a custom bundle field.
  */

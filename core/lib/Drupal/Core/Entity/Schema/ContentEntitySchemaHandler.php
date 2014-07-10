@@ -13,6 +13,7 @@ use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\field\FieldException;
 
 /**
  * Defines a schema handler that supports revisionable, translatable entities.
@@ -241,6 +242,8 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
    *
    * @throws \Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException
    *   Thrown when the update to the field is forbidden.
+   * @throws \Exception
+   *   Rethrown exception if the table recreation fails.
    */
   protected function updateDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
     if (!$storage_definition->hasData()) {
@@ -330,6 +333,11 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
    *   The storage definition of the field being updated.
    * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
    *   The original storage definition; i.e., the definition before the update.
+   *
+   * @throws \Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException
+   *   Thrown when the update to the field is forbidden.
+   * @throws \Exception
+   *   Rethrown exception if the table recreation fails.
    */
   protected function updateSharedTableSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
     if (!$this->storage->countFieldData($storage_definition, TRUE)) {
@@ -358,8 +366,6 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
         throw new FieldStorageDefinitionUpdateForbiddenException("The SQL storage cannot change the schema for an existing field with data.");
       }
 
-      $schema = array();
-      $original_schema = array();
       $updated_field_name = $storage_definition->getName();
       $table_mapping = $this->storage->getTableMapping();
       $column_names = $table_mapping->getColumnNames($updated_field_name);
@@ -484,6 +490,16 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
    *   The storage definition of the field whose schema has to be returned.
    * @param string[] $column_mapping
    *   A mapping of field column names to database column names.
+   *
+   * @return array
+   *   The schema definition for the field with the following keys:
+   *   - fields: The schema definition for the each field columns.
+   *   - indexes: The schema definition for the indexes.
+   *   - unique keys: The schema definition for the unique keys.
+   *   - foreign keys: The schema definition for the foreign keys.
+   *
+   * @throws \Drupal\field\FieldException
+   *   Exception thrown if the schema contains reserved column names.
    */
   protected function getSharedTableFieldSchema(FieldStorageDefinitionInterface $storage_definition, array $column_mapping) {
     $schema = array();
@@ -491,7 +507,7 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
 
     // Check that the schema does not include forbidden column names.
     if (array_intersect(array_keys($field_schema['columns']), $this->storage->getTableMapping()->getReservedColumns())) {
-      throw new FieldException('Illegal field type columns.');
+      throw new FieldException(format_string('Illegal field column names on @field_name', array('@field_name' => $storage_definition->getName())));
     }
 
     $field_name = $storage_definition->getName();
@@ -669,21 +685,16 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
    * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    *
-   * FIXME Do we still need these two? The deleted parameter is not used.
-   *
-   * @param array $schema
-   *   The field schema array. Mandatory for upgrades, omit otherwise.
-   * @param bool $deleted
-   *   (optional) Whether the schema of the table holding the values of a
-   *   deleted field should be returned.
-   *
    * @return array
    *   The same as a hook_schema() implementation for the data and the
    *   revision tables.
    *
+   * @throws \Drupal\field\FieldException
+   *   Exception thrown if the schema contains reserved column names.
+   *
    * @see hook_schema()
    */
-  protected function getDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition, array $schema = NULL, $deleted = FALSE) {
+  protected function getDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition) {
     $description_current = "Data storage for {$storage_definition->getTargetEntityTypeId()} field {$storage_definition->getName()}.";
     $description_revision = "Revision archive storage for {$storage_definition->getTargetEntityTypeId()} field {$storage_definition->getName()}.";
 
@@ -770,14 +781,11 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
       ),
     );
 
-    if (!$schema) {
-      $schema = $storage_definition->getSchema();
-    }
-
     // Check that the schema does not include forbidden column names.
+    $schema = $storage_definition->getSchema();
     $table_mapping = $this->storage->getTableMapping();
     if (array_intersect(array_keys($schema['columns']), $table_mapping->getReservedColumns())) {
-      throw new FieldException(format_string('Illegal field type @field_type on @field_name.', array('@field_type' => $this->type, '@field_name' => $this->name)));
+      throw new FieldException(format_string('Illegal field column names on @field_name', array('@field_name' => $storage_definition->getName())));
     }
 
     // Add field columns.

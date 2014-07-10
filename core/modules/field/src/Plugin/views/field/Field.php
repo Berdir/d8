@@ -8,7 +8,6 @@
 namespace Drupal\field\Plugin\views\field;
 
 use Drupal\Component\Utility\Xss;
-use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
