@@ -456,7 +456,7 @@ services:
     class: Drupal\Core\ParamConverter\EntityConverter
     tags:
       - { name: paramconverter }
-    arguments: ['@entity.manager']
+    arguments: ['@entity.manager', '@language_manager']
   paramconverter.configentity_admin:
     class: Drupal\Core\ParamConverter\AdminPathConfigEntityConverter
     tags:

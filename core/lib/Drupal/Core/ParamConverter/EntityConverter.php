@@ -8,6 +8,9 @@
 namespace Drupal\Core\ParamConverter;
 
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\TypedData\TranslatableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
@@ -24,13 +27,23 @@ class EntityConverter implements ParamConverterInterface {
   protected $entityManager;
 
   /**
+   * The language manager which translates the entity.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Constructs a new EntityConverter.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    */
-  public function __construct(EntityManagerInterface $entity_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, LanguageManagerInterface $language_manager) {
     $this->entityManager = $entity_manager;
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -39,7 +52,12 @@ class EntityConverter implements ParamConverterInterface {
   public function convert($value, $definition, $name, array $defaults, Request $request) {
     $entity_type = substr($definition['type'], strlen('entity:'));
     if ($storage = $this->entityManager->getStorage($entity_type)) {
-      return $storage->load($value);
+      $entity = $storage->load($value);
+      if ($entity instanceof TranslatableInterface) {
+        $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->id;
+        $entity = $entity->getTranslation($langcode);
+      }
+      return $entity;
     }
   }
 
