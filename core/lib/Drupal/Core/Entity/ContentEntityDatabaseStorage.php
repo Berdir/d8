@@ -1151,7 +1151,7 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase implements S
   protected function usesDedicatedTable(FieldStorageDefinitionInterface $definition) {
     // Everything that is not provided by the entity type is stored in a
     // dedicated table.
-    return $definition->getProvider() != $this->entityType->getProvider() && !$definition->hasCustomStorage();
+    return ($definition->getProvider() != $this->entityType->getProvider() && !$definition->hasCustomStorage()) || $definition->isMultiple();
   }
 
   /**
@@ -1750,6 +1750,7 @@ class ContentEntityDatabaseStorage extends ContentEntityStorageBase implements S
    *   unique among all other fields.
    */
   public static function _fieldColumnName(FieldStorageDefinitionInterface $storage_definition, $column) {
+    return $column;
     return in_array($column, FieldConfig::getReservedColumns()) ? $column : $storage_definition->getName() . '_' . $column;
   }
 

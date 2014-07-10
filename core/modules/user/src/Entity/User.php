@@ -527,7 +527,6 @@ class User extends ContentEntityBase implements UserInterface {
     // @todo Convert this to entity_reference_field, see
     // https://drupal.org/node/2044859.
     $fields['roles'] = FieldDefinition::create('string')
-      ->setCustomStorage(TRUE)
       ->setLabel(t('Roles'))
       ->setCardinality(FieldDefinition::CARDINALITY_UNLIMITED)
       ->setDescription(t('The roles the user has.'));

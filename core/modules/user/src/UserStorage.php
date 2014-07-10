@@ -75,7 +75,7 @@ class UserStorage extends ContentEntityDatabaseStorage implements UserStorageInt
   /**
    * {@inheritdoc}
    */
-  function mapFromStorageRecords(array $records) {
+  /*function mapFromStorageRecords(array $records) {
     foreach ($records as $record) {
       $record->roles = array();
       if ($record->uid) {
@@ -89,7 +89,7 @@ class UserStorage extends ContentEntityDatabaseStorage implements UserStorageInt
     // Add any additional roles from the database.
     $this->addRoles($records);
     return parent::mapFromStorageRecords($records);
-  }
+  }*/
 
   /**
    * {@inheritdoc}
