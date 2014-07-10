@@ -8,8 +8,6 @@
 namespace Drupal\Core\ParamConverter;
 
 use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
@@ -42,7 +40,10 @@ class EntityConverter implements ParamConverterInterface {
   public function convert($value, $definition, $name, array $defaults, Request $request) {
     $entity_type = substr($definition['type'], strlen('entity:'));
     if ($storage = $this->entityManager->getStorage($entity_type)) {
-      $entity = $this->entityManager->getTranslationFromContext($storage->load($value));
+      $entity = $storage->load($value);
+      if ($entity instanceof TranslatableInterface) {
+        $entity = $this->entityManager->getTranslationFromContext($entity);
+      }
       return $entity;
     }
   }
