@@ -36,7 +36,7 @@ function image_field_views_data(FieldConfigInterface $field) {
  * Views integration to provide reverse relationships on image fields.
  */
 function image_field_views_data_views_data_alter(array &$data, FieldConfigInterface $field) {
-  $entity_type_id = $field->getEntityTypeId();
+  $entity_type_id = $field->getTargetEntityTypeId();
   $field_name = $field->getName();
   $entity_manager = \Drupal::entityManager();
   $entity_type = $entity_manager->getDefinition($entity_type_id);

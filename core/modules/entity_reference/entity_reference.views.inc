@@ -5,7 +5,6 @@
  * Provides views data for the entity_reference module.
  */
 
-use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\field\FieldConfigInterface;
 
 /**
@@ -14,6 +13,7 @@ use Drupal\field\FieldConfigInterface;
 function entity_reference_field_views_data(FieldConfigInterface $field) {
   $data = field_views_field_default_views_data($field);
   $entity_manager = \Drupal::entityManager();
+  $table_mapping = $entity_manager->getStorage($field->getTargetEntityTypeId())->getTableMapping();
   foreach ($data as $table_name => $table_data) {
     // Add a relationship to the target entity type.
     $target_entity_type_id = $field->getSetting('target_type');
@@ -44,7 +44,7 @@ function entity_reference_field_views_data(FieldConfigInterface $field) {
       'help' => t('Relate each @label with a @field_name.', $args),
       'id' => 'entity_reverse',
       'field_name' => $field->getName(),
-      'field table' => ContentEntityDatabaseStorage::_fieldTableName($field),
+      'field table' => $table_mapping->getDedicatedDataTableName($field),
       'field field' => $field->getName() . '_target_id',
       'base' => $target_entity_type->getBaseTable(),
       'base field' => $target_entity_type->getKey('id'),

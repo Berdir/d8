@@ -419,7 +419,7 @@ function taxonomy_field_views_data(FieldConfigInterface $field) {
  */
 function taxonomy_field_views_data_views_data_alter(array &$data, FieldConfigInterface $field) {
   $field_name = $field->getName();
-  $entity_type_id = $field->getEntityTypeId();
+  $entity_type_id = $field->getTargetEntityTypeId();
   $entity_manager = \Drupal::entityManager();
   $entity_type = $entity_manager->getDefinition($entity_type_id);
   $pseudo_field_name = 'reverse_' . $field_name . '_' . $entity_type_id;
