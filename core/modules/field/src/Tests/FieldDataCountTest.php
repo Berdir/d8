@@ -85,7 +85,8 @@ class FieldDataCountTest extends FieldUnitTestBase {
     $storage = \Drupal::entityManager()->getStorage('entity_test');
     if ($storage instanceof ContentEntityDatabaseStorage) {
       // Count the actual number of rows in the field table.
-      $field_table_name = $storage->_fieldTableName($field);
+      $table_mapping = $storage->getTableMapping();
+      $field_table_name = $table_mapping->getDedicatedDataTableName($field);
       $result = db_select($field_table_name, 't')
         ->fields('t')
         ->countQuery()

@@ -7,9 +7,12 @@
 
 namespace Drupal\Core\Entity\Schema;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
  * Defines a schema handler that supports revisionable, translatable entities.
@@ -45,6 +48,13 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
   protected $schema;
 
   /**
+   * The database connection to be used.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * Constructs a ContentEntitySchemaHandler.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -53,11 +63,343 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
    *   The entity type.
    * @param \Drupal\Core\Entity\ContentEntityDatabaseStorage $storage
    *   The storage of the entity type. This must be an SQL-based storage.
+   * @param \Drupal\Core\Database\Connection $database
+   *   The database connection to be used.
    */
-  public function __construct(EntityManagerInterface $entity_manager, ContentEntityTypeInterface $entity_type, ContentEntityDatabaseStorage $storage) {
+  public function __construct(EntityManagerInterface $entity_manager, ContentEntityTypeInterface $entity_type, ContentEntityDatabaseStorage $storage, Connection $database) {
     $this->entityType = $entity_type;
     $this->fieldStorageDefinitions = $entity_manager->getFieldStorageDefinitions($entity_type->id());
     $this->storage = $storage;
+    $this->database = $database;
+  }
+
+  /**
+   * Performs the specified operation on a field.
+   *
+   * This figures out whether the field is stored in a dedicated or shared table
+   * and forwards the call to the proper handler.
+   *
+   * @param string $operation
+   *   The name of the operation to be performed.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The field storage definition
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
+   *   (optional) The original field storage definition. This is relevant (and
+   *   required) only for updates. Defaults to NULL.
+   */
+  protected function performSchemaOperation($operation, FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original = NULL) {
+    $table_mapping = $this->storage->getTableMapping();
+    if ($table_mapping->requiresDedicatedTableStorage($storage_definition)) {
+      $this->{$operation . 'DedicatedTableSchema'}($storage_definition, $original);
+    }
+    elseif ($table_mapping->allowsSharedTableStorage($storage_definition)) {
+      $this->{$operation . 'SharedTableSchema'}($storage_definition, $original);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createFieldSchema(FieldStorageDefinitionInterface $storage_definition) {
+    $this->performSchemaOperation('create', $storage_definition);
+  }
+
+  /**
+   * Creates the schema for a field stored in a dedicated table.
+   *
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The storage definition of the field being created.
+   */
+  protected function createDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition) {
+    $schema = $this->getDedicatedTableSchema($storage_definition);
+    foreach ($schema as $name => $table) {
+      $this->database->schema()->createTable($name, $table);
+    }
+  }
+
+  /**
+   * Creates the schema for a field stored in a shared table.
+   *
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The storage definition of the field being created.
+   */
+  protected function createSharedTableSchema(FieldStorageDefinitionInterface $storage_definition) {
+    $created_field_name = $storage_definition->getName();
+    $table_mapping = $this->storage->getTableMapping();
+    $column_names = $table_mapping->getColumnNames($created_field_name);
+    $schema = $this->getSharedTableFieldSchema($storage_definition, $column_names);
+    $keys = array_diff_key($schema, array('fields' => FALSE));
+
+    // Iterate over the mapped table to find the ones that will host the created
+    // field schema.
+    foreach ($table_mapping->getTableNames() as $table_name) {
+      foreach ($table_mapping->getFieldNames($table_name) as $field_name) {
+        if ($field_name == $created_field_name) {
+          foreach ($schema['fields'] as $column_name => $specifier) {
+            $this->database->schema()->addField($table_name, $column_name, $specifier, $keys);
+          }
+          // After creating the field schema skip to the next table.
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function markFieldSchemaAsDeleted(FieldStorageDefinitionInterface $storage_definition) {
+    $table_mapping = $this->storage->getTableMapping();
+    // TODO Do we need this also for shared table storage?
+    if ($table_mapping->requiresDedicatedTableStorage($storage_definition)) {
+      // Move the table to a unique name while the table contents are being
+      // deleted.
+      $table = $table_mapping->getDedicatedDataTableName($storage_definition);
+      $revision_table = $table_mapping->getDedicatedRevisionTableName($storage_definition);
+      $new_table = $table_mapping->getDedicatedDataTableName($storage_definition, TRUE);
+      $revision_new_table = $table_mapping->getDedicatedRevisionTableName($storage_definition, TRUE);
+      $this->database->schema()->renameTable($table, $new_table);
+      $this->database->schema()->renameTable($revision_table, $revision_new_table);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteFieldSchema(FieldStorageDefinitionInterface $storage_definition) {
+    $this->performSchemaOperation('delete', $storage_definition);
+  }
+
+  /**
+   * Deletes the schema for a field stored in a dedicated table.
+   *
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The storage definition of the field being deleted.
+   */
+  protected function deleteDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition) {
+    $table_mapping = $this->storage->getTableMapping();
+    $table_name = $table_mapping->getDedicatedDataTableName($storage_definition, TRUE);
+    $revision_name = $table_mapping->getDedicatedRevisionTableName($storage_definition, TRUE);
+    $this->database->schema()->dropTable($table_name);
+    $this->database->schema()->dropTable($revision_name);
+  }
+
+  /**
+   * Deletes the schema for a field stored in a shared table.
+   *
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The storage definition of the field being deleted.
+   */
+  protected function deleteSharedTableSchema(FieldStorageDefinitionInterface $storage_definition) {
+    $deleted_field_name = $storage_definition->getName();
+    $table_mapping = $this->storage->getTableMapping();
+    $column_names = $table_mapping->getColumnNames($deleted_field_name);
+    $schema = $this->getSharedTableFieldSchema($storage_definition, $column_names);
+    $schema_handler = $this->database->schema();
+
+    // Iterate over the mapped table to find the ones that host the deleted
+    // field schema.
+    foreach ($table_mapping->getTableNames() as $table_name) {
+      foreach ($table_mapping->getFieldNames($table_name) as $field_name) {
+        if ($field_name == $deleted_field_name) {
+          // Drop indexes and unique keys first.
+          if (!empty($schema['indexes'])) {
+            foreach ($schema['indexes'] as $name => $specifier) {
+              $schema_handler->dropIndex($table_name, $name);
+            }
+          }
+          if (!empty($schema['unique keys'])) {
+            foreach ($schema['unique keys'] as $name => $specifier) {
+              $schema_handler->dropUniqueKey($table_name, $name);
+            }
+          }
+          // Drop columns.
+          foreach ($column_names as $column_name) {
+            $schema_handler->dropField($table_name, $column_name);
+          }
+          // After deleting the field schema skip to the next table.
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function updateFieldSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
+    $this->performSchemaOperation('update', $storage_definition, $original);
+  }
+
+  /**
+   * Updates the schema for a field stored in a shared table.
+   *
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The storage definition of the field being updated.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
+   *   The original storage definition; i.e., the definition before the update.
+   *
+   * @throws \Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException
+   *   Thrown when the update to the field is forbidden.
+   */
+  protected function updateDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
+    if (!$storage_definition->hasData()) {
+      // There is no data. Re-create the tables completely.
+      if ($this->database->supportsTransactionalDDL()) {
+        // If the database supports transactional DDL, we can go ahead and rely
+        // on it. If not, we will have to rollback manually if something fails.
+        $transaction = $this->database->startTransaction();
+      }
+      try {
+        $original_schema = $this->getDedicatedTableSchema($original);
+        foreach ($original_schema as $name => $table) {
+          $this->database->schema()->dropTable($name, $table);
+        }
+        $schema = $this->getDedicatedTableSchema($storage_definition);
+        foreach ($schema as $name => $table) {
+          $this->database->schema()->createTable($name, $table);
+        }
+      }
+      catch (\Exception $e) {
+        if ($this->database->supportsTransactionalDDL()) {
+          $transaction->rollback();
+        }
+        else {
+          // Recreate tables.
+          $original_schema = $this->getDedicatedTableSchema($original);
+          foreach ($original_schema as $name => $table) {
+            if (!$this->database->schema()->tableExists($name)) {
+              $this->database->schema()->createTable($name, $table);
+            }
+          }
+        }
+        throw $e;
+      }
+    }
+    else {
+      if ($storage_definition->getColumns() != $original->getColumns()) {
+        throw new FieldStorageDefinitionUpdateForbiddenException("The SQL storage cannot change the schema for an existing field with data.");
+      }
+      // There is data, so there are no column changes. Drop all the prior
+      // indexes and create all the new ones, except for all the priors that
+      // exist unchanged.
+      $table_mapping = $this->storage->getTableMapping();
+      $table = $table_mapping->getDedicatedDataTableName($original);
+      $revision_table = $table_mapping->getDedicatedRevisionTableName($original);
+
+      $schema = $storage_definition->getSchema();
+      $original_schema = $original->getSchema();
+
+      foreach ($original_schema['indexes'] as $name => $columns) {
+        if (!isset($schema['indexes'][$name]) || $columns != $schema['indexes'][$name]) {
+          $real_name = $this->getFieldIndexName($storage_definition, $name);
+          $this->database->schema()->dropIndex($table, $real_name);
+          $this->database->schema()->dropIndex($revision_table, $real_name);
+        }
+      }
+      $table = $table_mapping->getDedicatedDataTableName($storage_definition);
+      $revision_table = $table_mapping->getDedicatedRevisionTableName($storage_definition);
+      foreach ($schema['indexes'] as $name => $columns) {
+        if (!isset($original_schema['indexes'][$name]) || $columns != $original_schema['indexes'][$name]) {
+          $real_name = $this->getFieldIndexName($storage_definition, $name);
+          $real_columns = array();
+          foreach ($columns as $column_name) {
+            // Indexes can be specified as either a column name or an array with
+            // column name and length. Allow for either case.
+            if (is_array($column_name)) {
+              $real_columns[] = array(
+                $table_mapping->getFieldColumnName($storage_definition, $column_name[0]),
+                $column_name[1],
+              );
+            }
+            else {
+              $real_columns[] = $table_mapping->getFieldColumnName($storage_definition, $column_name);
+            }
+          }
+          $this->database->schema()->addIndex($table, $real_name, $real_columns);
+          $this->database->schema()->addIndex($revision_table, $real_name, $real_columns);
+        }
+      }
+    }
+  }
+
+  /**
+   * Updates the schema for a field stored in a shared table.
+   *
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The storage definition of the field being updated.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
+   *   The original storage definition; i.e., the definition before the update.
+   */
+  protected function updateSharedTableSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
+    if (!$this->storage->countFieldData($storage_definition, TRUE)) {
+      if ($this->database->supportsTransactionalDDL()) {
+        // If the database supports transactional DDL, we can go ahead and rely
+        // on it. If not, we will have to rollback manually if something fails.
+        $transaction = $this->database->startTransaction();
+      }
+      try {
+        $this->deleteSharedTableSchema($original);
+        $this->createSharedTableSchema($storage_definition);
+      }
+      catch (\Exception $e) {
+        if ($this->database->supportsTransactionalDDL()) {
+          $transaction->rollback();
+        }
+        else {
+          // Recreate original schema.
+          $this->createSharedTableSchema($original);
+        }
+        throw $e;
+      }
+    }
+    else {
+      if ($storage_definition->getColumns() != $original->getColumns()) {
+        throw new FieldStorageDefinitionUpdateForbiddenException("The SQL storage cannot change the schema for an existing field with data.");
+      }
+
+      $schema = array();
+      $original_schema = array();
+      $updated_field_name = $storage_definition->getName();
+      $table_mapping = $this->storage->getTableMapping();
+      $column_names = $table_mapping->getColumnNames($updated_field_name);
+      $original_schema = $this->getSharedTableFieldSchema($original, $column_names);
+      $schema = $this->getSharedTableFieldSchema($storage_definition, $column_names);
+      $schema_handler = $this->database->schema();
+
+      // Iterate over the mapped table to find the ones that host the deleted
+      // field schema.
+      foreach ($table_mapping->getTableNames() as $table_name) {
+        foreach ($table_mapping->getFieldNames($table_name) as $field_name) {
+          if ($field_name == $updated_field_name) {
+            // Drop original indexes and unique keys.
+            if (!empty($original_schema['indexes'])) {
+              foreach ($original_schema['indexes'] as $name => $specifier) {
+                $schema_handler->dropIndex($table_name, $name);
+              }
+            }
+            if (!empty($original_schema['unique keys'])) {
+              foreach ($original_schema['unique keys'] as $name => $specifier) {
+                $schema_handler->dropUniqueKey($table_name, $name);
+              }
+            }
+            // Create new indexes and unique keys.
+            if (!empty($schema['indexes'])) {
+              foreach ($schema['indexes'] as $name => $specifier) {
+                $schema_handler->addIndex($table_name, $name, $specifier);
+              }
+            }
+            if (!empty($schema['unique keys'])) {
+              foreach ($schema['unique keys'] as $name => $specifier) {
+                $schema_handler->addUniqueKey($table_name, $name, $specifier);
+              }
+            }
+            // After deleting the field schema skip to the next table.
+            break;
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -82,10 +424,16 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
 
       $table_mapping = $this->storage->getTableMapping();
       foreach ($table_mapping->getTableNames() as $table_name) {
-        // Add the schema from field definitions.
+        if (!isset($schema[$table_name])) {
+          $schema[$table_name] = array();
+        }
         foreach ($table_mapping->getFieldNames($table_name) as $field_name) {
-          $column_names = $table_mapping->getColumnNames($field_name);
-          $this->addFieldSchema($schema[$table_name], $field_name, $column_names);
+          // Add the schema for base field definitions.
+          if ($table_mapping->allowsSharedTableStorage($this->fieldStorageDefinitions[$field_name])) {
+            $column_names = $table_mapping->getColumnNames($field_name);
+            $storage_definition = $this->fieldStorageDefinitions[$field_name];
+            $schema[$table_name] = array_merge_recursive($schema[$table_name], $this->getSharedTableFieldSchema($storage_definition, $column_names));
+          }
         }
 
         // Add the schema for extra fields.
@@ -132,16 +480,22 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
   /**
    * Returns the schema for a single field definition.
    *
-   * @param array $schema
-   *   The table schema to add the field schema to, passed by reference.
-   * @param string $field_name
-   *   The name of the field.
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The storage definition of the field whose schema has to be returned.
    * @param string[] $column_mapping
    *   A mapping of field column names to database column names.
    */
-  protected function addFieldSchema(array &$schema, $field_name, array $column_mapping) {
-    $field_schema = $this->fieldStorageDefinitions[$field_name]->getSchema();
-    $field_description = $this->fieldStorageDefinitions[$field_name]->getDescription();
+  protected function getSharedTableFieldSchema(FieldStorageDefinitionInterface $storage_definition, array $column_mapping) {
+    $schema = array();
+    $field_schema = $storage_definition->getSchema();
+
+    // Check that the schema does not include forbidden column names.
+    if (array_intersect(array_keys($field_schema['columns']), $this->storage->getTableMapping()->getReservedColumns())) {
+      throw new FieldException('Illegal field type columns.');
+    }
+
+    $field_name = $storage_definition->getName();
+    $field_description = $storage_definition->getDescription();
 
     foreach ($column_mapping as $field_column_name => $schema_field_name) {
       $column_schema = $field_schema['columns'][$field_column_name];
@@ -166,19 +520,18 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
     }
 
     if (!empty($field_schema['indexes'])) {
-      $indexes = $this->getFieldIndexes($field_name, $field_schema, $column_mapping);
-      $schema['indexes'] = array_merge($schema['indexes'], $indexes);
+      $schema['indexes'] = $this->getFieldIndexes($field_name, $field_schema, $column_mapping);
     }
 
     if (!empty($field_schema['unique keys'])) {
-      $unique_keys = $this->getFieldUniqueKeys($field_name, $field_schema, $column_mapping);
-      $schema['unique keys'] = array_merge($schema['unique keys'], $unique_keys);
+      $schema['unique keys'] = $this->getFieldUniqueKeys($field_name, $field_schema, $column_mapping);
     }
 
     if (!empty($field_schema['foreign keys'])) {
-      $foreign_keys = $this->getFieldForeignKeys($field_name, $field_schema, $column_mapping);
-      $schema['foreign keys'] = array_merge($schema['foreign keys'], $foreign_keys);
+      $schema['foreign keys'] = $this->getFieldForeignKeys($field_name, $field_schema, $column_mapping);
     }
+
+    return $schema;
   }
 
   /**
@@ -309,6 +662,171 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
     );
   }
 
+
+  /**
+   * Returns the SQL schema for a dedicated table.
+   *
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The field storage definition.
+   *
+   * FIXME Do we still need these two? The deleted parameter is not used.
+   *
+   * @param array $schema
+   *   The field schema array. Mandatory for upgrades, omit otherwise.
+   * @param bool $deleted
+   *   (optional) Whether the schema of the table holding the values of a
+   *   deleted field should be returned.
+   *
+   * @return array
+   *   The same as a hook_schema() implementation for the data and the
+   *   revision tables.
+   *
+   * @see hook_schema()
+   */
+  protected function getDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition, array $schema = NULL, $deleted = FALSE) {
+    $description_current = "Data storage for {$storage_definition->getTargetEntityTypeId()} field {$storage_definition->getName()}.";
+    $description_revision = "Revision archive storage for {$storage_definition->getTargetEntityTypeId()} field {$storage_definition->getName()}.";
+
+    $id_definition = $this->fieldStorageDefinitions[$this->entityType->getKey('id')];
+    if ($id_definition->getType() == 'integer') {
+      $id_schema = array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The entity id this data is attached to',
+      );
+    }
+    else {
+      $id_schema = array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'description' => 'The entity id this data is attached to',
+      );
+    }
+
+    // Define the revision ID schema, default to integer if there is no revision
+    // ID.
+    // @todo Revisit this code: the revision id should match the entity id type
+    //   if revisions are not supported.
+    $revision_id_definition = $this->entityType->isRevisionable() ? $this->fieldStorageDefinitions[$this->entityType->getKey('revision')] : NULL;
+    if (!$revision_id_definition || $revision_id_definition->getType() == 'integer') {
+      $revision_id_schema = array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'description' => 'The entity revision id this data is attached to, or NULL if the entity type is not versioned',
+      );
+    }
+    else {
+      $revision_id_schema = array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+        'description' => 'The entity revision id this data is attached to, or NULL if the entity type is not versioned',
+      );
+    }
+
+    $data_schema = array(
+      'description' => $description_current,
+      'fields' => array(
+        'bundle' => array(
+          'type' => 'varchar',
+          'length' => 128,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'The field instance bundle to which this row belongs, used when deleting a field instance',
+        ),
+        'deleted' => array(
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'A boolean indicating whether this data item has been deleted'
+        ),
+        'entity_id' => $id_schema,
+        'revision_id' => $revision_id_schema,
+        'langcode' => array(
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'The language code for this data item.',
+        ),
+        'delta' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'description' => 'The sequence number for this data item, used for multi-value fields',
+        ),
+      ),
+      'primary key' => array('entity_id', 'deleted', 'delta', 'langcode'),
+      'indexes' => array(
+        'bundle' => array('bundle'),
+        'deleted' => array('deleted'),
+        'entity_id' => array('entity_id'),
+        'revision_id' => array('revision_id'),
+        'langcode' => array('langcode'),
+      ),
+    );
+
+    if (!$schema) {
+      $schema = $storage_definition->getSchema();
+    }
+
+    // Check that the schema does not include forbidden column names.
+    $table_mapping = $this->storage->getTableMapping();
+    if (array_intersect(array_keys($schema['columns']), $table_mapping->getReservedColumns())) {
+      throw new FieldException(format_string('Illegal field type @field_type on @field_name.', array('@field_type' => $this->type, '@field_name' => $this->name)));
+    }
+
+    // Add field columns.
+    foreach ($schema['columns'] as $column_name => $attributes) {
+      $real_name = $table_mapping->getFieldColumnName($storage_definition, $column_name);
+      $data_schema['fields'][$real_name] = $attributes;
+    }
+
+    // Add indexes.
+    foreach ($schema['indexes'] as $index_name => $columns) {
+      $real_name = $this->getFieldIndexName($storage_definition, $index_name);
+      foreach ($columns as $column_name) {
+        // Indexes can be specified as either a column name or an array with
+        // column name and length. Allow for either case.
+        if (is_array($column_name)) {
+          $data_schema['indexes'][$real_name][] = array(
+            $table_mapping->getFieldColumnName($storage_definition, $column_name[0]),
+            $column_name[1],
+          );
+        }
+        else {
+          $data_schema['indexes'][$real_name][] = $table_mapping->getFieldColumnName($storage_definition, $column_name);
+        }
+      }
+    }
+
+    // Add foreign keys.
+    foreach ($schema['foreign keys'] as $specifier => $specification) {
+      $real_name = $this->getFieldIndexName($storage_definition, $specifier);
+      $data_schema['foreign keys'][$real_name]['table'] = $specification['table'];
+      foreach ($specification['columns'] as $column_name => $referenced) {
+        $sql_storage_column = $table_mapping->getFieldColumnName($storage_definition, $column_name);
+        $data_schema['foreign keys'][$real_name]['columns'][$sql_storage_column] = $referenced;
+      }
+    }
+
+    // Construct the revision table.
+    $revision_schema = $data_schema;
+    $revision_schema['description'] = $description_revision;
+    $revision_schema['primary key'] = array('entity_id', 'revision_id', 'deleted', 'delta', 'langcode');
+    $revision_schema['fields']['revision_id']['not null'] = TRUE;
+    $revision_schema['fields']['revision_id']['description'] = 'The entity revision id this data is attached to';
+
+    return array(
+      $table_mapping->getDedicatedDataTableName($storage_definition) => $data_schema,
+      $table_mapping->getDedicatedRevisionTableName($storage_definition) => $revision_schema,
+    );
+  }
+
   /**
    * Initializes common information for a base table.
    *
@@ -338,6 +856,26 @@ class ContentEntitySchemaHandler implements EntitySchemaHandlerInterface {
     $this->addTableDefaults($schema);
 
     return $schema;
+  }
+
+  /**
+   * Generates an index name for a field data table.
+   *
+   * @private Calling this function circumvents the entity system and is
+   * strongly discouraged. This function is not considered part of the public
+   * API and modules relying on it might break even in minor releases.
+   *
+   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   *   The field storage definition.
+   * @param string $index
+   *   The name of the index.
+   *
+   * @return string
+   *   A string containing a generated index name for a field data table that is
+   *   unique among all other fields.
+   */
+  protected function getFieldIndexName(FieldStorageDefinitionInterface $storage_definition, $index) {
+    return $storage_definition->getName() . '_' . $index;
   }
 
   /**

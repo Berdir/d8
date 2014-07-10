@@ -186,11 +186,13 @@ class BulkDeleteTest extends FieldUnitTestBase {
     $this->assertEqual($instance->bundle, $bundle, 'The deleted instance is for the correct bundle');
 
     // Check that the actual stored content did not change during delete.
-    $schema = ContentEntityDatabaseStorage::_fieldSqlSchema($field);
-    $table = ContentEntityDatabaseStorage::_fieldTableName($field);
-    $column = ContentEntityDatabaseStorage::_fieldColumnName($field, 'value');
+    $storage = \Drupal::entityManager()->getStorage($this->entity_type);
+    /** @var \Drupal\Core\Entity\Sql\DefaultTableMappingInterface $table_mapping */
+    $table_mapping = $storage->getTableMapping();
+    $table = $table_mapping->getDedicatedDataTableName($field);
+    $column = $table_mapping->getFieldColumnName($field, 'value');
     $result = db_select($table, 't')
-      ->fields('t', array_keys($schema[$table]['fields']))
+      ->fields('t')
       ->execute();
     foreach ($result as $row) {
       $this->assertEqual($this->entities[$row->entity_id]->{$field->name}->value, $row->$column);

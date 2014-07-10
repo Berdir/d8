@@ -432,11 +432,6 @@ class FieldConfig extends ConfigEntityBase implements FieldConfigInterface {
         'foreign keys' => array(),
       );
 
-      // Check that the schema does not include forbidden column names.
-      if (array_intersect(array_keys($schema['columns']), static::getReservedColumns())) {
-        throw new FieldException(String::format('Illegal field type @field_type on @field_name.', array('@field_type' => $this->type, '@field_name' => $this->name)));
-      }
-
       // Merge custom indexes with those specified by the field type. Custom
       // indexes prevail.
       $schema['indexes'] = $this->indexes + $schema['indexes'];
@@ -613,15 +608,6 @@ class FieldConfig extends ConfigEntityBase implements FieldConfigInterface {
    */
   public function isQueryable() {
     return TRUE;
-  }
-
-  /**
-   * A list of columns that can not be used as field type columns.
-   *
-   * @return array
-   */
-  public static function getReservedColumns() {
-    return array('deleted');
   }
 
   /**

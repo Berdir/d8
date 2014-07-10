@@ -349,9 +349,12 @@ class Field extends FieldPluginBase {
     }
 
     $this->ensureMyTable();
-    $field_storage_definitions = $this->entityManager->getFieldStorageDefinitions($this->definition['entity_type']);
+    $entity_type_id = $this->definition['entity_type'];
+    $field_storage_definitions = $this->entityManager->getFieldStorageDefinitions($entity_type_id);
     $field = $field_storage_definitions[$this->definition['field_name']];
-    $column = ContentEntityDatabaseStorage::_fieldColumnName($field, $this->options['click_sort_column']);
+    /** @var \Drupal\Core\Entity\Sql\DefaultTableMappingInterface $table_mapping */
+    $table_mapping = $this->entityManager->getStorage($entity_type_id)->getTableMapping();
+    $column = $table_mapping->getFieldColumnName($field, $this->options['click_sort_column']);
     if (!isset($this->aliases[$column])) {
       // Column is not in query; add a sort on it (without adding the column).
       $this->aliases[$column] = $this->tableAlias . '.' . $column;

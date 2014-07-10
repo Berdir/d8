@@ -22,7 +22,7 @@ function field_views_data() {
   $module_handler = \Drupal::moduleHandler();
 
   foreach (\Drupal::entityManager()->getStorage('field_config')->loadMultiple() as $field) {
-    if (_field_views_is_sql_entity_type($field)) {
+    if (_field_views_get_entity_type_storage($field)) {
       $result = (array) $module_handler->invoke($field->module, 'field_views_data', array($field));
       if (empty($result)) {
         $result = field_views_field_default_views_data($field);
@@ -48,7 +48,7 @@ function field_views_data() {
  */
 function field_views_data_alter(&$data) {
   foreach (\Drupal::entityManager()->getStorage('field_config')->loadMultiple() as $field) {
-    if (_field_views_is_sql_entity_type($field)) {
+    if (_field_views_get_entity_type_storage($field)) {
       $function = $field->module . '_field_views_data_views_data_alter';
       if (function_exists($function)) {
         $function($data, $field);
@@ -63,12 +63,17 @@ function field_views_data_alter(&$data) {
  * @param \Drupal\field\FieldConfigInterface $field
  *   The field definition.
  *
- * @return bool
- *   True if the entity type uses ContentEntityDatabaseStorage.
+ * @return \Drupal\Core\Entity\ContentEntityDatabaseStorage
+ *   Returns the entity type storage if supported.
  */
-function _field_views_is_sql_entity_type(FieldConfigInterface $field) {
+function _field_views_get_entity_type_storage(FieldConfigInterface $field) {
+  $result = FALSE;
   $entity_manager = \Drupal::entityManager();
-  return $entity_manager->hasDefinition($field->entity_type) && $entity_manager->getStorage($field->entity_type) instanceof ContentEntityDatabaseStorage;
+  if ($entity_manager->hasDefinition($field->entity_type)) {
+    $storage = $entity_manager->getStorage($field->entity_type);
+    $result = $storage instanceof ContentEntityDatabaseStorage ? $storage : FALSE;
+  }
+  return $result;
 }
 
 /**
@@ -120,6 +125,11 @@ function field_views_field_default_views_data(FieldConfigInterface $field) {
   if (!$field->getBundles()) {
     return $data;
   }
+  // Check whether the entity type storage is supported.
+  $storage = _field_views_get_entity_type_storage($field);
+  if (!$storage) {
+    return $data;
+  }
 
   $field_name = $field->getName();
   $field_columns = $field->getColumns();
@@ -139,15 +149,18 @@ function field_views_field_default_views_data(FieldConfigInterface $field) {
   }
 
   // Description of the field tables.
+  // @todo Generalize this code to make it work with any table layout. See
+  //   https://drupal.org/node/2079019.
+  $table_mapping = $storage->getTableMapping();
   $field_tables = array(
     EntityStorageInterface::FIELD_LOAD_CURRENT => array(
-      'table' => ContentEntityDatabaseStorage::_fieldTableName($field),
+      'table' => $table_mapping->getDedicatedDataTableName($field),
       'alias' => "{$entity_type_id}__{$field_name}",
     ),
   );
   if ($supports_revisions) {
     $field_tables[EntityStorageInterface::FIELD_LOAD_REVISION] = array(
-      'table' => ContentEntityDatabaseStorage::_fieldRevisionTableName($field),
+      'table' => $table_mapping->getDedicatedRevisionTableName($field),
       'alias' => "{$entity_type_id}_revision__{$field_name}",
     );
   }
@@ -178,7 +191,7 @@ function field_views_field_default_views_data(FieldConfigInterface $field) {
   // Build the list of additional fields to add to queries.
   $add_fields = array('delta', 'langcode', 'bundle');
   foreach (array_keys($field_columns) as $column) {
-    $add_fields[] = ContentEntityDatabaseStorage::_fieldColumnName($field, $column);
+    $add_fields[] = $table_mapping->getFieldColumnName($field, $column);
   }
   // Determine the label to use for the field. We don't have a label available
   // at the field level, so we just go through all instances and take the one
@@ -302,11 +315,10 @@ function field_views_field_default_views_data(FieldConfigInterface $field) {
       else {
         $group = t('@group (historical data)', array('@group' => $group_name));
       }
-      $column_real_name = ContentEntityDatabaseStorage::_fieldColumnName($field, $column);
+      $column_real_name = $table_mapping->getFieldColumnName($field, $column);
 
       // Load all the fields from the table by default.
-      $field_sql_schema = ContentEntityDatabaseStorage::_fieldSqlSchema($field);
-      $additional_fields = array_keys($field_sql_schema[$table]['fields']);
+      $additional_fields = $table_mapping->getAllColumns($table);
 
       $data[$table_alias][$column_real_name] = array(
         'group' => $group,

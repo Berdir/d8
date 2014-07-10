@@ -6,11 +6,10 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\field\FieldConfigInterface;
-use Drupal\field\FieldConfigUpdateForbiddenException;
 
 /**
  * Implements hook_help().

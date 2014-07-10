@@ -252,11 +252,11 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
 
     $this->setUpSchemaHandler();
 
-    $table_mapping = new DefaultTableMapping($this->storageDefinitions);
+    $table_mapping = new DefaultTableMapping($this->storageDefinitions, $this->storageDefinitions);
     $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
     $table_mapping->setExtraColumns('entity_test', array('default_langcode'));
 
-    $this->storage->expects($this->once())
+    $this->storage->expects($this->any())
       ->method('getTableMapping')
       ->will($this->returnValue($table_mapping));
 
@@ -418,11 +418,11 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
 
     $this->setUpSchemaHandler();
 
-    $table_mapping = new DefaultTableMapping($this->storageDefinitions);
+    $table_mapping = new DefaultTableMapping($this->storageDefinitions, $this->storageDefinitions);
     $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
     $table_mapping->setFieldNames('entity_test_revision', array_keys($this->storageDefinitions));
 
-    $this->storage->expects($this->once())
+    $this->storage->expects($this->any())
       ->method('getTableMapping')
       ->will($this->returnValue($table_mapping));
 
@@ -503,7 +503,7 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
       ),
     ));
 
-    $this->storage->expects($this->once())
+    $this->storage->expects($this->any())
       ->method('getDataTable')
       ->will($this->returnValue('entity_test_field_data'));
 
@@ -517,11 +517,11 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
 
     $this->setUpSchemaHandler();
 
-    $table_mapping = new DefaultTableMapping($this->storageDefinitions);
+    $table_mapping = new DefaultTableMapping($this->storageDefinitions, $this->storageDefinitions);
     $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
     $table_mapping->setFieldNames('entity_test_field_data', array_keys($this->storageDefinitions));
 
-    $this->storage->expects($this->once())
+    $this->storage->expects($this->any())
       ->method('getTableMapping')
       ->will($this->returnValue($table_mapping));
 
@@ -624,13 +624,13 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
 
     $this->setUpSchemaHandler();
 
-    $table_mapping = new DefaultTableMapping($this->storageDefinitions);
+    $table_mapping = new DefaultTableMapping($this->storageDefinitions, $this->storageDefinitions);
     $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
     $table_mapping->setFieldNames('entity_test_revision', array_keys($this->storageDefinitions));
     $table_mapping->setFieldNames('entity_test_field_data', array_keys($this->storageDefinitions));
     $table_mapping->setFieldNames('entity_test_revision_field_data', array_keys($this->storageDefinitions));
 
-    $this->storage->expects($this->once())
+    $this->storage->expects($this->any())
       ->method('getTableMapping')
       ->will($this->returnValue($table_mapping));
 
@@ -770,14 +770,20 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
    * This uses the field definitions set in $this->fieldDefinitions.
    */
   protected function setUpSchemaHandler() {
-    $this->entityManager->expects($this->once())
+    $this->entityManager->expects($this->any())
       ->method('getFieldStorageDefinitions')
       ->with($this->entityType->id())
       ->will($this->returnValue($this->storageDefinitions));
+
+    $connection = $this->getMockBuilder('Drupal\Core\Database\Connection')
+      ->disableOriginalConstructor()
+      ->getMock();
+
     $this->schemaHandler = new ContentEntitySchemaHandler(
       $this->entityManager,
       $this->entityType,
-      $this->storage
+      $this->storage,
+      $connection
     );
   }
 
@@ -791,7 +797,11 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
    *   FieldStorageDefinitionInterface::getSchema().
    */
   public function setUpStorageDefinition($field_name, array $schema) {
-    $this->storageDefinitions[$field_name] = $this->getMock('Drupal\Core\Field\FieldStorageDefinitionInterface');
+    $this->storageDefinitions[$field_name] = $this->getMock('Drupal\Tests\Core\Field\TestBaseFieldDefinitionInterface');
+    // getDescription() is called once for each table.
+    $this->storageDefinitions[$field_name]->expects($this->any())
+      ->method('getName')
+      ->will($this->returnValue($field_name));
     // getDescription() is called once for each table.
     $this->storageDefinitions[$field_name]->expects($this->any())
       ->method('getDescription')
@@ -800,7 +810,7 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
     $this->storageDefinitions[$field_name]->expects($this->any())
       ->method('getSchema')
       ->will($this->returnValue($schema));
-    $this->storageDefinitions[$field_name]->expects($this->once())
+    $this->storageDefinitions[$field_name]->expects($this->any())
       ->method('getColumns')
       ->will($this->returnValue($schema['columns']));
   }

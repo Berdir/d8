@@ -62,8 +62,10 @@ class ApiDataTest extends FieldTestBase {
     // Check the table and the joins of the first field.
     // Attached to node only.
     $field = $this->fields[0];
-    $current_table = ContentEntityDatabaseStorage::_fieldTableName($field);
-    $revision_table = ContentEntityDatabaseStorage::_fieldRevisionTableName($field);
+    /** @var \Drupal\Core\Entity\Sql\DefaultTableMappingInterface $table_mapping */
+    $table_mapping = \Drupal::entityManager()->getStorage('node')->getTableMapping();
+    $current_table = $table_mapping->getDedicatedDataTableName($field);
+    $revision_table = $table_mapping->getDedicatedRevisionTableName($field);
     $data[$current_table] = $views_data->get($current_table);
     $data[$revision_table] = $views_data->get($revision_table);
 

@@ -520,9 +520,12 @@ function file_field_views_data(FieldConfigInterface $field) {
  */
 function file_field_views_data_views_data_alter(array &$data, FieldConfigInterface $field) {
   $entity_type_id = $field->entity_type;
-  $entity_type = \Drupal::entityManager()->getDefinition($entity_type_id);
+  $entity_manager = \Drupal::entityManager();
+  $entity_type = $entity_manager->getDefinition($entity_type_id);
   $field_name = $field->getName();
   $pseudo_field_name = 'reverse_' . $field_name . '_' . $entity_type_id;
+  /** @var \Drupal\Core\Entity\Sql\DefaultTableMappingInterface $table_mapping */
+  $table_mapping = $entity_manager->getStorage($entity_type_id)->getTableMapping();
 
   list($label) = field_views_field_label($entity_type_id, $field_name);
 
@@ -532,7 +535,7 @@ function file_field_views_data_views_data_alter(array &$data, FieldConfigInterfa
     'id' => 'entity_reverse',
     'field_name' => $field_name,
     'entity_type' => $entity_type_id,
-    'field table' => ContentEntityDatabaseStorage::_fieldTableName($field),
+    'field table' => $table_mapping->getDedicatedDataTableName($field),
     'field field' => $field_name . '_target_id',
     'base' => $entity_type->getBaseTable(),
     'base field' => $entity_type->getKey('id'),
