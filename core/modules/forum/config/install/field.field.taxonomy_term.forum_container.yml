@@ -2,11 +2,11 @@ id: taxonomy_term.forum_container
 status: true
 langcode: en
 name: forum_container
-type: list_boolean
+type: boolean
 settings:
   allowed_values:
-    - ''
-    - ''
+    - 0
+    - 1
   allowed_values_function: ''
 module: options
 entity_type: taxonomy_term

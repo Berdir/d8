@@ -97,7 +97,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->bool = entity_create('field_config', array(
       'name' => 'bool',
       'entity_type' => 'entity_test',
-      'type' => 'list_boolean',
+      'type' => 'boolean',
       'cardinality' => 1,
       'settings' => array(
         'allowed_values' => array(
@@ -481,7 +481,7 @@ class OptionsWidgetsTest extends FieldTestBase {
   }
 
   /**
-   * Tests the 'options_onoff' widget.
+   * Tests the 'boolean_onoff' widget.
    */
   function testOnOffCheckbox() {
     // Create an instance of the 'boolean' field.
@@ -491,7 +491,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     ))->save();
     entity_get_form_display('entity_test', 'entity_test', 'default')
       ->setComponent($this->bool->getName(), array(
-        'type' => 'options_onoff',
+        'type' => 'boolean_onoff',
       ))
       ->save();
 
@@ -505,30 +505,30 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     // Display form: with no field data, option is unchecked.
     $this->drupalGet('entity_test/manage/' . $entity->id());
-    $this->assertNoFieldChecked('edit-bool');
+    $this->assertNoFieldChecked('edit-bool-value');
     $this->assertRaw('Some dangerous &amp; unescaped <strong>markup</strong>', 'Option text was properly filtered.');
 
     // Submit form: check the option.
-    $edit = array('bool' => TRUE);
+    $edit = array('bool[value]' => TRUE);
     $this->drupalPostForm(NULL, $edit, t('Save'));
     $this->assertFieldValues($entity_init, 'bool', array(1));
 
     // Display form: check that the right options are selected.
     $this->drupalGet('entity_test/manage/' . $entity->id());
-    $this->assertFieldChecked('edit-bool');
+    $this->assertFieldChecked('edit-bool-value');
 
     // Submit form: uncheck the option.
-    $edit = array('bool' => FALSE);
+    $edit = array('bool[value]' => FALSE);
     $this->drupalPostForm(NULL, $edit, t('Save'));
     $this->assertFieldValues($entity_init, 'bool', array(0));
 
     // Display form: with 'off' value, option is unchecked.
     $this->drupalGet('entity_test/manage/' . $entity->id());
-    $this->assertNoFieldChecked('edit-bool');
+    $this->assertNoFieldChecked('edit-bool-value');
   }
 
   /**
-   * Tests that the 'options_onoff' widget has a 'display_label' setting.
+   * Tests that the 'boolean_onoff' widget has a 'display_label' setting.
    */
   function testOnOffCheckboxLabelSetting() {
     // Create Basic page node type.
@@ -543,7 +543,7 @@ class OptionsWidgetsTest extends FieldTestBase {
     entity_create('field_config', array(
       'name' => $field_name,
       'entity_type' => 'node',
-      'type' => 'list_boolean',
+      'type' => 'boolean',
       'cardinality' => 1,
       'settings' => array(
         'allowed_values' => array(
@@ -562,7 +562,7 @@ class OptionsWidgetsTest extends FieldTestBase {
 
     entity_get_form_display('node', 'page', 'default')
       ->setComponent($field_name, array(
-        'type' => 'options_onoff',
+        'type' => 'boolean_onoff',
       ))
       ->save();
 

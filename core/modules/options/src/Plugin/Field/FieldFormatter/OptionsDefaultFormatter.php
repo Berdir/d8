@@ -17,10 +17,10 @@ use Drupal\Core\Field\FieldItemListInterface;
  *   id = "list_default",
  *   label = @Translation("Default"),
  *   field_types = {
+ *     "boolean",
  *     "list_integer",
  *     "list_float",
  *     "list_text",
- *     "list_boolean"
  *   }
  * )
  */

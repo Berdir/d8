@@ -20,7 +20,6 @@ use Drupal\options\Plugin\Field\FieldWidget\OptionsWidgetBase;
  *     "list_integer",
  *     "list_float",
  *     "list_text",
- *     "list_boolean"
  *   },
  *   multiple_values = TRUE
  * )

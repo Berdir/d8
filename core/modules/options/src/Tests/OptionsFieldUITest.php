@@ -206,7 +206,7 @@ class OptionsFieldUITest extends FieldTestBase {
    */
   function testOptionsAllowedValuesBoolean() {
     $this->field_name = 'field_options_boolean';
-    $this->createOptionsField('list_boolean');
+    $this->createOptionsField('boolean');
 
     // Check that the separate 'On' and 'Off' form fields work.
     $on = $this->randomName();
@@ -246,7 +246,7 @@ class OptionsFieldUITest extends FieldTestBase {
    * Helper function to create list field of a given type.
    *
    * @param string $type
-   *   'list_integer', 'list_float', 'list_text' or 'list_boolean'
+   *   'boolean', 'list_integer', 'list_float' or 'list_text'
    */
   protected function createOptionsField($type) {
     // Create a test field and instance.
@@ -296,7 +296,7 @@ class OptionsFieldUITest extends FieldTestBase {
    */
   function testNodeDisplay() {
     $this->field_name = strtolower($this->randomName());
-    $this->createOptionsField('list_boolean');
+    $this->createOptionsField('boolean');
     $node = $this->drupalCreateNode(array('type' => $this->type));
 
     $on = $this->randomName();
@@ -311,7 +311,7 @@ class OptionsFieldUITest extends FieldTestBase {
 
     // Select a default value.
     $edit = array(
-      $this->field_name => '1',
+      $this->field_name . '[value]' => '1',
     );
     $this->drupalPostForm('node/' . $node->id() . '/edit', $edit, t('Save and keep published'));
 

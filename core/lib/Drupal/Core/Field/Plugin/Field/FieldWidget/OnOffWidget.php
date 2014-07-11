@@ -2,22 +2,22 @@
 
 /**
  * @file
- * Contains \Drupal\options\Plugin\Field\FieldWidget\OnOffWidget.
+ * Contains \Drupal\Core\Field\Plugin\Field\FieldWidget\OnOffWidget.
  */
 
-namespace Drupal\options\Plugin\Field\FieldWidget;
+namespace Drupal\Core\Field\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\options\Plugin\Field\FieldWidget\OptionsWidgetBase;
 
 /**
- * Plugin implementation of the 'options_onoff' widget.
+ * Plugin implementation of the 'boolean_onoff' widget.
  *
  * @FieldWidget(
- *   id = "options_onoff",
+ *   id = "boolean_onoff",
  *   label = @Translation("Single on/off checkbox"),
  *   field_types = {
- *     "list_boolean"
+ *     "boolean"
  *   },
  *   multiple_values = TRUE
  * )
@@ -62,22 +62,19 @@ class OnOffWidget extends OptionsWidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, array &$form_state) {
-    $element = parent::formElement($items, $delta, $element, $form, $form_state);
+    $options = $items->getFieldDefinition()->getSetting('allowed_values');
 
-    $options = $this->getOptions($items[$delta]);
-    $selected = $this->getSelectedOptions($items);
-
-    $element += array(
+    $element['value'] = $element + array(
       '#type' => 'checkbox',
-      '#default_value' => !empty($selected[0]),
+      '#default_value' => !empty($items[0]->value),
     );
 
     // Override the title from the incoming $element.
     if ($this->getSetting('display_label')) {
-      $element['#title'] = $this->fieldDefinition->getLabel();
+      $element['value']['#title'] = $this->fieldDefinition->getLabel();
     }
     else {
-      $element['#title'] = isset($options[1]) ? $options[1] : '';
+      $element['value']['#title'] = isset($options[1]) ? $options[1] : '';
     }
 
     return $element;

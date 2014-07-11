@@ -18,7 +18,7 @@ process:
     plugin: static_map
     source: type
     map:
-      checkbox: options_onoff
+      checkbox: boolean_onoff
       date: datetime_default
       list: text_textfield
       selection: options_select

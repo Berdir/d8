@@ -17,6 +17,7 @@ use Drupal\Core\Field\FieldItemListInterface;
  *   id = "number_unformatted",
  *   label = @Translation("Unformatted"),
  *   field_types = {
+ *     "boolean",
  *     "integer",
  *     "decimal",
  *     "float"
