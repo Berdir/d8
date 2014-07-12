@@ -13,23 +13,14 @@ use Drupal\field\Tests\FieldUnitTestBase;
 
 /**
  * Tests the new entity API for the boolean field type.
+ *
+ * @group field
  */
 class BooleanItemTest extends FieldUnitTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Boolena field item',
-      'description' => 'Tests the new entity API for the boolean field type.',
-      'group' => 'Field types',
-    );
-  }
-
   public function setUp() {
     parent::setUp();
 

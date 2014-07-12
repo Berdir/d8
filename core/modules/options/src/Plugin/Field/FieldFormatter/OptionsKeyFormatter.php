@@ -17,7 +17,6 @@ use Drupal\Core\Field\FieldItemListInterface;
  *   id = "list_key",
  *   label = @Translation("Key"),
  *   field_types = {
- *     "boolean",
  *     "list_integer",
  *     "list_float",
  *     "list_text",

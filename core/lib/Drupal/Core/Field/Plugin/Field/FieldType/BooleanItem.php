@@ -7,10 +7,10 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
-use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\TypedData\AllowedValuesInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
@@ -20,19 +20,19 @@ use Drupal\Core\TypedData\DataDefinition;
  *   id = "boolean",
  *   label = @Translation("Boolean"),
  *   description = @Translation("An entity field containing a boolean value."),
- *   default_widget = "boolean",
+ *   default_widget = "checkbox",
  *   default_formatter = "number_unformatted",
  * )
  */
-class BooleanItem extends FieldItemBase {
+class BooleanItem extends FieldItemBase implements AllowedValuesInterface {
 
   /**
    * {@inheritdoc}
    */
   public static function defaultSettings() {
     return array(
-      'allowed_values' => array(0, 1),
-      'allowed_values_function' => '',
+      'on_label' => '1',
+      'off_label' => '0',
     ) + parent::defaultSettings();
   }
 
@@ -65,64 +65,52 @@ class BooleanItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public function settingsForm(array &$form, array &$form_state, $has_data) {
-    $allowed_values = $this->getSetting('allowed_values');
-    $allowed_values_function = $this->getSetting('allowed_values_function');
-
-    $values = $allowed_values;
-    $off_value = array_shift($values);
-    $on_value = array_shift($values);
-
-    $element['allowed_values'] = array(
-      '#type' => 'value',
-      '#description' => '',
-      '#value_callback' => array(get_class($this), 'getAllowedValues'),
-      '#access' => empty($allowed_values_function),
-    );
-    $element['allowed_values']['on'] = array(
+    $element['on_label'] = array(
       '#type' => 'textfield',
-      '#title' => t('On value'),
-      '#default_value' => $on_value,
-      '#required' => FALSE,
-      '#description' => t('If left empty, "1" will be used.'),
-      // Change #parents to make sure the element is not saved into field
-      // settings.
-      '#parents' => array('on'),
+      '#title' => t('On label'),
+      '#default_value' => $this->getSetting('on_label'),
+      '#required' => TRUE,
     );
-    $element['allowed_values']['off'] = array(
+    $element['off_label'] = array(
       '#type' => 'textfield',
-      '#title' => t('Off value'),
-      '#default_value' => $off_value,
-      '#required' => FALSE,
-      '#description' => t('If left empty, "0" will be used.'),
-      // Change #parents to make sure the element is not saved into field
-      // settings.
-      '#parents' => array('off'),
-    );
-
-    // Link the allowed value to the on / off elements to prepare for the rare
-    // case of an alter changing #parents.
-    $element['allowed_values']['#on_parents'] = &$element['allowed_values']['on']['#parents'];
-    $element['allowed_values']['#off_parents'] = &$element['allowed_values']['off']['#parents'];
-
-    $element['allowed_values_function'] = array(
-      '#type' => 'item',
-      '#title' => t('Allowed values list'),
-      '#markup' => t('The value of this field is being determined by the %function function and may not be changed.', array('%function' => $allowed_values_function)),
-      '#access' => !empty($allowed_values_function),
-      '#value' => $allowed_values_function,
+      '#title' => t('Off label'),
+      '#default_value' => $this->getSetting('off_label'),
+      '#required' => TRUE,
     );
 
     return $element;
   }
 
   /**
-   * Form element #value_callback: assembles the allowed values for 'boolean'
-   * fields.
+   * {@inheritdoc}
    */
-  public static function getAllowedValues($element, $input, $form_state) {
-    $on = NestedArray::getValue($form_state['input'], $element['#on_parents']);
-    $off = NestedArray::getValue($form_state['input'], $element['#off_parents']);
-    return array($off, $on);
+  public function getPossibleValues(AccountInterface $account = NULL) {
+    return array(0, 1);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPossibleOptions(AccountInterface $account = NULL) {
+    return array(
+      0 => $this->getSetting('off_label'),
+      1 => $this->getSetting('on_label'),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSettableValues(AccountInterface $account = NULL) {
+    return array(0, 1);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSettableOptions(AccountInterface $account = NULL) {
+    return $this->getPossibleOptions($account);
+  }
+
 
 }

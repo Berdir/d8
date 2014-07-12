@@ -4,10 +4,8 @@ langcode: en
 name: forum_container
 type: boolean
 settings:
-  allowed_values:
-    - 0
-    - 1
-  allowed_values_function: ''
+  on_label: Yes
+  off_label: No
 module: options
 entity_type: taxonomy_term
 locked: true

@@ -102,15 +102,12 @@ field.boolean.settings:
   type: mapping
   label: 'List (boolean) settings'
   mapping:
-    allowed_values:
-      type: sequence
-      label: 'Allowed values list'
-      sequence:
-        - type: string
-          label: 'Value'
-    allowed_values_function:
+    on_label:
       type: string
-      label: 'Allowed values function'
+      label: 'On label'
+    off_label:
+      type: string
+      label: 'Off label'
 
 field.boolean.instance_settings:
   label: 'List (boolean)'
@@ -323,7 +320,7 @@ entity_form_display.field.number:
           type: label
           label: 'Placeholder'
 
-entity_form_display.field.boolean_onoff:
+entity_form_display.field.checkbox:
   type: entity_field_form_display_base
   label: 'Single on/off checkbox format settings'
   mapping:

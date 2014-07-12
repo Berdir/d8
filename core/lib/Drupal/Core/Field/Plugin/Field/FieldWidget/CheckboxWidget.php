@@ -2,27 +2,26 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Field\Plugin\Field\FieldWidget\OnOffWidget.
+ * Contains \Drupal\Core\Field\Plugin\Field\FieldWidget\CheckboxWidget.
  */
 
 namespace Drupal\Core\Field\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\options\Plugin\Field\FieldWidget\OptionsWidgetBase;
+use Drupal\Core\Field\WidgetBase;
 
 /**
- * Plugin implementation of the 'boolean_onoff' widget.
+ * Plugin implementation of the 'checkbox' widget.
  *
  * @FieldWidget(
- *   id = "boolean_onoff",
+ *   id = "checkbox",
  *   label = @Translation("Single on/off checkbox"),
  *   field_types = {
  *     "boolean"
  *   },
- *   multiple_values = TRUE
  * )
  */
-class OnOffWidget extends OptionsWidgetBase {
+class CheckboxWidget extends WidgetBase {
 
   /**
    * {@inheritdoc}
@@ -39,7 +38,7 @@ class OnOffWidget extends OptionsWidgetBase {
   public function settingsForm(array $form, array &$form_state) {
     $element['display_label'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Use field label instead of the "On value" as label'),
+      '#title' => t('Use field label instead of the "On label" as label'),
       '#default_value' => $this->getSetting('display_label'),
       '#weight' => -1,
     );
@@ -62,8 +61,6 @@ class OnOffWidget extends OptionsWidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, array &$form_state) {
-    $options = $items->getFieldDefinition()->getSetting('allowed_values');
-
     $element['value'] = $element + array(
       '#type' => 'checkbox',
       '#default_value' => !empty($items[0]->value),
@@ -74,7 +71,7 @@ class OnOffWidget extends OptionsWidgetBase {
       $element['value']['#title'] = $this->fieldDefinition->getLabel();
     }
     else {
-      $element['value']['#title'] = isset($options[1]) ? $options[1] : '';
+      $element['value']['#title'] = $this->fieldDefinition->getSetting('on_label');
     }
 
     return $element;
