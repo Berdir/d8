@@ -11,6 +11,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\Core\Routing\RoutingEvents;
+use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
@@ -32,16 +33,26 @@ class RouterRebuildSubscriber implements EventSubscriberInterface {
   protected $lock;
 
   /**
+   * The menu link plugin manager
+   *
+   * @var \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
+   */
+  protected $menuLinkManager;
+
+  /**
    * Constructs the RouterRebuildSubscriber object.
    *
    * @param \Drupal\Core\Routing\RouteBuilderInterface $route_builder
    *   The route builder.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock backend.
+   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
+   *   The menu link plugin manager.
    */
-  public function __construct(RouteBuilderInterface $route_builder, LockBackendInterface $lock) {
+  public function __construct(RouteBuilderInterface $route_builder, LockBackendInterface $lock, MenuLinkManagerInterface $menu_link_manager) {
     $this->routeBuilder = $route_builder;
     $this->lock = $lock;
+    $this->menuLinkManager = $menu_link_manager;
   }
 
   /**
@@ -73,11 +84,9 @@ class RouterRebuildSubscriber implements EventSubscriberInterface {
       $transaction = db_transaction();
       try {
         // Ensure the menu links are up to date.
-        menu_link_rebuild_defaults();
-        // Clear the menu cache.
-        menu_cache_clear_all();
-        // Track which menu items are expanded.
-        _menu_update_expanded_menus();
+        $this->menuLinkManager->rebuild();
+        // Ignore any database replicas temporarily.
+        db_ignore_replica();
       }
       catch (\Exception $e) {
         $transaction->rollback();
