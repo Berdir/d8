@@ -11,9 +11,10 @@
 function menu_link_content_uninstall() {
   // Call the manager and delete all the plugins.
   $uuids = db_query('SELECT uuid FROM {menu_link_content}')->fetchCol();
-  $menu_tree = \Drupal::menuTree();
+  /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager */
+  $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
   foreach ($uuids as $uuid) {
     // Manually build the plugin ID, and remove it from the menu tree.
-    $menu_tree->deleteLink("menu_link_content:$uuid", FALSE);
+    $menu_link_manager->deleteLink("menu_link_content:$uuid", FALSE);
   }
 }
