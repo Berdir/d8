@@ -11,7 +11,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\form_test\Callbacks;
 
 /**
- * Form builder for testing drupal_validate_form().
+ * Form builder for testing \Drupal\Core\Form\FormValidatorInterface::validateForm().
  *
  * Serves for testing form processing and alterations by form validation
  * handlers, especially for the case of a validation error:
