@@ -180,7 +180,7 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
   public function submitConfigurationForm(array &$form, array &$form_state) {
     $new_definition = $this->extractFormValues($form, $form_state);
 
-    return $this->menuLinkManager->updateLink($this->menuLink->getPluginId(), $new_definition);
+    return $this->menuLinkManager->updateDefinition($this->menuLink->getPluginId(), $new_definition);
   }
 
   /**
