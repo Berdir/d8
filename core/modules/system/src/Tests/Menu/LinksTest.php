@@ -162,7 +162,7 @@ class LinksTest extends WebTestBase {
     // Start over, and delete child-1, and check that the children of child-1
     // have been reassigned to the parent.
     $links = $this->createLinkHierarchy($module);
-    $this->menuLinkManager->deleteLink($links['child-1']);
+    $this->menuLinkManager->removeDefinition($links['child-1']);
 
     $expected_hierarchy = array(
       'parent' => FALSE,

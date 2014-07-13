@@ -104,7 +104,7 @@ class MenuDeleteForm extends EntityConfirmFormBase {
     // @todo - there ought to be a better way.
     $menu_links = $this->menuLinkManager->loadLinksByRoute('menu_ui.menu_edit', array('menu' => $this->entity->id()), TRUE);
     foreach ($menu_links as $id => $link) {
-      $this->menuLinkManager->deleteLink($id);
+      $this->menuLinkManager->removeDefinition($id);
     }
 
     // Delete the custom menu and all its menu links.
