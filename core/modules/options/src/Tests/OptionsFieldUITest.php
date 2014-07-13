@@ -202,34 +202,6 @@ class OptionsFieldUITest extends FieldTestBase {
   }
 
   /**
-   * Options (boolean) : test 'On/Off' values input.
-   */
-  function testOptionsAllowedValuesBoolean() {
-    $this->field_name = 'field_options_boolean';
-    $this->createOptionsField('boolean');
-
-    // Check that the separate 'On' and 'Off' form fields work.
-    $on = $this->randomName();
-    $off = $this->randomName();
-    $allowed_values = array(1 => $on, 0 => $off);
-    $edit = array(
-      'on' => $on,
-      'off' => $off,
-    );
-    $this->drupalPostForm($this->admin_path, $edit, t('Save field settings'));
-    $this->assertRaw(t('Updated field %label field settings.', array('%label' => $this->field_name)));
-
-    // Test the allowed_values on the field settings form.
-    $this->drupalGet($this->admin_path);
-    $this->assertFieldByName('on', $on, t("The 'On' value is stored correctly."));
-    $this->assertFieldByName('off', $off, t("The 'Off' value is stored correctly."));
-    $field = FieldConfig::loadByName('node', $this->field_name);
-    $this->assertEqual($field->getSetting('allowed_values'), $allowed_values, 'The allowed value is correct');
-    $this->assertNull($field->getSetting('on'), 'The on value is not saved into settings');
-    $this->assertNull($field->getSetting('off'), 'The off value is not saved into settings');
-  }
-
-  /**
    * Options (text) : test 'trimmed values' input.
    */
   function testOptionsTrimmedValuesText() {
@@ -296,14 +268,15 @@ class OptionsFieldUITest extends FieldTestBase {
    */
   function testNodeDisplay() {
     $this->field_name = strtolower($this->randomName());
-    $this->createOptionsField('boolean');
+    $this->createOptionsField('list_integer');
     $node = $this->drupalCreateNode(array('type' => $this->type));
 
     $on = $this->randomName();
     $off = $this->randomName();
     $edit = array(
-      'on' => $on,
-      'off' => $off,
+      'field[settings][allowed_values]' =>
+        "1|$on
+        0|$off",
     );
 
     $this->drupalPostForm($this->admin_path, $edit, t('Save field settings'));
@@ -311,7 +284,7 @@ class OptionsFieldUITest extends FieldTestBase {
 
     // Select a default value.
     $edit = array(
-      $this->field_name . '[value]' => '1',
+      $this->field_name => '1',
     );
     $this->drupalPostForm('node/' . $node->id() . '/edit', $edit, t('Save and keep published'));
 
