@@ -143,7 +143,7 @@ class LinksTest extends WebTestBase {
     // childs of child-1 have been moved too.
     $links = $this->createLinkHierarchy($module);
     /* @var \Drupal\Core\Menu\MenuLinkInterface $menu_link_plugin  */
-    $this->menuLinkManager->updateLink($links['child-1'], array('parent' => $links['child-2']));
+    $this->menuLinkManager->updateDefinition($links['child-1'], array('parent' => $links['child-2']));
     // Verify that the entity was updated too.
     /* @var \Drupal\Core\Menu\MenuLinkInterface $menu_link_plugin  */
     $menu_link_plugin = $this->menuLinkManager->createInstance($links['child-1']);

@@ -40,7 +40,7 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
     /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager */
     $menu_link_manager = $this->container->get('plugin.manager.menu.link');
     // Move a link into the new menu.
-    $menu_link = $menu_link_manager->updateLink('test_page_test.test_page', array('menu_name' => 'llama', 'parent' => ''));
+    $menu_link = $menu_link_manager->updateDefinition('test_page_test.test_page', array('menu_name' => 'llama', 'parent' => ''));
     $block = $this->drupalPlaceBlock('system_menu_block:llama', array('label' => 'Llama', 'provider' => 'system', 'region' => 'footer'));
 
     // Prime the page cache.
@@ -68,7 +68,7 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
     $this->verifyPageCache($path, 'HIT');
 
     // Verify that after modifying the menu link weight, there is a cache miss.
-    $menu_link_manager->updateLink('test_page_test.test_page', array('weight' => -10));
+    $menu_link_manager->updateDefinition('test_page_test.test_page', array('weight' => -10));
     $this->pass('Test modification of menu link.', 'Debug');
     $this->verifyPageCache($path, 'MISS');
 
