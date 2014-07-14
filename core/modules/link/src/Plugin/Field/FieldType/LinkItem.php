@@ -7,6 +7,7 @@
 
 namespace Drupal\link\Plugin\Field\FieldType;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
@@ -135,9 +136,36 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
   /**
    * {@inheritdoc}
    */
+  public function preSave() {
+    // Trim any spaces around the link text.
+    $this->title = trim($this->title);
+
+    $parsed_url = UrlHelper::parse(trim($this->url));
+    $this->url = $parsed_url['path'];
+    $this->options = ($this->options) ?: array();
+
+    // The link 'query' and 'fragment' parts need to be split and updated only
+    // if they exist (e.g. when the 'url' property is new or updated).
+    $options = array();
+    if (!empty($parsed_url['query'])) {
+      $options['query'] = $parsed_url['query'];
+    }
+    if (!empty($parsed_url['fragment'])) {
+      $options['fragment'] = $parsed_url['fragment'];
+    }
+    $this->options = $options + $this->options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isEmpty() {
-    $value = $this->get('url')->getValue();
-    return $value === NULL || $value === '';
+    if ($this->isExternal()) {
+      return $this->url === NULL || $this->url === '';
+    }
+    else {
+      return $this->route_name === NULL || $this->route_name === '';
+    }
   }
 
   /**
@@ -147,4 +175,19 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
     // External links don't have a route_name value.
     return empty($this->route_name);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setValue($values, $notify = TRUE) {
+    // Unserialize the values.
+    // @todo The storage controller should take care of this.
+    foreach (array('route_parameters', 'options') as $property) {
+      if (isset($values[$property]) && is_string($values[$property])) {
+        $values[$property] = unserialize($values[$property]);
+      }
+    }
+    parent::setValue($values, $notify);
+  }
+
 }

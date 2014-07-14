@@ -90,4 +90,12 @@ interface ShortcutInterface extends ContentEntityInterface {
    */
   public function setRouteParams($route_parameters);
 
+  /**
+   * Returns the Url object for the link this shortcut points to.
+   *
+   * @return \Drupal\Core\Url
+   *   The Url object.
+   */
+  public function getUrl();
+
 }

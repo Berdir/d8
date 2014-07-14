@@ -8,6 +8,7 @@
 namespace Drupal\shortcut\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Url;
 use Drupal\shortcut\ShortcutSetInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -39,7 +40,9 @@ class ShortcutSetController extends ControllerBase {
       $shortcut = $this->entityManager()->getStorage('shortcut')->create(array(
         'title' => $name,
         'shortcut_set' => $shortcut_set->id(),
-        'path' => $link,
+        'link' => array(
+          'url' => $link,
+        ) + Url::createFromPath($link)->toArray(),
       ));
 
       try {

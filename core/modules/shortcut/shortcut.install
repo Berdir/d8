@@ -5,14 +5,10 @@
  * Install, update and uninstall functions for the shortcut module.
  */
 
-use Drupal\Core\Database\Database;
-use Drupal\Core\Language\Language;
-
 /**
  * Implements hook_schema().
  */
 function shortcut_schema() {
-
   $schema['shortcut_set_users'] = array(
     'description' => 'Maps users to shortcut sets.',
     'fields' => array(

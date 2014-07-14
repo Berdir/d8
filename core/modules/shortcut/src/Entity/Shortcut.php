@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Url;
+use Drupal\link\LinkItemInterface;
 use Drupal\shortcut\ShortcutInterface;
 
 /**
@@ -63,7 +64,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
    */
   public function setTitle($link_title) {
     $this->set('title', $link_title);
-   return $this;
+    return $this;
   }
 
   /**
@@ -85,14 +86,14 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
    * {@inheritdoc}
    */
   public function getRouteName() {
-    return $this->get('route_name')->value;
+    return $this->get('link')->route_name;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setRouteName($route_name) {
-    $this->set('route_name', $route_name);
+    $this->get('link')->route_name = $route_name;
     return $this;
   }
 
@@ -100,15 +101,22 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
    * {@inheritdoc}
    */
   public function getRouteParams() {
-    return $this->get('route_parameters')->first()->getValue();
+    return $this->get('link')->route_parameters;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setRouteParams($route_parameters) {
-    $this->set('route_parameters', array($route_parameters));
+    $this->get('link')->route_parameters = $route_parameters;
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUrl() {
+    return new Url($this->link->route_name, (array) $this->link->route_parameters, (array) $this->link->options);
   }
 
   /**
@@ -120,17 +128,6 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
     if (!isset($values['shortcut_set'])) {
       $values['shortcut_set'] = 'default';
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function preSave(EntityStorageInterface $storage) {
-    parent::preSave($storage);
-
-    $url = Url::createFromPath($this->path->value);
-    $this->setRouteName($url->getRouteName());
-    $this->setRouteParams($url->getRouteParameters());
   }
 
   /**
@@ -188,27 +185,26 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
       ->setLabel(t('Weight'))
       ->setDescription(t('Weight among shortcuts in the same shortcut set.'));
 
-    $fields['route_name'] = FieldDefinition::create('string')
-      ->setLabel(t('Route name'))
-      ->setDescription(t('The machine name of a defined Route this shortcut represents.'));
-
-    $fields['route_parameters'] = FieldDefinition::create('map')
-      ->setLabel(t('Route parameters'))
-      ->setDescription(t('A serialized array of route parameters of this shortcut.'));
+    $fields['link'] = FieldDefinition::create('link')
+      ->setLabel(t('Path'))
+      ->setDescription(t('The location this shortcut points to.'))
+      ->setRequired(TRUE)
+      ->setTranslatable(FALSE)
+      ->setSettings(array(
+        'default_value' => '',
+        'max_length' => 560,
+        'link_type' => LinkItemInterface::LINK_INTERNAL,
+        'title' => DRUPAL_DISABLED,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'link',
+        'weight' => 0,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['langcode'] = FieldDefinition::create('language')
       ->setLabel(t('Language code'))
       ->setDescription(t('The language code of the shortcut.'));
-
-    $fields['path'] = FieldDefinition::create('string')
-      ->setLabel(t('Path'))
-      ->setDescription(t('The computed shortcut path.'))
-      ->setComputed(TRUE)
-      ->setCustomStorage(TRUE);
-
-    $item_definition = $fields['path']->getItemDefinition();
-    $item_definition->setClass('\Drupal\shortcut\ShortcutPathItem');
-    $fields['path']->setItemDefinition($item_definition);
 
     return $fields;
   }

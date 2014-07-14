@@ -29,6 +29,13 @@ class UrlTest extends UnitTestCase {
   protected $urlGenerator;
 
   /**
+   * The path alias manager.
+   *
+   * @var \Drupal\Core\Path\AliasManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $pathAliasManager;
+
+  /**
    * The router.
    *
    * @var \Drupal\Tests\Core\Routing\TestRouterInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -54,15 +61,31 @@ class UrlTest extends UnitTestCase {
     $map[] = array('node_edit', array('node' => '2'), array(), '/node/2/edit');
     $this->map = $map;
 
+    $alias_map = array(
+      // Set up one proper alias that can be resolved to a system path.
+      array('node-alias-test', NULL, 'node'),
+      // Passing in anything else should return the same string.
+      array('node', NULL, 'node'),
+      array('node/1', NULL, 'node/1'),
+      array('node/2/edit', NULL, 'node/2/edit'),
+      array('non-existent', NULL, 'non-existent'),
+    );
+
     $this->urlGenerator = $this->getMock('Drupal\Core\Routing\UrlGeneratorInterface');
     $this->urlGenerator->expects($this->any())
       ->method('generateFromRoute')
       ->will($this->returnValueMap($this->map));
 
+    $this->pathAliasManager = $this->getMock('Drupal\Core\Path\AliasManagerInterface');
+    $this->pathAliasManager->expects($this->any())
+      ->method('getPathByAlias')
+      ->will($this->returnValueMap($alias_map));
+
     $this->router = $this->getMock('Drupal\Tests\Core\Routing\TestRouterInterface');
     $container = new ContainerBuilder();
     $container->set('router', $this->router);
     $container->set('url_generator', $this->urlGenerator);
+    $container->set('path.alias_manager.cached', $this->pathAliasManager);
     \Drupal::setContainer($container);
   }
 
@@ -107,6 +130,27 @@ class UrlTest extends UnitTestCase {
   public function testCreateFromPathFront() {
     $url = Url::createFromPath('<front>');
     $this->assertSame('<front>', $url->getRouteName());
+  }
+
+  /**
+   * Tests the createFromPath method with a path alias.
+   *
+   * @covers ::createFromPath()
+   */
+  public function testCreateFromPathAlias() {
+    $this->router->expects($this->any())
+      ->method('match')
+      ->will($this->returnValueMap(array(
+        array('/node', array(
+          RouteObjectInterface::ROUTE_NAME => 'view.frontpage.page_1',
+          '_raw_variables' => new ParameterBag(),
+        )),
+      )));
+
+    $values = $this->map[0];
+    array_pop($values);
+    $url = Url::createFromPath('node-alias-test');
+    $this->assertSame($values, array_values($url->toArray()));
   }
 
   /**

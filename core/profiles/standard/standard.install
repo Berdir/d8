@@ -64,7 +64,9 @@ function standard_install() {
     'shortcut_set' => 'default',
     'title' => t('Add content'),
     'weight' => -20,
-    'path' => 'node/add',
+    'link' => array(
+      'route_name' => 'node.add_page',
+    ),
   ));
   $shortcut->save();
 
@@ -72,7 +74,9 @@ function standard_install() {
     'shortcut_set' => 'default',
     'title' => t('All content'),
     'weight' => -19,
-    'path' => 'admin/content',
+    'link' => array(
+      'route_name' => 'node.content_overview',
+    ),
   ));
   $shortcut->save();
 

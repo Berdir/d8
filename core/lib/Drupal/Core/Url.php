@@ -123,13 +123,17 @@ class Url {
     else {
       // Look up the route name and parameters used for the given path.
       try {
+        // Path aliases are added on the request level (instead of the routing
+        // level), so we need to convert the path manually.
+        // @see \Drupal\Core\EventSubscriber\PathSubscriber
+        $path = \Drupal::service('path.alias_manager.cached')->getPathByAlias($path);
         $result = \Drupal::service('router')->match('/' . $path);
       }
       catch (ResourceNotFoundException $e) {
         throw new MatchingRouteNotFoundException(sprintf('No matching route could be found for the path "%s"', $path), 0, $e);
       }
       $route_name = $result[RouteObjectInterface::ROUTE_NAME];
-      $route_parameters = $result['_raw_variables']->all();
+      $route_parameters = isset($result['_raw_variables']) ? $result['_raw_variables']->all() : array();
     }
     return new static($route_name, $route_parameters);
   }

@@ -218,8 +218,6 @@ class LinkWidget extends WidgetBase {
           $url->setOption('attributes', $value['attributes']);
 
           $value += $url->toArray();
-          // Reset the URL value to contain only the path.
-          $value['url'] = $parsed_url['path'];
         }
         catch (NotFoundHttpException $e) {
           // Nothing to do here, LinkTypeConstraintValidator emits errors.
