@@ -19,5 +19,5 @@ views.display.block:
       label: 'Allow'
       mapping:
         items_per_page:
-         type: integer
+         type: boolean
          label: Items per page
