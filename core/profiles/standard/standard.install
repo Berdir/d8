@@ -75,7 +75,7 @@ function standard_install() {
     'title' => t('All content'),
     'weight' => -19,
     'link' => array(
-      'route_name' => 'node.content_overview',
+      'route_name' => 'view.content.page_1',
     ),
   ));
   $shortcut->save();

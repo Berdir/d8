@@ -85,7 +85,7 @@ class UrlTest extends UnitTestCase {
     $container = new ContainerBuilder();
     $container->set('router', $this->router);
     $container->set('url_generator', $this->urlGenerator);
-    $container->set('path.alias_manager.cached', $this->pathAliasManager);
+    $container->set('path.alias_manager', $this->pathAliasManager);
     \Drupal::setContainer($container);
   }
 

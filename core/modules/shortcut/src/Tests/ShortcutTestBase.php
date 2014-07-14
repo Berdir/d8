@@ -22,7 +22,7 @@ abstract class ShortcutTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('node', 'toolbar', 'shortcut');
+  public static $modules = array('node', 'toolbar', 'shortcut', 'views');
 
   /**
    * User with permission to administer shortcuts.
@@ -72,7 +72,7 @@ abstract class ShortcutTestBase extends WebTestBase {
         'weight' => -19,
         'link' => array(
           'url' => 'admin/content',
-          'route_name' => 'node.content_overview',
+          'route_name' => 'view.content.page_1',
         ),
       ));
       $shortcut->save();

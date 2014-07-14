@@ -126,7 +126,7 @@ class Url {
         // Path aliases are added on the request level (instead of the routing
         // level), so we need to convert the path manually.
         // @see \Drupal\Core\EventSubscriber\PathSubscriber
-        $path = \Drupal::service('path.alias_manager.cached')->getPathByAlias($path);
+        $path = \Drupal::service('path.alias_manager')->getPathByAlias($path);
         $result = \Drupal::service('router')->match('/' . $path);
       }
       catch (ResourceNotFoundException $e) {
