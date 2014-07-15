@@ -71,10 +71,10 @@ class IntegrationTest extends ViewTestBase {
    */
   public function testNodeCounterIntegration() {
     $this->drupalGet('node/' . $this->node->id());
-    // Manually calling statistics.php, simulating ajax behavior.
+    // Manually calling statistics controller, simulating ajax behavior.
     // @see \Drupal\statistics\Tests\StatisticsLoggingTest::testLogging().
     global $base_url;
-    $stats_path = $base_url . '/' . drupal_get_path('module', 'statistics'). '/statistics.php';
+    $stats_path = $base_url . '/statistics/count';
     $client = \Drupal::httpClient();
     $client->setDefaultOption('config/curl', array(CURLOPT_TIMEOUT => 10));
     $client->post($stats_path, array('body' => array('nid' => $this->node->id())));

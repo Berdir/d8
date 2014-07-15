@@ -65,7 +65,7 @@ class StatisticsLoggingTest extends WebTestBase {
     global $base_url;
     $path = 'node/' . $this->node->id();
     $module_path = drupal_get_path('module', 'statistics');
-    $stats_path = $base_url . '/' . $module_path . '/statistics.php';
+    $stats_path = $base_url . '/statistics/count';
     $expected_library = $module_path . '/statistics.js';
     $expected_settings = '"statistics":{"data":{"nid":"' . $this->node->id() . '"}';
 
@@ -84,7 +84,8 @@ class StatisticsLoggingTest extends WebTestBase {
     $this->assertRaw($expected_library, 'Found statistics library JS on node page.');
     $this->assertRaw($expected_settings, 'Found statistics settings on node page.');
 
-    // Manually call statistics.php to simulate ajax data collection behavior.
+    // Manually call statistics controller to simulate ajax data collection
+    // behavior.
     $nid = $this->node->id();
     $post = array('nid' => $nid);
     $this->client->post($stats_path, array('body' => $post));

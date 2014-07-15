@@ -24,12 +24,12 @@ class StatisticsReportsTest extends StatisticsTestBase {
     // Visit a node to have something show up in the block.
     $node = $this->drupalCreateNode(array('type' => 'page', 'uid' => $this->blocking_user->id()));
     $this->drupalGet('node/' . $node->id());
-    // Manually calling statistics.php, simulating ajax behavior.
+    // Manually calling statistics controller, simulating ajax behavior.
     $nid = $node->id();
     $post = http_build_query(array('nid' => $nid));
     $headers = array('Content-Type' => 'application/x-www-form-urlencoded');
     global $base_url;
-    $stats_path = $base_url . '/' . drupal_get_path('module', 'statistics'). '/statistics.php';
+    $stats_path = $base_url . '/statistics/count';
     $client = \Drupal::httpClient();
     $client->setDefaultOption('config/curl', array(CURLOPT_TIMEOUT => 10));
     $client->post($stats_path, array('headers' => $headers, 'body' => $post));

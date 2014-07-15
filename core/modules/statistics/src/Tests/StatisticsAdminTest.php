@@ -75,11 +75,11 @@ class StatisticsAdminTest extends WebTestBase {
 
     // Hit the node.
     $this->drupalGet('node/' . $this->test_node->id());
-    // Manually calling statistics.php, simulating ajax behavior.
+    // Manually calling statistics controller, simulating ajax behavior.
     $nid = $this->test_node->id();
     $post = array('nid' => $nid);
     global $base_url;
-    $stats_path = $base_url . '/' . drupal_get_path('module', 'statistics'). '/statistics.php';
+    $stats_path = $base_url . '/statistics/count';
     $this->client->post($stats_path, array('body' => $post));
 
     // Hit the node again (the counter is incremented after the hit, so
@@ -100,11 +100,11 @@ class StatisticsAdminTest extends WebTestBase {
     \Drupal::config('statistics.settings')->set('count_content_views', 1)->save();
 
     $this->drupalGet('node/' . $this->test_node->id());
-    // Manually calling statistics.php, simulating ajax behavior.
+    // Manually calling statistics controller, simulating ajax behavior.
     $nid = $this->test_node->id();
     $post = array('nid' => $nid);
     global $base_url;
-    $stats_path = $base_url . '/' . drupal_get_path('module', 'statistics'). '/statistics.php';
+    $stats_path = $base_url . '/statistics/count';
     $this->client->post($stats_path, array('body' => $post));
 
     $result = db_select('node_counter', 'n')
@@ -134,11 +134,11 @@ class StatisticsAdminTest extends WebTestBase {
     \Drupal::state()->set('statistics.day_timestamp', 8640000);
 
     $this->drupalGet('node/' . $this->test_node->id());
-    // Manually calling statistics.php, simulating ajax behavior.
+    // Manually calling statistics controller, simulating ajax behavior.
     $nid = $this->test_node->id();
     $post = array('nid' => $nid);
     global $base_url;
-    $stats_path = $base_url . '/' . drupal_get_path('module', 'statistics'). '/statistics.php';
+    $stats_path = $base_url . '/statistics/count';
     $this->client->post($stats_path, array('body' => $post));
     $this->drupalGet('node/' . $this->test_node->id());
     $this->client->post($stats_path, array('body' => $post));

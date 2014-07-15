@@ -134,12 +134,12 @@ DirectoryIndex index.php index.html index.htm
   RewriteCond %{REQUEST_URI} !/core/[^/]*\.php$
   # Allow access to test-specific PHP files:
   RewriteCond %{REQUEST_URI} !/core/modules/system/tests/https?.php$
-  # Allow access to Statistics module's custom front controller.
-  # Copy and adapt this rule to directly execute PHP files in contributed or
-  # custom modules or to run another PHP application in the same directory.
-  RewriteCond %{REQUEST_URI} !/core/modules/statistics/statistics.php$
   # Deny access to any other PHP files that do not match the rules above.
   RewriteRule "^.+/.*\.php$" - [F]
+
+  # Copy and adapt this rule to directly execute PHP files in contributed or
+  # custom modules or to run another PHP application in the same directory.
+  # RewriteCond %{REQUEST_URI} !/core/modules/statistics/statistics.php$
 
   # Rules to correctly serve gzip compressed CSS and JS files.
   # Requires both mod_rewrite and mod_headers to be enabled.

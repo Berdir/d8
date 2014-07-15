@@ -5,3 +5,10 @@ statistics.settings:
     _title: 'Statistics'
   requirements:
     _permission: 'administer statistics'
+
+statistics.count:
+  path: '/statistics/count'
+  defaults:
+    _controller: 'Drupal\statistics\StatisticsController::updateNodeViewCounter'
+  requirements:
+    _access: 'TRUE'
