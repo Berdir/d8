@@ -118,8 +118,8 @@ class MenuLinkResetForm extends ConfirmFormBase {
    *   Returns AccessInterface::ALLOW when access was granted, otherwise
    *   AccessInterface::DENY.
    */
-  public function linkIsResetable(MenuLinkInterface $menu_link_plugin) {
-    return $menu_link_plugin->isResetable() ? AccessInterface::ALLOW : AccessInterface::DENY;
+  public function linkIsResettable(MenuLinkInterface $menu_link_plugin) {
+    return $menu_link_plugin->isResettable() ? AccessInterface::ALLOW : AccessInterface::DENY;
   }
 
 }

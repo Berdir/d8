@@ -299,7 +299,7 @@ class MenuForm extends EntityForm {
           );
         }
         // Links can either be reset or deleted, not both.
-        if ($link->isResetable()) {
+        if ($link->isResettable()) {
           $operations['reset'] = array(
             'title' => $this->t('Reset'),
             'route_name' => 'menu_ui.link_reset',
