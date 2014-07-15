@@ -7,11 +7,11 @@
 
 namespace Drupal\Core\Menu\Form;
 
-use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
+use Drupal\Core\Plugin\PluginFormInterface;
 
 /**
- * Defines an interface for edit forms for menu links.
+ * Defines an interface for edit forms of menu links.
  *
  * All menu link plugins use the same interface for their configuration or
  * editing form, but the implementations may differ.
