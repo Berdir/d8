@@ -15,6 +15,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
  *
  * All menu link plugins use the same interface for their configuration or
  * editing form, but the implementations may differ.
+ * 
  * @see \Drupal\Core\Menu\MenuLinkInterface::getFormClass()
  */
 interface MenuLinkFormInterface extends PluginFormInterface {
