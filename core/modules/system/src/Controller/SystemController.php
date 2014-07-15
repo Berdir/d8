@@ -119,7 +119,7 @@ class SystemController extends ControllerBase {
       drupal_set_message($this->t('One or more problems were detected with your Drupal installation. Check the <a href="@status">status report</a> for more information.', array('@status' => url('admin/reports/status'))), 'error');
     }
     $parameters = new MenuTreeParameters();
-    $parameters->setRoot($link_id)->excludeRoot()->topLevelOnly()->excludeHiddenLinks();
+    $parameters->setRoot($link_id)->excludeRoot()->setTopLevelOnly()->excludeHiddenLinks();
     $tree = $this->menuLinkTree->load(NULL, $parameters);
     $manipulators = array(
       array('callable' => 'menu.default_tree_manipulators:checkAccess'),
