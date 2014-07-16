@@ -1,6 +1,8 @@
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - comment
 id: comments_recent
 label: 'Recent comments'
 module: views
