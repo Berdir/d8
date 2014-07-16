@@ -20,30 +20,18 @@ use Drupal\Tests\UnitTestCase;
 class MenuLinkTreeElementTest extends UnitTestCase {
 
   /**
-   * Tests construction and setters.
+   * Tests construction.
    *
    * @covers ::__construct
-   * @covers ::setAccessible
-   * @covers ::setSubtree
    */
   public function testConstruction() {
     $link = MenuLinkMock::create(array('id' => 'test'));
     $item = new MenuLinkTreeElement($link, FALSE, 3, FALSE, array());
-    $this->assertSame($link, $item->getLink());
-    $this->assertSame(FALSE, $item->hasChildren());
-    $this->assertSame(3, $item->getDepth());
-    $this->assertSame(FALSE, $item->isInActiveTrail());
-    $this->assertSame(array(), $item->getSubtree());
-    $this->assertSame(NULL, $item->isAccessible());
-
-    $item->setAccessible(TRUE);
-    $this->assertSame(TRUE, $item->isAccessible());
-    $item->setAccessible(FALSE);
-    $this->assertSame(FALSE, $item->isAccessible());
-
-    $subtree = array(new MenuLinkTreeElement(MenuLinkMock::create(array('id' => 'foobar')), FALSE, 4, FALSE, array()));
-    $item->setSubtree($subtree);
-    $this->assertSame($subtree, $item->getSubtree());
+    $this->assertSame($link, $item->link);
+    $this->assertSame(FALSE, $item->hasChildren);
+    $this->assertSame(3, $item->depth);
+    $this->assertSame(FALSE, $item->inActiveTrail);
+    $this->assertSame(array(), $item->subtree);
   }
 
   /**

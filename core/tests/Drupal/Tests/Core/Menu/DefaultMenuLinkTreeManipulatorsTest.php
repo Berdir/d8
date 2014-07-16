@@ -95,17 +95,17 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
       8 => MenuLinkMock::create(array('id' => 'test.example8', 'route_name' => 'example8', 'title' => 'quxqux', 'parent' => '')),
     );
     $this->originalTree = array();
-    $this->originalTree[1] = new TestMenuLinkTreeElement($this->links[1], FALSE, 1, FALSE, array());
-    $this->originalTree[2] = new TestMenuLinkTreeElement($this->links[2], TRUE, 1, FALSE, array(
-      3 => new TestMenuLinkTreeElement($this->links[3], TRUE, 2, FALSE, array(
-        4 => new TestMenuLinkTreeElement($this->links[4], FALSE, 3, FALSE, array()),
+    $this->originalTree[1] = new MenuLinkTreeElement($this->links[1], FALSE, 1, FALSE, array());
+    $this->originalTree[2] = new MenuLinkTreeElement($this->links[2], TRUE, 1, FALSE, array(
+      3 => new MenuLinkTreeElement($this->links[3], TRUE, 2, FALSE, array(
+        4 => new MenuLinkTreeElement($this->links[4], FALSE, 3, FALSE, array()),
       )),
     ));
-    $this->originalTree[5] = new TestMenuLinkTreeElement($this->links[5], TRUE, 1, FALSE, array(
-      7 => new TestMenuLinkTreeElement($this->links[7], FALSE, 2, FALSE, array()),
+    $this->originalTree[5] = new MenuLinkTreeElement($this->links[5], TRUE, 1, FALSE, array(
+      7 => new MenuLinkTreeElement($this->links[7], FALSE, 2, FALSE, array()),
     ));
-    $this->originalTree[6] = new TestMenuLinkTreeElement($this->links[6], FALSE, 1, FALSE, array());
-    $this->originalTree[8] = new TestMenuLinkTreeElement($this->links[8], FALSE, 1, FALSE, array());
+    $this->originalTree[6] = new MenuLinkTreeElement($this->links[6], FALSE, 1, FALSE, array());
+    $this->originalTree[8] = new MenuLinkTreeElement($this->links[8], FALSE, 1, FALSE, array());
   }
 
   /**
@@ -119,19 +119,16 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
     $tree = $this->defaultMenuTreeManipulators->generateIndexAndSort($tree);
 
     // Validate that parent elements #1, #2, #5 and #6 exist on the root level.
-    $this->assertEquals($this->links[1]->getPluginId(), $tree['50000 foo test.example1']->getLink()->getPluginId());
-    $this->assertEquals($this->links[2]->getPluginId(), $tree['50000 bar test.example2']->getLink()->getPluginId());
-    $this->assertEquals($this->links[5]->getPluginId(), $tree['50000 foofoo test.example5']->getLink()->getPluginId());
-    $this->assertEquals($this->links[6]->getPluginId(), $tree['50000 barbar test.example6']->getLink()->getPluginId());
-    $this->assertEquals($this->links[8]->getPluginId(), $tree['50000 quxqux test.example8']->getLink()->getPluginId());
+    $this->assertEquals($this->links[1]->getPluginId(), $tree['50000 foo test.example1']->link->getPluginId());
+    $this->assertEquals($this->links[2]->getPluginId(), $tree['50000 bar test.example2']->link->getPluginId());
+    $this->assertEquals($this->links[5]->getPluginId(), $tree['50000 foofoo test.example5']->link->getPluginId());
+    $this->assertEquals($this->links[6]->getPluginId(), $tree['50000 barbar test.example6']->link->getPluginId());
+    $this->assertEquals($this->links[8]->getPluginId(), $tree['50000 quxqux test.example8']->link->getPluginId());
 
     // Verify that child element #4 is at the correct location in the hierarchy.
-    $subtree = $tree['50000 bar test.example2']->getSubtree();
-    $subtree = $subtree['50000 baz test.example3']->getSubtree();
-    $this->assertEquals($this->links[4]->getPluginId(), $subtree['50000 qux test.example4']->getLink()->getPluginId());
+    $this->assertEquals($this->links[4]->getPluginId(), $tree['50000 bar test.example2']->subtree['50000 baz test.example3']->subtree['50000 qux test.example4']->link->getPluginId());
     // Verify that child element #7 is at the correct location in the hierarchy.
-    $subtree = $tree['50000 foofoo test.example5']->getSubtree();
-    $this->assertEquals($this->links[7]->getPluginId(), $subtree['50000 bazbaz test.example7']->getLink()->getPluginId());
+    $this->assertEquals($this->links[7]->getPluginId(), $tree['50000 foofoo test.example5']->subtree['50000 bazbaz test.example7']->link->getPluginId());
   }
 
   /**
@@ -154,9 +151,8 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
       )));
 
     $this->mockTree();
-    $subtree = $this->originalTree[5]->getSubtree();
-    $subtree[7]->setAccessible(TRUE);
-    $this->originalTree[8]->setAccessible(FALSE);
+    $this->originalTree[5]->subtree[7]->access = TRUE;
+    $this->originalTree[8]->access = FALSE;
 
     $tree = $this->defaultMenuTreeManipulators->checkAccess($this->originalTree);
 
@@ -164,22 +160,21 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
     $this->assertFalse(array_key_exists(1, $tree));
     // Menu link 2: route with parameters, access granted.
     $element = $tree[2];
-    $this->assertTrue($element->isAccessible());
+    $this->assertTrue($element->access);
     // Menu link 3: route with parameters, access forbidden, hence removed,
     // including its children.
-    $this->assertFalse(array_key_exists(3, $tree[2]->getSubtree()));
+    $this->assertFalse(array_key_exists(3, $tree[2]->subtree));
     // Menu link 4: child of menu link 3, which already is removed.
-    $this->assertSame(array(), $tree[2]->getSubtree());
+    $this->assertSame(array(), $tree[2]->subtree);
     // Menu link 5: no route name, treated as external, hence access granted.
     $element = $tree[5];
-    $this->assertTrue($element->isAccessible());
+    $this->assertTrue($element->access);
     // Menu link 6: external URL, hence access granted.
     $element = $tree[6];
-    $this->assertTrue($element->isAccessible());
+    $this->assertTrue($element->access);
     // Menu link 7: 'access' already set.
-    $subtree = $tree[5]->getSubtree();
-    $element = $subtree[7];
-    $this->assertTrue($element->isAccessible());
+    $element = $tree[5]->subtree[7];
+    $this->assertTrue($element->access);
     // Menu link 8: 'access' already set, to FALSE, hence removed.
     $this->assertFalse(array_key_exists(8, $tree));
   }
@@ -216,7 +211,7 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
 
     // Link 5 in the active trail.
     $this->mockTree();
-    $this->originalTree[5]->setInActiveTrail(TRUE);
+    $this->originalTree[5]->inActiveTrail = TRUE;
     // Get level 0.
     $tree = $this->defaultMenuTreeManipulators->extractSubtreeOfActiveTrail($this->originalTree, 0);
     $this->assertEquals(array(1, 2, 5, 6, 8), array_keys($tree));
@@ -229,7 +224,7 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
 
     // Link 2 in the active trail.
     $this->mockTree();
-    $this->originalTree[2]->setInActiveTrail(TRUE);
+    $this->originalTree[2]->inActiveTrail = TRUE;
     // Get level 0.
     $tree = $this->defaultMenuTreeManipulators->extractSubtreeOfActiveTrail($this->originalTree, 0);
     $this->assertEquals(array(1, 2, 5, 6, 8), array_keys($tree));
@@ -242,9 +237,8 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
 
     // Links 2 and 3 in the active trail.
     $this->mockTree();
-    $this->originalTree[2]->setInActiveTrail(TRUE);
-    $subtree = $this->originalTree[2]->getSubtree();
-    $subtree[3]->setInActiveTrail(TRUE);
+    $this->originalTree[2]->inActiveTrail = TRUE;
+    $this->originalTree[2]->subtree[3]->inActiveTrail = TRUE;
     // Get level 0.
     $tree = $this->defaultMenuTreeManipulators->extractSubtreeOfActiveTrail($this->originalTree, 0);
     $this->assertEquals(array(1, 2, 5, 6, 8), array_keys($tree));
@@ -254,14 +248,6 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
     // Get level 2.
     $tree = $this->defaultMenuTreeManipulators->extractSubtreeOfActiveTrail($this->originalTree, 2);
     $this->assertEquals(array(4), array_keys($tree));
-  }
-
-}
-
-class TestMenuLinkTreeElement extends MenuLinkTreeElement {
-
-  public function setInActiveTrail($in_active_trail) {
-    $this->inActiveTrail = $in_active_trail;
   }
 
 }

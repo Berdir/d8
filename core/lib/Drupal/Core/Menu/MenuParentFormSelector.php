@@ -136,20 +136,19 @@ class MenuParentFormSelector implements MenuParentFormSelectorInterface {
    */
   protected function parentSelectOptionsTreeWalk(array $tree, $menu_name, $indent, array &$options, $exclude, $depth_limit) {
     foreach ($tree as $element) {
-      if ($element->getDepth() > $depth_limit) {
+      if ($element->depth > $depth_limit) {
         // Don't iterate through any links on this level.
         break;
       }
-      $link = $element->getLink();
+      $link = $element->link;
       if ($link->getPluginId() != $exclude) {
         $title = $indent . ' ' . Unicode::truncate($link->getTitle(), 30, TRUE, FALSE);
         if ($link->isHidden()) {
           $title .= ' (' . $this->t('disabled') . ')';
         }
         $options[$menu_name . ':' . $link->getPluginId()] = $title;
-        $subtree = $element->getSubtree();
-        if (!empty($subtree)) {
-          $this->parentSelectOptionsTreeWalk($subtree, $menu_name, $indent . '--', $options, $exclude, $depth_limit);
+        if (!empty($element->subtree)) {
+          $this->parentSelectOptionsTreeWalk($element->subtree, $menu_name, $indent . '--', $options, $exclude, $depth_limit);
         }
       }
     }

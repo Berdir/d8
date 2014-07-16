@@ -152,29 +152,27 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   public function build(array $tree) {
     $build = array();
 
-    /** @var \Drupal\Core\Menu\MenuLinkTreeElement $data */
     foreach ($tree as $data) {
       $class = array();
       /** @var \Drupal\Core\Menu\MenuLinkInterface $link */
-      $link = $data->getLink();
+      $link = $data->link;
       // Generally we only deal with visible links, but just in case.
       if ($link->isHidden()) {
         continue;
       }
       // Set a class for the <li>-tag. Only set 'expanded' class if the link
       // also has visible children within the current tree.
-      $subtree = $data->getSubtree();
-      if ($data->hasChildren() && !empty($subtree)) {
+      if ($data->hasChildren && !empty($data->subtree)) {
         $class[] = 'expanded';
       }
-      elseif ($data->hasChildren()) {
+      elseif ($data->hasChildren) {
         $class[] = 'collapsed';
       }
       else {
         $class[] = 'leaf';
       }
       // Set a class if the link is in the active trail.
-      if ($data->isInActiveTrail()) {
+      if ($data->inActiveTrail) {
         $class[] = 'active-trail';
       }
 
@@ -183,9 +181,9 @@ class MenuLinkTree implements MenuLinkTreeInterface {
       $element['#attributes']['class'] = $class;
       $element['#title'] = $link->getTitle();
       $element['#url'] = $link->getUrlObject();
-      $element['#below'] = $subtree ? $this->build($subtree) : array();
-      if (count($data->getOptions())) {
-        $element['#url']->setOptions(NestedArray::mergeDeep($element['#url']->getOptions(), $data->getOptions()));
+      $element['#below'] = $data->subtree ? $this->build($data->subtree) : array();
+      if (isset($data->options)) {
+        $element['#url']->setOptions(NestedArray::mergeDeep($element['#url']->getOptions(), $data->options));
       }
       $element['#original_link'] = $link;
       // Index using the link's unique ID.
