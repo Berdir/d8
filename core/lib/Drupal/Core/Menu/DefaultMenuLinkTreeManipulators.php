@@ -68,12 +68,13 @@ class DefaultMenuLinkTreeManipulators {
     foreach ($tree as $key => $element) {
       // Other menu tree manipulators may already have calculated access, do not
       // overwrite the existing value in that case.
-      if (!isset($element->access)) {
-        $tree[$key]->access = $this->menuLinkCheckAccess($element->link);
+      if ($element->isAccessible() === NULL) {
+        $tree[$key]->setAccessible($this->menuLinkCheckAccess($element->getLink()));
       }
-      if ($tree[$key]->access) {
-        if ($tree[$key]->subtree) {
-          $tree[$key]->subtree = $this->checkAccess($tree[$key]->subtree);
+      if ($tree[$key]->isAccessible()) {
+        $subtree = $tree[$key]->getSubtree();
+        if (!empty($subtree)) {
+          $tree[$key]->setSubtree($this->checkAccess($subtree));
         }
       }
       else {
@@ -118,15 +119,16 @@ class DefaultMenuLinkTreeManipulators {
   public function generateIndexAndSort(array $tree) {
     $new_tree = array();
     foreach ($tree as $key => $v) {
-      if ($tree[$key]->subtree) {
-        $tree[$key]->subtree = $this->generateIndexAndSort($tree[$key]->subtree);
+      $subtree = $tree[$key]->getSubtree();
+      if ($subtree) {
+        $tree[$key]->setSubtree($this->generateIndexAndSort($subtree));
       }
-      $instance = $tree[$key]->link;
+      $link = $tree[$key]->getLink();
       // The weights are made a uniform 5 digits by adding 50000 as an offset.
       // After $this->menuLinkCheckAccess(), $instance->getTitle() has the
       // localized or translated title. Adding the plugin id to the end of the
       // index insures that it is unique.
-      $new_tree[(50000 + $instance->getWeight()) . ' ' . $instance->getTitle() . ' ' . $instance->getPluginId()] = $tree[$key];
+      $new_tree[(50000 + $link->getWeight()) . ' ' . $link->getTitle() . ' ' . $link->getPluginId()] = $tree[$key];
     }
     ksort($new_tree);
     return $new_tree;
@@ -143,10 +145,11 @@ class DefaultMenuLinkTreeManipulators {
    */
   public function flatten(array $tree) {
     foreach ($tree as $key => $element) {
-      if ($tree[$key]->subtree) {
-        $tree += $this->flatten($tree[$key]->subtree);
+      $subtree = $tree[$key]->getSubtree();
+      if ($subtree) {
+        $tree += $this->flatten($subtree);
       }
-      $tree[$key]->subtree = array();
+      $tree[$key]->setSubtree(array());
     }
     return $tree;
   }
@@ -168,9 +171,9 @@ class DefaultMenuLinkTreeManipulators {
       // Loop through the current level's elements  until we find one that is in
       // the active trail.
       while ($element = array_shift($tree)) {
-        if ($element->inActiveTrail) {
+        if ($element->isInActiveTrail()) {
           // If the element is in the active trail, we continue in the subtree.
-          $tree = $element->subtree;
+          $tree = $element->getSubtree();
           break;
         }
       }

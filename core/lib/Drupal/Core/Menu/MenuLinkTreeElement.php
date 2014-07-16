@@ -34,7 +34,7 @@ class MenuLinkTreeElement {
    *
    * @var \Drupal\Core\Menu\MenuLinkInterface
    */
-  public $link;
+  protected $link;
 
   /**
    * The subtree of this element in the menu link tree (this link's children).
@@ -44,38 +44,35 @@ class MenuLinkTreeElement {
    *
    * @var \Drupal\Core\Menu\MenuLinkTreeElement[]
    */
-  public $subtree;
+  protected $subtree;
 
   /**
    * The depth of this link relative to the root of the tree.
    *
    * @var int
    */
-  public $depth;
+  protected $depth;
 
   /**
    * Whether this link has any children at all.
    *
    * @var bool
    */
-  public $hasChildren;
+  protected $hasChildren;
 
   /**
    * Whether this link is in the active trail.
    *
    * @var bool
    */
-  public $inActiveTrail;
+  protected $inActiveTrail;
 
   /**
    * Whether this link is accessible by the current user.
    *
-   * If the value is NULL the access was not determined yet, if Boolean it was
-   * determined already.
-   *
    * @var bool|NULL
    */
-  public $access;
+  protected $access;
 
   /**
    * Additional options for this link.
@@ -84,7 +81,7 @@ class MenuLinkTreeElement {
    * \Drupal\Core\Menu\MenuLinkInterface::getOptions(), to allow menu link tree
    * manipulators to add or override link options.
    */
-  public $options = array();
+  protected $options = array();
 
   /**
    * Constructs a new \Drupal\Core\Menu\MenuLinkTreeElement.
@@ -122,7 +119,96 @@ class MenuLinkTreeElement {
     $sum = function ($carry, MenuLinkTreeElement $element) {
       return $carry + $element->count();
     };
-    return 1 + array_reduce($this->subtree, $sum);
+    return 1 + array_reduce($this->getSubtree(), $sum);
+  }
+
+  /**
+   * Gets the menu link for this element in the menu link tree.
+   *
+   * @return \Drupal\Core\Menu\MenuLinkInterface
+   */
+  public function getLink() {
+    return $this->link;
+  }
+
+  /**
+   * Gets the subtree of this element in the menu link tree.
+   *
+   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   */
+  public function getSubtree() {
+    return $this->subtree;
+  }
+
+  /**
+   * Sets the subtree of this element in the menu link tree.
+   *
+   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $subtree
+   *   The subtree to set.
+   *
+   * @return $this
+   */
+  public function setSubtree(array $subtree) {
+    $this->subtree = $subtree;
+    return $this;
+  }
+
+  /**
+   * Gets the depth of this link relative to the root of the tree.
+   *
+   * @return int
+   */
+  public function getDepth() {
+    return $this->depth;
+  }
+
+  /**
+   * Indicates whether this link has any children at all.
+   *
+   * @return bool
+   */
+  public function hasChildren() {
+    return $this->hasChildren;
+  }
+
+  /**
+   * Indicates whether this link is in the active trail.
+   *
+   * @return bool
+   */
+  public function isInActiveTrail() {
+    return $this->inActiveTrail;
+  }
+
+  /**
+   * Indicates whether this link is accessible by the current user.
+   *
+   * @return bool|null
+   *   If the value is NULL the access was not determined yet, if Boolean it was
+   *   determined already.
+   */
+  public function isAccessible() {
+    return $this->access;
+  }
+
+  /**
+   * Whether this link is accessible by the current user.
+   *
+   * @param bool $access
+   * @return $this
+   */
+  public function setAccessible($access) {
+    $this->access = $access;
+    return $this;
+  }
+
+  /**
+   * Get additional options for this link.
+   *
+   * @return array
+   */
+  public function getOptions() {
+    return $this->options;
   }
 
 }
