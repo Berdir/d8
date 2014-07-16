@@ -2,19 +2,19 @@
 
 /**
  * @file
- * Contains \Drupal\entity\Tests\EntityFormDisplayTest.
+ * Contains \Drupal\field_ui\Tests\EntityFormDisplayTest.
  */
 
-namespace Drupal\entity\Tests;
+namespace Drupal\field_ui\Tests;
 
-use Drupal\simpletest\DrupalUnitTestBase;
+use Drupal\simpletest\KernelTestBase;
 
 /**
  * Tests the entity display configuration entities.
  *
- * @group entity
+ * @group field_ui
  */
-class EntityFormDisplayTest extends DrupalUnitTestBase {
+class EntityFormDisplayTest extends KernelTestBase {
 
   public static $modules = array('entity', 'field', 'entity_test', 'user', 'text');
 

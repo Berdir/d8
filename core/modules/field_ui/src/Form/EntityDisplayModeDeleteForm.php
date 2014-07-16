@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\entity\Form\EntityDisplayModeDeleteForm.
+ * Contains \Drupal\field_ui\Form\EntityDisplayModeDeleteForm.
  */
 
-namespace Drupal\entity\Form;
+namespace Drupal\field_ui\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
 use Drupal\Core\Url;

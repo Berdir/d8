@@ -31,22 +31,10 @@ use Drupal\entity\EntityFormModeInterface;
  * @ConfigEntityType(
  *   id = "form_mode",
  *   label = @Translation("Form mode"),
- *   controllers = {
- *     "list_builder" = "Drupal\entity\EntityFormModeListBuilder",
- *     "form" = {
- *       "add" = "Drupal\entity\Form\EntityFormModeAddForm",
- *       "edit" = "Drupal\entity\Form\EntityDisplayModeEditForm",
- *       "delete" = "Drupal\entity\Form\EntityDisplayModeDeleteForm"
- *     }
- *   },
  *   admin_permission = "administer display modes",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label"
- *   },
- *   links = {
- *     "delete-form" = "entity.form_mode_delete",
- *     "edit-form" = "entity.form_mode_edit"
  *   }
  * )
  */

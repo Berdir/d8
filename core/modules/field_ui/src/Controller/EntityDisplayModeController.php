@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\entity\Controller\EntityDisplayModeController.
+ * Contains \Drupal\field_ui\Controller\EntityDisplayModeController.
  */
 
-namespace Drupal\entity\Controller;
+namespace Drupal\field_ui\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 
