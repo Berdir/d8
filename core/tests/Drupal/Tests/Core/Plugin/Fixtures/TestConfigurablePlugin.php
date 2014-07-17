@@ -22,7 +22,7 @@ class TestConfigurablePlugin extends PluginBase implements ConfigurablePluginInt
   /**
    * {@inheritdoc}
    */
-  public function setConfiguration(array $configuration) {
+  public function setConfiguration($configuration) {
     $this->configuration = $configuration;
   }
 

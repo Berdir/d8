@@ -128,7 +128,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    *
    * Sets up the tables and builds the maps,
    *
-   * @param array $configuration
+   * @param mixed $configuration
    *   The configuration.
    * @param string $plugin_id
    *   The plugin ID for the migration process to do.
@@ -137,7 +137,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface {
    * @param \Drupal\migrate\Entity\MigrationInterface $migration
    *   The migration to do.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->migration = $migration;

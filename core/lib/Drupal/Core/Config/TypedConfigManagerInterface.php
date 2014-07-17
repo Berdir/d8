@@ -35,7 +35,7 @@ Interface TypedConfigManagerInterface extends PluginManagerInterface, CachedDisc
    * @param string $data_type
    *   The data type, for which a typed configuration object should be
    *   instantiated.
-   * @param array $configuration
+   * @param mixed $configuration
    *   The plugin configuration array, i.e. an array with the following keys:
    *   - data definition: The data definition object, i.e. an instance of
    *     \Drupal\Core\TypedData\DataDefinitionInterface.
@@ -48,7 +48,7 @@ Interface TypedConfigManagerInterface extends PluginManagerInterface, CachedDisc
    * @return \Drupal\Core\Config\Schema\Element
    *   The instantiated typed configuration object.
    */
-  public function createInstance($data_type, array $configuration = array());
+  public function createInstance($data_type, $configuration = array());
 
   /**
    * Creates a new typed configuration object instance.

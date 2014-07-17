@@ -38,7 +38,7 @@ class NodeType extends ConditionPluginBase implements ContainerFactoryPluginInte
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $entity_storage
    *   The entity storage.
-   * @param array $configuration
+   * @param mixed $configuration
    *   The plugin configuration, i.e. an array with configuration values keyed
    *   by configuration option name. The special key 'context' may be used to
    *   initialize the defined contexts by setting it to an array of context
@@ -48,7 +48,7 @@ class NodeType extends ConditionPluginBase implements ContainerFactoryPluginInte
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    */
-  public function __construct(EntityStorageInterface $entity_storage, array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(EntityStorageInterface $entity_storage, $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityStorage = $entity_storage;
   }
@@ -56,7 +56,7 @@ class NodeType extends ConditionPluginBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $container->get('entity.manager')->getStorage('node_type'),
       $configuration,

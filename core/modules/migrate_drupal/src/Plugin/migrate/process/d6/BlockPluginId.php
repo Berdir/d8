@@ -37,7 +37,7 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, MigratePluginManager $process_plugin_manager) {
+  public function __construct($configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, MigratePluginManager $process_plugin_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->blockContentStorage = $storage;
     $this->migration = $migration;
@@ -47,7 +47,7 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
     $entity_manager = $container->get('entity.manager');
     return new static(
       $configuration,

@@ -31,7 +31,7 @@ abstract class ImageEffectBase extends PluginBase implements ImageEffectInterfac
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct($configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->setConfiguration($configuration);
@@ -102,7 +102,7 @@ abstract class ImageEffectBase extends PluginBase implements ImageEffectInterfac
   /**
    * {@inheritdoc}
    */
-  public function setConfiguration(array $configuration) {
+  public function setConfiguration($configuration) {
     $configuration += array(
       'data' => array(),
       'uuid' => '',

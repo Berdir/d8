@@ -27,8 +27,8 @@ class UnapprovedComments extends LocalTaskDefault implements ContainerFactoryPlu
   /**
    * Construct the UnapprovedComments object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param array $plugin_definition
@@ -36,7 +36,7 @@ class UnapprovedComments extends LocalTaskDefault implements ContainerFactoryPlu
    * @param \Drupal\comment\CommentStorageInterface $comment_storage
    *   The comment storage service.
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, CommentStorageInterface $comment_storage) {
+  public function __construct($configuration, $plugin_id, array $plugin_definition, CommentStorageInterface $comment_storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->commentStorage = $comment_storage;
   }
@@ -44,7 +44,7 @@ class UnapprovedComments extends LocalTaskDefault implements ContainerFactoryPlu
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
       $plugin_id,

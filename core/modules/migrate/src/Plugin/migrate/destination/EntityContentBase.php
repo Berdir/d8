@@ -32,8 +32,8 @@ class EntityContentBase extends Entity {
   /**
    * Constructs a content entity.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
@@ -49,7 +49,7 @@ class EntityContentBase extends Entity {
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, MigratePluginManager $plugin_manager, EntityManagerInterface $entity_manager) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, MigratePluginManager $plugin_manager, EntityManagerInterface $entity_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage, $bundles);
     $this->migrateEntityFieldPluginManager = $plugin_manager;
     $this->entityManager = $entity_manager;
@@ -58,7 +58,7 @@ class EntityContentBase extends Entity {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
     $entity_type = static::getEntityTypeId($plugin_id);
     return new static(
       $configuration,

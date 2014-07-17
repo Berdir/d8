@@ -41,8 +41,8 @@ class NodeNewComments extends Numeric {
   /**
    * Constructs a Drupal\Component\Plugin\PluginBase object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -50,7 +50,7 @@ class NodeNewComments extends Numeric {
    * @param \Drupal\Core\Database\Connection $database
    *   Database Service Object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, Connection $database) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->database = $database;
@@ -59,7 +59,7 @@ class NodeNewComments extends Numeric {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static($configuration, $plugin_id, $plugin_definition, $container->get('database'));
   }
 

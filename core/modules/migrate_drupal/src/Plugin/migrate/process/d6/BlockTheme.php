@@ -38,8 +38,8 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
   /**
    * Constructs a BlockTheme object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
@@ -51,7 +51,7 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
    * @param array $themes
    *   The list of themes available on the destination.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, Config $theme_config, array $themes) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, Config $theme_config, array $themes) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->themeConfig = $theme_config;
     $this->themes = $themes;
@@ -60,7 +60,7 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,

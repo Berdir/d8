@@ -47,7 +47,7 @@ abstract class PluginBag implements \Iterator, \Countable {
   /**
    * Sets the configuration for all plugins in this bag.
    *
-   * @param array $configuration
+   * @param mixed $configuration
    *   An array of up-to-date plugin configuration.
    *
    * @return $this

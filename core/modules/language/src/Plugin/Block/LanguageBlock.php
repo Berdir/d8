@@ -35,8 +35,8 @@ class LanguageBlock extends BlockBase implements ContainerFactoryPluginInterface
   /**
    * Constructs an LanguageBlock object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -44,7 +44,7 @@ class LanguageBlock extends BlockBase implements ContainerFactoryPluginInterface
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LanguageManagerInterface $language_manager) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, LanguageManagerInterface $language_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->languageManager = $language_manager;
   }
@@ -53,7 +53,7 @@ class LanguageBlock extends BlockBase implements ContainerFactoryPluginInterface
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
       $plugin_id,

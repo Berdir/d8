@@ -32,8 +32,8 @@ class EntityComment extends EntityContentBase {
   /**
    * Builds an comment entity destination.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -51,7 +51,7 @@ class EntityComment extends EntityContentBase {
    * @param \Drupal\Core\State\StateInterface $state
    *   The state storage object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, MigratePluginManager $plugin_manager, EntityManagerInterface $entity_manager, StateInterface $state) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, MigratePluginManager $plugin_manager, EntityManagerInterface $entity_manager, StateInterface $state) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage, $bundles, $plugin_manager, $entity_manager);
     $this->state = $state;
   }
@@ -59,7 +59,7 @@ class EntityComment extends EntityContentBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
     $entity_type = static::getEntityTypeId($plugin_id);
     return new static(
       $configuration,

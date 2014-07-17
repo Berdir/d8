@@ -70,7 +70,7 @@ abstract class BlockBase extends ContextAwarePluginBase implements BlockPluginIn
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct($configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->setConfiguration($configuration);
@@ -88,7 +88,7 @@ abstract class BlockBase extends ContextAwarePluginBase implements BlockPluginIn
   /**
    * {@inheritdoc}
    */
-  public function setConfiguration(array $configuration) {
+  public function setConfiguration($configuration) {
     $this->configuration = NestedArray::mergeDeep(
       $this->baseConfigurationDefaults(),
       $this->defaultConfiguration(),
@@ -493,7 +493,7 @@ abstract class BlockBase extends ContextAwarePluginBase implements BlockPluginIn
   /**
    * {@inheritdoc}
    */
-  public function setVisibilityConfig($instance_id, array $configuration) {
+  public function setVisibilityConfig($instance_id, $configuration) {
     $this->getVisibilityConditions()->setInstanceConfiguration($instance_id, $configuration);
     return $this;
   }

@@ -50,8 +50,8 @@ class AggregatorFeedBlock extends BlockBase implements ContainerFactoryPluginInt
   /**
    * Constructs an AggregatorFeedBlock object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -63,7 +63,7 @@ class AggregatorFeedBlock extends BlockBase implements ContainerFactoryPluginInt
    * @param \Drupal\Core\Entity\Query\QueryInterface $item_query
    *   The entity query object for feed items.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, FeedStorageInterface $feed_storage, ItemStorageInterface $item_storage, QueryInterface $item_query) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, FeedStorageInterface $feed_storage, ItemStorageInterface $item_storage, QueryInterface $item_query) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->feedStorage = $feed_storage;
     $this->itemStorage = $item_storage;
@@ -74,7 +74,7 @@ class AggregatorFeedBlock extends BlockBase implements ContainerFactoryPluginInt
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
       $plugin_id,

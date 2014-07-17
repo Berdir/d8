@@ -56,11 +56,11 @@ class DefaultPluginBag extends PluginBag {
    *
    * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
    *   The manager to be used for instantiating plugins.
-   * @param array $configurations
+   * @param mixed $configurations
    *   (optional) An associative array containing the initial configuration for
    *   each plugin in the bag, keyed by plugin instance ID.
    */
-  public function __construct(PluginManagerInterface $manager, array $configurations = array()) {
+  public function __construct(PluginManagerInterface $manager, $configurations = array()) {
     $this->manager = $manager;
     $this->configurations = $configurations;
 
@@ -145,10 +145,10 @@ class DefaultPluginBag extends PluginBag {
    *
    * @param string $instance_id
    *   The ID of a plugin to set the configuration for.
-   * @param array $configuration
+   * @param mixed $configuration
    *   The plugin configuration to set.
    */
-  public function setInstanceConfiguration($instance_id, array $configuration) {
+  public function setInstanceConfiguration($instance_id, $configuration) {
     $this->configurations[$instance_id] = $configuration;
     $instance = $this->get($instance_id);
     if ($instance instanceof ConfigurablePluginInterface) {

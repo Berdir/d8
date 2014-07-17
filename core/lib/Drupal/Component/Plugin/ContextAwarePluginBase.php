@@ -30,7 +30,7 @@ abstract class ContextAwarePluginBase extends PluginBase implements ContextAware
    * Overrides the construction of context aware plugins to allow for
    * unvalidated constructor based injection of contexts.
    *
-   * @param array $configuration
+   * @param mixed $configuration
    *   The plugin configuration, i.e. an array with configuration values keyed
    *   by configuration option name. The special key 'context' may be used to
    *   initialize the defined contexts by setting it to an array of context
@@ -40,7 +40,7 @@ abstract class ContextAwarePluginBase extends PluginBase implements ContextAware
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct($configuration, $plugin_id, $plugin_definition) {
     $context = array();
     if (isset($configuration['context'])) {
       $context = $configuration['context'];

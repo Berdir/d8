@@ -29,7 +29,7 @@ class DedupeEntity extends DedupeBase implements ContainerFactoryPluginInterface
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, QueryFactory $entity_query_factory) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, QueryFactory $entity_query_factory) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityQueryFactory = $entity_query_factory;
   }
@@ -37,7 +37,7 @@ class DedupeEntity extends DedupeBase implements ContainerFactoryPluginInterface
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,

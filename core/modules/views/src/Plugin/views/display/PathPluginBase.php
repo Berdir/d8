@@ -50,8 +50,8 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
   /**
    * Constructs a PathPluginBase object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -63,7 +63,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    * @param \Drupal\Core\Form\FormErrorInterface $form_error
    *   The form error helper.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, FormErrorInterface $form_error) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, FormErrorInterface $form_error) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->routeProvider = $route_provider;
@@ -74,7 +74,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
       $plugin_id,

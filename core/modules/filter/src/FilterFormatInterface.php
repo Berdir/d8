@@ -37,7 +37,7 @@ interface FilterFormatInterface extends ConfigEntityInterface {
    * @param array $configuration
    *   The filter plugin configuration to set.
    */
-  public function setFilterConfig($instance_id, array $configuration);
+  public function setFilterConfig($instance_id, $configuration);
 
   /**
    * Returns if this format is the fallback format.

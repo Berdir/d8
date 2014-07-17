@@ -25,8 +25,8 @@ abstract class DestinationBase extends PluginBase implements MigrateDestinationI
   /**
    * Constructs an entity destination plugin.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -34,7 +34,7 @@ abstract class DestinationBase extends PluginBase implements MigrateDestinationI
    * @param MigrationInterface $migration
    *   The migration.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;
   }

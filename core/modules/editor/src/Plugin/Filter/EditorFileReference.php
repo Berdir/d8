@@ -38,8 +38,8 @@ class EditorFileReference extends FilterBase implements ContainerFactoryPluginIn
   /**
    * Constructs a \Drupal\editor\Plugin\Filter\EditorFileReference object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -47,7 +47,7 @@ class EditorFileReference extends FilterBase implements ContainerFactoryPluginIn
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   An entity manager object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityManagerInterface $entity_manager) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, EntityManagerInterface $entity_manager) {
     $this->entityManager = $entity_manager;
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -55,7 +55,7 @@ class EditorFileReference extends FilterBase implements ContainerFactoryPluginIn
   /**
    * {@inheritdoc}
    */
-  static public function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  static public function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
       $plugin_id,

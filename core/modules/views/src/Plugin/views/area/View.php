@@ -37,8 +37,8 @@ class View extends AreaPluginBase {
    /**
     * Constructs a View object.
     *
-    * @param array $configuration
-    *   A configuration array containing information about the plugin instance.
+    * @param mixed $configuration
+    *   Configuration for the plugin instance.
     * @param string $plugin_id
     *   The plugin_id for the plugin instance.
     * @param mixed $plugin_definition
@@ -46,7 +46,7 @@ class View extends AreaPluginBase {
     * @param \Drupal\Core\Entity\EntityStorageInterface $view_storage
     *   The view storage.
     */
-   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $view_storage) {
+   public function __construct($configuration, $plugin_id, $plugin_definition, EntityStorageInterface $view_storage) {
      parent::__construct($configuration, $plugin_id, $plugin_definition);
 
      $this->viewStorage = $view_storage;
@@ -55,7 +55,7 @@ class View extends AreaPluginBase {
    /**
     * {@inheritdoc}
     */
-   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+   public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
        return new static(
            $configuration,
            $plugin_id,

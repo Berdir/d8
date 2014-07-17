@@ -56,7 +56,7 @@ class UserSearch extends SearchPluginBase implements AccessibleInterface {
   /**
    * {@inheritdoc}
    */
-  static public function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  static public function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $container->get('database'),
       $container->get('entity.manager'),
@@ -79,14 +79,14 @@ class UserSearch extends SearchPluginBase implements AccessibleInterface {
    *   The module handler.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    */
-  public function __construct(Connection $database, EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(Connection $database, EntityManagerInterface $entity_manager, ModuleHandlerInterface $module_handler, AccountInterface $current_user, $configuration, $plugin_id, $plugin_definition) {
     $this->database = $database;
     $this->entityManager = $entity_manager;
     $this->moduleHandler = $module_handler;

@@ -58,7 +58,7 @@ class FormatterPluginManager extends DefaultPluginManager {
   /**
    * {@inheritdoc}
    */
-  public function createInstance($plugin_id, array $configuration = array()) {
+  public function createInstance($plugin_id, $configuration = array()) {
     $plugin_definition = $this->getDefinition($plugin_id);
     $plugin_class = DefaultFactory::getPluginClass($plugin_id, $plugin_definition);
 
@@ -142,7 +142,7 @@ class FormatterPluginManager extends DefaultPluginManager {
    * @return array
    *   The display properties with defaults added.
    */
-  public function prepareConfiguration($field_type, array $configuration) {
+  public function prepareConfiguration($field_type, $configuration) {
     // Fill in defaults for missing properties.
     $configuration += array(
       'label' => 'above',

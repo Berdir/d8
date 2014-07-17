@@ -36,8 +36,8 @@ class MenuLinkDefault extends MenuLinkBase implements ContainerFactoryPluginInte
   /**
    * Constructs a new MenuLinkDefault.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -45,7 +45,7 @@ class MenuLinkDefault extends MenuLinkBase implements ContainerFactoryPluginInte
    * @param \Drupal\Core\Menu\StaticMenuLinkOverridesInterface $static_override
    *   The static override storage.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, StaticMenuLinkOverridesInterface $static_override) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, StaticMenuLinkOverridesInterface $static_override) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->staticOverride = $static_override;
@@ -54,7 +54,7 @@ class MenuLinkDefault extends MenuLinkBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
       $plugin_id,

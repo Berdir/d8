@@ -39,8 +39,8 @@ class BulkForm extends FieldPluginBase {
   /**
    * Constructs a new BulkForm object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
@@ -48,7 +48,7 @@ class BulkForm extends FieldPluginBase {
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The action storage.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $storage) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, EntityStorageInterface $storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->actionStorage = $storage;
@@ -57,7 +57,7 @@ class BulkForm extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static($configuration, $plugin_id, $plugin_definition, $container->get('entity.manager')->getStorage('action'));
   }
 

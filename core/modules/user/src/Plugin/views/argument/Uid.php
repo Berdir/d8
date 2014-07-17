@@ -31,8 +31,8 @@ class Uid extends Numeric {
   /**
    * Constructs a Drupal\Component\Plugin\PluginBase object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -40,7 +40,7 @@ class Uid extends Numeric {
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The user storage.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $storage) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, EntityStorageInterface $storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->storage = $storage;
   }
@@ -48,7 +48,7 @@ class Uid extends Numeric {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static($configuration, $plugin_id, $plugin_definition,
       $container->get('entity.manager')->getStorage('user'));
   }

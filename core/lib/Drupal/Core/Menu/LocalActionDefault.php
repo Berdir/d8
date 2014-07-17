@@ -28,8 +28,8 @@ class LocalActionDefault extends PluginBase implements LocalActionInterface, Con
   /**
    * Constructs a LocalActionDefault object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -37,7 +37,7 @@ class LocalActionDefault extends PluginBase implements LocalActionInterface, Con
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider to load routes by name.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->routeProvider = $route_provider;
@@ -46,7 +46,7 @@ class LocalActionDefault extends PluginBase implements LocalActionInterface, Con
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
       $plugin_id,

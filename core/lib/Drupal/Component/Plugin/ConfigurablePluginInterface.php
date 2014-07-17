@@ -26,9 +26,9 @@ interface ConfigurablePluginInterface {
    * Sets the configuration for this plugin instance.
    *
    * @param array $configuration
-   *   An associative array containing the plugin's configuration.
+   *   The plugin instance configuration.
    */
-  public function setConfiguration(array $configuration);
+  public function setConfiguration($configuration);
 
   /**
    * Returns default configuration for this plugin.

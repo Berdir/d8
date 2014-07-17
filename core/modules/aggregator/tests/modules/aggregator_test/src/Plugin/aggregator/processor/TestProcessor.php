@@ -37,7 +37,7 @@ class TestProcessor extends AggregatorPluginSettingsBase implements ProcessorInt
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
       $plugin_id,
@@ -49,8 +49,8 @@ class TestProcessor extends AggregatorPluginSettingsBase implements ProcessorInt
   /**
    * Constructs a TestProcessor object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -58,7 +58,7 @@ class TestProcessor extends AggregatorPluginSettingsBase implements ProcessorInt
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config
    *   The configuration factory object.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config) {
     $this->configFactory = $config;
     parent::__construct($configuration + $this->getConfiguration(), $plugin_id, $plugin_definition);
   }
@@ -132,7 +132,7 @@ class TestProcessor extends AggregatorPluginSettingsBase implements ProcessorInt
   /**
    * {@inheritdoc}
    */
-  public function setConfiguration(array $configuration) {
+  public function setConfiguration($configuration) {
     $config = $this->configFactory->get('aggregator_test.settings');
     foreach ($configuration as $key => $value) {
       $config->set($key, $value);

@@ -33,8 +33,8 @@ class Raw extends ArgumentDefaultPluginBase {
   /**
    * Constructs a Raw object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -42,7 +42,7 @@ class Raw extends ArgumentDefaultPluginBase {
    * @param \Drupal\Core\Path\AliasManagerInterface $alias_manager
    *   The alias manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, AliasManagerInterface $alias_manager) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, AliasManagerInterface $alias_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->aliasManager = $alias_manager;
@@ -51,7 +51,7 @@ class Raw extends ArgumentDefaultPluginBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
       $plugin_id,

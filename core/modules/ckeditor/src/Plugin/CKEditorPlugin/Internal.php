@@ -36,8 +36,8 @@ class Internal extends CKEditorPluginBase implements ContainerFactoryPluginInter
   /**
    * Constructs a \Drupal\ckeditor\Plugin\CKEditorPlugin\Internal object.
    *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
@@ -45,7 +45,7 @@ class Internal extends CKEditorPluginBase implements ContainerFactoryPluginInter
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   The cache backend.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CacheBackendInterface $cache_backend) {
+  public function __construct($configuration, $plugin_id, $plugin_definition, CacheBackendInterface $cache_backend) {
     $this->cache = $cache_backend;
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -55,8 +55,8 @@ class Internal extends CKEditorPluginBase implements ContainerFactoryPluginInter
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The container to pull out services used in the plugin.
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
+   * @param mixed $configuration
+   *   Configuration for the plugin instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
@@ -65,7 +65,7 @@ class Internal extends CKEditorPluginBase implements ContainerFactoryPluginInter
    * @return static
    *   Returns an instance of this plugin.
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
       $plugin_id,

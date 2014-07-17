@@ -171,6 +171,6 @@ interface BlockPluginInterface extends ConfigurablePluginInterface, PluginFormIn
    *
    * @return $this
    */
-  public function setVisibilityConfig($instance_id, array $configuration);
+  public function setVisibilityConfig($instance_id, $configuration);
 
 }

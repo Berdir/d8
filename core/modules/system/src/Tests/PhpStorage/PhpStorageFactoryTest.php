@@ -75,7 +75,7 @@ class PhpStorageFactoryTest extends DrupalUnitTestBase {
    * @param array $configuration
    *   An array of configuration to set. Will be merged with default values.
    */
-  protected function setSettings($name = 'default', array $configuration = array()) {
+  protected function setSettings($name = 'default', $configuration = array()) {
     $settings['php_storage'][$name] = $configuration + array(
       'class' => 'Drupal\system\PhpStorage\MockPhpStorage',
       'directory' => 'tmp://',

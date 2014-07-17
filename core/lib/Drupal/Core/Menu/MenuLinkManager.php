@@ -224,7 +224,7 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    *
    * @param string $plugin_id
    *   The ID of the plugin being instantiated.
-   * @param array $configuration
+   * @param mixed $configuration
    *   An array of configuration relevant to the plugin instance.
    *
    * @return \Drupal\Core\Menu\MenuLinkInterface
@@ -233,7 +233,7 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    *   If the instance cannot be created, such as if the ID is invalid.
    */
-  public function createInstance($plugin_id, array $configuration = array()) {
+  public function createInstance($plugin_id, $configuration = array()) {
     return $this->factory->createInstance($plugin_id, $configuration);
   }
 

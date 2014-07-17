@@ -46,7 +46,7 @@ class SelectionPluginManager extends DefaultPluginManager {
   /**
    * Overrides \Drupal\Component\Plugin\PluginManagerBase::createInstance().
    */
-  public function createInstance($plugin_id, array $configuration = array()) {
+  public function createInstance($plugin_id, $configuration = array()) {
     // We want to provide a broken handler class whenever a class is not found.
     try {
       return parent::createInstance($plugin_id, $configuration);

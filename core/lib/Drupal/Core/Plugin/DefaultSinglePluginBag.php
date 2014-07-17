@@ -50,10 +50,10 @@ class DefaultSinglePluginBag extends PluginBag {
    *   The manager to be used for instantiating plugins.
    * @param string $instance_id
    *   The ID of the plugin instance.
-   * @param array $configuration
+   * @param mixed $configuration
    *   An array of configuration.
    */
-  public function __construct(PluginManagerInterface $manager, $instance_id, array $configuration) {
+  public function __construct(PluginManagerInterface $manager, $instance_id, $configuration) {
     $this->manager = $manager;
     $this->instanceId = $instance_id;
     // This is still needed by the parent PluginBag class.

@@ -16,7 +16,7 @@ interface FactoryInterface {
    *
    * @param string $plugin_id
    *   The ID of the plugin being instantiated.
-   * @param array $configuration
+   * @param mixed $configuration
    *   An array of configuration relevant to the plugin instance.
    *
    * @return object
@@ -25,6 +25,6 @@ interface FactoryInterface {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    *   If the instance cannot be created, such as if the ID is invalid.
    */
-  public function createInstance($plugin_id, array $configuration = array());
+  public function createInstance($plugin_id, $configuration = array());
 
 }

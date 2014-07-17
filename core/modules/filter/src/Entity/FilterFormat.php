@@ -149,7 +149,7 @@ class FilterFormat extends ConfigEntityBase implements FilterFormatInterface, En
   /**
    * {@inheritdoc}
    */
-  public function setFilterConfig($instance_id, array $configuration) {
+  public function setFilterConfig($instance_id, $configuration) {
     $this->filters[$instance_id] = $configuration;
     if (isset($this->filterBag)) {
       $this->filterBag->setInstanceConfiguration($instance_id, $configuration);

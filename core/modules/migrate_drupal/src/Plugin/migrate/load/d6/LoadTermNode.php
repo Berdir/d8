@@ -22,7 +22,7 @@ class LoadTermNode extends LoadEntity {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
+  public function __construct($configuration, $plugin_id, array $plugin_definition, MigrationInterface $migration) {
     $configuration['bundle_migration'] = 'd6_taxonomy_vocabulary';
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
   }

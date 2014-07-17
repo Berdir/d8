@@ -67,7 +67,7 @@ class TypedDataManager extends DefaultPluginManager {
    *
    * @param string $data_type
    *   The data type, for which a typed object should be instantiated.
-   * @param array $configuration
+   * @param mixed $configuration
    *   The plugin configuration array, i.e. an array with the following keys:
    *   - data definition: The data definition object, i.e. an instance of
    *     \Drupal\Core\TypedData\DataDefinitionInterface.
@@ -80,7 +80,7 @@ class TypedDataManager extends DefaultPluginManager {
    * @return \Drupal\Core\TypedData\TypedDataInterface
    *   The instantiated typed data object.
    */
-  public function createInstance($data_type, array $configuration = array()) {
+  public function createInstance($data_type, $configuration = array()) {
     $data_definition = $configuration['data_definition'];
     $type_definition = $this->getDefinition($data_type);
 
