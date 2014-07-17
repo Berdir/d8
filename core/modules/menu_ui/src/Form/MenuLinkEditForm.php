@@ -57,7 +57,6 @@ class MenuLinkEditForm extends FormBase {
    *   The plugin instance to use for this form.
    */
   public function buildForm(array $form, array &$form_state, MenuLinkInterface $menu_link_plugin = NULL) {
-
     $form['menu_link_id'] = array(
       '#type' => 'value',
       '#value' => $menu_link_plugin->getPluginId(),

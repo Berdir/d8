@@ -11,18 +11,18 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\system\MenuInterface;
 
 /**
- * Define a route controller for the form for adding a menu link content entity.
+ * Defines a route controller for a form for menu link content entity creation.
  */
 class MenuController extends ControllerBase {
 
   /**
-   * Provides the menu link submission form.
+   * Provides the menu link creation form.
    *
    * @param \Drupal\system\MenuInterface $menu
    *   An entity representing a custom menu.
    *
    * @return array
-   *   Returns the menu link submission form.
+   *   Returns the menu link creation form.
    */
   public function addLink(MenuInterface $menu) {
     $menu_link = $this->entityManager()->getStorage('menu_link_content')->create(array(
