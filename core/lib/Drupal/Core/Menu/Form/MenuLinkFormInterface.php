@@ -21,7 +21,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
 interface MenuLinkFormInterface extends PluginFormInterface {
 
   /**
-   * Injects the menu link instance.
+   * Injects the menu link plugin instance.
    *
    * @param \Drupal\Core\Menu\MenuLinkInterface $menu_link
    *   A menu link plugin instance.
@@ -29,7 +29,7 @@ interface MenuLinkFormInterface extends PluginFormInterface {
   public function setMenuLinkInstance(MenuLinkInterface $menu_link);
 
   /**
-   * Form plugin helper.
+   * Form plugin helper which extracts a plugin definition from form values.
    *
    * @param array $form
    *   An associative array containing the structure of the form.
@@ -37,7 +37,7 @@ interface MenuLinkFormInterface extends PluginFormInterface {
    *   An associative array containing the current state of the form.
    *
    * @return array
-   *   The new plugin definition values takes from the form values.
+   *   The new plugin definition values taken from the form values.
    */
   public function extractFormValues(array &$form, array &$form_state);
 

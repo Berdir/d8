@@ -9,6 +9,8 @@ namespace Drupal\menu_link_content\Form;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Url;
+use Drupal\Core\Access\AccessManager;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -35,12 +37,12 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
   /**
    * The content menu link.
    *
-   * @var \Drupal\menu_link_content\Entity\MenuLinkContent
+   * @var \Drupal\menu_link_content\Entity\MenuLinkContentInterface
    */
   protected $entity;
 
   /**
-   * The menu tree service.
+   * The parent form selector service.
    *
    * @var \Drupal\Core\Menu\MenuParentFormSelectorInterface
    */
@@ -61,6 +63,20 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
   protected $languageManager;
 
   /**
+   * The access manager.
+   *
+   * @var \Drupal\Core\Access\AccessManager
+   */
+  protected $accessManager;
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $account;
+
+  /**
    * Constructs a MenuLinkContentForm object.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -75,14 +91,20 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
    *   The request context.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
+   * @param \Drupal\Core\Access\AccessManager $access_manager
+   *   The access manager.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The current user.
    */
-  public function __construct(EntityManagerInterface $entity_manager, MenuParentFormSelectorInterface $menu_parent_selector, AliasManagerInterface $alias_manager, ModuleHandlerInterface $module_handler, RequestContext $request_context, LanguageManagerInterface $language_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, MenuParentFormSelectorInterface $menu_parent_selector, AliasManagerInterface $alias_manager, ModuleHandlerInterface $module_handler, RequestContext $request_context, LanguageManagerInterface $language_manager, AccessManager $access_manager, AccountInterface $account) {
     parent::__construct($entity_manager, $language_manager);
     $this->menuParentSelector = $menu_parent_selector;
     $this->pathAliasManager = $alias_manager;
     $this->moduleHandler = $module_handler;
     $this->requestContext = $request_context;
     $this->languageManager = $language_manager;
+    $this->accessManager = $access_manager;
+    $this->account = $account;
   }
 
   /**
@@ -95,7 +117,9 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
       $container->get('path.alias_manager'),
       $container->get('module_handler'),
       $container->get('router.request_context'),
-      $container->get('language_manager')
+      $container->get('language_manager'),
+      $container->get('access_manager'),
+      $container->get('current_user')
     );
   }
 
@@ -103,7 +127,8 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
    * {@inheritdoc}
    */
   public function setMenuLinkInstance(MenuLinkInterface $menu_link) {
-    // Load the entity for the entity form.
+    // Load the entity for the entity form. Loading by entity ID is much faster
+    // than loading by uuid, so use that ID if we have it.
     $metadata = $menu_link->getMetaData();
     if (!empty($metadata['entity_id'])) {
       $this->entity = $this->entityManager->getStorage('menu_link_content')->load($metadata['entity_id']);
@@ -165,7 +190,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
   }
 
   /**
-   * Break up a user-entered URL or path into all the relevant parts.
+   * Breaks up a user-entered URL or path into all the relevant parts.
    *
    * @param string $url
    *   The user-entered URL or path.
@@ -208,7 +233,6 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
    * {@inheritdoc}
    */
   public function extractFormValues(array &$form, array &$form_state) {
-
     $new_definition = array();
     $new_definition['expanded'] = !empty($form_state['values']['expanded']) ? 1 : 0;
     $new_definition['hidden'] = empty($form_state['values']['enabled']) ? 1 : 0;
@@ -240,7 +264,6 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
    * {@inheritdoc}
    */
   public function form(array $form, array &$form_state) {
-
     $form = parent::form($form, $form_state);
 
     $language_configuration = $this->moduleHandler->invoke('language', 'get_default_configuration', array('menu_link_content', 'menu_link_content'));
@@ -362,7 +385,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
     $saved = $menu_link->save();
 
     if ($saved) {
-      drupal_set_message(t('The menu link has been saved.'));
+      drupal_set_message($this->t('The menu link has been saved.'));
       $form_state['redirect_route'] = array(
         'route_name' => 'menu_link_content.link_edit',
         'route_parameters' => array(
@@ -371,7 +394,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
       );
     }
     else {
-      drupal_set_message(t('There was an error saving the menu link.'), 'error');
+      drupal_set_message($this->t('There was an error saving the menu link.'), 'error');
       $form_state['rebuild'] = TRUE;
     }
   }
@@ -390,7 +413,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
     }
     elseif ($extracted['route_name']) {
       // Users are not allowed to add a link to a page they cannot access.
-      $valid = \Drupal::service('access_manager')->checkNamedRoute($extracted['route_name'], $extracted['route_parameters'], \Drupal::currentUser());
+      $valid = $this->accessManager->checkNamedRoute($extracted['route_name'], $extracted['route_parameters'], $this->account);
     }
     if (!$valid) {
       $this->setFormError('url', $form_state, $this->t("The path '@link_path' is either invalid or you do not have access to it.", array('@link_path' => $form_state['values']['url'])));

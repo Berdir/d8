@@ -71,7 +71,7 @@ class MenuLinkEditForm extends FormBase {
     $form['actions'] = array('#type' => 'actions');
     $form['actions']['submit'] = array(
       '#type' => 'submit',
-      '#value' => t('Save'),
+      '#value' => $this->t('Save'),
       '#button_type' => 'primary',
     );
     return $form;

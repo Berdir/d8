@@ -10,6 +10,9 @@ namespace Drupal\menu_link_content\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\system\MenuInterface;
 
+/**
+ * Define a route controller for the form for adding a menu link content entity.
+ */
 class MenuController extends ControllerBase {
 
   /**

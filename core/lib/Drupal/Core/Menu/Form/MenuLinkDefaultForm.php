@@ -40,7 +40,7 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
   protected $menuLinkManager;
 
   /**
-   * The menu tree service.
+   * The parent form selector service.
    *
    * @var \Drupal\Core\Menu\MenuParentFormSelectorInterface
    */
@@ -61,7 +61,7 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
   protected $moduleData;
 
   /**
-   * Constructs a new MenuLinkDefaultForm.
+   * Constructs a new \Drupal\Core\Menu\Form\MenuLinkDefaultForm.
    *
    * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
    *   The menu link manager.
@@ -186,9 +186,16 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
   /**
    * Helper function to get a module name.
    *
-   * This function is horrible, but core has nothing better until we add a
+   * @param string $module
+   *   A module machine name.
+   *
+   * @todo This function is horrible, but core has nothing better until we add a
    * a method to the ModuleHandler that handles this nicely.
-   * @see https://drupal.org/node/2281989
+   * https://drupal.org/node/2281989
+   *
+   * @return string
+   *   The human-readable, localized module name, or the machine name passed in
+   *   if no matching module is found.
    */
   protected function getModuleName($module) {
     // Gather module data.

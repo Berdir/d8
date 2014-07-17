@@ -11,6 +11,8 @@ use Drupal\content_translation\Tests\ContentTranslationUITest;
 
 /**
  * Tests the menu link content UI.
+ *
+ * @group Menu
  */
 class MenuLinkContentUITest extends ContentTranslationUITest {
 
@@ -25,17 +27,6 @@ class MenuLinkContentUITest extends ContentTranslationUITest {
     'menu_link_content',
     'menu_ui',
   );
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Menu link content translation UI',
-      'description' => 'Tests the basic menu link content translation UI.',
-      'group' => 'Menu',
-    );
-  }
 
   /**
    * {@inheritdoc}
