@@ -75,7 +75,7 @@ class RoutePreloader implements EventSubscriberInterface {
    */
   public function onRequest(KernelEvent $event) {
     // Just preload on normal HTML pages, as they will display menu links.
-    if ($this->negotiation->getContentType($event->getRequest()) == 'html') {
+    if ($event->getRequest()->getMethod() == 'GET' && $this->negotiation->getContentType($event->getRequest()) == 'html') {
       $this->loadNonAdminRoutes();
     }
   }
