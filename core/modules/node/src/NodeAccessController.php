@@ -122,10 +122,7 @@ class NodeAccessController extends EntityAccessController implements NodeAccessC
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    $configured_types = node_permissions_get_configured_types();
-    if (isset($configured_types[$entity_bundle])) {
-      return $account->hasPermission('create ' . $entity_bundle . ' content');
-    }
+    return $account->hasPermission('create ' . $entity_bundle . ' content');
   }
 
   /**
