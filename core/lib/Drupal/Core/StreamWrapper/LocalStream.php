@@ -87,10 +87,17 @@ abstract class LocalStream implements StreamWrapperInterface {
       $uri = $this->uri;
     }
 
-    list(, $target) = explode('://', $uri, 2);
+    $uri_parts = explode('://', $uri, 2);
+    if (count($uri_parts) === 1) {
+      // The delimiter ('://') was not found in $uri, malformed $uri passed.
+      throw new \InvalidArgumentException('Malformed $uri parameter passed: %s', $uri);
+    }
+    else {
+      list(, $target) = $uri_parts;
 
-    // Remove erroneous leading or trailing, forward-slashes and backslashes.
-    return trim($target, '\/');
+      // Remove erroneous leading or trailing, forward-slashes and backslashes.
+      return trim($target, '\/');
+    }
   }
 
   /**

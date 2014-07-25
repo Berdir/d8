@@ -913,6 +913,10 @@ function drupal_set_time_limit($time_limit) {
 /**
  * Returns the path to a system item (module, theme, etc.).
  *
+ * This function should only be used when including a file containing PHP code;
+ * the 'module://', 'profile://' and 'theme://' stream wrappers should be used
+ * for other use cases.
+ *
  * @param $type
  *   The type of the item; one of 'core', 'profile', 'module', 'theme', or
  *   'theme_engine'.

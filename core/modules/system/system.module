@@ -735,6 +735,24 @@ function system_stream_wrappers() {
       'description' => new TranslationWrapper('Temporary local files for upload and previews.'),
       'type' => STREAM_WRAPPERS_LOCAL_HIDDEN,
     ),
+    'module' => array(
+      'name' => t('Module files'),
+      'class' => 'Drupal\Core\StreamWrapper\ModuleStream',
+      'description' => t('Local module files.'),
+      'type' => STREAM_WRAPPERS_READ,
+    ),
+    'theme' => array(
+      'name' => t('Theme files'),
+      'class' => 'Drupal\Core\StreamWrapper\ThemeStream',
+      'description' => t('Local theme files.'),
+      'type' => STREAM_WRAPPERS_READ,
+    ),
+    'profile' => array(
+      'name' => t('Profile files'),
+      'class' => 'Drupal\Core\StreamWrapper\ProfileStream',
+      'description' => t('Local profile files.'),
+      'type' => STREAM_WRAPPERS_READ,
+    ),
   );
 
   // Only register the private file stream wrapper if a file path has been set.
