@@ -61,6 +61,7 @@ class BlockPluginBag extends DefaultSinglePluginBag {
 
     try {
       parent::initializePlugin($instance_id);
+      $this->get($instance_id)->setInstanceId($this->blockId);
     }
     catch (PluginException $e) {
       $module = $this->configuration['provider'];

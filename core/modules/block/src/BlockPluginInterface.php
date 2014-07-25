@@ -143,6 +143,25 @@ interface BlockPluginInterface extends ConfigurablePluginInterface, PluginFormIn
   public function getMachineNameSuggestion();
 
   /**
+   * Returns a unique instance ID for the current block instance.
+   *
+   * This is not automatically provided, instead, whoever uses block plugins,
+   * like block entities need to set an instance id using setInstanceId().
+   *
+   * @return string
+   *   A string that is unique for this block instance.
+   */
+  public function getInstanceId();
+
+  /**
+   * Set the instance ID for this block instance.
+   *
+   * @param string $instance_id
+   *   The block instance ID
+   */
+  public function setInstanceId($instance_id);
+
+  /**
    * Gets conditions for this block.
    *
    * @return \Drupal\Core\Condition\ConditionInterface[]|\Drupal\Core\Condition\ConditionPluginBag
