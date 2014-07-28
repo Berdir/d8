@@ -97,6 +97,16 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
   /**
    * {@inheritdoc}
    */
+  public function hasData() {
+    return (bool) $this->getQuery()
+      ->range(0, 1)
+      ->count()
+      ->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function loadUnchanged($id) {
     $this->resetCache(array($id));
     return $this->load($id);
@@ -456,6 +466,24 @@ abstract class EntityStorageBase extends EntityControllerBase implements EntityS
    */
   public function getQuery($conjunction = 'AND') {
     return \Drupal::entityQuery($this->getEntityTypeId(), $conjunction);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onEntityDefinitionCreate() {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onEntityDefinitionUpdate(EntityTypeInterface $original) {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onEntityDefinitionDelete() {
   }
 
 }

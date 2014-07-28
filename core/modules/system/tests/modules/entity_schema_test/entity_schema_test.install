@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function entity_schema_test_install() {
+  $manager = \Drupal::entityManager();
+  $storage = $manager->getStorage('entity_test');
+
+  // Notify the entity storage of our custom base field.
+  $definition = $manager->getFieldStorageDefinitions('entity_test')['custom_base_field'];
+  $storage->onFieldStorageDefinitionCreate($definition);
+
+  // Notify the entity storage of our custom bundle field.
+  $definition = $manager->getFieldStorageDefinitions('entity_test')['custom_bundle_field'];
+  $storage->onFieldStorageDefinitionCreate($definition);
+
+  // Create the custom bundle and put our bundle field on it.
+  entity_test_create_bundle('custom');
+  $definition = $manager->getFieldDefinitions('entity_test', 'custom')['custom_bundle_field'];
+  $storage->onFieldDefinitionCreate($definition);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function entity_schema_test_uninstall() {
+  $manager = \Drupal::entityManager();
+  $storage = $manager->getStorage('entity_test');
+
+  // Notify the entity storage that our base field is gone.
+  $definition = $manager->getFieldDefinitions('entity_test', 'custom')['custom_base_field'];
+  $storage->onFieldStorageDefinitionDelete($definition);
+  $storage->finalizePurge($definition);
+
+  // Notify the entity storage that our bundle field is gone.
+  $definition = $manager->getFieldDefinitions('entity_test', 'custom')['custom_bundle_field'];
+  $storage->onFieldDefinitionDelete($definition);
+  do {
+    $count = $storage->purgeFieldData($definition, 500);
+  }
+  while ($count != 0);
+
+  $storage_definition = $manager->getFieldStorageDefinitions('entity_test')['custom_bundle_field'];
+  $storage->onFieldStorageDefinitionDelete($storage_definition);
+  $storage->finalizePurge($storage_definition);
+
+  $manager->clearCachedFieldDefinitions();
+}

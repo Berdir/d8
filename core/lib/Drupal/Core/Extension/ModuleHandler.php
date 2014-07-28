@@ -11,7 +11,6 @@ use Drupal\Component\Graph\Graph;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Entity\Schema\EntitySchemaProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -809,17 +808,9 @@ class ModuleHandler implements ModuleHandlerInterface {
 
         // Install any entity schemas belonging to the module.
         $entity_manager = \Drupal::entityManager();
-        $schema = \Drupal::database()->schema();
         foreach ($entity_manager->getDefinitions() as $entity_type) {
           if ($entity_type->getProvider() == $module) {
-            $storage = $entity_manager->getStorage($entity_type->id());
-            if ($storage instanceof EntitySchemaProviderInterface) {
-              foreach ($storage->getSchema() as $table_name => $table_schema) {
-                if (!$schema->tableExists($table_name)) {
-                  $schema->createTable($table_name, $table_schema);
-                }
-              }
-            }
+            $entity_manager->getStorage($entity_type->id())->onEntityDefinitionCreate();
           }
         }
 
@@ -917,17 +908,9 @@ class ModuleHandler implements ModuleHandlerInterface {
 
       // Remove any entity schemas belonging to the module.
       $entity_manager = \Drupal::entityManager();
-      $schema = \Drupal::database()->schema();
       foreach ($entity_manager->getDefinitions() as $entity_type) {
         if ($entity_type->getProvider() == $module) {
-          $storage = $entity_manager->getStorage($entity_type->id());
-          if ($storage instanceof EntitySchemaProviderInterface) {
-            foreach ($storage->getSchema() as $table_name => $table_schema) {
-              if ($schema->tableExists($table_name)) {
-                $schema->dropTable($table_name);
-              }
-            }
-          }
+          $entity_manager->getStorage($entity_type->id())->onEntityDefinitionDelete();
         }
       }
 

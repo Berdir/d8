@@ -10,7 +10,7 @@ namespace Drupal\field\Tests;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\field\FieldException;
+use Drupal\Core\Field\FieldException;
 
 /**
  * Tests field storage create, read, update, and delete.

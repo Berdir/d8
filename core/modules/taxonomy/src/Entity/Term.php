@@ -165,7 +165,8 @@ class Term extends ContentEntityBase implements TermInterface {
       // Save new terms with no parents by default.
       ->setDefaultValue(0)
       ->setSetting('unsigned', TRUE)
-      ->addConstraint('TermParent', array());
+      ->addConstraint('TermParent', array())
+      ->setCustomStorage(TRUE);
 
     $fields['changed'] = FieldDefinition::create('changed')
       ->setLabel(t('Changed'))

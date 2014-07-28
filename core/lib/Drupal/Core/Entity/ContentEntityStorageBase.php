@@ -78,6 +78,11 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Fie
   /**
    * {@inheritdoc}
    */
+  public function onEntityDefinitionUpdate(EntityTypeInterface $original) { }
+
+  /**
+   * {@inheritdoc}
+   */
   public function onFieldStorageDefinitionCreate(FieldStorageDefinitionInterface $storage_definition) { }
 
   /**

@@ -7,7 +7,7 @@
 
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldStorageConfigInterface;
-use Drupal\field\FieldException;
+use Drupal\Core\Field\FieldException;
 
 /**
  * @defgroup field_purge Field API bulk data deletion

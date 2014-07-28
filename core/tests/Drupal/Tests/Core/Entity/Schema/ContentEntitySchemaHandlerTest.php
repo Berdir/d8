@@ -10,6 +10,7 @@ namespace Drupal\Tests\Core\Entity\Schema;
 use Drupal\Core\Entity\ContentEntityType;
 use Drupal\Core\Entity\Schema\ContentEntitySchemaHandler;
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -246,16 +247,6 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
       ),
     ));
 
-    $this->setUpSchemaHandler();
-
-    $table_mapping = new DefaultTableMapping($this->storageDefinitions);
-    $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
-    $table_mapping->setExtraColumns('entity_test', array('default_langcode'));
-
-    $this->storage->expects($this->once())
-      ->method('getTableMapping')
-      ->will($this->returnValue($table_mapping));
-
     $expected = array(
       'entity_test' => array(
         'description' => 'The base table for entity_test entities.',
@@ -381,9 +372,18 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
         ),
       ),
     );
-    $actual = $this->schemaHandler->getSchema();
 
-    $this->assertEquals($expected, $actual);
+    $this->setUpEntitySchemaHandler($expected);
+
+    $table_mapping = new DefaultTableMapping($this->storageDefinitions, $this->storageDefinitions);
+    $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
+    $table_mapping->setExtraColumns('entity_test', array('default_langcode'));
+
+    $this->storage->expects($this->any())
+      ->method('getTableMapping')
+      ->will($this->returnValue($table_mapping));
+
+    $this->schemaHandler->createEntitySchema($this->entityType);
   }
 
   /**
@@ -419,16 +419,6 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
         ),
       ),
     ));
-
-    $this->setUpSchemaHandler();
-
-    $table_mapping = new DefaultTableMapping($this->storageDefinitions);
-    $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
-    $table_mapping->setFieldNames('entity_test_revision', array_keys($this->storageDefinitions));
-
-    $this->storage->expects($this->once())
-      ->method('getTableMapping')
-      ->will($this->returnValue($table_mapping));
 
     $expected = array(
       'entity_test' => array(
@@ -483,9 +473,17 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
       ),
     );
 
-    $actual = $this->schemaHandler->getSchema();
+    $this->setUpEntitySchemaHandler($expected);
 
-    $this->assertEquals($expected, $actual);
+    $table_mapping = new DefaultTableMapping($this->storageDefinitions, $this->storageDefinitions);
+    $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
+    $table_mapping->setFieldNames('entity_test_revision', array_keys($this->storageDefinitions));
+
+    $this->storage->expects($this->any())
+      ->method('getTableMapping')
+      ->will($this->returnValue($table_mapping));
+
+    $this->schemaHandler->createEntitySchema($this->entityType);
   }
 
   /**
@@ -507,7 +505,7 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
       ),
     ));
 
-    $this->storage->expects($this->once())
+    $this->storage->expects($this->any())
       ->method('getDataTable')
       ->will($this->returnValue('entity_test_field_data'));
 
@@ -518,16 +516,6 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
         ),
       ),
     ));
-
-    $this->setUpSchemaHandler();
-
-    $table_mapping = new DefaultTableMapping($this->storageDefinitions);
-    $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
-    $table_mapping->setFieldNames('entity_test_field_data', array_keys($this->storageDefinitions));
-
-    $this->storage->expects($this->once())
-      ->method('getTableMapping')
-      ->will($this->returnValue($table_mapping));
 
     $expected = array(
       'entity_test' => array(
@@ -575,9 +563,17 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
       ),
     );
 
-    $actual = $this->schemaHandler->getSchema();
+    $this->setUpEntitySchemaHandler($expected);
 
-    $this->assertEquals($expected, $actual);
+    $table_mapping = new DefaultTableMapping($this->storageDefinitions, $this->storageDefinitions);
+    $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
+    $table_mapping->setFieldNames('entity_test_field_data', array_keys($this->storageDefinitions));
+
+    $this->storage->expects($this->any())
+      ->method('getTableMapping')
+      ->will($this->returnValue($table_mapping));
+
+    $this->schemaHandler->createEntitySchema($this->entityType);
   }
 
   /**
@@ -625,18 +621,6 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
         ),
       ),
     ));
-
-    $this->setUpSchemaHandler();
-
-    $table_mapping = new DefaultTableMapping($this->storageDefinitions);
-    $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
-    $table_mapping->setFieldNames('entity_test_revision', array_keys($this->storageDefinitions));
-    $table_mapping->setFieldNames('entity_test_field_data', array_keys($this->storageDefinitions));
-    $table_mapping->setFieldNames('entity_test_revision_field_data', array_keys($this->storageDefinitions));
-
-    $this->storage->expects($this->once())
-      ->method('getTableMapping')
-      ->will($this->returnValue($table_mapping));
 
     $expected = array(
       'entity_test' => array(
@@ -763,25 +747,287 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
       ),
     );
 
-    $actual = $this->schemaHandler->getSchema();
+    $this->setUpEntitySchemaHandler($expected);
 
-    $this->assertEquals($expected, $actual);
+    $table_mapping = new DefaultTableMapping($this->storageDefinitions, $this->storageDefinitions);
+    $table_mapping->setFieldNames('entity_test', array_keys($this->storageDefinitions));
+    $table_mapping->setFieldNames('entity_test_revision', array_keys($this->storageDefinitions));
+    $table_mapping->setFieldNames('entity_test_field_data', array_keys($this->storageDefinitions));
+    $table_mapping->setFieldNames('entity_test_revision_field_data', array_keys($this->storageDefinitions));
+
+    $this->storage->expects($this->any())
+      ->method('getTableMapping')
+      ->will($this->returnValue($table_mapping));
+
+    $this->schemaHandler->createEntitySchema($this->entityType);
+  }
+
+  /**
+   * Tests the schema for a field dedicated table.
+   *
+   * @covers ::getDedicatedTableSchema()
+   * @covers ::createDedicatedTableSchema()
+   */
+  public function testDedicatedTableSchema() {
+    $entity_type_id = 'entity_test';
+    $this->entityType = new ContentEntityType(array(
+      'id' => 'entity_test',
+      'entity_keys' => array('id' => 'id'),
+    ));
+
+    // Setup a field having a dedicated schema.
+    $field_name = $this->randomName();
+    $this->setUpStorageDefinition($field_name, array(
+      'columns' => array(
+        'shape' => array(
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => FALSE,
+        ),
+        'color' => array(
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => FALSE,
+        ),
+      ),
+      'foreign keys' => array(
+        'color' => array(
+          'table' => 'color',
+          'columns' => array(
+            'color' => 'id'
+          ),
+        ),
+      ),
+      'unique keys' => array(),
+      'indexes' => array(),
+    ));
+
+    $field_storage = $this->storageDefinitions[$field_name];
+    $field_storage
+      ->expects($this->any())
+      ->method('getType')
+      ->will($this->returnValue('shape'));
+    $field_storage
+      ->expects($this->any())
+      ->method('getTargetEntityTypeId')
+      ->will($this->returnValue($entity_type_id));
+    $field_storage
+      ->expects($this->any())
+      ->method('isMultiple')
+      ->will($this->returnValue(TRUE));
+
+    $this->storageDefinitions['id']
+      ->expects($this->any())
+      ->method('getType')
+      ->will($this->returnValue('integer'));
+
+    $expected = array(
+      $entity_type_id . '__' . $field_name => array(
+        'description' => "Data storage for $entity_type_id field $field_name.",
+        'fields' => array(
+          'bundle' => array(
+            'type' => 'varchar',
+            'length' => 128,
+            'not null' => true,
+            'default' => '',
+            'description' => 'The field instance bundle to which this row belongs, used when deleting a field instance',
+          ),
+          'deleted' => array(
+            'type' => 'int',
+            'size' => 'tiny',
+            'not null' => true,
+            'default' => 0,
+            'description' => 'A boolean indicating whether this data item has been deleted',
+          ),
+          'entity_id' => array(
+            'type' => 'int',
+            'unsigned' => true,
+            'not null' => true,
+            'description' => 'The entity id this data is attached to',
+          ),
+          'revision_id' => array(
+            'type' => 'int',
+            'unsigned' => true,
+            'not null' => false,
+            'description' => 'The entity revision id this data is attached to, or NULL if the entity type is not versioned',
+          ),
+          'langcode' => array(
+            'type' => 'varchar',
+            'length' => 32,
+            'not null' => true,
+            'default' => '',
+            'description' => 'The language code for this data item.',
+          ),
+          'delta' => array(
+            'type' => 'int',
+            'unsigned' => true,
+            'not null' => true,
+            'description' => 'The sequence number for this data item, used for multi-value fields',
+          ),
+          $field_name . '_shape' => array(
+            'type' => 'varchar',
+            'length' => 32,
+            'not null' => false,
+          ),
+          $field_name . '_color' => array(
+            'type' => 'varchar',
+            'length' => 32,
+            'not null' => false,
+          ),
+        ),
+        'primary key' => array('entity_id', 'deleted', 'delta', 'langcode'),
+        'indexes' => array(
+          'bundle' => array('bundle'),
+          'deleted' => array('deleted'),
+          'entity_id' => array('entity_id'),
+          'revision_id' => array('revision_id'),
+          'langcode' => array('langcode'),
+        ),
+        'foreign keys' => array(
+          $field_name . '_color' => array(
+            'table' => 'color',
+            'columns' => array(
+              $field_name . '_color' => 'id',
+            ),
+          ),
+        ),
+      ),
+      $entity_type_id . '_revision__' . $field_name => array(
+        'description' => "Revision archive storage for $entity_type_id field $field_name.",
+        'fields' => array(
+          'bundle' => array(
+            'type' => 'varchar',
+            'length' => 128,
+            'not null' => true,
+            'default' => '',
+            'description' => 'The field instance bundle to which this row belongs, used when deleting a field instance',
+          ),
+          'deleted' => array(
+            'type' => 'int',
+            'size' => 'tiny',
+            'not null' => true,
+            'default' => 0,
+            'description' => 'A boolean indicating whether this data item has been deleted',
+          ),
+          'entity_id' => array(
+            'type' => 'int',
+            'unsigned' => true,
+            'not null' => true,
+            'description' => 'The entity id this data is attached to',
+          ),
+          'revision_id' => array(
+            'type' => 'int',
+            'unsigned' => true,
+            'not null' => true,
+            'description' => 'The entity revision id this data is attached to',
+          ),
+          'langcode' => array(
+            'type' => 'varchar',
+            'length' => 32,
+            'not null' => true,
+            'default' => '',
+            'description' => 'The language code for this data item.',
+          ),
+          'delta' => array(
+            'type' => 'int',
+            'unsigned' => true,
+            'not null' => true,
+            'description' => 'The sequence number for this data item, used for multi-value fields',
+          ),
+          $field_name . '_shape' => array(
+            'type' => 'varchar',
+            'length' => 32,
+            'not null' => false,
+          ),
+          $field_name . '_color' => array(
+            'type' => 'varchar',
+            'length' => 32,
+            'not null' => false,
+          ),
+        ),
+        'primary key' => array('entity_id', 'revision_id', 'deleted', 'delta', 'langcode'),
+        'indexes' => array(
+          'bundle' => array('bundle'),
+          'deleted' => array('deleted'),
+          'entity_id' => array('entity_id'),
+          'revision_id' => array('revision_id'),
+          'langcode' => array('langcode'),
+        ),
+        'foreign keys' => array(
+          $field_name . '_color' => array(
+            'table' => 'color',
+            'columns' => array(
+              $field_name . '_color' => 'id',
+            ),
+          ),
+        ),
+      ),
+    );
+
+    $this->setUpEntitySchemaHandler($expected);
+
+    $table_mapping = new DefaultTableMapping($this->storageDefinitions, $this->storageDefinitions);
+    $table_mapping->setFieldNames($entity_type_id, array_keys($this->storageDefinitions));
+    $table_mapping->setExtraColumns($entity_type_id, array('default_langcode'));
+
+    $this->storage->expects($this->any())
+      ->method('getTableMapping')
+      ->will($this->returnValue($table_mapping));
+
+    $this->schemaHandler->createFieldSchema($field_storage);
   }
 
   /**
    * Sets up the schema handler.
    *
-   * This uses the field definitions set in $this->fieldDefinitions.
+   * This uses the field definitions set in $this->storageDefinitions.
+   *
+   * @param array $expected
+   *   (optional) An associative array describing the expected entity schema to
+   *   be created. Defaults to expecting nothing.
    */
-  protected function setUpSchemaHandler() {
-    $this->entityManager->expects($this->once())
+  protected function setUpEntitySchemaHandler(array $expected = array()) {
+    $this->entityManager->expects($this->any())
       ->method('getFieldStorageDefinitions')
       ->with($this->entityType->id())
       ->will($this->returnValue($this->storageDefinitions));
+
+    $db_schema_handler = $this->getMockBuilder('Drupal\Core\Database\Schema')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    if ($expected) {
+      $invocation_count = 0;
+      $expected_table_names = array_keys($expected);
+      $expected_table_schemas = array_values($expected);
+
+      $db_schema_handler->expects($this->any())
+        ->method('createTable')
+        ->with(
+          $this->callback(function($table_name) use (&$invocation_count, $expected_table_names) {
+            return $expected_table_names[$invocation_count] == $table_name;
+          }),
+          $this->callback(function($table_schema) use (&$invocation_count, $expected_table_schemas) {
+            return $expected_table_schemas[$invocation_count] == $table_schema;
+          })
+        )
+        ->will($this->returnCallback(function() use (&$invocation_count) {
+          $invocation_count++;
+        }));
+    }
+
+    $connection = $this->getMockBuilder('Drupal\Core\Database\Connection')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $connection->expects($this->any())
+      ->method('schema')
+      ->will($this->returnValue($db_schema_handler));
+
     $this->schemaHandler = new ContentEntitySchemaHandler(
       $this->entityManager,
       $this->entityType,
-      $this->storage
+      $this->storage,
+      $connection
     );
   }
 
@@ -795,7 +1041,11 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
    *   FieldStorageDefinitionInterface::getSchema().
    */
   public function setUpStorageDefinition($field_name, array $schema) {
-    $this->storageDefinitions[$field_name] = $this->getMock('Drupal\Core\Field\FieldStorageDefinitionInterface');
+    $this->storageDefinitions[$field_name] = $this->getMock('Drupal\Tests\Core\Field\TestBaseFieldDefinitionInterface');
+    // getDescription() is called once for each table.
+    $this->storageDefinitions[$field_name]->expects($this->any())
+      ->method('getName')
+      ->will($this->returnValue($field_name));
     // getDescription() is called once for each table.
     $this->storageDefinitions[$field_name]->expects($this->any())
       ->method('getDescription')
@@ -804,7 +1054,7 @@ class ContentEntitySchemaHandlerTest extends UnitTestCase {
     $this->storageDefinitions[$field_name]->expects($this->any())
       ->method('getSchema')
       ->will($this->returnValue($schema));
-    $this->storageDefinitions[$field_name]->expects($this->once())
+    $this->storageDefinitions[$field_name]->expects($this->any())
       ->method('getColumns')
       ->will($this->returnValue($schema['columns']));
   }

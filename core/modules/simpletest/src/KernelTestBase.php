@@ -11,6 +11,7 @@ use Drupal\Component\Utility\String;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Site\Settings;
@@ -384,24 +385,14 @@ abstract class KernelTestBase extends UnitTestBase {
   protected function installEntitySchema($entity_type_id) {
     /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
     $entity_manager = $this->container->get('entity.manager');
-    /** @var \Drupal\Core\Database\Schema $schema_handler */
-    $schema_handler = $this->container->get('database')->schema();
-
     $storage = $entity_manager->getStorage($entity_type_id);
-    if ($storage instanceof EntitySchemaProviderInterface) {
-      $schema = $storage->getSchema();
-      foreach ($schema as $table_name => $table_schema) {
-        $schema_handler->createTable($table_name, $table_schema);
-      }
+    $storage->onEntityDefinitionCreate();
 
+    if ($storage instanceof SqlEntityStorageInterface) {
+      $table_mapping = $storage->getTableMapping();
       $this->pass(String::format('Installed entity type tables for the %entity_type entity type: %tables', array(
         '%entity_type' => $entity_type_id,
-        '%tables' => '{' . implode('}, {', array_keys($schema)) . '}',
-      )));
-    }
-    else {
-      throw new \RuntimeException(String::format('Entity type %entity_type does not support automatic schema installation.', array(
-        '%entity-type' => $entity_type_id,
+        '%tables' => '{' . implode('}, {', $table_mapping->getTableNames()) . '}',
       )));
     }
   }

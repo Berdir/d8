@@ -12,7 +12,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\field\FieldException;
+use Drupal\Core\Field\FieldException;
 use Drupal\field\FieldStorageConfigInterface;
 
 /**
@@ -227,7 +227,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   /**
    * Overrides \Drupal\Core\Entity\Entity::preSave().
    *
-   * @throws \Drupal\field\FieldException
+   * @throws \Drupal\Core\FieldException
    *   If the field definition is invalid.
    * @throws \Drupal\Core\Entity\EntityStorageException
    *   In case of failures at the configuration storage level.
@@ -254,7 +254,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The entity storage.
    *
-   * @throws \Drupal\field\FieldException If the field definition is invalid.
+   * @throws \Drupal\Core\FieldException If the field definition is invalid.
    */
    protected function preSaveNew(EntityStorageInterface $storage) {
     $entity_manager = \Drupal::entityManager();
@@ -432,11 +432,6 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
         'foreign keys' => array(),
       );
 
-      // Check that the schema does not include forbidden column names.
-      if (array_intersect(array_keys($schema['columns']), static::getReservedColumns())) {
-        throw new FieldException(String::format('Illegal field type @field_type on @field_name.', array('@field_type' => $this->type, '@field_name' => $this->name)));
-      }
-
       // Merge custom indexes with those specified by the field type. Custom
       // indexes prevail.
       $schema['indexes'] = $this->indexes + $schema['indexes'];
@@ -613,15 +608,6 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    */
   public function isQueryable() {
     return TRUE;
-  }
-
-  /**
-   * A list of columns that can not be used as field type columns.
-   *
-   * @return array
-   */
-  public static function getReservedColumns() {
-    return array('deleted');
   }
 
   /**

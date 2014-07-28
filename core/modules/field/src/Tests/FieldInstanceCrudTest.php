@@ -10,7 +10,7 @@ namespace Drupal\field\Tests;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldInstanceConfig;
-use Drupal\field\FieldException;
+use Drupal\Core\Field\FieldException;
 
 /**
  * Create field entities by attaching fields to entities.

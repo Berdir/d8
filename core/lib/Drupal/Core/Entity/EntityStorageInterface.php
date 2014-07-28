@@ -33,6 +33,14 @@ interface EntityStorageInterface {
   const FIELD_LOAD_REVISION = 'FIELD_LOAD_REVISION';
 
   /**
+   * Checks whether the storage contains at least one entity.
+   *
+   * @return bool
+   *   TRUE if the storage has data, FALSE otherwise.
+   */
+  public function hasData();
+
+  /**
    * Resets the internal, static entity cache.
    *
    * @param $ids
@@ -187,5 +195,23 @@ interface EntityStorageInterface {
    *   Entity type definition.
    */
   public function getEntityType();
+
+  /**
+   * Reacts to the creation of the entity type definition.
+   */
+  public function onEntityDefinitionCreate();
+
+  /**
+   * Reacts to the update of the entity type definition.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   *   The original entity type definition.
+   */
+  public function onEntityDefinitionUpdate(EntityTypeInterface $original);
+
+  /**
+   * Reacts to the deletion of the entity type definition.
+   */
+  public function onEntityDefinitionDelete();
 
 }
