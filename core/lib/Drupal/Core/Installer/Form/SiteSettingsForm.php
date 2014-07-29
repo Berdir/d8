@@ -102,7 +102,7 @@ class SiteSettingsForm extends FormBase {
         array('driver'),
         array($default_driver),
       ),
-      '#submit' => array(array($this, 'submitForm')),
+      '#submit' => array('submitForm'),
     );
 
     $form['errors'] = array();

@@ -41,7 +41,7 @@ class AjaxTestDialogForm extends FormBase {
       '#name' => 'button1',
       '#value' => 'Button 1 (modal)',
       '#ajax' => array(
-        'callback' => array($this, 'modal'),
+        'callback' => 'modal',
       ),
     );
     $form['button2'] = array(
@@ -49,7 +49,7 @@ class AjaxTestDialogForm extends FormBase {
       '#name' => 'button2',
       '#value' => 'Button 2 (non-modal)',
       '#ajax' => array(
-        'callback' => array($this, 'nonModal'),
+        'callback' => 'nonModal',
       ),
     );
 

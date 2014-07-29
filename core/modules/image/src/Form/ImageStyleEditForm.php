@@ -145,8 +145,8 @@ class ImageStyleEditForm extends ImageStyleFormBase {
     $form['effects']['new']['add'] = array(
       '#type' => 'submit',
       '#value' => $this->t('Add'),
-      '#validate' => array(array($this, 'effectValidate')),
-      '#submit' => array(array($this, 'effectSave')),
+      '#validate' => array('effectValidate'),
+      '#submit' => array('effectSave'),
     );
 
     return parent::form($form, $form_state);

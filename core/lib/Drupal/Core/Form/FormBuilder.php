@@ -134,6 +134,26 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
   }
 
   /**
+   * Converts support notations for a form callback to a valid callable.
+   *
+   * Specifically, supports that methods on the form/callback object as strings.
+   *
+   * @param string|array $callback
+   *   The callback.
+   * @param array $form_state
+   *   Form state.
+   *
+   * @return array|string
+   *   A valid callable.
+   */
+  public static function processCallback($callback, array &$form_state) {
+    if (is_string($callback) && method_exists($form_state['build_info']['callback_object'], $callback)) {
+      $callback = array($form_state['build_info']['callback_object'], $callback);
+    }
+    return $callback;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getFormId($form_arg, &$form_state) {
@@ -691,8 +711,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
     $form += $this->getElementInfo('form');
     $form += array('#tree' => FALSE, '#parents' => array());
-    $form['#validate'][] = array($form_state['build_info']['callback_object'], 'validateForm');
-    $form['#submit'][] = array($form_state['build_info']['callback_object'], 'submitForm');
+    $form['#validate'][] = 'validateForm';
+    $form['#submit'][] = 'submitForm';
 
     // If no #theme has been set, automatically apply theme suggestions.
     // theme_form() itself is in #theme_wrappers and not #theme. Therefore, the
@@ -859,6 +879,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // checkboxes and files.
     if (isset($element['#process']) && !$element['#processed']) {
       foreach ($element['#process'] as $process) {
+        $process = self::processCallback($process, $form_state);
         $element = call_user_func_array($process, array(&$element, &$form_state, &$form_state['complete_form']));
       }
       $element['#processed'] = TRUE;

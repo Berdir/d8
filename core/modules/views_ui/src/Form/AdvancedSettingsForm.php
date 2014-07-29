@@ -45,7 +45,7 @@ class AdvancedSettingsForm extends ConfigFormBase {
     $form['cache']['clear_cache'] = array(
       '#type' => 'submit',
       '#value' => $this->t("Clear Views' cache"),
-      '#submit' => array(array($this, 'cacheSubmit')),
+      '#submit' => array('cacheSubmit'),
     );
 
     $form['debug'] = array(

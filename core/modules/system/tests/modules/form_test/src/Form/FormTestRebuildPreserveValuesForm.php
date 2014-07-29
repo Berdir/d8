@@ -52,7 +52,7 @@ class FormTestRebuildPreserveValuesForm extends FormBase {
       $form['add_more'] = array(
         '#type' => 'submit',
         '#value' => 'Add more',
-        '#submit' => array(array($this, 'addMoreSubmitForm')),
+        '#submit' => array('addMoreSubmitForm'),
       );
     }
     else {

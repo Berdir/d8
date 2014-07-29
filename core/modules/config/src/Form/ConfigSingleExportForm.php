@@ -93,7 +93,7 @@ class ConfigSingleExportForm extends FormBase {
       '#options' => $config_types,
       '#default_value' => $config_type,
       '#ajax' => array(
-        'callback' => array($this, 'updateConfigurationType'),
+        'callback' => 'updateConfigurationType',
         'wrapper' => 'edit-config-type-wrapper',
       ),
     );
@@ -107,7 +107,7 @@ class ConfigSingleExportForm extends FormBase {
       '#prefix' => '<div id="edit-config-type-wrapper">',
       '#suffix' => '</div>',
       '#ajax' => array(
-        'callback' => array($this, 'updateExport'),
+        'callback' => 'updateExport',
         'wrapper' => 'edit-export-wrapper',
       ),
     );

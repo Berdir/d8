@@ -182,7 +182,7 @@ class MenuForm extends EntityForm {
     // submit button has custom submit handlers.
     if ($this->moduleHandler->moduleExists('language')) {
       array_unshift($actions['submit']['#submit'],'language_configuration_element_submit');
-      array_unshift($actions['submit']['#submit'], array($this, 'languageConfigurationSubmit'));
+      array_unshift($actions['submit']['#submit'], 'languageConfigurationSubmit');
     }
     // We cannot leverage the regular submit handler definition because we have
     // button-specific ones here. Hence we need to explicitly set it for the

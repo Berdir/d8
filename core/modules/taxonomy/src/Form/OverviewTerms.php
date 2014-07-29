@@ -336,7 +336,7 @@ class OverviewTerms extends FormBase {
       );
       $form['actions']['reset_alphabetical'] = array(
         '#type' => 'submit',
-        '#submit' => array(array($this, 'submitReset')),
+        '#submit' => array('submitReset'),
         '#value' => $this->t('Reset to alphabetical'),
       );
       $form_state['redirect'] = array(current_path(), ($page ? array('query' => array('page' => $page)) : array()));

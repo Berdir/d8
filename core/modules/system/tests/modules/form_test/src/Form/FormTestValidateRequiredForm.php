@@ -26,7 +26,7 @@ class FormTestValidateRequiredForm extends FormBase {
    */
   public function buildForm(array $form, array &$form_state) {
     $options = array('foo' => 'foo', 'bar' => 'bar');
-    $validate = array(array($this, 'elementValidateRequired'));
+    $validate = array('elementValidateRequired');
 
     $form['textfield'] = array(
       '#type' => 'textfield',

@@ -156,7 +156,7 @@ class FieldInstanceEditForm extends FormBase {
     $form['actions']['delete'] = array(
       '#type' => 'submit',
       '#value' => $this->t('Delete field'),
-      '#submit' => array(array($this, 'delete')),
+      '#submit' => array('delete'),
     );
     return $form;
   }
