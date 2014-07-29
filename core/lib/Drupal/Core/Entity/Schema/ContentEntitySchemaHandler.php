@@ -510,8 +510,12 @@ class ContentEntitySchemaHandler implements ContentEntitySchemaHandlerInterface 
     foreach ($table_mapping->getTableNames() as $table_name) {
       foreach ($table_mapping->getFieldNames($table_name) as $field_name) {
         if ($field_name == $created_field_name) {
-          foreach ($schema['fields'] as $column_name => $specifier) {
-            $this->database->schema()->addField($table_name, $column_name, $specifier, $keys);
+          foreach ($schema['fields'] as $column_name => $spec) {
+            // Support an initial value for new fields.
+            if ($initial = $storage_definition->getSetting('initial')) {
+              $spec['initial'] = $initial;
+            }
+            $this->database->schema()->addField($table_name, $column_name, $spec, $keys);
           }
           // After creating the field schema skip to the next table.
           break;
