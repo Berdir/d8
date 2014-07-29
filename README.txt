@@ -1,3 +1,16 @@
+NEW BRANCH!
+-----------
+
+Drupal 8 now uses semantic versioning. If you are using Git, run
+
+$ git checkout 8.0.x
+
+If you download packaged archives, the new files are at
+https://www.drupal.org/node/2311847
+
+For more information about semantic versioning for Drupal core, see
+https://www.drupal.org/node/586146
+
 
 CONTENTS OF THIS FILE
 ---------------------
