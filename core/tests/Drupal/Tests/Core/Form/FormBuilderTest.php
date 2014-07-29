@@ -8,7 +8,8 @@
 namespace Drupal\Tests\Core\Form {
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Form\FormInterface;
+  use Drupal\Core\Form\FormBuilder;
+  use Drupal\Core\Form\FormInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -420,6 +421,47 @@ class FormBuilderTest extends FormTestBase {
     $form_state = array();
     $form = $this->simulateFormSubmission($form_id, $form_arg, $form_state);
     $this->assertSame("$form_id--2", $form['#id']);
+  }
+
+  /**
+   * @covers ::processCallback()
+   */
+  public function testProcessCallbackValidMethod() {
+    $form_state = array(
+      'build_info' => array(
+        'callback_object' => new TestForm(),
+      )
+    );
+    $processed_callback = FormBuilder::processCallback('buildForm', $form_state);
+    $this->assertEquals(array($form_state['build_info']['callback_object'], 'buildForm'), $processed_callback);
+  }
+
+  /**
+   * @covers ::processCallback()
+   */
+  public function testProcessCallbackInValidMethod() {
+    $form_state = array(
+      'build_info' => array(
+        'callback_object' => new TestForm(),
+      )
+    );
+    $processed_callback = FormBuilder::processCallback('not_a_method', $form_state);
+    // The callback was not changed as no such method exists.
+    $this->assertEquals('not_a_method', $processed_callback);
+  }
+
+  /**
+   * @covers ::processCallback()
+   */
+  public function testProcessCallbackArray() {
+    $form_state = array(
+      'build_info' => array(
+        'callback_object' => new TestForm(),
+      )
+    );
+    $callback = array($form_state['build_info']['callback_object'], 'buildForm');
+    $processed_callback = FormBuilder::processCallback('buildForm', $form_state);
+    $this->assertEquals($callback, $processed_callback);
   }
 
 }
