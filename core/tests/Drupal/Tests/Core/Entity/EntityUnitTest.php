@@ -257,6 +257,7 @@ class EntityUnitTest extends UnitTestCase {
       ->getMock();
     $this->entityType->setClass(get_class($this->entity));
 
+    $this->entityManager = $this->getMock('\Drupal\Core\Entity\EntityManagerInterface', array('getDefinitions'));
     $this->entityManager->expects($this->once())
       ->method('getDefinitions')
       ->will($this->returnValue(array($this->entityTypeId => $this->entityType)));

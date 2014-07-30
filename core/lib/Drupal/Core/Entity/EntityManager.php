@@ -11,6 +11,8 @@ use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\String;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
+use Drupal\Core\Entity\Exception\AmbiguousEntityClassException;
+use Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -135,6 +137,13 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
   protected $fieldMap = array();
 
   /**
+   * Contains cached mappings of class names to entity types.
+   *
+   * @var array
+   */
+  protected $classNameEntityTypeMap = array();
+
+  /**
    * Constructs a new Entity plugin manager.
    *
    * @param \Traversable $namespaces
@@ -170,6 +179,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     parent::clearCachedDefinitions();
     $this->clearCachedBundles();
     $this->clearCachedFieldDefinitions();
+    $this->classNameEntityTypeMap = array();
   }
 
   /**
@@ -901,6 +911,58 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     $entities = $this->getStorage($entity_type_id)->loadByProperties(array($uuid_key => $uuid));
 
     return reset($entities);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityTypeFromClass($class_name) {
+
+    // Check the already calculated classes first.
+    if (isset($this->classNameEntityTypeMap[$class_name])) {
+      return $this->classNameEntityTypeMap[$class_name];
+    }
+
+    $subclasses = 0;
+    $same_class = 0;
+    $entity_type_id = NULL;
+    $subclass_entity_type_id = NULL;
+    foreach ($this->getDefinitions() as $entity_type) {
+      // Check if this is the same class, throw an exception if there is more
+      // than one match.
+      if ($entity_type->getClass() == $class_name) {
+        $entity_type_id = $entity_type->id();
+        if ($same_class++) {
+          throw new AmbiguousEntityClassException($class_name);
+        }
+      }
+      // Check for entity types that are subclasses of the called class. Do not
+      // immediately throw an exception if there is more than one, as multiple
+      // subclasses are OK as long as there is an exact match.
+      elseif (is_subclass_of($entity_type->getClass(), $class_name)) {
+        $subclass_entity_type_id = $entity_type->id();
+        $subclasses++;
+      }
+    }
+
+    // Return the matching entity type ID or the subclass match if there is one
+    // as a secondary priority.
+    if ($entity_type_id) {
+      $this->classNameEntityTypeMap[$class_name] = $entity_type_id;
+      return $entity_type_id;
+    }
+
+    // If there is no exact match, throw an exception if there is more than
+    // one matching subclass.
+    if ($subclasses > 1) {
+      throw new AmbiguousEntityClassException($class_name);
+    }
+
+    if ($subclass_entity_type_id) {
+      $this->classNameEntityTypeMap[$class_name] = $subclass_entity_type_id;
+      return $subclass_entity_type_id;
+    }
+    throw new NoCorrespondingEntityClassException($class_name);
   }
 
 }
