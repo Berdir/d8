@@ -8,10 +8,12 @@
 namespace Drupal\taxonomy\Tests;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Tests a taxonomy term reference field that allows multiple vocabularies.
+ *
+ * @group taxonomy
  */
 class TermFieldMultipleVocabularyTest extends TaxonomyTestBase {
 
@@ -25,14 +27,6 @@ class TermFieldMultipleVocabularyTest extends TaxonomyTestBase {
   protected $vocabulary1;
   protected $vocabulary2;
 
-  public static function getInfo() {
-    return array(
-      'name' => 'Multiple vocabulary term reference field',
-      'description' => 'Tests term reference fields that allow multiple vocabularies.',
-      'group' => 'Taxonomy',
-    );
-  }
-
   function setUp() {
     parent::setUp();
 
@@ -43,7 +37,7 @@ class TermFieldMultipleVocabularyTest extends TaxonomyTestBase {
 
     // Set up a field and instance.
     $this->field_name = drupal_strtolower($this->randomName());
-    entity_create('field_config', array(
+    entity_create('field_storage_config', array(
       'name' => $this->field_name,
       'entity_type' => 'entity_test',
       'type' => 'taxonomy_term_reference',
@@ -122,9 +116,9 @@ class TermFieldMultipleVocabularyTest extends TaxonomyTestBase {
     $this->assertText($term1->getName(), 'Term 1 name is displayed.');
     $this->assertNoText($term2->getName(), 'Term 2 name is not displayed.');
 
-    // Verify that field and instance settings are correct.
-    $field = FieldConfig::loadByName('entity_test', $this->field_name);
-    $this->assertEqual(count($field->getSetting('allowed_values')), 1, 'Only one vocabulary is allowed for the field.');
+    // Verify that field storage and instance settings are correct.
+    $field_storage = FieldStorageConfig::loadByName('entity_test', $this->field_name);
+    $this->assertEqual(count($field_storage->getSetting('allowed_values')), 1, 'Only one vocabulary is allowed for the field.');
 
     // The widget should still be displayed.
     $this->drupalGet('entity_test/add');

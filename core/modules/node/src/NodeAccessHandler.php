@@ -61,10 +61,12 @@ class NodeAccessHandler extends EntityAccessHandler implements NodeAccessHandler
    * {@inheritdoc}
    */
   public function access(EntityInterface $entity, $operation, $langcode = LanguageInterface::LANGCODE_DEFAULT, AccountInterface $account = NULL) {
-    if (user_access('bypass node access', $account)) {
+    $account = $this->prepareUser($account);
+
+    if ($account->hasPermission('bypass node access')) {
       return TRUE;
     }
-    if (!user_access('access content', $account)) {
+    if (!$account->hasPermission('access content')) {
       return FALSE;
     }
     return parent::access($entity, $operation, $langcode, $account);
@@ -76,10 +78,10 @@ class NodeAccessHandler extends EntityAccessHandler implements NodeAccessHandler
   public function createAccess($entity_bundle = NULL, AccountInterface $account = NULL, array $context = array()) {
     $account = $this->prepareUser($account);
 
-    if (user_access('bypass node access', $account)) {
+    if ($account->hasPermission('bypass node access')) {
       return TRUE;
     }
-    if (!user_access('access content', $account)) {
+    if (!$account->hasPermission('access content')) {
       return FALSE;
     }
 
@@ -98,7 +100,7 @@ class NodeAccessHandler extends EntityAccessHandler implements NodeAccessHandler
     $uid = $translation->getOwnerId();
 
     // Check if authors can view their own unpublished nodes.
-    if ($operation === 'view' && !$status && user_access('view own unpublished content', $account)) {
+    if ($operation === 'view' && !$status && $account->hasPermission('view own unpublished content')) {
 
       if ($account->id() != 0 && $account->id() == $uid) {
         return TRUE;
@@ -124,7 +126,7 @@ class NodeAccessHandler extends EntityAccessHandler implements NodeAccessHandler
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
     $configured_types = node_permissions_get_configured_types();
     if (isset($configured_types[$entity_bundle])) {
-      return user_access('create ' . $entity_bundle . ' content', $account);
+      return $account->hasPermission('create ' . $entity_bundle . ' content');
     }
   }
 

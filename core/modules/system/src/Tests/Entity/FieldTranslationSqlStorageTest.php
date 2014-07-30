@@ -10,20 +10,14 @@ namespace Drupal\system\Tests\Entity;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityDatabaseStorage;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
- * Tests entity translation.
+ * Tests Field translation SQL Storage.
+ *
+ * @group Entity
  */
 class FieldTranslationSqlStorageTest extends EntityLanguageTestBase {
-
-  public static function getInfo() {
-    return array(
-      'name'  => 'Field translation SQL storage tests',
-      'description'  => "Test Field translation SQL Storage.",
-      'group' => 'Entity API'
-    );
-  }
 
   /**
    * Tests field SQL storage.
@@ -91,10 +85,10 @@ class FieldTranslationSqlStorageTest extends EntityLanguageTestBase {
     $fields = array($this->field_name, $this->untranslatable_field_name);
 
     foreach ($fields as $field_name) {
-      $field = FieldConfig::loadByName($entity_type, $field_name);
+      $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
       $tables = array(
-        ContentEntityDatabaseStorage::_fieldTableName($field),
-        ContentEntityDatabaseStorage::_fieldRevisionTableName($field),
+        ContentEntityDatabaseStorage::_fieldTableName($field_storage),
+        ContentEntityDatabaseStorage::_fieldRevisionTableName($field_storage),
       );
 
       foreach ($tables as $table) {

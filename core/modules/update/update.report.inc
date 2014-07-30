@@ -5,6 +5,7 @@
  * Code required only when rendering the available updates report.
  */
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\String;
 
 /**
@@ -27,8 +28,12 @@ function theme_update_report($variables) {
   $output = drupal_render($update_last_check);
 
   if (!is_array($data)) {
+    // @todo When converting this theme function to Twig, double-check with the
+    //   caller to ensure $data is not double-escaped. At present, we cannot
+    //   guarantee within this function that it is safe. Address in:
+    //   https://www.drupal.org/node/1898466
     $output .= '<p>' . $data . '</p>';
-    return $output;
+    return SafeMarkup::set($output);
   }
 
   $header = array();
@@ -48,28 +53,28 @@ function theme_update_report($variables) {
       case UPDATE_CURRENT:
         $class = 'ok';
         $uri = 'core/misc/icons/73b355/check.png';
-        $text = t('ok');
+        $text = t('Ok');
         break;
       case UPDATE_UNKNOWN:
       case UPDATE_FETCH_PENDING:
       case UPDATE_NOT_FETCHED:
         $class = 'unknown';
         $uri = 'core/misc/icons/e29700/warning.png';
-        $text = t('warning');
+        $text = t('Warning');
         break;
       case UPDATE_NOT_SECURE:
       case UPDATE_REVOKED:
       case UPDATE_NOT_SUPPORTED:
         $class = 'error';
         $uri = 'core/misc/icons/ea2800/error.png';
-        $text = t('error');
+        $text = t('Error');
         break;
       case UPDATE_NOT_CHECKED:
       case UPDATE_NOT_CURRENT:
       default:
         $class = 'warning';
         $uri = 'core/misc/icons/e29700/warning.png';
-        $text = t('warning');
+        $text = t('Warning');
         break;
     }
 
@@ -269,7 +274,7 @@ function theme_update_report($variables) {
     $row_key = isset($project['title']) ? drupal_strtolower($project['title']) : drupal_strtolower($project['name']);
     $rows[$project['project_type']][$row_key] = array(
       'class' => array($class),
-      'data' => array($row),
+      'data' => array(SafeMarkup::set($row)),
     );
   }
 
@@ -305,7 +310,7 @@ function theme_update_report($variables) {
   );
   drupal_render($assets);
 
-  return $output;
+  return SafeMarkup::set($output);
 }
 
 /**

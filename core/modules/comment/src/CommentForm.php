@@ -206,14 +206,6 @@ class CommentForm extends ContentEntityForm {
       '#access' => $is_admin,
     );
 
-    $form['subject'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Subject'),
-      '#maxlength' => 64,
-      '#default_value' => $comment->getSubject(),
-      '#access' => $field_definition->getSetting('subject'),
-    );
-
     // Used for conditional validation of author fields.
     $form['is_anonymous'] = array(
       '#type' => 'value',
@@ -396,7 +388,7 @@ class CommentForm extends ContentEntityForm {
       $query = array();
       // Find the current display page for this comment.
       $field_definition = $this->entityManager->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle())[$field_name];
-      $page = comment_get_display_page($comment->id(), $field_definition);
+      $page = $this->entityManager->getStorage('comment')->getDisplayOrdinal($comment, $field_definition->getSetting('default_mode'), $field_definition->getSetting('per_page'));
       if ($page > 0) {
         $query['page'] = $page;
       }

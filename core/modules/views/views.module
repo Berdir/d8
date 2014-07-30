@@ -120,7 +120,7 @@ function views_theme($existing, $type, $theme, $path) {
 
   // Our extra version of pager from pager.inc
   $hooks['views_mini_pager'] = $base + array(
-    'variables' => array('tags' => array(), 'quantity' => 10, 'element' => 0, 'parameters' => array()),
+    'variables' => array('tags' => array(), 'quantity' => 9, 'element' => 0, 'parameters' => array()),
     'template' => 'views-mini-pager',
   );
 
@@ -134,7 +134,7 @@ function views_theme($existing, $type, $theme, $path) {
     'exposed_form' => array('view' => NULL, 'options' => NULL),
     'pager' => array(
       'view' => NULL, 'options' => NULL,
-      'tags' => array(), 'quantity' => 10, 'element' => 0, 'parameters' => array()
+      'tags' => array(), 'quantity' => 9, 'element' => 0, 'parameters' => array()
     ),
   );
 
@@ -305,23 +305,6 @@ function views_permission() {
 }
 
 /**
- * Implements hook_menu_link_defaults_alter().
- */
-function views_menu_link_defaults_alter(array &$links) {
-  // @todo Decide what to do with all the crazy logic in views_menu_alter() in
-  // https://drupal.org/node/2107533.
-  $views = Views::getApplicableViews('uses_hook_menu');
-  foreach ($views as $data) {
-    /** @var \Drupal\views\ViewExecutable $view */
-    list($view, $display_id) = $data;
-    $result = $view->executeHookMenuLinkDefaults($display_id, $links);
-    foreach ($result as $link_id => $link) {
-      $links[$link_id] = $link;
-    }
-  }
-}
-
-/**
  * Implements hook_page_alter().
  */
 function views_page_alter(&$page) {
@@ -338,7 +321,7 @@ function views_page_alter(&$page) {
  */
 function views_preprocess_page(&$variables) {
   // Early-return to prevent adding unnecessary JavaScript.
-  if (!user_access('access contextual links')) {
+  if (!\Drupal::currentUser()->hasPermission('access contextual links')) {
     return;
   }
 
@@ -663,27 +646,6 @@ function views_hook_info() {
 }
 
 /**
- * Fetch a list of all base tables available
- *
- * @param $type
- *   Either 'display', 'style' or 'row'
- * @param $key
- *   For style plugins, this is an optional type to restrict to. May be 'normal',
- *   'summary', 'feed' or others based on the neds of the display.
- * @param $base
- *   An array of possible base tables.
- *
- * @return
- *   A keyed array of in the form of 'base_table' => 'Description'.
- *
- * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\views\Views::fetchPluginNames().
- */
-function views_fetch_plugin_names($type, $key = NULL, $base = array()) {
-  return Views::fetchPluginNames($type, $key, $base);
-}
-
-/**
  * Gets all the views plugin definitions.
  *
  * @return array
@@ -694,25 +656,6 @@ function views_fetch_plugin_names($type, $key = NULL, $base = array()) {
  */
 function views_get_plugin_definitions() {
   return Views::getPluginDefinitions();
-}
-
-/**
- * Returns a list of plugins and metadata about them.
- *
- * @return array
- *   An array keyed by PLUGIN_TYPE:PLUGIN_NAME, like 'display:page' or
- *   'pager:full', containing an array with the following keys:
- *   - title: The plugin's title.
- *   - type: The plugin type.
- *   - module: The module providing the plugin.
- *   - views: An array of enabled Views that are currently using this plugin,
- *     keyed by machine name.
- *
- * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal\views\Views::pluginList().
- */
-function views_plugin_list() {
-  return Views::pluginList();
 }
 
 /**
@@ -1047,22 +990,6 @@ function views_get_view_result($name, $display_id = NULL) {
   else {
     return array();
   }
-}
-
-/**
- * #process callback to see if we need to String::checkPlain() the options.
- *
- * Since FAPI is inconsistent, the #options are sanitized for you in all cases
- * _except_ checkboxes. We have form elements that are sometimes 'select' and
- * sometimes 'checkboxes', so we need decide late in the form rendering cycle
- * if the options need to be sanitized before they're rendered. This callback
- * inspects the type, and if it's still 'checkboxes', does the sanitation.
- */
-function views_process_check_options($element, &$form_state) {
-  if ($element['#type'] == 'checkboxes' || $element['#type'] == 'checkbox') {
-    $element['#options'] = array_map('\Drupal\Component\Utility\String::checkPlain', $element['#options']);
-  }
-  return $element;
 }
 
 /**

@@ -226,6 +226,7 @@ class DisplayOverview extends DisplayOverviewBase {
       'above' => $this->t('Above'),
       'inline' => $this->t('Inline'),
       'hidden' => '- ' . $this->t('Hidden') . ' -',
+      'visually_hidden' => '- ' . $this->t('Visually Hidden') . ' -',
     );
   }
 

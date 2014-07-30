@@ -68,7 +68,7 @@ class OpmlFeedAdd extends FormBase {
    */
   public function buildForm(array $form, array &$form_state) {
     $intervals = array(900, 1800, 3600, 7200, 10800, 21600, 32400, 43200, 64800, 86400, 172800, 259200, 604800, 1209600, 2419200);
-    $period = array_map('format_interval', array_combine($intervals, $intervals));
+    $period = array_map(array(\Drupal::service('date'), 'formatInterval'), array_combine($intervals, $intervals));
 
     $form['upload'] = array(
       '#type' => 'file',
@@ -86,7 +86,7 @@ class OpmlFeedAdd extends FormBase {
       '#title' => $this->t('Update interval'),
       '#default_value' => 3600,
       '#options' => $period,
-      '#description' => $this->t('The length of time between feed updates. Requires a correctly configured <a href="@cron">cron maintenance task</a>.', array('@cron' => url('admin/reports/status'))),
+      '#description' => $this->t('The length of time between feed updates. Requires a correctly configured <a href="@cron">cron maintenance task</a>.', array('@cron' => $this->url('system.status'))),
     );
 
     $form['actions'] = array('#type' => 'actions');

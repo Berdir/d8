@@ -13,6 +13,8 @@ use Drupal\simpletest\KernelTestBase;
 
 /**
  * Tests the block config schema.
+ *
+ * @group block
  */
 class BlockConfigSchemaTest extends KernelTestBase {
 
@@ -21,7 +23,17 @@ class BlockConfigSchemaTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = array('block', 'aggregator', 'book', 'block_content', 'forum', 'node', 'statistics', 'taxonomy');
+  public static $modules = array(
+    'block',
+    'aggregator',
+    'book',
+    'block_content',
+    'comment',
+    'forum',
+    'node',
+    'statistics',
+    'taxonomy',
+  );
 
   /**
    * The typed config manager.
@@ -36,17 +48,6 @@ class BlockConfigSchemaTest extends KernelTestBase {
    * @var \Drupal\block\BlockManagerInterface
    */
   protected $blockManager;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Block config schema',
-      'description' => '',
-      'group' => 'Block',
-    );
-  }
 
   /**
    * {@inheritdoc}

@@ -12,6 +12,8 @@ use Drupal\content_translation\Tests\ContentTranslationUITest;
 
 /**
  * Tests the Node Translation UI.
+ *
+ * @group node
  */
 class NodeTranslationUITest extends ContentTranslationUITest {
 
@@ -28,14 +30,6 @@ class NodeTranslationUITest extends ContentTranslationUITest {
    * @var string
    */
   protected $profile = 'standard';
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Node translation UI',
-      'description' => 'Tests the node translation UI.',
-      'group' => 'Node',
-    );
-  }
 
   function setUp() {
     $this->entityTypeId = 'node';
@@ -177,22 +171,6 @@ class NodeTranslationUITest extends ContentTranslationUITest {
       $this->assertEqual($translation->isSticky(), $values[$langcode]['sticky'], 'Sticky of Translation correctly stored.');
       $this->assertEqual($translation->isPromoted(), $values[$langcode]['promote'], 'Promoted of Translation correctly stored.');
     }
-  }
-
-  /**
-   * Tests translate link on content admin page.
-   */
-  function testTranslateLinkContentAdminPage() {
-    $this->drupalLogin($this->administrator);
-
-    $page = $this->drupalCreateNode(array('type' => 'page'));
-    $article = $this->drupalCreateNode(array('type' => 'article', 'langcode' => $this->langcodes[0]));
-
-    // Verify translation links.
-    $this->drupalGet('admin/content');
-    $this->assertResponse(200);
-    $this->assertLinkByHref('node/' . $article->id() . '/translations');
-    $this->assertNoLinkByHref('node/' . $page->id() . '/translations');
   }
 
   /**

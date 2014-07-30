@@ -13,7 +13,9 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Tests\FieldUnitTestBase;
 
 /**
- * Tests the new entity API for the image field type.
+ * Tests using entity fields of the image field type.
+ *
+ * @group image
  */
 class ImageItemTest extends FieldUnitTestBase {
 
@@ -36,21 +38,13 @@ class ImageItemTest extends FieldUnitTestBase {
    */
   protected $imageFactory;
 
-  public static function getInfo() {
-    return array(
-      'name' => 'Image field item API',
-      'description' => 'Tests using entity fields of the image field type.',
-      'group' => 'Image',
-    );
-  }
-
   public function setUp() {
     parent::setUp();
 
     $this->installEntitySchema('file');
     $this->installSchema('file', array('file_usage'));
 
-    entity_create('field_config', array(
+    entity_create('field_storage_config', array(
       'name' => 'image_test',
       'entity_type' => 'entity_test',
       'type' => 'image',

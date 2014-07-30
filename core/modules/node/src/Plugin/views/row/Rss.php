@@ -7,6 +7,7 @@
 
 namespace Drupal\node\Plugin\views\row;
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\String;
 use Drupal\views\Plugin\views\row\RowPluginBase;
 
@@ -37,7 +38,7 @@ class Rss extends RowPluginBase {
   protected function defineOptions() {
     $options = parent::defineOptions();
 
-    $options['item_length'] = array('default' => 'default');
+    $options['view_mode'] = array('default' => 'default');
     $options['links'] = array('default' => FALSE, 'bool' => TRUE);
 
     return $options;
@@ -46,11 +47,11 @@ class Rss extends RowPluginBase {
   public function buildOptionsForm(&$form, &$form_state) {
     parent::buildOptionsForm($form, $form_state);
 
-    $form['item_length'] = array(
+    $form['view_mode'] = array(
       '#type' => 'select',
       '#title' => t('Display type'),
       '#options' => $this->buildOptionsForm_summary_options(),
-      '#default_value' => $this->options['item_length'],
+      '#default_value' => $this->options['view_mode'],
     );
     $form['links'] = array(
       '#type' => 'checkbox',
@@ -75,7 +76,7 @@ class Rss extends RowPluginBase {
 
   public function summaryTitle() {
     $options = $this->buildOptionsForm_summary_options();
-    return String::checkPlain($options[$this->options['item_length']]);
+    return String::checkPlain($options[$this->options['view_mode']]);
   }
 
   public function preRender($values) {
@@ -97,7 +98,7 @@ class Rss extends RowPluginBase {
       return;
     }
 
-    $display_mode = $this->options['item_length'];
+    $display_mode = $this->options['view_mode'];
     if ($display_mode == 'default') {
       $display_mode = \Drupal::config('system.rss')->get('items.view_mode');
     }
@@ -162,7 +163,7 @@ class Rss extends RowPluginBase {
     }
 
     $item = new \stdClass();
-    $item->description = $item_text;
+    $item->description = SafeMarkup::set($item_text);
     $item->title = $node->label();
     $item->link = $node->link;
     $item->elements = $node->rss_elements;

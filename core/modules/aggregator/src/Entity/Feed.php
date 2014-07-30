@@ -23,6 +23,7 @@ use Drupal\aggregator\FeedInterface;
  *   controllers = {
  *     "storage" = "Drupal\aggregator\FeedStorage",
  *     "view_builder" = "Drupal\aggregator\FeedViewBuilder",
+ *     "access" = "Drupal\aggregator\FeedAccessController",
  *     "form" = {
  *       "default" = "Drupal\aggregator\FeedForm",
  *       "delete" = "Drupal\aggregator\Form\FeedDeleteForm",
@@ -36,6 +37,7 @@ use Drupal\aggregator\FeedInterface;
  *   },
  *   base_table = "aggregator_feed",
  *   fieldable = TRUE,
+ *   render_cache = FALSE,
  *   entity_keys = {
  *     "id" = "fid",
  *     "label" = "title",
@@ -107,6 +109,7 @@ class Feed extends ContentEntityBase implements FeedInterface {
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
     if (\Drupal::moduleHandler()->moduleExists('block')) {
       // Make sure there are no active blocks for these feeds.
       $ids = \Drupal::entityQuery('block')
@@ -159,7 +162,7 @@ class Feed extends ContentEntityBase implements FeedInterface {
       ));
 
     $intervals = array(900, 1800, 3600, 7200, 10800, 21600, 32400, 43200, 64800, 86400, 172800, 259200, 604800, 1209600, 2419200);
-    $period = array_map('format_interval', array_combine($intervals, $intervals));
+    $period = array_map(array(\Drupal::service('date'), 'formatInterval'), array_combine($intervals, $intervals));
     $period[AGGREGATOR_CLEAR_NEVER] = t('Never');
 
     $fields['refresh'] = FieldDefinition::create('list_integer')

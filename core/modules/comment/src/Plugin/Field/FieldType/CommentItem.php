@@ -7,6 +7,7 @@
 
 namespace Drupal\comment\Plugin\Field\FieldType;
 
+use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\Entity\CommentType;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
@@ -40,11 +41,10 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
    */
   public static function defaultInstanceSettings() {
     return array(
-      'default_mode' => COMMENT_MODE_THREADED,
+      'default_mode' => CommentManagerInterface::COMMENT_MODE_THREADED,
       'per_page' => 50,
       'form_location' => COMMENT_FORM_BELOW,
       'anonymous' => COMMENT_ANONYMOUS_MAYNOT_CONTACT,
-      'subject' => 1,
       'preview' => DRUPAL_OPTIONAL,
     ) + parent::defaultInstanceSettings();
   }
@@ -141,11 +141,6 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
         COMMENT_ANONYMOUS_MUST_CONTACT => t('Anonymous posters must leave their contact information'),
       ),
       '#access' => $anonymous_user->hasPermission('post comments'),
-    );
-    $element['comment']['subject'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Allow comment title'),
-      '#default_value' => $settings['subject'],
     );
     $element['comment']['form_location'] = array(
       '#type' => 'checkbox',

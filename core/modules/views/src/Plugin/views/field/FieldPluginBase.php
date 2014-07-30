@@ -8,6 +8,7 @@
 namespace Drupal\views\Plugin\views\field;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Component\Utility\Xss;
@@ -24,7 +25,7 @@ use Drupal\views\ViewExecutable;
  * Field handlers handle both querying and display of fields in views.
  *
  * Field handler plugins extend
- * \Drupal\views\Plugin\views\field\FieldHandlerBase. They must be
+ * \Drupal\views\Plugin\views\field\FieldPluginBase. They must be
  * annotated with \Drupal\views\Annotation\ViewsField annotation, and they
  * must be in namespace directory Plugin\views\field.
  *
@@ -899,7 +900,7 @@ abstract class FieldPluginBase extends HandlerBase {
       $form['alter']['help'] = array(
         '#type' => 'details',
         '#title' => t('Replacement patterns'),
-        '#value' => $output,
+        '#value' => SafeMarkup::set($output),
         '#states' => array(
           'visible' => array(
             array(
@@ -946,7 +947,7 @@ abstract class FieldPluginBase extends HandlerBase {
 
       $form['alter']['ellipsis'] = array(
         '#type' => 'checkbox',
-        '#title' => t('Add "..." at the end of trimmed text'),
+        '#title' => t('Add "…" at the end of trimmed text'),
         '#default_value' => $this->options['alter']['ellipsis'],
         '#states' => array(
           'visible' => array(
@@ -1181,6 +1182,9 @@ abstract class FieldPluginBase extends HandlerBase {
         $this->last_render = $this->renderText($alter);
       }
     }
+    // @todo Fix this in https://www.drupal.org/node/2280961
+    $this->last_render = SafeMarkup::set($this->last_render);
+
 
     return $this->last_render;
   }
@@ -1655,7 +1659,7 @@ abstract class FieldPluginBase extends HandlerBase {
    *   The alter array of options to use.
    *     - max_length: Maximum length of the string, the rest gets truncated.
    *     - word_boundary: Trim only on a word boundary.
-   *     - ellipsis: Show an ellipsis (...) at the end of the trimmed string.
+   *     - ellipsis: Show an ellipsis (…) at the end of the trimmed string.
    *     - html: Make sure that the html is correct.
    *
    * @param string $value
@@ -1684,8 +1688,7 @@ abstract class FieldPluginBase extends HandlerBase {
       $value = rtrim(preg_replace('/(?:<(?!.+>)|&(?!.+;)).*$/us', '', $value));
 
       if (!empty($alter['ellipsis'])) {
-        // @todo: What about changing this to a real ellipsis?
-        $value .= t('...');
+        $value .= t('…');
       }
     }
     if (!empty($alter['html'])) {

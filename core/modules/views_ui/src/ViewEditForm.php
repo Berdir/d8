@@ -11,12 +11,13 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Datetime\Date as DateFormatter;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Render\Element;
 use Drupal\user\TempStoreFactory;
 use Drupal\views\Views;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -34,21 +35,31 @@ class ViewEditForm extends ViewFormBase {
   /**
    * The request object.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected $request;
+  protected $requestStack;
+
+  /**
+   * The date formatter service.
+   *
+   * @var \Drupal\Core\Datetime\Date
+   */
+  protected $dateFormatter;
 
   /**
    * Constructs a new ViewEditForm object.
    *
    * @param \Drupal\user\TempStoreFactory $temp_store_factory
    *   The factory for the temp store object.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request object.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack object.
+   * @param \Drupal\Core\Datetime\Date $date_formatter
+   *   The date Formatter service.
    */
-  public function __construct(TempStoreFactory $temp_store_factory, Request $request) {
+  public function __construct(TempStoreFactory $temp_store_factory, RequestStack $requestStack, DateFormatter $date_formatter) {
     $this->tempStore = $temp_store_factory->get('views');
-    $this->request = $request;
+    $this->requestStack = $requestStack;
+    $this->dateFormatter = $date_formatter;
   }
 
   /**
@@ -57,7 +68,8 @@ class ViewEditForm extends ViewFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('user.tempstore'),
-      $container->get('request')
+      $container->get('request_stack'),
+      $container->get('date')
     );
   }
 
@@ -125,7 +137,7 @@ class ViewEditForm extends ViewFormBase {
       );
       $lock_message_substitutions = array(
         '!user' => drupal_render($username),
-        '!age' => format_interval(REQUEST_TIME - $view->lock->updated),
+        '!age' => $this->dateFormatter->formatInterval(REQUEST_TIME - $view->lock->updated),
         '!break' => $view->url('break-lock'),
       );
       $form['locked'] = array(
@@ -292,7 +304,7 @@ class ViewEditForm extends ViewFormBase {
     $view->set('display', $displays);
 
     // @todo: Revisit this when http://drupal.org/node/1668866 is in.
-    $query = $this->request->query;
+    $query = $this->requestStack->getCurrentRequest()->query;
     $destination = $query->get('destination');
 
     if (!empty($destination)) {
@@ -765,7 +777,7 @@ class ViewEditForm extends ViewFormBase {
    * should not yet redirect to the destination.
    */
   public function submitDelayDestination($form, &$form_state) {
-    $query = $this->request->query;
+    $query = $this->requestStack->getCurrentRequest()->query;
     // @todo: Revisit this when http://drupal.org/node/1668866 is in.
     $destination = $query->get('destination');
     if (isset($destination) && $form_state['redirect'] !== FALSE) {

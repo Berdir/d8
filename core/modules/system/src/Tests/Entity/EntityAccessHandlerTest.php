@@ -14,16 +14,10 @@ use Drupal\Core\Entity\EntityAccessHandler;
 
 /**
  * Tests the entity access handler.
+ *
+ * @group Entity
  */
 class EntityAccessHandlerTest extends EntityLanguageTestBase  {
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Entity access',
-      'description' => 'Tests entity access.',
-      'group' => 'Entity API',
-    );
-  }
 
   function setUp() {
     parent::setUp();

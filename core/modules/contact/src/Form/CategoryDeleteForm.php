@@ -19,13 +19,13 @@ class CategoryDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return t('Are you sure you want to delete %name?', array('%name' => $this->entity->label()));
+    return $this->t('Are you sure you want to delete %name?', array('%name' => $this->entity->label()));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCancelRoute() {
+  public function getCancelUrl() {
     return new Url('contact.category_list');
   }
 
@@ -33,7 +33,7 @@ class CategoryDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getConfirmText() {
-    return t('Delete');
+    return $this->t('Delete');
   }
 
   /**
@@ -41,9 +41,9 @@ class CategoryDeleteForm extends EntityConfirmFormBase {
    */
   public function submit(array $form, array &$form_state) {
     $this->entity->delete();
-    drupal_set_message(t('Category %label has been deleted.', array('%label' => $this->entity->label())));
+    drupal_set_message($this->t('Category %label has been deleted.', array('%label' => $this->entity->label())));
     watchdog('contact', 'Category %label has been deleted.', array('%label' => $this->entity->label()), WATCHDOG_NOTICE);
-    $form_state['redirect_route'] = $this->getCancelRoute();
+    $form_state['redirect_route'] = $this->getCancelUrl();
   }
 
 }

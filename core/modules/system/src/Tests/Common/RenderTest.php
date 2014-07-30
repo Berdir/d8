@@ -13,7 +13,9 @@ use Drupal\Core\Render\Element;
 use Drupal\simpletest\DrupalUnitTestBase;
 
 /**
- * Tests drupal_render().
+ * Performs functional tests on drupal_render().
+ *
+ * @group Common
  */
 class RenderTest extends DrupalUnitTestBase {
 
@@ -23,14 +25,6 @@ class RenderTest extends DrupalUnitTestBase {
    * @var array
    */
   public static $modules = array('system', 'common_test');
-
-  public static function getInfo() {
-    return array(
-      'name' => 'drupal_render()',
-      'description' => 'Performs functional tests on drupal_render().',
-      'group' => 'Common',
-    );
-  }
 
   function setUp() {
     parent::setUp();
@@ -91,7 +85,7 @@ class RenderTest extends DrupalUnitTestBase {
           '#foo' => 'foo',
           '#bar' => 'bar',
           '#theme_wrappers' => array('container'),
-          '#attributes' => array('class' => 'baz'),
+          '#attributes' => array('class' => array('baz')),
         ),
         'expected' => '<div class="baz">foobar</div>' . "\n",
       ),
@@ -104,7 +98,7 @@ class RenderTest extends DrupalUnitTestBase {
           '#type' => 'link',
           '#theme_wrappers' => array(
             'container' => array(
-              '#attributes' => array('class' => 'baz'),
+              '#attributes' => array('class' => array('baz')),
             ),
           ),
           '#attributes' => array('id' => 'foo'),
@@ -123,7 +117,7 @@ class RenderTest extends DrupalUnitTestBase {
           '#title' => 'foo',
           '#theme_wrappers' => array(
             'container' => array(
-              '#attributes' => array('class' => 'baz'),
+              '#attributes' => array('class' => array('baz')),
             ),
           ),
         ),
@@ -134,10 +128,10 @@ class RenderTest extends DrupalUnitTestBase {
       array(
         'name' => 'Two #theme_wrappers container hooks with different attributes',
         'value' => array(
-          '#attributes' => array('class' => 'foo'),
+          '#attributes' => array('class' => array('foo')),
           '#theme_wrappers' => array(
             'container' => array(
-              '#attributes' => array('class' => 'bar'),
+              '#attributes' => array('class' => array('bar')),
             ),
             'container',
           ),
@@ -149,7 +143,7 @@ class RenderTest extends DrupalUnitTestBase {
         'name' => '#theme_wrappers implements an array style theme hook suggestion',
         'value' => array(
           '#theme_wrappers' => array(array('container')),
-          '#attributes' => array('class' => 'foo'),
+          '#attributes' => array('class' => array('foo')),
         ),
         'expected' => '<div class="foo"></div>' . "\n",
       ),

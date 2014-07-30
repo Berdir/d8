@@ -49,13 +49,6 @@ abstract class BlockBase extends ContextAwarePluginBase implements BlockPluginIn
   /**
    * {@inheritdoc}
    */
-  public static function contextDefinitions() {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function label() {
     if (!empty($this->configuration['label'])) {
       return $this->configuration['label'];
@@ -72,7 +65,6 @@ abstract class BlockBase extends ContextAwarePluginBase implements BlockPluginIn
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
     $this->setConfiguration($configuration);
   }
 
@@ -234,7 +226,7 @@ abstract class BlockBase extends ContextAwarePluginBase implements BlockPluginIn
     // Identical options to the ones for page caching.
     // @see \Drupal\system\Form\PerformanceForm::buildForm()
     $period = array(0, 60, 180, 300, 600, 900, 1800, 2700, 3600, 10800, 21600, 32400, 43200, 86400);
-    $period = array_map('format_interval', array_combine($period, $period));
+    $period = array_map(array(\Drupal::service('date'), 'formatInterval'), array_combine($period, $period));
     $period[0] = '<' . t('no caching') . '>';
     $period[\Drupal\Core\Cache\Cache::PERMANENT] = t('Forever');
     $form['cache'] = array(
@@ -344,6 +336,9 @@ abstract class BlockBase extends ContextAwarePluginBase implements BlockPluginIn
    * @see \Drupal\block\BlockBase::blockValidate()
    */
   public function validateConfigurationForm(array &$form, array &$form_state) {
+    // Remove the admin_label form item element value so it will not persist.
+    unset($form_state['values']['admin_label']);
+
     // Transform the #type = checkboxes value to a numerically indexed array.
     $form_state['values']['cache']['contexts'] = array_values(array_filter($form_state['values']['cache']['contexts']));
 

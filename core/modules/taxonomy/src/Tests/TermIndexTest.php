@@ -12,16 +12,10 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
  * Tests the hook implementations that maintain the taxonomy index.
+ *
+ * @group taxonomy
  */
 class TermIndexTest extends TaxonomyTestBase {
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Taxonomy term index',
-      'description' => 'Tests the hook implementations that maintain the taxonomy index.',
-      'group' => 'Taxonomy',
-    );
-  }
 
   function setUp() {
     parent::setUp();
@@ -34,7 +28,7 @@ class TermIndexTest extends TaxonomyTestBase {
     $this->vocabulary = $this->createVocabulary();
 
     $this->field_name_1 = drupal_strtolower($this->randomName());
-    entity_create('field_config', array(
+    entity_create('field_storage_config', array(
       'name' => $this->field_name_1,
       'entity_type' => 'node',
       'type' => 'taxonomy_term_reference',
@@ -65,7 +59,7 @@ class TermIndexTest extends TaxonomyTestBase {
       ->save();
 
     $this->field_name_2 = drupal_strtolower($this->randomName());
-    entity_create('field_config', array(
+    entity_create('field_storage_config', array(
       'name' => $this->field_name_2,
       'entity_type' => 'node',
       'type' => 'taxonomy_term_reference',

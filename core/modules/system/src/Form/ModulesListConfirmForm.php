@@ -73,7 +73,7 @@ class ModulesListConfirmForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getCancelRoute() {
+  public function getCancelUrl() {
     return new Url('system.modules_list');
   }
 
@@ -107,7 +107,7 @@ class ModulesListConfirmForm extends ConfirmFormBase {
 
     // Redirect to the modules list page if the key value store is empty.
     if (!$this->modules) {
-      return new RedirectResponse($this->urlGenerator()->generate('system.modules_list', array(), TRUE));
+      return new RedirectResponse($this->url('system.modules_list', [], ['absolute' => TRUE]));
     }
 
     $items = array();
@@ -151,7 +151,7 @@ class ModulesListConfirmForm extends ConfirmFormBase {
       drupal_set_message($this->t('The configuration options have been saved.'));
     }
 
-    $form_state['redirect_route'] = $this->getCancelRoute();
+    $form_state['redirect_route'] = $this->getCancelUrl();
   }
 
 }

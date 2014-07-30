@@ -9,10 +9,12 @@ namespace Drupal\comment\Tests;
 
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\content_translation\Tests\ContentTranslationUITest;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Tests the Comment Translation UI.
+ *
+ * @group comment
  */
 class CommentTranslationUITest extends ContentTranslationUITest {
 
@@ -27,14 +29,6 @@ class CommentTranslationUITest extends ContentTranslationUITest {
    * @var array
    */
   public static $modules = array('language', 'content_translation', 'node', 'comment');
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Comment translation UI',
-      'description' => 'Tests the basic comment translation UI.',
-      'group' => 'Comment',
-    );
-  }
 
   function setUp() {
     $this->entityTypeId = 'comment';
@@ -74,9 +68,9 @@ class CommentTranslationUITest extends ContentTranslationUITest {
    */
   function setupTestFields() {
     parent::setupTestFields();
-    $field = FieldConfig::loadByName('comment', 'comment_body');
-    $field->translatable = TRUE;
-    $field->save();
+    $field_storage = FieldStorageConfig::loadByName('comment', 'comment_body');
+    $field_storage->translatable = TRUE;
+    $field_storage->save();
   }
 
   /**
@@ -112,7 +106,7 @@ class CommentTranslationUITest extends ContentTranslationUITest {
   protected function getNewEntityValues($langcode) {
     // Comment subject is not translatable hence we use a fixed value.
     return array(
-      'subject' => $this->subject,
+      'subject' => array(array('value' => $this->subject)),
       'comment_body' => array(array('value' => $this->randomName(16))),
     ) + parent::getNewEntityValues($langcode);
   }

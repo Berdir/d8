@@ -7,15 +7,12 @@
 
 namespace Drupal\Tests\Core\Datetime;
 
-use Drupal\Core\Datetime\Date;
+use Drupal\Core\Datetime\Date as DateFormatter;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * Tests the date service.
- *
- * @group Drupal
- *
- * @see \Drupal\Core\Datetime\Date
+ * @coversDefaultClass \Drupal\Core\Datetime\Date
+ * @group Datetime
  */
 class DateTest extends UnitTestCase {
 
@@ -45,25 +42,14 @@ class DateTest extends UnitTestCase {
    *
    * @var \Drupal\Core\Datetime\Date
    */
-  protected $date;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Date service test.',
-      'description' => 'Tests the date service.',
-      'group' => 'System'
-    );
-  }
+  protected $dateFormatter;
 
   protected function setUp() {
     $this->entityManager = $this->getMock('Drupal\Core\Entity\EntityManagerInterface');
     $this->languageManager = $this->getMock('Drupal\Core\Language\LanguageManagerInterface');
     $this->stringTranslation = $this->getMock('Drupal\Core\StringTranslation\TranslationInterface');
 
-    $this->date = new Date($this->entityManager, $this->languageManager, $this->stringTranslation, $this->getConfigFactoryStub());
+    $this->dateFormatter = new DateFormatter($this->entityManager, $this->languageManager, $this->stringTranslation, $this->getConfigFactoryStub());
   }
 
   /**
@@ -84,10 +70,10 @@ class DateTest extends UnitTestCase {
 
     // Check if the granularity is specified.
     if ($granularity) {
-      $result = $this->date->formatInterval($interval, $granularity, $langcode);
+      $result = $this->dateFormatter->formatInterval($interval, $granularity, $langcode);
     }
     else {
-      $result = $this->date->formatInterval($interval);
+      $result = $this->dateFormatter->formatInterval($interval);
     }
 
     $this->assertEquals($expected, $result);
@@ -137,7 +123,7 @@ class DateTest extends UnitTestCase {
       ->with('0 sec', array(), array('langcode' => 'xxx-lolspeak'))
       ->will($this->returnValue('0 sec'));
 
-    $result = $this->date->formatInterval(0, 1, 'xxx-lolspeak');
+    $result = $this->dateFormatter->formatInterval(0, 1, 'xxx-lolspeak');
 
     $this->assertEquals('0 sec', $result);
   }

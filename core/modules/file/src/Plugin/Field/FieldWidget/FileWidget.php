@@ -76,7 +76,7 @@ class FileWidget extends WidgetBase {
     // Load the items for form rebuilds from the field state as they might not be
     // in $form_state['values'] because of validation limitations. Also, they are
     // only passed in as $items when editing existing entities.
-    $field_state = field_form_get_state($parents, $field_name, $form_state);
+    $field_state = static::getWidgetState($parents, $field_name, $form_state);
     if (isset($field_state['items'])) {
       $items->setValue($field_state['items']);
     }
@@ -314,18 +314,18 @@ class FileWidget extends WidgetBase {
     $current = count(Element::children(NestedArray::getValue($form, $parents))) - 1;
 
     $field_storage_definitions = \Drupal::entityManager()->getFieldStorageDefinitions($element['#entity_type']);
-    $field = $field_storage_definitions[$element['#field_name']];
+    $field_storage = $field_storage_definitions[$element['#field_name']];
     $uploaded = count($values['fids']);
     $count = $uploaded + $current;
-    if ($count > $field->getCardinality()) {
-      $keep = $uploaded - $count + $field->getCardinality();
+    if ($count > $field_storage->getCardinality()) {
+      $keep = $uploaded - $count + $field_storage->getCardinality();
       $removed_files = array_slice($values['fids'], $keep);
       $removed_names = array();
       foreach ($removed_files as $fid) {
         $file = file_load($fid);
         $removed_names[] = $file->getFilename();
       }
-      $args = array('%field' => $field->getFieldName(), '@max' => $field->getCardinality(), '@count' => $keep, '%list' => implode(', ', $removed_names));
+      $args = array('%field' => $field_storage->getFieldName(), '@max' => $field_storage->getCardinality(), '@count' => $keep, '%list' => implode(', ', $removed_names));
       $message = t('Field %field can only hold @max values but there were @count uploaded. The following files have been omitted as a result: %list.', $args);
       drupal_set_message($message, 'warning');
       $values['fids'] = array_slice($values['fids'], 0, $keep);
@@ -530,9 +530,9 @@ class FileWidget extends WidgetBase {
     NestedArray::setValue($form_state['values'], array_slice($button['#parents'], 0, -2), $submitted_values);
 
     // Update items.
-    $field_state = field_form_get_state($parents, $field_name, $form_state);
+    $field_state = static::getWidgetState($parents, $field_name, $form_state);
     $field_state['items'] = $submitted_values;
-    field_form_set_state($parents, $field_name, $form_state, $field_state);
+    static::setWidgetState($parents, $field_name, $form_state, $field_state);
   }
 
 }

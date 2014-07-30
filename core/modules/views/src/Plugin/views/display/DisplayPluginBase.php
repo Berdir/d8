@@ -31,7 +31,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException as Dependen
  * displays (see \Drupal\views\Plugin\views\display\DefaultDisplay).
  *
  * Display plugins extend \Drupal\views\Plugin\views\display\DisplayPluginBase.
- * They must be annotated with \Drupal\views\Plugin\Annotation\ViewsDisplay
+ * They must be annotated with \Drupal\views\Annotation\ViewsDisplay
  * annotation, and they must be in namespace directory Plugin\views\display.
  *
  * @ingroup views_plugins
@@ -901,14 +901,8 @@ abstract class DisplayPluginBase extends PluginBase {
         // If this is during form submission and there are temporary options
         // which can only appear if the view is in the edit cache, use those
         // options instead. This is used for AJAX multi-step stuff.
-        // @todo Remove dependency on Request object
-        //   https://drupal.org/node/2059003.
-        try {
-          if ($this->view->getRequest()->request->get('form_id') && isset($this->view->temporary_options[$type][$id])) {
-            $info = $this->view->temporary_options[$type][$id];
-          }
-        }
-        catch (DependencyInjectionRuntimeException $e) {
+        if ($this->view->getRequest()->request->get('form_id') && isset($this->view->temporary_options[$type][$id])) {
+          $info = $this->view->temporary_options[$type][$id];
         }
 
         if ($info['id'] != $id) {
@@ -2125,17 +2119,14 @@ abstract class DisplayPluginBase extends PluginBase {
   }
 
   /**
-   * Creates menu links, if this display provides some.
-   *
-   * @param array $existing_links
-   *   An array of already existing menu items provided by drupal.
+   * Gets menu links, if this display provides some.
    *
    * @return array
    *   The menu links registers for this display.
    *
-   * @see hook_menu_link_defaults()
+   * @see \Drupal\views\Plugin\Derivative\ViewsMenuLink
    */
-  public function executeHookMenuLinkDefaults(array &$existing_links) {
+  public function getMenuLinks() {
     return array();
   }
 

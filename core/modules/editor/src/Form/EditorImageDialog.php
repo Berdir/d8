@@ -8,6 +8,7 @@
 namespace Drupal\editor\Form;
 
 use Drupal\Component\Utility\Bytes;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormBase;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Core\Ajax\AjaxResponse;
@@ -96,14 +97,15 @@ class EditorImageDialog extends FormBase {
     $form['attributes']['alt'] = array(
       '#title' => $this->t('Alternative text'),
       '#type' => 'textfield',
+      '#required' => TRUE,
       '#default_value' => isset($image_element['alt']) ? $image_element['alt'] : '',
       '#maxlength' => 2048,
     );
     $form['dimensions'] = array(
       '#type' => 'item',
       '#title' => $this->t('Image size'),
-      '#field_prefix' => '<div class="container-inline">',
-      '#field_suffix' => '</div>',
+      '#field_prefix' => SafeMarkup::set('<div class="container-inline">'),
+      '#field_suffix' => SafeMarkup::set('</div>'),
     );
     $form['dimensions']['width'] = array(
       '#title' => $this->t('Width'),

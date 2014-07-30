@@ -15,8 +15,7 @@ use Drupal\Core\Language\Language;
 
 /**
  * @coversDefaultClass \Drupal\Core\Entity\ContentEntityBase
- *
- * @group Drupal
+ * @group Entity
  */
 class ContentEntityBaseUnitTest extends UnitTestCase {
 
@@ -96,17 +95,6 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    * @var \Drupal\Core\Field\FieldDefinition[]
    */
   protected $fieldDefinitions;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'description' => '',
-      'name' => '\Drupal\Core\Entity\ContentEntityBase unit test',
-      'group' => 'Entity',
-    );
-  }
 
   /**
    * {@inheritdoc}
@@ -276,7 +264,8 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
     // This method is internal, so check for errors on calling it only.
     $storage = $this->getMock('\Drupal\Core\Entity\EntityStorageInterface');
     $record = new \stdClass();
-    $this->entity->preSaveRevision($storage, $record);
+    // Our mocked entity->preSaveRevision() returns NULL, so assert that.
+    $this->assertNull($this->entity->preSaveRevision($storage, $record));
   }
 
   /**
@@ -364,7 +353,8 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
   public function testSetContext() {
     $name = $this->randomName();
     $parent = $this->getMock('\Drupal\Core\TypedData\TypedDataInterface');
-    $this->entity->setContext($name, $parent);
+    // Our mocked entity->setContext() returns NULL, so assert that.
+    $this->assertNull($this->entity->setContext($name, $parent));
   }
 
   /**

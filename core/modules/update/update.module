@@ -11,6 +11,7 @@
  * ability to install contributed modules and themes via an user interface.
  */
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Site\Settings;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
@@ -164,7 +165,7 @@ function update_page_build() {
  * @see update_menu()
  */
 function update_manager_access() {
-  return Settings::get('allow_authorize_operations', TRUE) && user_access('administer software updates');
+  return Settings::get('allow_authorize_operations', TRUE) && \Drupal::currentUser()->hasPermission('administer software updates');
 }
 
 /**
@@ -172,10 +173,6 @@ function update_manager_access() {
  */
 function update_theme() {
   return array(
-    'update_manager_update_form' => array(
-      'render element' => 'form',
-      'file' => 'update.manager.inc',
-    ),
     'update_last_check' => array(
       'variables' => array('last' => 0),
       'template' => 'update-last-check',
@@ -537,7 +534,8 @@ function _update_message_text($msg_type, $msg_reason, $report_link = FALSE, $lan
     }
   }
 
-  return $text;
+  // All strings are t() and empty space concatenated so return SafeMarkup.
+  return SafeMarkup::set($text);
 }
 
 /**
@@ -658,7 +656,7 @@ function update_storage_clear() {
 function _update_manager_unique_identifier() {
   $id = &drupal_static(__FUNCTION__, '');
   if (empty($id)) {
-    $id = substr(hash('sha256', drupal_get_hash_salt()), 0, 8);
+    $id = substr(hash('sha256', Settings::getHashSalt()), 0, 8);
   }
   return $id;
 }

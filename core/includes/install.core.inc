@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
@@ -355,10 +356,12 @@ function install_begin_request(&$install_state) {
     $environment = 'prod';
   }
 
-  $kernel = InstallerKernel::createFromRequest($request, drupal_classloader(), $environment);
+  // Only allow dumping the container once the hash salt has been created.
+  $kernel = InstallerKernel::createFromRequest($request, drupal_classloader(), $environment, (bool) Settings::get('hash_salt', FALSE));
   $kernel->setSitePath($site_path);
   $kernel->boot();
   $container = $kernel->getContainer();
+  $container->get('request_stack')->push($request);
 
   // Register the file translation service.
   if (isset($GLOBALS['config']['locale.settings']['translation.path'])) {
@@ -1451,7 +1454,7 @@ function install_load_profile(&$install_state) {
  *   An array of information about the current installation state.
  */
 function install_bootstrap_full() {
-  \Drupal::service('session_manager')->initialize();
+  \Drupal::service('session_manager')->startLazy();
 }
 
 /**
@@ -1694,19 +1697,21 @@ function install_finished(&$install_state) {
   $snapshot = \Drupal::service('config.storage.snapshot');
   \Drupal::service('config.manager')->createSnapshot($active, $snapshot);
 
-  // Load current user and perform final login tasks.
-  // This has to be done after drupal_flush_all_caches()
-  // to avoid session regeneration.
-  $account = user_load(1);
-  user_login_finalize($account);
+  if ($install_state['interactive']) {
+    // Load current user and perform final login tasks.
+    // This has to be done after drupal_flush_all_caches()
+    // to avoid session regeneration.
+    $account = user_load(1);
+    user_login_finalize($account);
+  }
 
   // @todo Temporary hack to satisfy PIFR.
   // @see https://drupal.org/node/1317548
   $pifr_assertion = '<span style="display: none;">Drupal installation complete</span>';
-
-  drupal_set_message(t('Congratulations, you installed @drupal!', array(
+  $success_message = t('Congratulations, you installed @drupal!', array(
     '@drupal' => drupal_install_profile_distribution_name(),
-  )) . $pifr_assertion);
+  ));
+  drupal_set_message(SafeMarkup::set($success_message . $pifr_assertion));
 }
 
 /**
