@@ -9,6 +9,8 @@ namespace Drupal\node;
 
 use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
@@ -124,6 +126,17 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
     if (isset($configured_types[$entity_bundle])) {
       return $account->hasPermission('create ' . $entity_bundle . ' content');
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+    $administrative_fields = array('uid', 'status', 'changed', 'created', 'promote', 'sticky');
+    if ($operation == 'edit' && in_array($field_definition->getName(), $administrative_fields)) {
+      return $account->hasPermission('administer nodes');
+    }
+    return parent::checkFieldAccess($operation, $field_definition, $account, $items);
   }
 
   /**

@@ -1,15 +1,18 @@
 <?php
 /**
  * @file
- * Contains \Drupal\node\NodeFieldAccessTest.
+ * Contains \Drupal\node\Tests\NodeFieldAccessTest.
  */
 
 namespace Drupal\node\Tests;
 
-
-use Doctrine\Tests\Common\Annotations\True;
 use Drupal\system\Tests\Entity\EntityUnitTestBase;
 
+/**
+ * Tests node field level access.
+ *
+ * @group node
+ */
 class NodeFieldAccessTest extends EntityUnitTestBase {
 
   /**
@@ -18,18 +21,6 @@ class NodeFieldAccessTest extends EntityUnitTestBase {
    * @var array
    */
   public static $modules = array('node');
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Node (base-)fields default access',
-      'description' => 'Test if access definitions on field level are honored by field access api.',
-      'group' => 'Node',
-    );
-  }
-
 
   public static $administrative_node_fields = array(
     'status',
