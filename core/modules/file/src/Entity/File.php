@@ -255,7 +255,7 @@ class File extends ContentEntityBase implements FileInterface {
       ->setLabel(t('Filename'))
       ->setDescription(t('Name of the file with no path components.'));
 
-    $fields['uri'] = FieldDefinition::create('uri')
+    $fields['uri'] = FieldDefinition::create('string')
       ->setLabel(t('URI'))
       ->setDescription(t('The URI to access the file (either local or remote).'))
       ->setSetting('max_length', 255);
