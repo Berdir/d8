@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\file\FileAccessController.
+ * Contains \Drupal\file\FileAccessHandler.
  */
 
 namespace Drupal\file;
 
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -15,7 +15,7 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Provides a File access controller.
  */
-class FileAccessController extends EntityAccessController {
+class FileAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\aggregator\FeedAccessController.
+ * Contains \Drupal\aggregator\FeedAccessHandler.
  */
 
 namespace Drupal\aggregator;
 
-use Drupal\Core\Entity\EntityAccessController;
+use Drupal\Core\Entity\EntityAccessHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines an access controller for the feed entity.
+ * Defines an access handler for the feed entity.
  *
  * @see \Drupal\aggregator\Entity\Feed
  */
-class FeedAccessController extends EntityAccessController {
+class FeedAccessHandler extends EntityAccessHandler {
 
   /**
    * {@inheritdoc}

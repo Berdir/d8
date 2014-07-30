@@ -300,9 +300,9 @@ use Drupal\Core\Render\Element;
  *     Configuration Translation module, without the need of a controller class.
  *   - access: If your configuration entity has complex permissions, you might
  *     need an access controller, implementing
- *     \Drupal\Core\Entity\EntityAccessControllerInterface, but most entities
+ *     \Drupal\Core\Entity\EntityAccessHandlerInterface, but most entities
  *     can just use the 'admin_permission' annotation instead. Note that if you
- *     are creating your own access controller, you should override the
+ *     are creating your own access handler, you should override the
  *     checkAccess() and checkCreateAccess() methods, not access().
  *   - storage: A class implementing
  *     \Drupal\Core\Entity\EntityStorageInterface. If not specified, content
