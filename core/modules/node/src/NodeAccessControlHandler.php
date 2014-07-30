@@ -132,9 +132,13 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
    * {@inheritdoc}
    */
   protected function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
-    $administrative_fields = array('uid', 'status', 'changed', 'created', 'promote', 'sticky');
+    $administrative_fields = array('uid', 'status', 'created', 'promote', 'sticky', 'revision_log');
+    $read_only_fields = array('changed', 'revision_timestamp', 'revision_uid');
     if ($operation == 'edit' && in_array($field_definition->getName(), $administrative_fields)) {
       return $account->hasPermission('administer nodes');
+    }
+    if ($operation == 'edit' && in_array($field_definition->getName(), $read_only_fields)) {
+      return FALSE;
     }
     return parent::checkFieldAccess($operation, $field_definition, $account, $items);
   }

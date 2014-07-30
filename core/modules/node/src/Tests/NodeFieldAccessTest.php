@@ -6,6 +6,9 @@
 
 namespace Drupal\node\Tests;
 
+use Drupal\Component\Utility\String;
+use Drupal\Core\Annotation\Action;
+use Drupal\node\Entity\Node;
 use Drupal\system\Tests\Entity\EntityUnitTestBase;
 
 /**
@@ -22,31 +25,43 @@ class NodeFieldAccessTest extends EntityUnitTestBase {
    */
   public static $modules = array('node');
 
-  public static $administrative_node_fields = array(
+  /**
+   * Fields that only users with administer nodes permissions can change.
+   *
+   * @var array
+   */
+  protected $administrativeFields = array(
     'status',
     'promote',
     'sticky',
     'created',
-    'changed',
     'uid',
+    'revision_log',
   );
+
+  /**
+   * These fields are automatically managed and can not be changed by any user.
+   *
+   * @var array
+   */
+  protected $readOnlyFields = array('changed', 'revision_uid', 'revision_timestamp');
 
   /**
    * Test permissions on nodes status field.
    */
   function testAccessToAdministrativeFields() {
 
-    // A all mighty user
+    // A all mighty user.
     $chuck_norris = $this->createUser(array(), array('bypass node access'));
 
-    // An administrator user
+    // An administrator user.
     $content_admin_user = $this->createUser(array(), array('administer nodes'));
 
-    // Two different editor users
+    // Two different editor users.
     $page_creator_user = $this->createUser(array(), array('create page content', 'edit own page content', 'delete own page content'));
     $page_manager_user = $this->createUser(array(), array('create page content', 'edit any page content', 'delete any page content'));
 
-    // An unprivileged user
+    // An unprivileged user.
     $page_unrelated_user = $this->createUser(array(), array('access content'));
 
     // List of all users
@@ -60,47 +75,60 @@ class NodeFieldAccessTest extends EntityUnitTestBase {
 
     // Create three "Basic pages". One is owned by our test-user
     // "page_creator", one by "page_manager", and one by someone else.
-    $node1 = entity_create('node', array(
+    $node1 = Node::create(array(
       'title' => $this->randomName(8),
       'uid' => $page_creator_user->id(),
       'type' => 'page',
     ));
-    $node2 = entity_create('node', array(
+    $node2 = Node::create(array(
       'title' => $this->randomName(8),
       'uid' => $page_manager_user->id(),
       'type' => 'page',
     ));
-    $node3 = entity_create('node', array(
+    $node3 = Node::create(array(
       'title' => $this->randomName(8),
       'uid' => $chuck_norris->id(),
       'type' => 'page',
     ));
 
-    foreach(NodeFieldAccessTest::$administrative_node_fields as $field) {
+    foreach ($this->administrativeFields as $field) {
 
-      // Checks on view operations:
-      foreach($test_users as $account) {
-        $may_view = $node1->{$field}->access("view", $account);
-        $this->assertTrue($may_view, "Any user may view status fields.");
+      // Checks on view operations.
+      foreach ($test_users as $account) {
+        $may_view = $node1->{$field}->access('view', $account);
+        $this->assertTrue($may_view, String::format('Any user may view the field @name.', array('@name' => $field)));
       }
 
-      // Checks on edit operations:
-      $may_update = $node1->{$field}->access("edit", $page_creator_user);
-      $this->assertFalse($may_update, "Users with permission \"edit own <type> content\" must not edit $field fields.");
-      $may_update = $node2->{$field}->access("edit", $page_creator_user);
-      $this->assertFalse($may_update, "Users with permission \"edit own <type> content\" must not edit $field fields.");
-      $may_update = $node2->{$field}->access("edit", $page_manager_user);
-      $this->assertFalse($may_update, "Users with permission \"edit any <type> content\" must not edit $field fields.");
-      $may_update = $node1->{$field}->access("edit", $page_manager_user);
-      $this->assertFalse($may_update, "Users with permission \"edit any <type> content\" must not edit $field fields.");
-      $may_update = $node2->{$field}->access("edit", $page_unrelated_user);
-      $this->assertFalse($may_update, "Users not having permission \"edit any <type> content\" must not edit $field fields.");
-      $may_update = $node1->{$field}->access("edit", $chuck_norris) && $node3->status->access("edit", $chuck_norris);
-      $this->assertTrue($may_update, "Users with permission \"bypass node access\" may edit $field fields on all nodes.");
-      $may_update = $node1->{$field}->access("edit", $content_admin_user) && $node3->status->access("edit", $content_admin_user);
-      $this->assertTrue($may_update, "Users with permission \"administer nodes\" may edit $field fields on all nodes.");
+      // Checks on edit operations.
+      $may_update = $node1->{$field}->access('edit', $page_creator_user);
+      $this->assertFalse($may_update, String::format('Users with permission "edit own page content" is not allowed to the field @name.', array('@name' => $field)));
+      $may_update = $node2->{$field}->access('edit', $page_creator_user);
+      $this->assertFalse($may_update, String::format('Users with permission "edit own page content" is not allowed to the field @name.', array('@name' => $field)));
+      $may_update = $node2->{$field}->access('edit', $page_manager_user);
+      $this->assertFalse($may_update, String::format('Users with permission "edit any page content" is not allowed to the field @name.', array('@name' => $field)));
+      $may_update = $node1->{$field}->access('edit', $page_manager_user);
+      $this->assertFalse($may_update, String::format('Users with permission "edit any page content" is not allowed to the field @name.', array('@name' => $field)));
+      $may_update = $node2->{$field}->access('edit', $page_unrelated_user);
+      $this->assertFalse($may_update, String::format('Users not having permission "edit any page content" is not allowed to the field @name.', array('@name' => $field)));
+      $may_update = $node1->{$field}->access('edit', $chuck_norris) && $node3->status->access('edit', $chuck_norris);
+      $this->assertTrue($may_update, String::format('Users with permission "bypass node access" may edit @name fields on all nodes.', array('@name' => $field)));
+      $may_update = $node1->{$field}->access('edit', $content_admin_user) && $node3->status->access('edit', $content_admin_user);
+      $this->assertTrue($may_update, String::format('Users with permission "administer nodes" may edit @name fields on all nodes.', array('@name' => $field)));
     }
 
+    foreach ($this->readOnlyFields as $field) {
+      // Check view operation.
+      foreach ($test_users as $account) {
+        $may_view = $node1->{$field}->access('view', $account);
+        $this->assertTrue($may_view, String::format('Any user may view the field @name.', array('@name' => $field)));
+      }
+
+      // Check edit operation.
+      foreach ($test_users as $account) {
+        $may_view = $node1->{$field}->access('edit', $account);
+        $this->assertFalse($may_view, String::format('No user is not allowed to edit the field @name.', array('@name' => $field)));
+      }
+    }
   }
 
 }
