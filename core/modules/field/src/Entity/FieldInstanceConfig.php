@@ -625,11 +625,11 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
    * @todo Investigate in https://drupal.org/node/2074253.
    */
   public function __sleep() {
-    // Only serialize properties from self::toArray().
-    $properties = array_keys(array_intersect_key($this->toArray(), get_object_vars($this)));
-    // Serialize $entityTypeId property so that toArray() works when waking up.
-    $properties[] = 'entityTypeId';
-    return $properties;
+    // Only serialize necessary properties, excluding those that can be
+    // recalculated.
+    $properties = get_object_vars($this);
+    unset($properties['fieldStorage'], $properties['itemDefinition'], $properties['bundle_rename_allowed']);
+    return array_keys($properties);
   }
 
   /**
