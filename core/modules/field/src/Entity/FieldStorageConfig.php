@@ -650,15 +650,6 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   }
 
   /**
-   * Implements the magic __wakeup() method.
-   */
-  public function __wakeup() {
-    // Run the values from self::toArray() through __construct().
-    $values = array_intersect_key($this->toArray(), get_object_vars($this));
-    $this->__construct($values);
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getConstraints() {
