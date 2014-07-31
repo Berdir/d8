@@ -18,16 +18,16 @@
  * @link theme_render Theme system and Render API topic @endlink for more
  * information about render arrays and rendering.
  *
- * @section sec_theme_hooks Theme Hooks The theme system is invoked in
- * drupal_render() by calling the internal _theme() function, which operates on
- * the concept of "theme hooks". Theme hooks define how a particular type of
- * data should be rendered. They are registered by modules by implenting
- * hook_theme(), which specifies the name of the hook, the input "variables"
- * used to provide data and options, and other information. Modules implementing
- * hook_theme() also need to provide a default implementation for each of their
- * theme hooks, normally in a Twig file, and they may also provide preprocessing
- * functions. For example, the core Search module defines a theme hook for a
- * search result item in search_theme():
+ * @section sec_theme_hooks Theme Hooks
+ * The theme system is invoked in drupal_render() by calling the internal
+ * _theme() function, which operates on the concept of "theme hooks". Theme
+ * hooks define how a particular type of data should be rendered. They are
+ * registered by modules by implenting hook_theme(), which specifies the name of
+ * the hook, the input "variables" used to provide data and options, and other
+ * information. Modules implementing hook_theme() also need to provide a default
+ * implementation for each of their theme hooks, normally in a Twig file, and
+ * they may also provide preprocessing functions. For example, the core Search
+ * module defines a theme hook for a search result item in search_theme():
  * @code
  * return array(
  *   'search_result' => array(
@@ -239,9 +239,9 @@
  * @param $form
  *   Nested array of form elements that comprise the form.
  * @param $form_state
- *   A keyed array containing the current state of the form.
+ *   The current state of the form.
  */
-function hook_form_system_theme_settings_alter(&$form, &$form_state) {
+function hook_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
   // Add a checkbox to toggle the breadcrumb trail.
   $form['toggle_breadcrumb'] = array(
     '#type' => 'checkbox',
