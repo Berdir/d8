@@ -78,8 +78,8 @@ class EntityReferenceController extends ControllerBase {
     }
 
     $field_definition = $definitions[$field_name];
-    $access_handler = $this->entityManager()->getAccessHandler($entity_type);
-    if ($field_definition->getType() != 'entity_reference' || !$access_handler->fieldAccess('edit', $field_definition)) {
+    $access_control_handler = $this->entityManager()->getAccessControlHandler($entity_type);
+    if ($field_definition->getType() != 'entity_reference' || !$access_control_handler->fieldAccess('edit', $field_definition)) {
       throw new AccessDeniedHttpException();
     }
 

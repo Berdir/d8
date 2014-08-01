@@ -2,29 +2,25 @@
 
 /**
  * @file
- * Contains \Drupal\node\NodeAccessHandler.
+ * Contains \Drupal\node\NodeAccessControlHandler.
  */
 
 namespace Drupal\node;
 
-use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines the access handler for the node entity type.
+ * Defines the access control handler for the node entity type.
  *
  * @see \Drupal\node\Entity\Node
  */
-class NodeAccessHandler extends EntityAccessHandler implements NodeAccessHandlerInterface, EntityControllerInterface {
+class NodeAccessControlHandler extends EntityAccessControlHandler implements NodeAccessControlHandlerInterface, EntityControllerInterface {
 
   /**
    * The node grant storage.
@@ -34,7 +30,7 @@ class NodeAccessHandler extends EntityAccessHandler implements NodeAccessHandler
   protected $grantStorage;
 
   /**
-   * Constructs a NodeAccessHandler object.
+   * Constructs a NodeAccessControlHandler object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.

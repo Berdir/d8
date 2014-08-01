@@ -21,7 +21,7 @@ use Drupal\Core\Url;
  *   label = @Translation("Custom menu link"),
  *   controllers = {
  *     "storage" = "Drupal\Core\Entity\ContentEntityDatabaseStorage",
- *     "access" = "Drupal\menu_link_content\MenuLinkContentAccessHandler",
+ *     "access" = "Drupal\menu_link_content\MenuLinkContentAccessControlHandler",
  *     "form" = {
  *       "default" = "Drupal\menu_link_content\Form\MenuLinkContentForm",
  *       "delete" = "Drupal\menu_link_content\Form\MenuLinkContentDeleteForm"

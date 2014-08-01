@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\block\BlockAccessHandler.
+ * Contains \Drupal\block\BlockAccessControlHandler.
  */
 
 namespace Drupal\block;
 
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the block entity type.
+ * Defines the access control handler for the block entity type.
  *
  * @see \Drupal\block\Entity\Block
  */
-class BlockAccessHandler extends EntityAccessHandler {
+class BlockAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}

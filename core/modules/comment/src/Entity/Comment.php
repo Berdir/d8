@@ -25,7 +25,7 @@ use Drupal\user\UserInterface;
  *   bundle_label = @Translation("Content type"),
  *   controllers = {
  *     "storage" = "Drupal\comment\CommentStorage",
- *     "access" = "Drupal\comment\CommentAccessHandler",
+ *     "access" = "Drupal\comment\CommentAccessControlHandler",
  *     "view_builder" = "Drupal\comment\CommentViewBuilder",
  *     "form" = {
  *       "default" = "Drupal\comment\CommentForm",

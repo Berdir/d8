@@ -8,7 +8,7 @@
 namespace Drupal\entity_test\Entity;
 
 /**
- * Defines a test entity class with no access handler.
+ * Defines a test entity class with no access control handler.
  *
  * @ContentEntityType(
  *   id = "entity_test_default_access",

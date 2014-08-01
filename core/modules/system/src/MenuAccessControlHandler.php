@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\system\MenuAccessHandler.
+ * Contains \Drupal\system\MenuAccessControlHandler.
  */
 
 namespace Drupal\system;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the menu entity type.
+ * Defines the access control handler for the menu entity type.
  *
  * @see \Drupal\system\Entity\Menu
  */
-class MenuAccessHandler extends EntityAccessHandler {
+class MenuAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}

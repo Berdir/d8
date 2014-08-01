@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\EntityAccessHandlerInterface.
+ * Contains \Drupal\Core\Entity\EntityAccessControlHandlerInterface.
  */
 
 namespace Drupal\Core\Entity;
@@ -14,14 +14,14 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines a common interface for entity access handlers.
+ * Defines a common interface for entity access control handlers.
  */
-interface EntityAccessHandlerInterface {
+interface EntityAccessControlHandlerInterface {
 
   /**
    * Checks access to an operation on a given entity or entity translation.
    *
-   * Use \Drupal\Core\Entity\EntityAccessHandlerInterface::createAccess()
+   * Use \Drupal\Core\Entity\EntityAccessControlHandlerInterface::createAccess()
    * to check access to create an entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
@@ -62,7 +62,7 @@ interface EntityAccessHandlerInterface {
   public function resetCache();
 
   /**
-   * Sets the module handler for this access handler.
+   * Sets the module handler for this access control handler.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
@@ -77,7 +77,7 @@ interface EntityAccessHandlerInterface {
    * This method does not determine whether access is granted to the entity
    * itself, only the specific field. Callers are responsible for ensuring that
    * entity access is also respected, for example by using
-   * \Drupal\Core\Entity\EntityAccessHandlerInterface::access().
+   * \Drupal\Core\Entity\EntityAccessControlHandlerInterface::access().
    *
    * @param string $operation
    *   The operation access should be checked for.
@@ -92,7 +92,7 @@ interface EntityAccessHandlerInterface {
    *    is checked for the field definition, without any specific value
    *    available. Defaults to NULL.
    *
-   * @see \Drupal\Core\Entity\EntityAccessHandlerInterface::access()
+   * @see \Drupal\Core\Entity\EntityAccessControlHandlerInterface::access()
    */
   public function fieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account = NULL, FieldItemListInterface $items = NULL);
 

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\system\Tests\Entity\EntityAccessHandlerTest.
+ * Contains \Drupal\system\Tests\Entity\EntityAccessHControlandlerTest.
  */
 
 namespace Drupal\system\Tests\Entity;
@@ -10,14 +10,14 @@ namespace Drupal\system\Tests\Entity;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessibleInterface;
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 
 /**
- * Tests the entity access handler.
+ * Tests the entity access control handler.
  *
  * @group Entity
  */
-class EntityAccessHandlerTest extends EntityLanguageTestBase  {
+class EntityAccessControlHandlerTest extends EntityLanguageTestBase  {
 
   function setUp() {
     parent::setUp();
@@ -73,10 +73,10 @@ class EntityAccessHandlerTest extends EntityLanguageTestBase  {
     // The implementation requires that the global user id can be loaded.
     \Drupal::currentUser()->setAccount($this->createUser(array('uid' => 2)));
 
-    // Check that the default access handler is used for entities that don't
-    // have a specific access handler defined.
-    $handler = $this->container->get('entity.manager')->getAccessHandler('entity_test_default_access');
-    $this->assertTrue($handler instanceof EntityAccessHandler, 'The default entity handler is used for the entity_test_default_access entity type.');
+    // Check that the default access control handler is used for entities that don't
+    // have a specific access control handler defined.
+    $handler = $this->container->get('entity.manager')->getAccessControlHandler('entity_test_default_access');
+    $this->assertTrue($handler instanceof EntityAccessControlHandler, 'The default entity handler is used for the entity_test_default_access entity type.');
 
     $entity = entity_create('entity_test_default_access');
     $this->assertEntityAccess(array(

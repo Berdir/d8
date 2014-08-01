@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\system\DateFormatAccessHandler.
+ * Contains \Drupal\system\DateFormatAccessControlHandler.
  */
 
 namespace Drupal\system;
 
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the date format entity type.
+ * Defines the access control handler for the date format entity type.
  *
  * @see \Drupal\system\Entity\DateFormat
  */
-class DateFormatAccessHandler extends EntityAccessHandler {
+class DateFormatAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}

@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\contact\CategoryAccessHandler.
+ * Contains \Drupal\contact\CategoryAccessControlHandler.
  */
 
 namespace Drupal\contact;
 
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the contact category entity type.
+ * Defines the access control handler for the contact category entity type.
  *
  * @see \Drupal\contact\Entity\Category
  */
-class CategoryAccessHandler extends EntityAccessHandler {
+class CategoryAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}

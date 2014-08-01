@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\comment\CommentAccessHandler.
+ * Contains \Drupal\comment\CommentAccessControlHandler.
  */
 
 namespace Drupal\comment;
 
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the comment entity type.
+ * Defines the access control handler for the comment entity type.
  *
  * @see \Drupal\comment\Entity\Comment
  */
-class CommentAccessHandler extends EntityAccessHandler {
+class CommentAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}

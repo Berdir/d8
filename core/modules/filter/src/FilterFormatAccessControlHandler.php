@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\filter\FilterFormatAccessHandler.
+ * Contains \Drupal\filter\FilterFormatAccessControlHandler.
  */
 
 namespace Drupal\filter;
 
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the filter format entity type.
+ * Defines the access control handler for the filter format entity type.
  *
  * @see \Drupal\filter\Entity\FilterFormat
  */
-class FilterFormatAccessHandler extends EntityAccessHandler {
+class FilterFormatAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}

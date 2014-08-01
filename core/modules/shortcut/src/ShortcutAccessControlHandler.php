@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\shortcut\ShortcutAccessHandler.
+ * Contains \Drupal\shortcut\ShortcutAccessControlHandler.
  */
 
 namespace Drupal\shortcut;
 
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityControllerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -15,11 +15,11 @@ use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines the access handler for the shortcut entity type.
+ * Defines the access control handler for the shortcut entity type.
  *
  * @see \Drupal\shortcut\Entity\Shortcut
  */
-class ShortcutAccessHandler extends EntityAccessHandler implements EntityControllerInterface {
+class ShortcutAccessControlHandler extends EntityAccessControlHandler implements EntityControllerInterface {
 
   /**
    * The shortcut_set storage.
@@ -29,7 +29,7 @@ class ShortcutAccessHandler extends EntityAccessHandler implements EntityControl
   protected $shortcutSetStorage;
 
   /**
-   * Constructs a ShortcutAccessHandler object.
+   * Constructs a ShortcutAccessControlHandler object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.

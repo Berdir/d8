@@ -23,9 +23,9 @@ abstract class NodeTestBase extends WebTestBase {
   public static $modules = array('node', 'datetime');
 
   /**
-   * The node access handler.
+   * The node access control handler.
    *
-   * @var \Drupal\Core\Entity\EntityAccessHandlerInterface
+   * @var \Drupal\Core\Entity\EntityAccessControlHandlerInterface
    */
   protected $accessHandler;
 
@@ -43,7 +43,7 @@ abstract class NodeTestBase extends WebTestBase {
       )));
       $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
     }
-    $this->accessHandler = \Drupal::entityManager()->getAccessHandler('node');
+    $this->accessHandler = \Drupal::entityManager()->getAccessControlHandler('node');
   }
 
   /**

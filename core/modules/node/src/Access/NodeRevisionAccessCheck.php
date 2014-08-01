@@ -27,9 +27,9 @@ class NodeRevisionAccessCheck implements AccessInterface {
   protected $nodeStorage;
 
   /**
-   * The node access handler.
+   * The node access control handler.
    *
-   * @var \Drupal\Core\Entity\EntityAccessHandlerInterface
+   * @var \Drupal\Core\Entity\EntityAccessControlHandlerInterface
    */
   protected $nodeAccess;
 
@@ -57,7 +57,7 @@ class NodeRevisionAccessCheck implements AccessInterface {
    */
   public function __construct(EntityManagerInterface $entity_manager, Connection $connection) {
     $this->nodeStorage = $entity_manager->getStorage('node');
-    $this->nodeAccess = $entity_manager->getAccessHandler('node');
+    $this->nodeAccess = $entity_manager->getAccessControlHandler('node');
     $this->connection = $connection;
   }
 

@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Contains Drupal\entity_test\EntityTestAccessHandler.
+ * Contains Drupal\entity_test\EntityTestAccessControlHandler.
  */
 
 namespace Drupal\entity_test;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the test entity type.
+ * Defines the access control handler for the test entity type.
  *
  * @see \Drupal\entity_test\Entity\EntityTest
  * @see \Drupal\entity_test\Entity\EntityTestBaseFieldDisplay
@@ -23,7 +23,7 @@ use Drupal\Core\Session\AccountInterface;
  * @see \Drupal\entity_test\Entity\EntityTestRev
  * @see \Drupal\entity_test\Entity\EntityTestStringId
  */
-class EntityTestAccessHandler extends EntityAccessHandler {
+class EntityTestAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}

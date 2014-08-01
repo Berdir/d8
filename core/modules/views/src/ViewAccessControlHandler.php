@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\views\ViewAccessHandler.
+ * Contains \Drupal\views\ViewAccessControlHandler.
  */
 
 namespace Drupal\views;
 
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the view entity type.
+ * Defines the access control handler for the view entity type.
  *
  * @see \Drupal\views\Entity\View
  */
-class ViewAccessHandler extends EntityAccessHandler {
+class ViewAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}

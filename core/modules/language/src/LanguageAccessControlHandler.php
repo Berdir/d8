@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\language\LanguageAccessHandler.
+ * Contains \Drupal\language\LanguageAccessControlHandler.
  */
 
 namespace Drupal\language;
 
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the language entity type.
+ * Defines the access control handler for the language entity type.
  *
  * @see \Drupal\language\Entity\Language
  */
-class LanguageAccessHandler extends EntityAccessHandler {
+class LanguageAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}

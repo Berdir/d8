@@ -14,7 +14,7 @@ namespace Drupal\entity_test\Entity;
  *   id = "entity_test_cache",
  *   label = @Translation("Test entity with field cache"),
  *   controllers = {
- *     "access" = "Drupal\entity_test\EntityTestAccessHandler",
+ *     "access" = "Drupal\entity_test\EntityTestAccessControlHandler",
  *     "form" = {
  *       "default" = "Drupal\entity_test\EntityTestForm"
  *     },

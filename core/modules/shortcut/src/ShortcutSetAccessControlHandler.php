@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\shortcut\ShortcutSetAccessHandler.
+ * Contains \Drupal\shortcut\ShortcutSetAccessControlHandler.
  */
 
 namespace Drupal\shortcut;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the shortcut set entity type.
+ * Defines the access control handler for the shortcut set entity type.
  *
  * @see \Drupal\shortcut\Entity\ShortcutSet
  */
-class ShortcutSetAccessHandler extends EntityAccessHandler {
+class ShortcutSetAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}

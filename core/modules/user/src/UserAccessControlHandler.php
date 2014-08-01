@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Contains \Drupal\user\UserAccessHandler.
+ * Contains \Drupal\user\UserAccessControlHandler.
  */
 
 namespace Drupal\user;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the user entity type.
+ * Defines the access control handler for the user entity type.
  *
  * @see \Drupal\user\Entity\User
  */
-class UserAccessHandler extends EntityAccessHandler {
+class UserAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}
@@ -45,7 +45,7 @@ class UserAccessHandler extends EntityAccessHandler {
   /**
    * Check view access.
    *
-   * See EntityAccessHandlerInterface::view() for parameters.
+   * See EntityAccessControlHandlerInterface::view() for parameters.
    */
   protected function viewAccess(EntityInterface $entity, $langcode, AccountInterface $account) {
     // Never allow access to view the anonymous user account.

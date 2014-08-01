@@ -2,22 +2,22 @@
 
 /**
  * @file
- * Contains \Drupal\search\SearchPageAccessHandler.
+ * Contains \Drupal\search\SearchPageAccessControlHandler.
  */
 
 namespace Drupal\search;
 
 use Drupal\Core\Access\AccessibleInterface;
-use Drupal\Core\Entity\EntityAccessHandler;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Defines the access handler for the search page entity type.
+ * Defines the access control handler for the search page entity type.
  *
  * @see \Drupal\search\Entity\SearchPage
  */
-class SearchPageAccessHandler extends EntityAccessHandler {
+class SearchPageAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}

@@ -16,7 +16,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *   id = "entity_test_string_id",
  *   label = @Translation("Test entity with string_id"),
  *   controllers = {
- *     "access" = "Drupal\entity_test\EntityTestAccessHandler",
+ *     "access" = "Drupal\entity_test\EntityTestAccessControlHandler",
  *     "form" = {
  *       "default" = "Drupal\entity_test\EntityTestForm"
  *     },

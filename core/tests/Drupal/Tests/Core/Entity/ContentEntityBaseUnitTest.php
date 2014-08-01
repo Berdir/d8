@@ -368,7 +368,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    * @covers ::access
    */
   public function testAccess() {
-    $access = $this->getMock('\Drupal\Core\Entity\EntityAccessHandlerInterface');
+    $access = $this->getMock('\Drupal\Core\Entity\EntityAccessControlHandlerInterface');
     $operation = $this->randomName();
     $access->expects($this->at(0))
       ->method('access')
@@ -378,7 +378,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
       ->method('createAccess')
       ->will($this->returnValue(TRUE));
     $this->entityManager->expects($this->exactly(2))
-      ->method('getAccessHandler')
+      ->method('getAccessControlHandler')
       ->will($this->returnValue($access));
     $this->assertTrue($this->entity->access($operation));
     $this->assertTrue($this->entity->access('create'));
