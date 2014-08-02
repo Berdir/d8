@@ -91,7 +91,7 @@ class EntityForm extends FormBase implements EntityFormInterface {
   public function buildForm(array $form, FormStateInterface $form_state) {
     // During the initial form build, add this controller to the form state and
     // allow for initial preparation before form building and processing.
-    if (!isset($form_state['controller'])) {
+    if (!isset($form_state['entity_form_initialized'])) {
       $this->init($form_state);
     }
 
@@ -117,9 +117,8 @@ class EntityForm extends FormBase implements EntityFormInterface {
    * Initialize the form state and the entity before the first form build.
    */
   protected function init(FormStateInterface $form_state) {
-    // Add the controller to the form state so it can be easily accessed by
-    // module-provided form handlers there.
-    $form_state['controller'] = $this;
+    // Flag that this form has been initialized.
+    $form_state['entity_form_initialized'] = TRUE;
 
     // Prepare the entity to be presented in the entity form.
     $this->prepareEntity();
@@ -160,7 +159,7 @@ class EntityForm extends FormBase implements EntityFormInterface {
   public function processForm($element, FormStateInterface $form_state, $form) {
     // If the form is cached, process callbacks may not have a valid reference
     // to the entity object, hence we must restore it.
-    $this->entity = $form_state['controller']->getEntity();
+    $this->entity = $form_state->getFormObject()->getEntity();
 
     return $element;
   }
@@ -317,10 +316,6 @@ class EntityForm extends FormBase implements EntityFormInterface {
    */
   public function buildEntity(array $form, FormStateInterface $form_state) {
     $entity = clone $this->entity;
-    // If you submit a form, the form state comes from caching, which forces
-    // the controller to be the one before caching. Ensure to have the
-    // controller of the current request.
-    $form_state['controller'] = $this;
 
     $this->copyFormValuesToEntity($entity, $form, $form_state);
 

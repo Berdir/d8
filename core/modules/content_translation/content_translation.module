@@ -376,8 +376,8 @@ function content_translation_controller($entity_type_id) {
  *
  * @todo Move to \Drupal\content_translation\ContentTranslationManager.
  */
-function content_translation_form_controller($form_state) {
-  return isset($form_state['controller']) && $form_state['controller'] instanceof EntityFormInterface ? $form_state['controller'] : FALSE;
+function content_translation_form_controller(FormStateInterface $form_state) {
+  return $form_state->getFormObject() instanceof EntityFormInterface ? $form_state->getFormObject() : FALSE;
 }
 
 /**

@@ -332,7 +332,7 @@ class FormState implements FormStateInterface, \ArrayAccess {
    *  conflict with ones used by the Form API or other modules is to use the
    *  module name as the key name or a prefix for the key name. For example, the
    *  entity form classes use $this->entity in entity forms, or
-   *  $form_state['controller']->getEntity() outside the controller, to store
+   *  $form_state->getFormObject()->getEntity() outside the controller, to store
    *  information about the entity being edited, and this information stays
    *  available across successive clicks of the "Preview" button (if available)
    *  as well as when the "Save" button is finally clicked.
@@ -734,6 +734,14 @@ class FormState implements FormStateInterface, \ArrayAccess {
   public function setRebuild($rebuild = TRUE) {
     $this->set('rebuild', $rebuild);
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormObject() {
+    $build_info = $this->get('build_info');
+    return $build_info['callback_object'];
   }
 
   /**

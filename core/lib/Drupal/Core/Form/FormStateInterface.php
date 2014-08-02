@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Form;
 
+use Drupal\Core\Annotation\Action;
 use Drupal\Core\Url;
 
 /**
@@ -311,5 +312,13 @@ interface FormStateInterface {
    * @return $this
    */
   public function setRebuild($rebuild = TRUE);
+
+  /**
+   * Returns the form object that is responsible for building this form.
+   *
+   * @return \Drupal\Core\Form\FormInterface
+   *   The form object.
+   */
+  public function getFormObject();
 
 }
