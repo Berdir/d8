@@ -203,6 +203,26 @@ class EntityTypeTest extends UnitTestCase {
   }
 
   /**
+   * @covers ::getOriginalClass
+   */
+  public function testgetOriginalClassUnchanged() {
+    $class = $this->randomName();
+    $entity_type = $this->setUpEntityType(array('class' => $class));
+    $this->assertEquals($class, $entity_type->getOriginalClass());
+  }
+
+  /**
+   * @covers ::setClass
+   * @covers ::getOriginalClass
+   */
+  public function testgetOriginalClassChanged() {
+    $class = $this->randomName();
+    $entity_type = $this->setUpEntityType(array('class' => $class));
+    $entity_type->setClass($this->randomName());
+    $this->assertEquals($class, $entity_type->getOriginalClass());
+  }
+
+  /**
    * @covers ::id
    */
   public function testId() {
