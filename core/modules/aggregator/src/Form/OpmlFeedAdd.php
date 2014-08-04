@@ -106,7 +106,7 @@ class OpmlFeedAdd extends FormBase {
     // If both fields are empty or filled, cancel.
     $file_upload = $this->getRequest()->files->get('files[upload]', NULL, TRUE);
     if (empty($form_state['values']['remote']) == empty($file_upload)) {
-      $this->setFormError('remote', $form_state, $this->t('<em>Either</em> upload a file or enter a URL.'));
+      $form_state->setErrorByName('remote', $this->t('<em>Either</em> upload a file or enter a URL.'));
     }
   }
 
@@ -125,7 +125,7 @@ class OpmlFeedAdd extends FormBase {
         $data = $response->getBody(TRUE);
       }
       catch (RequestException $e) {
-        watchdog('aggregator', 'Failed to download OPML file due to "%error".', array('%error' => $e->getMessage()), WATCHDOG_WARNING);
+        $this->logger('aggregator')->warning('Failed to download OPML file due to "%error".', array('%error' => $e->getMessage()));
         drupal_set_message($this->t('Failed to download OPML file due to "%error".', array('%error' => $e->getMessage())));
         return;
       }

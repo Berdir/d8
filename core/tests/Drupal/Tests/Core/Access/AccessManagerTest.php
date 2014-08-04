@@ -421,11 +421,13 @@ class AccessManagerTest extends UnitTestCase {
 
     $this->paramConverter->expects($this->at(0))
       ->method('convert')
+      ->with(array(RouteObjectInterface::ROUTE_OBJECT => $this->routeCollection->get('test_route_2')))
       ->will($this->returnValue(array()));
 
     $this->paramConverter->expects($this->at(1))
       ->method('convert')
-      ->will($this->returnValue(array()));
+      ->with(array('value' => 'example', RouteObjectInterface::ROUTE_OBJECT => $this->routeCollection->get('test_route_4')))
+      ->will($this->returnValue(array('value' => 'example')));
 
     // Tests the access with routes with parameters without given request.
     $this->assertTrue($this->accessManager->checkNamedRoute('test_route_2', array(), $this->account));
@@ -459,8 +461,14 @@ class AccessManagerTest extends UnitTestCase {
     $this->paramConverter = $this->getMock('Drupal\Core\ParamConverter\ParamConverterManagerInterface');
     $this->paramConverter->expects($this->at(0))
       ->method('convert')
+      ->with(array('value' => 'example', RouteObjectInterface::ROUTE_OBJECT => $route))
       ->will($this->returnValue(array('value' => 'upcasted_value')));
 
+    $this->argumentsResolver->expects($this->atLeastOnce())
+      ->method('getArguments')
+      ->will($this->returnCallback(function ($callable, $route, $request, $account) {
+        return array($route);
+      }));
 
     $subrequest = Request::create('/test-route-1/example');
 
@@ -469,15 +477,15 @@ class AccessManagerTest extends UnitTestCase {
     $this->requestStack->push(new Request());
 
     $access_check = $this->getMock('Drupal\Tests\Core\Access\TestAccessCheckInterface');
-    $access_check->expects($this->any())
+    $access_check->expects($this->atLeastOnce())
       ->method('applies')
       ->will($this->returnValue(TRUE));
-    $access_check->expects($this->any())
+    $access_check->expects($this->atLeastOnce())
       ->method('access')
       ->will($this->returnValue(AccessInterface::KILL));
 
     $subrequest->attributes->set('value', 'upcasted_value');
-    $this->container->register('test_access', $access_check);
+    $this->container->set('test_access', $access_check);
 
     $this->accessManager->addCheckService('test_access', 'access');
     $this->accessManager->setChecks($this->routeCollection);
@@ -507,7 +515,7 @@ class AccessManagerTest extends UnitTestCase {
     $this->urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
     $this->urlGenerator->expects($this->any())
       ->method('generate')
-      ->with('test_route_1', array('value' => 'example'))
+      ->with('test_route_1', array())
       ->will($this->returnValueMap($map));
 
     $this->paramConverter = $this->getMock('Drupal\Core\ParamConverter\ParamConverterManagerInterface');
@@ -516,6 +524,12 @@ class AccessManagerTest extends UnitTestCase {
       ->with(array('value' => 'example', RouteObjectInterface::ROUTE_OBJECT => $route))
       ->will($this->returnValue(array('value' => 'upcasted_value')));
 
+    $this->argumentsResolver->expects($this->atLeastOnce())
+      ->method('getArguments')
+      ->will($this->returnCallback(function ($callable, $route, $request, $account) {
+        return array($route);
+      }));
+
     $subrequest = Request::create('/test-route-1/example');
 
     $this->accessManager = new AccessManager($this->routeProvider, $this->urlGenerator, $this->paramConverter, $this->argumentsResolver, $this->requestStack);
@@ -523,15 +537,15 @@ class AccessManagerTest extends UnitTestCase {
     $this->requestStack->push(new Request());
 
     $access_check = $this->getMock('Drupal\Tests\Core\Access\TestAccessCheckInterface');
-    $access_check->expects($this->any())
+    $access_check->expects($this->atLeastOnce())
       ->method('applies')
       ->will($this->returnValue(TRUE));
-    $access_check->expects($this->any())
+    $access_check->expects($this->atLeastOnce())
       ->method('access')
       ->will($this->returnValue(AccessInterface::KILL));
 
     $subrequest->attributes->set('value', 'upcasted_value');
-    $this->container->register('test_access', $access_check);
+    $this->container->set('test_access', $access_check);
 
     $this->accessManager->addCheckService('test_access', 'access');
     $this->accessManager->setChecks($this->routeCollection);

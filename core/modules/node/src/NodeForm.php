@@ -297,7 +297,7 @@ class NodeForm extends ContentEntityForm {
     $node = $this->buildEntity($form, $form_state);
 
     if ($node->id() && (node_last_changed($node->id(), $this->getFormLangcode($form_state)) > $node->getChangedTime())) {
-      $this->setFormError('changed', $form_state, $this->t('The content on this page has either been modified by another user, or you have already submitted modifications using this form. As a result, your changes cannot be saved.'));
+      $form_state->setErrorByName('changed', $this->t('The content on this page has either been modified by another user, or you have already submitted modifications using this form. As a result, your changes cannot be saved.'));
     }
 
     // Validate the "authored by" field.
@@ -305,14 +305,14 @@ class NodeForm extends ContentEntityForm {
       // The use of empty() is mandatory in the context of usernames
       // as the empty string denotes the anonymous user. In case we
       // are dealing with an anonymous user we set the user ID to 0.
-      $this->setFormError('uid', $form_state, $this->t('The username %name does not exist.', array('%name' => $form_state['values']['uid'])));
+      $form_state->setErrorByName('uid', $this->t('The username %name does not exist.', array('%name' => $form_state['values']['uid'])));
     }
 
     // Validate the "authored on" field.
     // The date element contains the date object.
     $date = $node->date instanceof DrupalDateTime ? $node->date : new DrupalDateTime($node->date);
     if ($date->hasErrors()) {
-      $this->setFormError('date', $form_state, $this->t('You have to specify a valid date.'));
+      $form_state->setErrorByName('date', $this->t('You have to specify a valid date.'));
     }
 
     // Invoke hook_node_validate() for validation needed by modules.
@@ -433,15 +433,15 @@ class NodeForm extends ContentEntityForm {
     $insert = $node->isNew();
     $node->save();
     $node_link = l(t('View'), 'node/' . $node->id());
-    $watchdog_args = array('@type' => $node->getType(), '%title' => $node->label());
+    $context = array('@type' => $node->getType(), '%title' => $node->label(), 'link' => $node_link);
     $t_args = array('@type' => node_get_type_label($node), '%title' => $node->label());
 
     if ($insert) {
-      watchdog('content', '@type: added %title.', $watchdog_args, WATCHDOG_NOTICE, $node_link);
+      $this->logger('content')->notice('@type: added %title.', $context);
       drupal_set_message(t('@type %title has been created.', $t_args));
     }
     else {
-      watchdog('content', '@type: updated %title.', $watchdog_args, WATCHDOG_NOTICE, $node_link);
+      $this->logger('content')->notice('@type: updated %title.', $context);
       drupal_set_message(t('@type %title has been updated.', $t_args));
     }
 

@@ -112,7 +112,7 @@ class ResponsiveImageMappingForm extends EntityForm {
       }
       // Make sure at least one mapping is defined.
       elseif (!$responsive_image_mapping->isNew() && !$responsive_image_mapping->hasMappings()) {
-        $this->setFormError('mappings', $form_state, $this->t('Please select at least one mapping.'));
+        $form_state->setErrorByName('mappings', $this->t('Please select at least one mapping.'));
       }
     }
   }
@@ -125,7 +125,7 @@ class ResponsiveImageMappingForm extends EntityForm {
     $responsive_image_mapping = $this->entity;
     $responsive_image_mapping->save();
 
-    watchdog('responsive_image', 'Responsive image mapping @label saved.', array('@label' => $responsive_image_mapping->label()), WATCHDOG_NOTICE);
+    $this->logger('responsive_image')->notice('Responsive image mapping @label saved.', array('@label' => $responsive_image_mapping->label()));
     drupal_set_message($this->t('Responsive image mapping %label saved.', array('%label' => $responsive_image_mapping->label())));
 
     // Redirect to edit form after creating a new mapping or after selecting

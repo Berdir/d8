@@ -113,7 +113,7 @@ class TermForm extends ContentEntityForm {
 
     // Ensure numeric values.
     if (isset($form_state['values']['weight']) && !is_numeric($form_state['values']['weight'])) {
-      $this->setFormError('weight', $form_state, $this->t('Weight value must be numeric.'));
+      $form_state->setErrorByName('weight', $this->t('Weight value must be numeric.'));
     }
   }
 
@@ -141,11 +141,11 @@ class TermForm extends ContentEntityForm {
     switch ($term->save()) {
       case SAVED_NEW:
         drupal_set_message($this->t('Created new term %term.', array('%term' => $term->getName())));
-        watchdog('taxonomy', 'Created new term %term.', array('%term' => $term->getName()), WATCHDOG_NOTICE, l($this->t('Edit'), 'taxonomy/term/' . $term->id() . '/edit'));
+        $this->logger('taxonomy')->notice('Created new term %term.', array('%term' => $term->getName(), 'link' => l($this->t('Edit'), 'taxonomy/term/' . $term->id() . '/edit')));
         break;
       case SAVED_UPDATED:
         drupal_set_message($this->t('Updated term %term.', array('%term' => $term->getName())));
-        watchdog('taxonomy', 'Updated term %term.', array('%term' => $term->getName()), WATCHDOG_NOTICE, l($this->t('Edit'), 'taxonomy/term/' . $term->id() . '/edit'));
+        $this->logger('taxonomy')->notice('Updated term %term.', array('%term' => $term->getName(), 'link' => l($this->t('Edit'), 'taxonomy/term/' . $term->id() . '/edit')));
         break;
     }
 

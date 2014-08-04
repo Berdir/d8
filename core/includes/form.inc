@@ -39,7 +39,7 @@ function form_get_cache($form_build_id, FormStateInterface $form_state) {
  *
  * @see \Drupal\Core\Form\FormBuilderInterface::setCache().
  */
-function form_set_cache($form_build_id, $form, $form_state) {
+function form_set_cache($form_build_id, $form, FormStateInterface $form_state) {
   \Drupal::formBuilder()->setCache($form_build_id, $form, $form_state);
 }
 
@@ -136,7 +136,7 @@ function drupal_process_form($form_id, &$form, FormStateInterface $form_state) {
  *
  * @see \Drupal\Core\Form\FormSubmitterInterface::redirectForm().
  */
-function drupal_redirect_form($form_state) {
+function drupal_redirect_form(FormStateInterface $form_state) {
   return \Drupal::service('form_submitter')->redirectForm($form_state);
 }
 
@@ -163,48 +163,48 @@ function form_execute_handlers($type, &$form, FormStateInterface $form_state) {
  * Files an error against a form element.
  *
  * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal::formBuilder()->setErrorByName().
+ *   Use $form_state->setErrorByName().
  *
- * @see \Drupal\Core\Form\FormErrorInterface::setErrorByName().
+ * @see \Drupal\Core\Form\FormStateInterface::setErrorByName().
  */
 function form_set_error($name, FormStateInterface $form_state, $message = '') {
-  \Drupal::formBuilder()->setErrorByName($name, $form_state, $message);
+  $form_state->setErrorByName($name, $message);
 }
 
 /**
  * Returns an associative array of all errors.
  *
  * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal::formBuilder()->getErrors().
+ *   Use $form_state->getErrors().
  *
- * @see \Drupal\Core\Form\FormErrorInterface::getErrors()
+ * @see \Drupal\Core\Form\FormStateInterface::getErrors()
  */
 function form_get_errors(FormStateInterface $form_state) {
-  return \Drupal::formBuilder()->getErrors($form_state);
+  return $form_state->getErrors();
 }
 
 /**
  * Returns the error message filed against the given form element.
  *
  * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal::formBuilder()->getError().
+ *   Use $form_state->getError().
  *
- * @see \Drupal\Core\Form\FormErrorInterface::getError().
+ * @see \Drupal\Core\Form\FormStateInterface::getError().
  */
 function form_get_error($element, FormStateInterface $form_state) {
-  return \Drupal::formBuilder()->getError($element, $form_state);
+  return $form_state->getError($element);
 }
 
 /**
  * Flags an element as having an error.
  *
  * @deprecated in Drupal 8.x-dev, will be removed before Drupal 8.0.
- *   Use \Drupal::formBuilder()->setError().
+ *   Use $form_state->setError().
  *
- * @see \Drupal\Core\Form\FormErrorInterface::setError().
+ * @see \Drupal\Core\Form\FormStateInterface::setError().
  */
 function form_error(&$element, FormStateInterface $form_state, $message = '') {
-  \Drupal::formBuilder()->setError($element, $form_state, $message);
+  $form_state->setError($element, $message);
 }
 
 /**
@@ -288,7 +288,7 @@ function form_state_values_clean(FormStateInterface $form_state) {
  *   The data that will appear in the $form_state['values'] collection
  *   for this element. Return nothing to use the default.
  */
-function form_type_image_button_value($form, $input, $form_state) {
+function form_type_image_button_value($form, $input, FormStateInterface $form_state) {
   if ($input !== FALSE) {
     if (!empty($input)) {
       // If we're dealing with Mozilla or Opera, we're lucky. It will
@@ -1172,7 +1172,7 @@ function form_pre_render_conditional_form_element($element) {
 /**
  * Processes a form button element.
  */
-function form_process_button($element, $form_state) {
+function form_process_button($element, FormStateInterface $form_state) {
   // If this is a button intentionally allowing incomplete form submission
   // (e.g., a "Previous" or "Add another item" button), then also skip
   // client-side validation.
@@ -1185,7 +1185,7 @@ function form_process_button($element, $form_state) {
 /**
  * Sets the #checked property of a checkbox element.
  */
-function form_process_checkbox($element, $form_state) {
+function form_process_checkbox($element, FormStateInterface $form_state) {
   $value = $element['#value'];
   $return_value = $element['#return_value'];
   // On form submission, the #value of an available and enabled checked

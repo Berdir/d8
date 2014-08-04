@@ -86,7 +86,7 @@ class BookAdminEditForm extends FormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     if ($form_state['values']['tree_hash'] != $form_state['values']['tree_current_hash']) {
-      $this->setFormError('', $form_state, $this->t('This book has been modified by another user, the changes could not be saved.'));
+      $form_state->setErrorByName('', $this->t('This book has been modified by another user, the changes could not be saved.'));
     }
   }
 
@@ -120,7 +120,7 @@ class BookAdminEditForm extends FormBase {
           $node->book['link_title'] = $values['title'];
           $node->setNewRevision();
           $node->save();
-          watchdog('content', 'book: updated %title.', array('%title' => $node->label()), WATCHDOG_NOTICE, l($this->t('View'), 'node/' . $node->id()));
+          $this->logger('content')->notice('book: updated %title.', array('%title' => $node->label(), 'link' => l($this->t('View'), 'node/' . $node->id())));
         }
       }
     }

@@ -82,7 +82,7 @@ class CategoryForm extends EntityForm {
     foreach ($recipients as &$recipient) {
       $recipient = trim($recipient);
       if (!valid_email_address($recipient)) {
-        $this->setFormError('recipients', $form_state, $this->t('%recipient is an invalid email address.', array('%recipient' => $recipient)));
+        $form_state->setErrorByName('recipients', $this->t('%recipient is an invalid email address.', array('%recipient' => $recipient)));
       }
     }
     $form_state['values']['recipients'] = $recipients;
@@ -100,11 +100,11 @@ class CategoryForm extends EntityForm {
 
     if ($status == SAVED_UPDATED) {
       drupal_set_message($this->t('Category %label has been updated.', array('%label' => $category->label())));
-      watchdog('contact', 'Category %label has been updated.', array('%label' => $category->label()), WATCHDOG_NOTICE, $edit_link);
+      $this->logger('contact')->notice('Category %label has been updated.', array('%label' => $category->label(), 'link' => $edit_link));
     }
     else {
       drupal_set_message($this->t('Category %label has been added.', array('%label' => $category->label())));
-      watchdog('contact', 'Category %label has been added.', array('%label' => $category->label()), WATCHDOG_NOTICE, $edit_link);
+      $this->logger('contact')->notice('Category %label has been added.', array('%label' => $category->label(), 'link' => $edit_link));
     }
 
     // Update the default category.
