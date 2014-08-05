@@ -269,9 +269,7 @@ class ParamConverterManagerTest extends UnitTestCase {
     $converter = $this->getMock('Drupal\Core\ParamConverter\ParamConverterInterface');
     $converter->expects($this->never())
       ->method('convert');
-    $this->manager->addConverter('test_convert');
-    $this->container->expects($this->never())
-      ->method('get');
+    $this->manager->addConverter($converter, 'test_convert');
 
     $this->manager->convert($defaults, new Request());
   }

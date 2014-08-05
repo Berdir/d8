@@ -157,7 +157,7 @@ class MenuNodeTest extends WebTestBase {
 
     // Ensure that removing the node also removes the menu entry.
     $this->drupalPostForm('node/' . $node->id() . '/delete', array(), t('Delete'));
-    $result = \Drupal::entityQuery('menu_link')->condition('link_path', 'node/' . $node->id())
+    $result = \Drupal::entityQuery('menu_link_content')->condition('title', $node->getTitle())
       ->execute();
     $this->assertEqual(array(), $result);
   }
