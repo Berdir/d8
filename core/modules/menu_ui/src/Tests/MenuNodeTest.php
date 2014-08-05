@@ -154,5 +154,12 @@ class MenuNodeTest extends WebTestBase {
     $this->assertNoOption('edit-menu-menu-parent', 'tools:'. $child_item->getPluginId());
     // Assert that unallowed Administration menu is not available in options.
     $this->assertNoOption('edit-menu-menu-parent', 'admin:');
+
+    // Ensure that removing the node also removes the menu entry.
+    $this->drupalPostForm('node/' . $node->id() . '/delete', array(), t('Delete'));
+    $result = \Drupal::entityQuery('menu_link')->condition('link_path', 'node/' . $node->id())
+      ->execute();
+    $this->assertEqual(array(), $result);
   }
+
 }

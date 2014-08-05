@@ -83,6 +83,9 @@ class ParamConverterManager implements ParamConverterManagerInterface {
    */
   public function convert(array $defaults, Request $request) {
     /** @var $route \Symfony\Component\Routing\Route */
+    if (!isset($defaults[RouteObjectInterface::ROUTE_OBJECT]) || !isset($defaults[RouteObjectInterface::ROUTE_NAME])) {
+      throw new ParamNotConvertedException("The defaults array did not contain routing information (_route, _route_name)");
+    }
     $route = $defaults[RouteObjectInterface::ROUTE_OBJECT];
 
     // Skip this enhancer if there are no parameter definitions.

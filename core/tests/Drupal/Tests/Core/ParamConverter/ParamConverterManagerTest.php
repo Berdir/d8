@@ -255,4 +255,25 @@ class ParamConverterManagerTest extends UnitTestCase {
     $this->manager->convert($defaults, new Request());
   }
 
+  /**
+   * @covers ::convert()
+   *
+   * @expectedException \Drupal\Core\ParamConverter\ParamNotConvertedException
+   * @expectedExceptionMessage The defaults array did not contain routing information (_route, _route_name)
+   */
+  public function testConvertMissingRoute() {
+    $defaults = array(
+      'key' => 'value',
+    );
+
+    $converter = $this->getMock('Drupal\Core\ParamConverter\ParamConverterInterface');
+    $converter->expects($this->never())
+      ->method('convert');
+    $this->manager->addConverter('test_convert');
+    $this->container->expects($this->never())
+      ->method('get');
+
+    $this->manager->convert($defaults, new Request());
+  }
+
 }

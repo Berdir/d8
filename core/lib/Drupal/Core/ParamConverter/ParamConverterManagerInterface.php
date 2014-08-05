@@ -60,6 +60,8 @@ interface ParamConverterManagerInterface {
    * @throws \Drupal\Core\ParamConverter\ParamNotConvertedException
    *   If one of the assigned converters returned NULL because the given
    *   variable could not be converted.
+   *   Additional the exception is thrown when either _route or _route_name is
+   *   not set.
    *
    * @return array
    *   The modified defaults.

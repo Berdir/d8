@@ -521,7 +521,7 @@ class AccessManagerTest extends UnitTestCase {
     $this->paramConverter = $this->getMock('Drupal\Core\ParamConverter\ParamConverterManagerInterface');
     $this->paramConverter->expects($this->at(0))
       ->method('convert')
-      ->with(array('value' => 'example', RouteObjectInterface::ROUTE_OBJECT => $route))
+      ->with(array('value' => 'example', RouteObjectInterface::ROUTE_OBJECT => $route, RouteObjectInterface::ROUTE_NAME => 'test_route_1'))
       ->will($this->returnValue(array('value' => 'upcasted_value')));
 
     $this->argumentsResolver->expects($this->atLeastOnce())
