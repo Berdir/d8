@@ -51,7 +51,7 @@ class MenuTest extends MenuWebTestBase {
   /**
    * An array of test menu links.
    *
-   * @var \Drupal\menu_link_content\Entity\MenuLinkContentInterface[]
+   * @var \Drupal\menu_link_content\MenuLinkContentInterface[]
    */
   protected $items;
 
@@ -130,8 +130,8 @@ class MenuTest extends MenuWebTestBase {
    */
   function addCustomMenuCRUD() {
     // Add a new custom menu.
-    $menu_name = substr(hash('sha256', $this->randomName(16)), 0, MENU_MAX_MENU_NAME_LENGTH_UI);
-    $label = $this->randomName(16);
+    $menu_name = substr(hash('sha256', $this->randomMachineName(16)), 0, MENU_MAX_MENU_NAME_LENGTH_UI);
+    $label = $this->randomMachineName(16);
 
     $menu = entity_create('menu', array(
       'id' => $menu_name,
@@ -145,7 +145,7 @@ class MenuTest extends MenuWebTestBase {
     $this->assertRaw($label, 'Custom menu was added.');
 
     // Edit the menu.
-    $new_label = $this->randomName(16);
+    $new_label = $this->randomMachineName(16);
     $menu->set('label', $new_label);
     $menu->save();
     $this->drupalGet('admin/structure/menu/manage/' . $menu_name);
@@ -161,8 +161,8 @@ class MenuTest extends MenuWebTestBase {
   function addCustomMenu() {
     // Try adding a menu using a menu_name that is too long.
     $this->drupalGet('admin/structure/menu/add');
-    $menu_name = substr(hash('sha256', $this->randomName(16)), 0, MENU_MAX_MENU_NAME_LENGTH_UI + 1);
-    $label = $this->randomName(16);
+    $menu_name = substr(hash('sha256', $this->randomMachineName(16)), 0, MENU_MAX_MENU_NAME_LENGTH_UI + 1);
+    $label = $this->randomMachineName(16);
     $edit = array(
       'id' => $menu_name,
       'description' => '',
@@ -179,7 +179,7 @@ class MenuTest extends MenuWebTestBase {
     )));
 
     // Change the menu_name so it no longer exceeds the maximum length.
-    $menu_name = substr(hash('sha256', $this->randomName(16)), 0, MENU_MAX_MENU_NAME_LENGTH_UI);
+    $menu_name = substr(hash('sha256', $this->randomMachineName(16)), 0, MENU_MAX_MENU_NAME_LENGTH_UI);
     $edit['id'] = $menu_name;
     $this->drupalPostForm('admin/structure/menu/add', $edit, t('Save'));
 
@@ -248,6 +248,10 @@ class MenuTest extends MenuWebTestBase {
         'alias' => 'node5',
       ),
     ));
+
+    // Verify add link button.
+    $this->drupalGet('admin/structure/menu');
+    $this->assertLinkByHref('admin/structure/menu/manage/' . $menu_name . '/add', 0, "The add menu link button url is correct");
 
     // Add menu links.
     $item1 = $this->addMenuLink('', 'node/' . $node1->id(), $menu_name, TRUE);
@@ -442,7 +446,7 @@ class MenuTest extends MenuWebTestBase {
   function testSystemMenuRename() {
     $this->drupalLogin($this->admin_user);
     $edit = array(
-      'label' => $this->randomName(16),
+      'label' => $this->randomMachineName(16),
     );
     $this->drupalPostForm('admin/structure/menu/manage/main', $edit, t('Save'));
 
@@ -520,7 +524,7 @@ class MenuTest extends MenuWebTestBase {
     $this->drupalGet("admin/structure/menu/manage/$menu_name/add");
     $this->assertResponse(200);
 
-    $title = '!link_' . $this->randomName(16);
+    $title = '!link_' . $this->randomMachineName(16);
     $edit = array(
       'url' => $path,
       'title[0][value]' => $title,
@@ -601,7 +605,7 @@ class MenuTest extends MenuWebTestBase {
   /**
    * Changes the parent of a menu link using the UI.
    *
-   * @param \Drupal\menu_link_content\Entity\MenuLinkContentInterface $item
+   * @param \Drupal\menu_link_content\MenuLinkContentInterface $item
    *   The menu link item to move.
    * @param int $parent
    *   The id of the new parent.
@@ -625,7 +629,7 @@ class MenuTest extends MenuWebTestBase {
    *   Menu link entity.
    */
   function modifyMenuLink(MenuLinkContent $item) {
-    $item->title->value = $this->randomName(16);
+    $item->title->value = $this->randomMachineName(16);
 
     $mlid = $item->id();
     $title = $item->getTitle();

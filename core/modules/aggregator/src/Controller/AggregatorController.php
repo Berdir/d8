@@ -9,7 +9,7 @@ namespace Drupal\aggregator\Controller;
 
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Datetime\Date as DateFormatter;
+use Drupal\Core\Datetime\DateFormatter;
 use Drupal\aggregator\FeedInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,14 +23,14 @@ class AggregatorController extends ControllerBase {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\Date
+   * @var \Drupal\Core\Datetime\DateFormatter
    */
   protected $dateFormatter;
 
   /**
    * Constructs a \Drupal\aggregator\Controller\AggregatorController object.
    *
-   * @param \Drupal\Core\Datetime\Date $date_formatter
+   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
    *    The date formatter service.
    */
   public function __construct(DateFormatter $date_formatter) {
@@ -42,7 +42,7 @@ class AggregatorController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('date')
+      $container->get('date.formatter')
     );
   }
 
@@ -149,12 +149,12 @@ class AggregatorController extends ControllerBase {
       $row[] = ($last_checked && $refresh_rate ? $this->t('%time left', array('%time' => $this->dateFormatter->formatInterval($last_checked + $refresh_rate - REQUEST_TIME))) : $this->t('never'));
       $links['edit'] = array(
         'title' => $this->t('Edit'),
-        'route_name' => 'aggregator.feed_configure',
+        'route_name' => 'entity.aggregator_feed.edit_form',
         'route_parameters' => array('aggregator_feed' => $feed->id()),
       );
       $links['delete'] = array(
         'title' => $this->t('Delete'),
-        'route_name' => 'aggregator.feed_delete',
+        'route_name' => 'entity.aggregator_feed.delete_form',
         'route_parameters' => array('aggregator_feed' => $feed->id()),
       );
       $links['delete_items'] = array(
@@ -229,7 +229,7 @@ class AggregatorController extends ControllerBase {
             ->viewMultiple($items, 'summary');
         }
       }
-      $feed->url = $this->url('aggregator.feed_view', array('aggregator_feed' => $feed->id()));
+      $feed->url = $this->url('entity.aggregator_feed.canonical', array('aggregator_feed' => $feed->id()));
       $build[$feed->id()] = array(
         '#theme' => 'aggregator_summary_items',
         '#summary_items' => $summary_items,

@@ -50,8 +50,6 @@ class FormStateTest extends UnitTestCase {
     $redirect = new RedirectResponse('/example');
     $data[] = array(array('redirect' => $redirect), $redirect);
 
-    $data[] = array(array('redirect_route' => array('route_name' => 'test_route_a')), new Url('test_route_a', array(), array('absolute' => TRUE)));
-    $data[] = array(array('redirect_route' => array('route_name' => 'test_route_b', 'route_parameters' => array('key' => 'value'))), new Url('test_route_b', array('key' => 'value'), array('absolute' => TRUE)));
     $data[] = array(array('redirect_route' => new Url('test_route_b', array('key' => 'value'))), new Url('test_route_b', array('key' => 'value'), array('absolute' => TRUE)));
 
     $data[] = array(array('programmed' => TRUE), NULL);
@@ -157,6 +155,30 @@ class FormStateTest extends UnitTestCase {
       ->setMethods(array('drupalSetMessage'))
       ->getMock();
     $form_state->setErrorByName('test', 'message');
+  }
+
+  /**
+   * Tests that setting the value for an element adds to the values.
+   *
+   * @covers ::setValueForElement
+   */
+  public function testSetValueForElement() {
+    $element = array(
+      '#parents' => array(
+        'foo',
+        'bar',
+      ),
+    );
+    $value = $this->randomMachineName();
+
+    $form_state = new FormState();
+    $form_state->setValueForElement($element, $value);
+    $expected = array(
+      'foo' => array(
+        'bar' => $value,
+      ),
+    );
+    $this->assertSame($expected, $form_state->getValues());
   }
 
 }

@@ -304,12 +304,12 @@ class FieldOverview extends OverviewBase {
     if (array_filter(array($field['label'], $field['field_name'], $field['type']))) {
       // Missing label.
       if (!$field['label']) {
-        $this->setFormError('fields][_add_new_field][label', $form_state, $this->t('Add new field: you need to provide a label.'));
+        $form_state->setErrorByName('fields][_add_new_field][label', $this->t('Add new field: you need to provide a label.'));
       }
 
       // Missing field name.
       if (!$field['field_name']) {
-        $this->setFormError('fields][_add_new_field][field_name', $form_state, $this->t('Add new field: you need to provide a field name.'));
+        $form_state->setErrorByName('fields][_add_new_field][field_name', $this->t('Add new field: you need to provide a field name.'));
       }
       // Field name validation.
       else {
@@ -322,7 +322,7 @@ class FieldOverview extends OverviewBase {
 
       // Missing field type.
       if (!$field['type']) {
-        $this->setFormError('fields][_add_new_field][type', $form_state, $this->t('Add new field: you need to select a field type.'));
+        $form_state->setErrorByName('fields][_add_new_field][type', $this->t('Add new field: you need to select a field type.'));
       }
     }
   }
@@ -348,12 +348,12 @@ class FieldOverview extends OverviewBase {
       if (array_filter(array($field['label'], $field['field_name']))) {
         // Missing label.
         if (!$field['label']) {
-          $this->setFormError('fields][_add_existing_field][label', $form_state, $this->t('Re-use existing field: you need to provide a label.'));
+          $form_state->setErrorByName('fields][_add_existing_field][label', $this->t('Re-use existing field: you need to provide a label.'));
         }
 
         // Missing existing field name.
         if (!$field['field_name']) {
-          $this->setFormError('fields][_add_existing_field][field_name', $form_state, $this->t('Re-use existing field: you need to select a field.'));
+          $form_state->setErrorByName('fields][_add_existing_field][field_name', $this->t('Re-use existing field: you need to select a field.'));
         }
       }
     }
@@ -478,7 +478,13 @@ class FieldOverview extends OverviewBase {
     if ($destinations) {
       $destination = drupal_get_destination();
       $destinations[] = $destination['destination'];
-      $form_state['redirect_route'] = FieldUI::getNextDestination($destinations, $form_state);
+      $next_destination = FieldUI::getNextDestination($destinations, $form_state);
+      if (isset($next_destination['route_name'])) {
+        $form_state->setRedirect($next_destination['route_name'], $next_destination['route_parameters'], $next_destination['options']);
+      }
+      else {
+        $form_state['redirect'] = $next_destination;
+      }
     }
     elseif (!$error) {
       drupal_set_message($this->t('Your settings have been saved.'));

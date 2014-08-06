@@ -153,7 +153,7 @@ abstract class SearchPageFormBase extends EntityForm {
       ->condition('id', $form_state['values']['id'], '<>')
       ->execute();
     if ($path) {
-      $this->setFormError('path', $form_state, $this->t('The search page path must be unique.'));
+      $form_state->setErrorByName('path', $this->t('The search page path must be unique.'));
     }
 
     if ($this->plugin instanceof PluginFormInterface) {
@@ -179,7 +179,7 @@ abstract class SearchPageFormBase extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
 
-    $form_state['redirect_route']['route_name'] = 'search.settings';
+    $form_state->setRedirect('search.settings');
   }
 
 }

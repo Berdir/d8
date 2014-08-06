@@ -120,7 +120,7 @@ class UserPasswordForm extends FormBase {
       form_set_value(array('#parents' => array('account')), $account, $form_state);
     }
     else {
-      $this->setFormError('name', $form_state, $this->t('Sorry, %name is not recognized as a username or an email address.', array('%name' => $name)));
+      $form_state->setErrorByName('name', $this->t('Sorry, %name is not recognized as a username or an email address.', array('%name' => $name)));
     }
   }
 
@@ -138,7 +138,7 @@ class UserPasswordForm extends FormBase {
       drupal_set_message($this->t('Further instructions have been sent to your email address.'));
     }
 
-    $form_state['redirect_route']['route_name'] = 'user.page';
+    $form_state->setRedirect('user.page');
   }
 
 }

@@ -415,7 +415,7 @@ class ModulesListForm extends FormBase {
    * @return array
    *   An array of modules to install and their dependencies.
    */
-  protected function buildModuleList($form_state) {
+  protected function buildModuleList(FormStateInterface $form_state) {
     $packages = $form_state['values']['modules'];
 
     // Build a list of modules to install.
@@ -486,7 +486,7 @@ class ModulesListForm extends FormBase {
       $this->keyValueExpirable->setWithExpire($account, $modules, 60);
 
       // Redirect to the confirmation form.
-      $form_state['redirect_route']['route_name'] = 'system.modules_list_confirm';
+      $form_state->setRedirect('system.modules_list_confirm');
 
       // We can exit here because at least one modules has dependencies
       // which we have to prompt the user for in a confirmation form.

@@ -163,7 +163,7 @@ class ImportForm extends FormBase {
 
     // Ensure we have the file uploaded.
     if (!$this->file) {
-      $this->setFormError('file', $form_state, $this->t('File to import not found.'));
+      $form_state->setErrorByName('file', $this->t('File to import not found.'));
     }
   }
 
@@ -190,6 +190,6 @@ class ImportForm extends FormBase {
     $batch = locale_translate_batch_build(array($file->uri => $file), $options);
     batch_set($batch);
 
-    $form_state['redirect_route']['route_name'] = 'locale.translate_page';
+    $form_state->setRedirect('locale.translate_page');
   }
 }

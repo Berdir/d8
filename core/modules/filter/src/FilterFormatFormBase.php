@@ -227,7 +227,7 @@ abstract class FilterFormatFormBase extends EntityForm {
       ->condition('name', $format_name)
       ->execute();
     if ($format_exists) {
-      $this->setFormError('name', $form_state, $this->t('Text format names must be unique. A format named %name already exists.', array('%name' => $format_name)));
+      $form_state->setErrorByName('name', $this->t('Text format names must be unique. A format named %name already exists.', array('%name' => $format_name)));
     }
   }
 
@@ -258,7 +258,7 @@ abstract class FilterFormatFormBase extends EntityForm {
       }
     }
 
-    $form_state['redirect_route']['route_name'] = 'filter.admin_overview';
+    $form_state->setRedirect('filter.admin_overview');
 
     return $this->entity;
   }

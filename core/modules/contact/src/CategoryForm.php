@@ -82,7 +82,7 @@ class CategoryForm extends EntityForm {
     foreach ($recipients as &$recipient) {
       $recipient = trim($recipient);
       if (!valid_email_address($recipient)) {
-        $this->setFormError('recipients', $form_state, $this->t('%recipient is an invalid email address.', array('%recipient' => $recipient)));
+        $form_state->setErrorByName('recipients', $this->t('%recipient is an invalid email address.', array('%recipient' => $recipient)));
       }
     }
     $form_state['values']['recipients'] = $recipients;
@@ -120,7 +120,7 @@ class CategoryForm extends EntityForm {
         ->save();
     }
 
-    $form_state['redirect_route']['route_name'] = 'contact.category_list';
+    $form_state->setRedirect('contact.category_list');
   }
 
 }

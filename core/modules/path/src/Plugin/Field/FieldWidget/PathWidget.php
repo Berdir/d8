@@ -87,13 +87,12 @@ class PathWidget extends WidgetBase {
     // Trim the submitted value.
     $alias = trim($element['alias']['#value']);
     if (!empty($alias)) {
-      $form_builder = \Drupal::formBuilder();
-      $form_builder->setValue($element['alias'], $alias, $form_state);
+      $form_state->setValueForElement($element['alias'], $alias);
 
       // Validate that the submitted alias does not exist yet.
       $is_exists = \Drupal::service('path.alias_storage')->aliasExists($alias, $element['langcode']['#value'], $element['source']['#value']);
       if ($is_exists) {
-        $form_builder->setError($element, $form_state, t('The alias is already in use.'));
+        $form_state->setError($element, t('The alias is already in use.'));
       }
     }
   }

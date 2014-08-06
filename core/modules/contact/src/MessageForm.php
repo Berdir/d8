@@ -108,8 +108,8 @@ class MessageForm extends ContentEntityForm {
       '#required' => TRUE,
     );
     if ($user->isAnonymous()) {
-      $form['#attached']['library'][] = 'core/jquery.cookie';
-      $form['#attributes']['class'][] = 'user-info-from-cookie';
+      $form['#attached']['library'][] = 'core/drupal.form';
+      $form['#attributes']['data-user-info-from-browser'] = TRUE;
     }
     // Do not allow authenticated users to alter the name or email values to
     // prevent the impersonation of other users.
@@ -191,9 +191,7 @@ class MessageForm extends ContentEntityForm {
       // over the submitted form values.
       $sender->name = $message->getSenderName();
       $sender->mail = $message->getSenderMail();
-      // Save the anonymous user information to a cookie for reuse.
-      // @todo remove when https://www.drupal.org/node/749748 is in.
-      user_cookie_save(array('name' => $message->getSenderName(), 'mail' => $message->getSenderMail()));
+
       // For the email message, clarify that the sender name is not verified; it
       // could potentially clash with a username on this site.
       $sender->name = $this->t('!name (not verified)', array('!name' => $message->getSenderName()));
@@ -258,10 +256,10 @@ class MessageForm extends ContentEntityForm {
     // To avoid false error messages caused by flood control, redirect away from
     // the contact form; either to the contacted user account or the front page.
     if ($message->isPersonal() && $user->hasPermission('access user profiles')) {
-      $form_state['redirect_route'] = $message->getPersonalRecipient()->urlInfo();
+      $form_state->setRedirectUrl($message->getPersonalRecipient()->urlInfo());
     }
     else {
-      $form_state['redirect_route']['route_name'] = '<front>';
+      $form_state->setRedirect('<front>');
     }
     // Save the message. In core this is a no-op but should contrib wish to
     // implement message storage, this will make the task of swapping in a real

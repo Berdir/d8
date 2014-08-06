@@ -69,7 +69,7 @@ class OpmlFeedAdd extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $intervals = array(900, 1800, 3600, 7200, 10800, 21600, 32400, 43200, 64800, 86400, 172800, 259200, 604800, 1209600, 2419200);
-    $period = array_map(array(\Drupal::service('date'), 'formatInterval'), array_combine($intervals, $intervals));
+    $period = array_map(array(\Drupal::service('date.formatter'), 'formatInterval'), array_combine($intervals, $intervals));
 
     $form['upload'] = array(
       '#type' => 'file',
@@ -106,7 +106,7 @@ class OpmlFeedAdd extends FormBase {
     // If both fields are empty or filled, cancel.
     $file_upload = $this->getRequest()->files->get('files[upload]', NULL, TRUE);
     if (empty($form_state['values']['remote']) == empty($file_upload)) {
-      $this->setFormError('remote', $form_state, $this->t('<em>Either</em> upload a file or enter a URL.'));
+      $form_state->setErrorByName('remote', $this->t('<em>Either</em> upload a file or enter a URL.'));
     }
   }
 
@@ -173,7 +173,7 @@ class OpmlFeedAdd extends FormBase {
       $new_feed->save();
     }
 
-    $form_state['redirect_route']['route_name'] = 'aggregator.admin_overview';
+    $form_state->setRedirect('aggregator.admin_overview');
   }
 
   /**

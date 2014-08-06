@@ -8,6 +8,7 @@
 namespace Drupal\Core\Form;
 
 use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Provides an interface for an object containing the current state of a form.
@@ -76,6 +77,36 @@ interface FormStateInterface {
   public function setIfNotExists($property, $value);
 
   /**
+   * Sets a response for this form.
+   *
+   * If a response is set, it will be used during processing and returned
+   * directly. The form will not be rebuilt or redirected.
+   *
+   * @param \Symfony\Component\HttpFoundation\Response $response
+   *   The response to return.
+   *
+   * @return $this
+   */
+  public function setResponse(Response $response);
+
+  /**
+   * Sets the redirect for the form.
+   *
+   * @param string $route_name
+   *   The name of the route
+   * @param array $route_parameters
+   *   (optional) An associative array of parameter names and values.
+   * @param array $options
+   *   (optional) An associative array of additional options. See
+   *   \Drupal\Core\Url for the available keys.
+   *
+   * @return $this
+   *
+   * @see \Drupal\Core\Form\FormSubmitterInterface::redirectForm()
+   */
+  public function setRedirect($route_name, array $route_parameters = array(), array $options = array());
+
+  /**
    * Sets the redirect URL for the form.
    *
    * @param \Drupal\Core\Url $url
@@ -85,7 +116,7 @@ interface FormStateInterface {
    *
    * @see \Drupal\Core\Form\FormSubmitterInterface::redirectForm()
    */
-  public function setRedirect(Url $url);
+  public function setRedirectUrl(Url $url);
 
   /**
    * Gets the value to use for redirecting after the form has been executed.
@@ -162,6 +193,35 @@ interface FormStateInterface {
   public function addValue($property, $value);
 
   /**
+   * Changes submitted form values during form validation.
+   *
+   * Use this function to change the submitted value of a form element in a form
+   * validation function, so that the changed value persists in $form_state
+   * through to the submission handlers.
+   *
+   * Note that form validation functions are specified in the '#validate'
+   * component of the form array (the value of $form['#validate'] is an array of
+   * validation function names). If the form does not originate in your module,
+   * you can implement hook_form_FORM_ID_alter() to add a validation function
+   * to $form['#validate'].
+   *
+   * @param array $element
+   *   The form element that should have its value updated; in most cases you
+   *   can just pass in the element from the $form array, although the only
+   *   component that is actually used is '#parents'. If constructing yourself,
+   *   set $element['#parents'] to be an array giving the path through the form
+   *   array's keys to the element whose value you want to update. For instance,
+   *   if you want to update the value of $form['elem1']['elem2'], which should
+   *   be stored in $form_state['values']['elem1']['elem2'], you would set
+   *   $element['#parents'] = array('elem1','elem2').
+   * @param mixed $value
+   *   The new value for the form element.
+   *
+   * @return $this
+   */
+  public function setValueForElement($element, $value);
+
+  /**
    * Determines if any forms have any errors.
    *
    * @return bool
@@ -227,16 +287,13 @@ interface FormStateInterface {
    *
    * This will require $form_state['values']['step1'] and everything within it
    * (for example, $form_state['values']['step1']['choice']) to be valid, so
-   * calls to FormErrorInterface::setErrorByName('step1', $form_state, $message)
-   * or
-   * FormErrorInterface::setErrorByName('step1][choice', $form_state, $message)
-   * will prevent the submit handlers from running, and result in the error
-   * message being displayed to the user. However, calls to
-   * FormErrorInterface::setErrorByName('step2', $form_state, $message) and
-   * FormErrorInterface::setErrorByName('step2][groupX][choiceY', $form_state, $message)
-   * will be suppressed, resulting in the message not being displayed to the
-   * user, and the submit handlers will run despite
-   * $form_state['values']['step2'] and
+   * calls to self::setErrorByName('step1', $message) or
+   * self::setErrorByName('step1][choice', $message) will prevent the submit
+   * handlers from running, and result in the error message being displayed to
+   * the user. However, calls to self::setErrorByName('step2', $message) and
+   * self::setErrorByName('step2][groupX][choiceY', $message) will be
+   * suppressed, resulting in the message not being displayed to the user, and
+   * the submit handlers will run despite $form_state['values']['step2'] and
    * $form_state['values']['step2']['groupX']['choiceY'] containing invalid
    * values. Errors for an invalid $form_state['values']['foo'] will be
    * suppressed, but errors flagging invalid values for
@@ -276,7 +333,7 @@ interface FormStateInterface {
   public function setError(&$element, $message = '');
 
   /**
-   * Clears all errors against all form elements made by FormErrorInterface::setErrorByName().
+   * Clears all errors against all form elements made by self::setErrorByName().
    */
   public function clearErrors();
 

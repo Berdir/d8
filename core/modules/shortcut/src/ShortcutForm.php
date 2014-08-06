@@ -66,7 +66,7 @@ class ShortcutForm extends ContentEntityForm {
    */
   public function validate(array $form, FormStateInterface $form_state) {
     if (!shortcut_valid_link($form_state['values']['path'])) {
-      $this->setFormError('path', $form_state, $this->t('The shortcut must correspond to a valid path on the site.'));
+      $form_state->setErrorByName('path', $this->t('The shortcut must correspond to a valid path on the site.'));
     }
 
     parent::validate($form, $form_state);
@@ -87,9 +87,9 @@ class ShortcutForm extends ContentEntityForm {
     }
     drupal_set_message($message);
 
-    $form_state['redirect_route'] = array(
-      'route_name' => 'shortcut.set_customize',
-      'route_parameters' => array('shortcut_set' => $entity->bundle()),
+    $form_state->setRedirect(
+      'entity.shortcut_set.customize_form',
+      array('shortcut_set' => $entity->bundle())
     );
   }
 

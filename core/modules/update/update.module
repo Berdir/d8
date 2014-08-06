@@ -189,8 +189,11 @@ function update_theme() {
       'template' => 'update-project-status',
     ),
     'update_version' => array(
-      'variables' => array('version' => NULL, 'tag' => NULL, 'class' => array()),
+      'variables' => array('version' => NULL, 'title' => NULL, 'attributes' => array()),
       'file' => 'update.report.inc',
+      // We are using template instead of '#type' => 'table' here to keep markup
+      // out of preprocess and allow for easier changes to markup.
+      'template' => 'update-version',
     ),
   );
 }
@@ -255,7 +258,7 @@ function update_themes_disabled($themes) {
  *
  * @see _update_cache_clear()
  */
-function update_form_system_modules_alter(&$form, $form_state) {
+function update_form_system_modules_alter(&$form, FormStateInterface $form_state) {
   $form['#submit'][] = 'update_storage_clear_submit';
 }
 
@@ -572,7 +575,7 @@ function _update_project_status_sort($a, $b) {
  * @see theme_update_report()
  */
 function template_preprocess_update_last_check(&$variables) {
-  $variables['time'] = \Drupal::service('date')->formatInterval(REQUEST_TIME - $variables['last']);
+  $variables['time'] = \Drupal::service('date.formatter')->formatInterval(REQUEST_TIME - $variables['last']);
   $variables['link'] = \Drupal::l(t('Check manually'), 'update.manual_status', array(), array('query' => drupal_get_destination()));
 }
 

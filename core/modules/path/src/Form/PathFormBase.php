@@ -12,7 +12,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Path\AliasManagerInterface;
 use Drupal\Core\Path\AliasStorageInterface;
-use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -145,10 +144,10 @@ abstract class PathFormBase extends FormBase {
     $langcode = isset($form_state['values']['langcode']) ? $form_state['values']['langcode'] : LanguageInterface::LANGCODE_NOT_SPECIFIED;
 
     if ($this->aliasStorage->aliasExists($alias, $langcode, $source)) {
-      $this->setFormError('alias', $form_state, t('The alias %alias is already in use in this language.', array('%alias' => $alias)));
+      $form_state->setErrorByName('alias', t('The alias %alias is already in use in this language.', array('%alias' => $alias)));
     }
     if (!drupal_valid_path($source)) {
-      $this->setFormError('source', $form_state, t("The path '@link_path' is either invalid or you do not have access to it.", array('@link_path' => $source)));
+      $form_state->setErrorByName('source', t("The path '@link_path' is either invalid or you do not have access to it.", array('@link_path' => $source)));
     }
   }
 
@@ -170,7 +169,7 @@ abstract class PathFormBase extends FormBase {
     $this->aliasStorage->save($source, $alias, $langcode, $pid);
 
     drupal_set_message($this->t('The alias has been saved.'));
-    $form_state['redirect_route'] = new Url('path.admin_overview');
+    $form_state->setRedirect('path.admin_overview');
   }
 
 }

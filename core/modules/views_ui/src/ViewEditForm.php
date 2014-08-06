@@ -11,7 +11,7 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
-use Drupal\Core\Datetime\Date as DateFormatter;
+use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Form\FormStateInterface;
@@ -43,7 +43,7 @@ class ViewEditForm extends ViewFormBase {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\Date
+   * @var \Drupal\Core\Datetime\DateFormatter
    */
   protected $dateFormatter;
 
@@ -54,7 +54,7 @@ class ViewEditForm extends ViewFormBase {
    *   The factory for the temp store object.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack object.
-   * @param \Drupal\Core\Datetime\Date $date_formatter
+   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
    *   The date Formatter service.
    */
   public function __construct(TempStoreFactory $temp_store_factory, RequestStack $requestStack, DateFormatter $date_formatter) {
@@ -70,7 +70,7 @@ class ViewEditForm extends ViewFormBase {
     return new static(
       $container->get('user.tempstore'),
       $container->get('request_stack'),
-      $container->get('date')
+      $container->get('date.formatter')
     );
   }
 
@@ -257,11 +257,11 @@ class ViewEditForm extends ViewFormBase {
 
     $view = $this->entity;
     if ($view->isLocked()) {
-      $this->setFormError('', $form_state, $this->t('Changes cannot be made to a locked view.'));
+      $form_state->setErrorByName('', $this->t('Changes cannot be made to a locked view.'));
     }
     foreach ($view->getExecutable()->validate() as $display_errors) {
       foreach ($display_errors as $error) {
-        $this->setFormError('', $form_state, $error);
+        $form_state->setErrorByName('', $error);
       }
     }
   }
@@ -296,10 +296,10 @@ class ViewEditForm extends ViewFormBase {
         unset($displays[$id]);
 
         // Redirect the user to the renamed display to be sure that the page itself exists and doesn't throw errors.
-        $form_state['redirect_route'] = array(
-          'route_name' => 'views_ui.edit_display',
-          'route_parameters' => array('view' => $view->id(), 'display_id' => $new_id),
-        );
+        $form_state->setRedirect('views_ui.edit_display', array(
+          'view' => $view->id(),
+          'display_id' => $new_id,
+        ));
       }
     }
     $view->set('display', $displays);
@@ -346,7 +346,7 @@ class ViewEditForm extends ViewFormBase {
     // Remove this view from cache so edits will be lost.
     $view = $this->entity;
     $this->tempStore->delete($view->id());
-    $form_state['redirect_route']['route_name'] = 'views_ui.list';
+    $form_state->setRedirect('views_ui.list');
   }
 
   /**
@@ -589,10 +589,10 @@ class ViewEditForm extends ViewFormBase {
     $view->cacheSet();
 
     // Redirect to the top-level edit page.
-    $form_state['redirect_route'] = array(
-      'route_name' => 'views_ui.edit_display',
-      'route_parameters' => array('view' => $view->id(), 'display_id' => $id),
-    );
+    $form_state->setRedirect('views_ui.edit_display', array(
+      'view' => $view->id(),
+      'display_id' => $id,
+    ));
   }
 
   /**
@@ -608,10 +608,10 @@ class ViewEditForm extends ViewFormBase {
     $view->cacheSet();
 
     // Redirect to the top-level edit page.
-    $form_state['redirect_route'] = array(
-      'route_name' => 'views_ui.edit_display',
-      'route_parameters' => array('view' => $view->id(), 'display_id' => $id),
-    );
+    $form_state->setRedirect('views_ui.edit_display', array(
+      'view' => $view->id(),
+      'display_id' => $id,
+    ));
   }
 
   /**
@@ -626,10 +626,10 @@ class ViewEditForm extends ViewFormBase {
     $view->cacheSet();
 
     // Redirect to the top-level edit page.
-    $form_state['redirect_route'] = array(
-      'route_name' => 'views_ui.edit_display',
-      'route_parameters' => array('view' => $view->id(), 'display_id' => $id),
-    );
+    $form_state->setRedirect('views_ui.edit_display', array(
+      'view' => $view->id(),
+      'display_id' => $id,
+    ));
   }
 
   /**
@@ -647,7 +647,7 @@ class ViewEditForm extends ViewFormBase {
 
     // Redirect to the top-level edit page. The first remaining display will
     // become the active display.
-    $form_state['redirect_route'] = $view->urlInfo('edit-form');
+    $form_state->setRedirectUrl($view->urlInfo('edit-form'));
   }
 
   /**
@@ -818,10 +818,10 @@ class ViewEditForm extends ViewFormBase {
     $view->cacheSet();
 
     // Redirect to the new display's edit page.
-    $form_state['redirect_route'] = array(
-      'route_name' => 'views_ui.edit_display',
-      'route_parameters' => array('view' => $view->id(), 'display_id' => $new_display_id),
-    );
+    $form_state->setRedirect('views_ui.edit_display', array(
+      'view' => $view->id(),
+      'display_id' => $new_display_id,
+    ));
   }
 
   /**
@@ -840,10 +840,10 @@ class ViewEditForm extends ViewFormBase {
     $view->cacheSet();
 
     // Redirect to the new display's edit page.
-    $form_state['redirect_route'] = array(
-      'route_name' => 'views_ui.edit_display',
-      'route_parameters' => array('view' => $view->id(), 'display_id' => $display_id),
-    );
+    $form_state->setRedirect('views_ui.edit_display', array(
+      'view' => $view->id(),
+      'display_id' => $display_id,
+    ));
   }
 
   /**
@@ -876,10 +876,10 @@ class ViewEditForm extends ViewFormBase {
     $view->cacheSet();
 
     // Redirect to the new display's edit page.
-    $form_state['redirect_route'] = array(
-      'route_name' => 'views_ui.edit_display',
-      'route_parameters' => array('view' => $view->id(), 'display_id' => $new_display_id),
-    );
+    $form_state->setRedirect('views_ui.edit_display', array(
+      'view' => $view->id(),
+      'display_id' => $new_display_id,
+    ));
   }
 
   /**

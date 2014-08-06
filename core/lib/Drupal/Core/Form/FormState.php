@@ -7,7 +7,9 @@
 
 namespace Drupal\Core\Form;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Stores information about the state of a form.
@@ -566,7 +568,7 @@ class FormState implements FormStateInterface, \ArrayAccess {
    * {@inheritdoc}
    */
   public function getValues() {
-    return $this->values;
+    return $this->values ?: array();
   }
 
   /**
@@ -582,7 +584,33 @@ class FormState implements FormStateInterface, \ArrayAccess {
   /**
    * {@inheritdoc}
    */
-  public function setRedirect(Url $url) {
+  public function setValueForElement($element, $value) {
+    $values = $this->getValues();
+    NestedArray::setValue($values, $element['#parents'], $value, TRUE);
+    $this->set('values', $values);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setResponse(Response $response) {
+    $this->set('response', $response);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRedirect($route_name, array $route_parameters = array(), array $options = array()) {
+    $url = new Url($route_name, $route_parameters, $options);
+    return $this->setRedirectUrl($url);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRedirectUrl(Url $url) {
     $this->set('redirect_route', $url);
     return $this;
   }
@@ -607,20 +635,12 @@ class FormState implements FormStateInterface, \ArrayAccess {
 
     // Check for a route-based redirection.
     if ($redirect_route = $this->get('redirect_route')) {
-      // @todo Remove once all redirects are converted to \Drupal\Core\Url. See
-      //   https://www.drupal.org/node/2189661.
-      if (!($redirect_route instanceof Url)) {
-        $redirect_route += array(
-          'route_parameters' => array(),
-          'options' => array(),
-        );
-        $redirect_route = new Url($redirect_route['route_name'], $redirect_route['route_parameters'], $redirect_route['options']);
-      }
-
       $redirect_route->setAbsolute();
       return $redirect_route;
     }
 
+    // @todo Remove once all redirects are converted away from paths in
+    //   https://www.drupal.org/node/2315807.
     return $this->get('redirect');
   }
 

@@ -165,7 +165,7 @@ class BreadcrumbTest extends MenuTestBase {
 
     foreach ($menus as $menu) {
       // Create a parent node in the current menu.
-      $title = $this->randomName();
+      $title = $this->randomMachineName();
       $node2 = $this->drupalCreateNode(array(
         'type' => $type,
         'title' => $title,
@@ -258,7 +258,7 @@ class BreadcrumbTest extends MenuTestBase {
     $this->drupalLogout();
     foreach ($tags as $name => $data) {
       $term = $data['term'];
-      /** @var \Drupal\menu_link_content\Entity\MenuLinkContentInterface $link */
+      /** @var \Drupal\menu_link_content\MenuLinkContentInterface $link */
       $link = $data['link'];
 
       $link_path = $link->getUrlObject()->getInternalPath();

@@ -46,8 +46,8 @@ class RegisterForm extends AccountForm {
       return new RedirectResponse(url('user/' . \Drupal::currentUser()->id(), array('absolute' => TRUE)));
     }
 
-    $form['#attached']['library'][] = 'core/jquery.cookie';
-    $form['#attributes']['class'][] = 'user-info-from-cookie';
+    $form['#attached']['library'][] = 'core/drupal.form';
+    $form['#attributes']['data-user-info-from-browser'] = TRUE;
 
     // Because the user status has security implications, users are blocked by
     // default when created programmatically and need to be actively activated
@@ -130,7 +130,7 @@ class RegisterForm extends AccountForm {
       _user_mail_notify('register_no_approval_required', $account);
       user_login_finalize($account);
       drupal_set_message($this->t('Registration successful. You are now logged in.'));
-      $form_state['redirect_route']['route_name'] = '<front>';
+      $form_state->setRedirect('<front>');
     }
     // No administrator approval required.
     elseif ($account->isActive() || $notify) {
@@ -145,7 +145,7 @@ class RegisterForm extends AccountForm {
           }
           else {
             drupal_set_message($this->t('A welcome message with further instructions has been sent to your email address.'));
-            $form_state['redirect_route']['route_name'] = '<front>';
+            $form_state->setRedirect('<front>');
           }
         }
       }
@@ -154,7 +154,7 @@ class RegisterForm extends AccountForm {
     else {
       _user_mail_notify('register_pending_approval', $account);
       drupal_set_message($this->t('Thank you for applying for an account. Your account is currently pending approval by the site administrator.<br />In the meantime, a welcome message with further instructions has been sent to your email address.'));
-      $form_state['redirect_route']['route_name'] = '<front>';
+      $form_state->setRedirect('<front>');
     }
   }
 }

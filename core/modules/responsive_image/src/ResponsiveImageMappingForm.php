@@ -112,7 +112,7 @@ class ResponsiveImageMappingForm extends EntityForm {
       }
       // Make sure at least one mapping is defined.
       elseif (!$responsive_image_mapping->isNew() && !$responsive_image_mapping->hasMappings()) {
-        $this->setFormError('mappings', $form_state, $this->t('Please select at least one mapping.'));
+        $form_state->setErrorByName('mappings', $this->t('Please select at least one mapping.'));
       }
     }
   }
@@ -131,15 +131,13 @@ class ResponsiveImageMappingForm extends EntityForm {
     // Redirect to edit form after creating a new mapping or after selecting
     // another breakpoint group.
     if (!$responsive_image_mapping->hasMappings()) {
-      $form_state['redirect_route'] = array(
-        'route_name' => 'responsive_image.mapping_page_edit',
-        'route_parameters' => array(
-          'responsive_image_mapping' => $responsive_image_mapping->id(),
-        ),
+      $form_state->setRedirect(
+        'entity.responsive_image_mapping.edit_form',
+        array('responsive_image_mapping' => $responsive_image_mapping->id())
       );
     }
     else {
-      $form_state['redirect_route']['route_name'] = 'responsive_image.mapping_page';
+      $form_state->setRedirect('responsive_image.mapping_page');
     }
   }
 

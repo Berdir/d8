@@ -38,7 +38,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
   /**
    * The content menu link.
    *
-   * @var \Drupal\menu_link_content\Entity\MenuLinkContentInterface
+   * @var \Drupal\menu_link_content\MenuLinkContentInterface
    */
   protected $entity;
 
@@ -336,7 +336,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
    * {@inheritdoc}
    */
   public function buildEntity(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\menu_link_content\Entity\MenuLinkContentInterface $entity */
+    /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
     $entity = parent::buildEntity($form, $form_state);
     $new_definition = $this->extractFormValues($form, $form_state);
 
@@ -363,11 +363,9 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
 
     if ($saved) {
       drupal_set_message($this->t('The menu link has been saved.'));
-      $form_state['redirect_route'] = array(
-        'route_name' => 'menu_link_content.link_edit',
-        'route_parameters' => array(
-          'menu_link_content' => $menu_link->id(),
-        ),
+      $form_state->setRedirect(
+        'entity.menu_link_content.canonical',
+        array('menu_link_content' => $menu_link->id())
       );
     }
     else {
@@ -401,7 +399,7 @@ class MenuLinkContentForm extends ContentEntityForm implements MenuLinkFormInter
       $valid = $this->accessManager->checkNamedRoute($extracted['route_name'], $extracted['route_parameters'], $this->account);
     }
     if (!$valid) {
-      $this->setFormError('url', $form_state, $this->t("The path '@link_path' is either invalid or you do not have access to it.", array('@link_path' => $form_state['values']['url'])));
+      $form_state->setErrorByName('url', $this->t("The path '@link_path' is either invalid or you do not have access to it.", array('@link_path' => $form_state['values']['url'])));
     }
     elseif ($extracted['route_name']) {
       // The user entered a Drupal path.

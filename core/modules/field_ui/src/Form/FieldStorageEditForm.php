@@ -165,7 +165,7 @@ class FieldStorageEditForm extends FormBase {
     $cardinality = $form_state['values']['field']['cardinality'];
     $cardinality_number = $form_state['values']['field']['cardinality_number'];
     if ($cardinality === 'number' && empty($cardinality_number)) {
-      $this->setFormError('field][cardinality_number', $form_state, $this->t('Number of values is required.'));
+      $form_state->setErrorByName('field][cardinality_number', $this->t('Number of values is required.'));
     }
   }
 
@@ -199,14 +199,14 @@ class FieldStorageEditForm extends FormBase {
       if (($destinations = $request->query->get('destinations')) && $next_destination = FieldUI::getNextDestination($destinations)) {
         $request->query->remove('destinations');
         if (isset($next_destination['route_name'])) {
-          $form_state['redirect_route'] = $next_destination;
+          $form_state->setRedirect($next_destination['route_name'], $next_destination['route_parameters'], $next_destination['options']);
         }
         else {
           $form_state['redirect'] = $next_destination;
         }
       }
       else {
-        $form_state['redirect_route'] = FieldUI::getOverviewRouteInfo($this->instance->entity_type, $this->instance->bundle);
+        $form_state->setRedirectUrl(FieldUI::getOverviewRouteInfo($this->instance->entity_type, $this->instance->bundle));
       }
     }
     catch (\Exception $e) {
