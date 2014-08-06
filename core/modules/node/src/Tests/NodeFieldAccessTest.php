@@ -7,7 +7,6 @@
 namespace Drupal\node\Tests;
 
 use Drupal\Component\Utility\String;
-use Drupal\Core\Annotation\Action;
 use Drupal\node\Entity\Node;
 use Drupal\system\Tests\Entity\EntityUnitTestBase;
 
@@ -51,11 +50,9 @@ class NodeFieldAccessTest extends EntityUnitTestBase {
    */
   function testAccessToAdministrativeFields() {
 
-    // A all mighty user.
-    $chuck_norris = $this->createUser(array(), array('bypass node access'));
-
-    // An administrator user.
-    $content_admin_user = $this->createUser(array(), array('administer nodes'));
+    // An administrator user. No user exists yet, ensure that the first user
+    // does not have UID 1.
+    $content_admin_user = $this->createUser(array('uid' => 2), array('administer nodes'));
 
     // Two different editor users.
     $page_creator_user = $this->createUser(array(), array('create page content', 'edit own page content', 'delete own page content'));
@@ -66,7 +63,6 @@ class NodeFieldAccessTest extends EntityUnitTestBase {
 
     // List of all users
     $test_users = array(
-      $chuck_norris,
       $content_admin_user,
       $page_creator_user,
       $page_manager_user,
@@ -76,18 +72,18 @@ class NodeFieldAccessTest extends EntityUnitTestBase {
     // Create three "Basic pages". One is owned by our test-user
     // "page_creator", one by "page_manager", and one by someone else.
     $node1 = Node::create(array(
-      'title' => $this->randomName(8),
+      'title' => $this->randomMachineName(8),
       'uid' => $page_creator_user->id(),
       'type' => 'page',
     ));
     $node2 = Node::create(array(
-      'title' => $this->randomName(8),
+      'title' => $this->randomMachineName(8),
       'uid' => $page_manager_user->id(),
       'type' => 'page',
     ));
     $node3 = Node::create(array(
-      'title' => $this->randomName(8),
-      'uid' => $chuck_norris->id(),
+      'title' => $this->randomMachineName(8),
+      //'uid' => $chuck_norris->id(),
       'type' => 'page',
     ));
 
@@ -110,8 +106,6 @@ class NodeFieldAccessTest extends EntityUnitTestBase {
       $this->assertFalse($may_update, String::format('Users with permission "edit any page content" is not allowed to the field @name.', array('@name' => $field)));
       $may_update = $node2->{$field}->access('edit', $page_unrelated_user);
       $this->assertFalse($may_update, String::format('Users not having permission "edit any page content" is not allowed to the field @name.', array('@name' => $field)));
-      $may_update = $node1->{$field}->access('edit', $chuck_norris) && $node3->status->access('edit', $chuck_norris);
-      $this->assertTrue($may_update, String::format('Users with permission "bypass node access" may edit @name fields on all nodes.', array('@name' => $field)));
       $may_update = $node1->{$field}->access('edit', $content_admin_user) && $node3->status->access('edit', $content_admin_user);
       $this->assertTrue($may_update, String::format('Users with permission "administer nodes" may edit @name fields on all nodes.', array('@name' => $field)));
     }
