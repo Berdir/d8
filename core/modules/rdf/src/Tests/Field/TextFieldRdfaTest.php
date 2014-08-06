@@ -43,6 +43,8 @@ class TextFieldRdfaTest extends FieldRdfaTestBase {
   public function setUp() {
     parent::setUp();
 
+    $this->installConfig(array('filter'));
+
     $this->createTestField();
 
     // Add the mapping.
