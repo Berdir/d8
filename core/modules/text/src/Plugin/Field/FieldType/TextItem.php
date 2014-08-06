@@ -15,7 +15,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @FieldType(
  *   id = "text",
- *   label = @Translation("Text"),
+ *   label = @Translation("Text (filtered)"),
  *   description = @Translation("This field stores varchar text in the database."),
  *   default_widget = "text_textfield",
  *   default_formatter = "text_default"
@@ -90,25 +90,6 @@ class TextItem extends TextItemBase {
       '#description' => t('The maximum length of the field in characters.'),
       '#min' => 1,
       '#disabled' => $has_data,
-    );
-
-    return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function instanceSettingsForm(array $form, FormStateInterface $form_state) {
-    $element = array();
-
-    $element['text_processing'] = array(
-      '#type' => 'radios',
-      '#title' => t('Text processing'),
-      '#default_value' => $this->getSetting('text_processing'),
-      '#options' => array(
-        t('Plain text'),
-        t('Filtered text (user selects text format)'),
-      ),
     );
 
     return $element;

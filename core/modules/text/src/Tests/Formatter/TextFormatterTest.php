@@ -66,24 +66,6 @@ class TextFormatterTest extends EntityUnitTestBase {
       'bundle' => $this->bundle,
       'field_name' => 'processed_text',
       'label' => 'Processed text',
-      'settings' => array(
-        'text_processing' => TRUE,
-      ),
-    ))->save();
-    entity_create('field_storage_config', array(
-      'name' => 'unprocessed_text',
-      'entity_type' => $this->entityType,
-      'type' => 'text',
-      'settings' => array(),
-    ))->save();
-    entity_create('field_instance_config', array(
-      'entity_type' => $this->entityType,
-      'bundle' => $this->bundle,
-      'field_name' => 'unprocessed_text',
-      'label' => 'Unprocessed text',
-      'settings' => array(
-        'text_processing' => FALSE,
-      ),
     ))->save();
   }
 
@@ -103,9 +85,6 @@ class TextFormatterTest extends EntityUnitTestBase {
       'value' => 'Hello, world!',
       'format' => 'my_text_format',
     );
-    $entity->unprocessed_text = array(
-      'value' => 'Hello, world!',
-    );
     $entity->save();
 
     foreach ($formatters as $formatter) {
@@ -116,12 +95,6 @@ class TextFormatterTest extends EntityUnitTestBase {
         'filter_format' => array('my_text_format' => 'my_text_format'),
       );
       $this->assertEqual($build[0]['#cache']['tags'], $expected_cache_tags, format_string('The @formatter formatter has the expected cache tags when formatting a processed text field.', array('@formatter' => $formatter)));
-
-      // Verify the unprocessed text field formatter's render array.
-      $build = $entity->get('unprocessed_text')->view(array('type' => $formatter));
-      debug($build[0]);
-      $this->assertEqual($build[0]['#markup'], 'Hello, world!');
-      $this->assertTrue(!isset($build[0]['#cache']), format_string('The @formatter formatter has the expected cache tags when formatting an unprocessed text field.', array('@formatter' => $formatter)));
     }
   }
 

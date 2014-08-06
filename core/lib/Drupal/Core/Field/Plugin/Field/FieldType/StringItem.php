@@ -9,6 +9,7 @@ namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
@@ -16,9 +17,8 @@ use Drupal\Core\TypedData\DataDefinition;
  *
  * @FieldType(
  *   id = "string",
- *   label = @Translation("String"),
- *   description = @Translation("An entity field containing a string value."),
- *   no_ui = TRUE,
+ *   label = @Translation("Text (plain)"),
+ *   description = @Translation("A field containing a plain string value."),
  *   default_widget = "string",
  *   default_formatter = "string"
  * )
@@ -78,6 +78,25 @@ class StringItem extends FieldItemBase {
     }
 
     return $constraints;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array &$form, FormStateInterface $form_state, $has_data) {
+    $element = array();
+
+    $element['max_length'] = array(
+      '#type' => 'number',
+      '#title' => t('Maximum length'),
+      '#default_value' => $this->getSetting('max_length'),
+      '#required' => TRUE,
+      '#description' => t('The maximum length of the field in characters.'),
+      '#min' => 1,
+      '#disabled' => $has_data,
+    );
+
+    return $element;
   }
 
 }

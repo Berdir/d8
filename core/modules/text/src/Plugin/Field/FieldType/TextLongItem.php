@@ -15,7 +15,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @FieldType(
  *   id = "text_long",
- *   label = @Translation("Long text"),
+ *   label = @Translation("Text (filtered, long)"),
  *   description = @Translation("This field stores long text in the database."),
  *   default_widget = "text_textarea",
  *   default_formatter = "text_default"
@@ -44,25 +44,6 @@ class TextLongItem extends TextItemBase {
         'format' => array('format'),
       ),
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function instanceSettingsForm(array $form, FormStateInterface $form_state) {
-    $element = array();
-
-    $element['text_processing'] = array(
-      '#type' => 'radios',
-      '#title' => t('Text processing'),
-      '#default_value' => $this->getSetting('text_processing'),
-      '#options' => array(
-        t('Plain text'),
-        t('Filtered text (user selects text format)'),
-      ),
-    );
-
-    return $element;
   }
 
 }

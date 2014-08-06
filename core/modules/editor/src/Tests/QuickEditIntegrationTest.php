@@ -73,7 +73,7 @@ class QuickEditIntegrationTest extends QuickEditTestBase {
     $this->createFieldWithInstance(
       $this->field_name, 'text', 1, 'Long text field',
       // Instance settings.
-      array('text_processing' => 1),
+      array(),
       // Widget type & settings.
       'text_textarea',
       array('size' => 42),
@@ -120,7 +120,7 @@ class QuickEditIntegrationTest extends QuickEditTestBase {
   /**
    * Tests editor selection when the Editor module is present.
    *
-   * Tests a textual field, with text processing, with cardinality 1 and >1,
+   * Tests a textual field, with text filtering, with cardinality 1 and >1,
    * always with a ProcessedTextEditor plug-in present, but with varying text
    * format compatibility.
    */
@@ -143,8 +143,8 @@ class QuickEditIntegrationTest extends QuickEditTestBase {
     $this->assertEqual('editor', $this->getSelectedEditor($entity->id(), $this->field_name), "With cardinality 1, and the full_html text format, the 'editor' editor is selected.");
 
     // Editor selection with text processing, cardinality >1
-    $this->fields->field_textarea_field_storage->cardinality = 2;
-    $this->fields->field_textarea_field_storage->save();
+    $this->field_textarea_field_storage->cardinality = 2;
+    $this->field_textarea_field_storage->save();
     $this->assertEqual('form', $this->getSelectedEditor($entity->id(), $this->field_name), "With cardinality >1, and both items using the full_html text format, the 'form' editor is selected.");
   }
 

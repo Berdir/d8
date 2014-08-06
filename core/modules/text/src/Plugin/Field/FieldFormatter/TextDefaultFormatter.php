@@ -32,25 +32,6 @@ class TextDefaultFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items) {
-    if ($this->getFieldSetting('text_processing')) {
-      return $this->viewElementsWithTextProcessing($items);
-    }
-    else {
-      return $this->viewElementsWithoutTextProcessing($items);
-    }
-  }
-
-  /**
-   * Builds a renderable array when text processing is enabled.
-   *
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
-   *   The text field values to be rendered.
-   *
-   * @return array
-   *   A renderable array for $items, as an array of child elements keyed by
-   *   consecutive numeric indexes starting from 0.
-   */
-  protected function viewElementsWithTextProcessing(FieldItemListInterface $items) {
     $elements = array();
 
     foreach ($items as $delta => $item) {
@@ -72,28 +53,6 @@ class TextDefaultFormatter extends FormatterBase {
       // for a renderable array in drupal_render().
       // @todo remove this work-around, see https://drupal.org/node/2273277
       drupal_render($elements[$delta], TRUE);
-    }
-
-    return $elements;
-  }
-
-  /**
-   * Builds a renderable array when text processing is disabled.
-   *
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
-   *   The text field values to be rendered.
-   *
-   * @return array
-   *   A renderable array for $items, as an array of child elements keyed by
-   *   consecutive numeric indexes starting from 0.
-   */
-  protected function viewElementsWithoutTextProcessing(FieldItemListInterface $items) {
-    $elements = array();
-
-    foreach ($items as $delta => $item) {
-      $elements[$delta] = array(
-        '#markup' => $item->processed,
-      );
     }
 
     return $elements;
