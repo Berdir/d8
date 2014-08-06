@@ -1237,16 +1237,8 @@ class EntityManagerTest extends UnitTestCase {
       ),
     );
 
-    // Set up a non-content entity type.
-    $non_content_entity_type = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
-    $entity_type->expects($this->any())
-      ->method('isSubclassOf')
-      ->with('\Drupal\Core\Entity\ContentEntityInterface')
-      ->will($this->returnValue(FALSE));
-
     $this->setUpEntityManager(array(
       'test_entity_type' => $entity_type,
-      'non_fieldable' => $non_content_entity_type,
     ));
 
     $integerFields = $this->entityManager->getFieldMapByFieldType('integer');
