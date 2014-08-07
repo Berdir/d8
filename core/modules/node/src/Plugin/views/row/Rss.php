@@ -54,11 +54,6 @@ class Rss extends RowPluginBase {
       '#options' => $this->buildOptionsForm_summary_options(),
       '#default_value' => $this->options['view_mode'],
     );
-    $form['links'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Display links'),
-      '#default_value' => $this->options['links'],
-    );
   }
 
   /**

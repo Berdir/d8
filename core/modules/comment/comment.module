@@ -121,6 +121,12 @@ function comment_entity_extra_field_info() {
         ),
       ),
     );
+    $extra['node'][$comment_type->id()]['display']['links'] = array(
+      'label' => t('Links'),
+      'description' => t('Comment operation links'),
+      'weight' => 100,
+      'visible' => TRUE,
+    );
   }
 
   return $return;
