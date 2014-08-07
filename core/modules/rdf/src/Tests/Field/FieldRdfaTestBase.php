@@ -95,9 +95,6 @@ abstract class FieldRdfaTestBase extends FieldUnitTestBase {
     // If verbose debugging is turned on, display the HTML and parsed RDF
     // in the results.
     if ($this->debug) {
-      debug($this->uri);
-      debug($property);
-      debug($expected_rdf_value);
       debug($output);
       debug($graph->toRdfPhp());
     }
