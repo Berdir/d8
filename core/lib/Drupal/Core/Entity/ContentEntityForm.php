@@ -9,7 +9,6 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\entity\Entity\EntityFormDisplay;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -77,7 +76,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
     $langcode = $this->getFormLangcode($form_state);
     $this->entity = $this->entity->getTranslation($langcode);
 
-    $form_display = EntityFormDisplay::collectRenderDisplay($this->entity, $this->getOperation());
+    $form_display = Entity\EntityFormDisplay::collectRenderDisplay($this->entity, $this->getOperation());
     $this->setFormDisplay($form_display, $form_state);
 
     parent::init($form_state);

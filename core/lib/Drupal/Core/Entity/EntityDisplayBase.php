@@ -2,13 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\entity\EntityDisplayBase.
+ * Contains \Drupal\Core\Entity\EntityDisplayBase.
  */
 
-namespace Drupal\entity;
+namespace Drupal\Core\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\field\Entity\FieldInstanceConfig;

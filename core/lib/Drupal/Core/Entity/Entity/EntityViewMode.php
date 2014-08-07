@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\entity\Entity\EntityViewMode.
+ * Contains \Drupal\Core\Entity\Entity\EntityViewMode.
  */
 
-namespace Drupal\entity\Entity;
+namespace Drupal\Core\Entity\Entity;
 
-use Drupal\entity\EntityDisplayModeBase;
-use Drupal\entity\EntityViewModeInterface;
+use Drupal\Core\Entity\EntityDisplayModeBase;
+use Drupal\Core\Entity\EntityViewModeInterface;
 
 /**
  * Defines the view mode configuration entity class.
@@ -40,6 +40,7 @@ use Drupal\entity\EntityViewModeInterface;
  *       "delete" = "Drupal\entity\Form\EntityDisplayModeDeleteForm"
  *     }
  *   },
+ *   config_prefix = "entity_view_mode",
  *   admin_permission = "administer display modes",
  *   entity_keys = {
  *     "id" = "id",

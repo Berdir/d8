@@ -10,14 +10,13 @@ namespace Drupal\Core\Entity;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\Render\Element;
-use Drupal\entity\Entity\EntityViewDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -393,7 +392,7 @@ class EntityViewBuilder extends EntityControllerBase implements EntityController
     // Get the display object.
     if (is_string($display_options)) {
       $view_mode = $display_options;
-      $display = EntityViewDisplay::collectRenderDisplay($entity, $view_mode);
+      $display = Entity\EntityViewDisplay::collectRenderDisplay($entity, $view_mode);
       // Hide all fields except the current one.
       foreach (array_keys($entity->getFieldDefinitions()) as $name) {
         if ($name != $field_name) {

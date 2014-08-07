@@ -2,15 +2,14 @@
 
 /**
  * @file
- * Contains \Drupal\entity\Entity\EntityFormDisplay.
+ * Contains \Drupal\Core\Entity\Entity\EntityFormDisplay.
  */
 
-namespace Drupal\entity\Entity;
+namespace Drupal\Core\Entity\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\entity\EntityDisplayBase;
 
 /**
  * Configuration entity that contains widget options for all components of a
@@ -19,14 +18,13 @@ use Drupal\entity\EntityDisplayBase;
  * @ConfigEntityType(
  *   id = "entity_form_display",
  *   label = @Translation("Entity form display"),
- *   config_prefix = "form_display",
  *   entity_keys = {
  *     "id" = "id",
  *     "status" = "status"
  *   }
  * )
  */
-class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayInterface {
+class EntityFormDisplay extends \Drupal\Core\Entity\EntityDisplayBase implements EntityFormDisplayInterface {
 
   /**
    * {@inheritdoc}

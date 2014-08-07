@@ -148,7 +148,7 @@ class EntityFormDisplayTest extends DrupalUnitTestBase {
     // Check that saving the display only writes data for fields whose display
     // is configurable.
     $display->save();
-    $config = \Drupal::config('entity.form_display.' . $display->id());
+    $config = \Drupal::config('core.entity_form_display.' . $display->id());
     $data = $config->get();
     $this->assertFalse(isset($data['content']['test_no_display']));
     $this->assertFalse(isset($data['hidden']['test_no_display']));

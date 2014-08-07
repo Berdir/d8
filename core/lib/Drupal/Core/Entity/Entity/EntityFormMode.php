@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\entity\Entity\EntityFormMode.
+ * Contains \Drupal\Core\Entity\Entity\EntityFormMode.
  */
 
-namespace Drupal\entity\Entity;
+namespace Drupal\Core\Entity\Entity;
 
-use Drupal\entity\EntityDisplayModeBase;
-use Drupal\entity\EntityFormModeInterface;
+use Drupal\Core\Entity\EntityDisplayModeBase;
+use Drupal\Core\Entity\EntityFormModeInterface;
 
 /**
  * Defines the form mode configuration entity class.
@@ -39,6 +39,7 @@ use Drupal\entity\EntityFormModeInterface;
  *       "delete" = "Drupal\entity\Form\EntityDisplayModeDeleteForm"
  *     }
  *   },
+ *   config_prefix = "entity_form_mode",
  *   admin_permission = "administer display modes",
  *   entity_keys = {
  *     "id" = "id",

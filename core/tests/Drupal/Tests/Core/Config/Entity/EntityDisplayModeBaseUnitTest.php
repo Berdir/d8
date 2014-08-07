@@ -11,7 +11,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * @coversDefaultClass \Drupal\entity\EntityDisplayModeBase
+ * @coversDefaultClass \Drupal\Core\Entity\EntityDisplayModeBase
  * @group Config
  */
 class EntityDisplayModeBaseUnitTest extends UnitTestCase {
@@ -19,7 +19,7 @@ class EntityDisplayModeBaseUnitTest extends UnitTestCase {
   /**
    * The entity under test.
    *
-   * @var \Drupal\entity\EntityDisplayModeBase|\PHPUnit_Framework_MockObject_MockObject
+   * @var \Drupal\Core\Entity\EntityDisplayModeBase|\PHPUnit_Framework_MockObject_MockObject
    */
   protected $entity;
 
