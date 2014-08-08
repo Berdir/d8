@@ -94,7 +94,7 @@ class EntityDisplayModeBaseUnitTest extends UnitTestCase {
       ->with($this->entityType)
       ->will($this->returnValue($this->entityInfo));
 
-    $this->entity = $this->getMockBuilder('\Drupal\entity\EntityDisplayModeBase')
+    $this->entity = $this->getMockBuilder('\Drupal\Core\Entity\EntityDisplayModeBase')
       ->setConstructorArgs(array($values, $this->entityType))
       ->setMethods(array('getFilterFormat'))
       ->getMock();

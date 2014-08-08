@@ -32,23 +32,10 @@ use Drupal\Core\Entity\EntityViewModeInterface;
  * @ConfigEntityType(
  *   id = "view_mode",
  *   label = @Translation("View mode"),
- *   controllers = {
- *     "list_builder" = "Drupal\entity\EntityDisplayModeListBuilder",
- *     "form" = {
- *       "add" = "Drupal\entity\Form\EntityDisplayModeAddForm",
- *       "edit" = "Drupal\entity\Form\EntityDisplayModeEditForm",
- *       "delete" = "Drupal\entity\Form\EntityDisplayModeDeleteForm"
- *     }
- *   },
  *   config_prefix = "entity_view_mode",
- *   admin_permission = "administer display modes",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label"
- *   },
- *   links = {
- *     "delete-form" = "entity.view_mode.delete_form",
- *     "edit-form" = "entity.view_mode.edit_form"
  *   }
  * )
  */

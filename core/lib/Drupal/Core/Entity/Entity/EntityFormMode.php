@@ -26,28 +26,14 @@ use Drupal\Core\Entity\EntityFormModeInterface;
  *
  * @see \Drupal\Core\Entity\EntityManagerInterface::getAllFormModes()
  * @see \Drupal\Core\Entity\EntityManagerInterface::getFormModes()
- * @see hook_entity_form_mode_info_alter()
  *
  * @ConfigEntityType(
  *   id = "form_mode",
  *   label = @Translation("Form mode"),
- *   controllers = {
- *     "list_builder" = "Drupal\entity\EntityFormModeListBuilder",
- *     "form" = {
- *       "add" = "Drupal\entity\Form\EntityFormModeAddForm",
- *       "edit" = "Drupal\entity\Form\EntityDisplayModeEditForm",
- *       "delete" = "Drupal\entity\Form\EntityDisplayModeDeleteForm"
- *     }
- *   },
  *   config_prefix = "entity_form_mode",
- *   admin_permission = "administer display modes",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label"
- *   },
- *   links = {
- *     "delete-form" = "entity.form_mode.delete_form",
- *     "edit-form" = "entity.form_mode.edit_form"
  *   }
  * )
  */
