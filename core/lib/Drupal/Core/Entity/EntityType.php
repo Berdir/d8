@@ -71,7 +71,7 @@ class EntityType implements EntityTypeInterface {
   protected $class;
 
   /**
-   * An array of controllers.
+   * An array of handlers.
    *
    * @var array
    */
@@ -333,18 +333,18 @@ class EntityType implements EntityTypeInterface {
   /**
    * {@inheritdoc}
    */
-  public function getHandlerClass($controller_type, $nested = FALSE) {
-    if ($this->hasHandlerClass($controller_type, $nested)) {
+  public function getHandlerClass($handler_type, $nested = FALSE) {
+    if ($this->hasHandlerClass($handler_type, $nested)) {
       $handlers = $this->getHandlerClasses();
-      return $nested ? $handlers[$controller_type][$nested] : $handlers[$controller_type];
+      return $nested ? $handlers[$handler_type][$nested] : $handlers[$handler_type];
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setHandlerClass($controller_type, $value) {
-    $this->handlers[$controller_type] = $value;
+  public function setHandlerClass($handler_type, $value) {
+    $this->handlers[$handler_type] = $value;
     return $this;
   }
 

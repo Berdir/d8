@@ -220,9 +220,9 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
   /**
    * {@inheritdoc}
    */
-  public function hasHandler($entity_type, $controller_type) {
+  public function hasHandler($entity_type, $handler_type) {
     if ($definition = $this->getDefinition($entity_type, FALSE)) {
-      return $definition->hasHandlerClass($controller_type);
+      return $definition->hasHandlerClass($handler_type);
     }
     return FALSE;
   }
@@ -280,7 +280,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
    *
    * @param string $entity_type
    *   The entity type for this controller.
-   * @param string $controller_type
+   * @param string $handler_type
    *   The controller type to create an instance for.
    * @param string $controller_class_getter
    *   (optional) The method to call on the entity type object to get the controller class.
@@ -290,17 +290,17 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  public function getHandler($entity_type, $controller_type, $controller_class_getter = NULL) {
-    if (!isset($this->controllers[$controller_type][$entity_type])) {
+  public function getHandler($entity_type, $handler_type, $controller_class_getter = NULL) {
+    if (!isset($this->controllers[$handler_type][$entity_type])) {
       $definition = $this->getDefinition($entity_type);
       if ($controller_class_getter) {
         $class = $definition->{$controller_class_getter}();
       }
       else {
-        $class = $definition->getHandlerClass($controller_type);
+        $class = $definition->getHandlerClass($handler_type);
       }
       if (!$class) {
-        throw new InvalidPluginDefinitionException($entity_type, sprintf('The "%s" entity type did not specify a %s class.', $entity_type, $controller_type));
+        throw new InvalidPluginDefinitionException($entity_type, sprintf('The "%s" entity type did not specify a %s class.', $entity_type, $handler_type));
       }
       if (is_subclass_of($class, 'Drupal\Core\Entity\EntityHandlerInterface')) {
         $controller = $class::createInstance($this->container, $definition);
@@ -314,9 +314,9 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
       if (method_exists($controller, 'setStringTranslation')) {
         $controller->setStringTranslation($this->translationManager);
       }
-      $this->controllers[$controller_type][$entity_type] = $controller;
+      $this->controllers[$handler_type][$entity_type] = $controller;
     }
-    return $this->controllers[$controller_type][$entity_type];
+    return $this->controllers[$handler_type][$entity_type];
   }
 
   /**
