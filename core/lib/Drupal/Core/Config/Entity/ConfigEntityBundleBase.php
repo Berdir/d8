@@ -46,7 +46,7 @@ abstract class ConfigEntityBundleBase extends ConfigEntityBase {
         $form_display = EntityFormDisplay::load($id);
         $new_id = $this->getEntityType()->getBundleOf() . '.' . $this->id() . '.' . $form_display->mode;
         $form_display->set('id', $new_id);
-        $form_display->bundle = $this->getEntityType()->getBundleOf();
+        $form_display->bundle = $this->id();
         $form_display->save();
       }
     }
