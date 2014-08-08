@@ -168,7 +168,7 @@ interface EntityTypeInterface {
   /**
    * Determines if there is a controller for a given type.
    *
-   * @param string $controller_type
+   * @param string $handler_type
    *   The type of controller to check.
    * @param bool $nested
    *   (optional) If this controller has a nested definition. Defaults to FALSE.
@@ -176,7 +176,7 @@ interface EntityTypeInterface {
    * @return bool
    *   TRUE if a controller of this type exists, FALSE otherwise.
    */
-  public function hasHandlerClass($controller_type, $nested = FALSE);
+  public function hasHandlerClass($handler_type, $nested = FALSE);
 
   /**
    * @param string $controller_type

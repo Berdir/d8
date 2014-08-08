@@ -335,8 +335,8 @@ class EntityType implements EntityTypeInterface {
    */
   public function getHandlerClass($controller_type, $nested = FALSE) {
     if ($this->hasHandlerClass($controller_type, $nested)) {
-      $controllers = $this->getHandlerClasses();
-      return $nested ? $controllers[$controller_type][$nested] : $controllers[$controller_type];
+      $handlers = $this->getHandlerClasses();
+      return $nested ? $handlers[$controller_type][$nested] : $handlers[$controller_type];
     }
   }
 
@@ -351,16 +351,16 @@ class EntityType implements EntityTypeInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasHandlerClass($controller_type, $nested = FALSE) {
-    $controllers = $this->getHandlerClasses();
-    if (!isset($controllers[$controller_type]) || ($nested && !isset($controllers[$controller_type][$nested]))) {
+  public function hasHandlerClass($handler_type, $nested = FALSE) {
+    $handlers = $this->getHandlerClasses();
+    if (!isset($handlers[$handler_type]) || ($nested && !isset($handlers[$handler_type][$nested]))) {
       return FALSE;
     }
-    $controller = $controllers[$controller_type];
+    $handler = $handlers[$handler_type];
     if ($nested) {
-      $controller = $controller[$nested];
+      $handler = $handler[$nested];
     }
-    return class_exists($controller);
+    return class_exists($handler);
   }
 
   /**

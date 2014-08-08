@@ -21,7 +21,7 @@ use Drupal\field\FieldStorageConfigInterface;
  * @ConfigEntityType(
  *   id = "field_storage_config",
  *   label = @Translation("Field"),
- *   controllers = {
+ *   handlers = {
  *     "storage" = "Drupal\field\FieldStorageConfigStorage"
  *   },
  *   config_prefix = "storage",
