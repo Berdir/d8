@@ -83,7 +83,6 @@ class NodeFieldAccessTest extends EntityUnitTestBase {
     ));
     $node3 = Node::create(array(
       'title' => $this->randomMachineName(8),
-      //'uid' => $chuck_norris->id(),
       'type' => 'page',
     ));
 
