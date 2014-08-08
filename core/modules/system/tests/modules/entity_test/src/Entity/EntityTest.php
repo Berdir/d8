@@ -20,7 +20,7 @@ use Drupal\user\UserInterface;
  * @ContentEntityType(
  *   id = "entity_test",
  *   label = @Translation("Test entity"),
- *   controllers = {
+ *   handlers = {
  *     "list_builder" = "Drupal\entity_test\EntityTestListBuilder",
  *     "view_builder" = "Drupal\entity_test\EntityTestViewBuilder",
  *     "access" = "Drupal\entity_test\EntityTestAccessControlHandler",

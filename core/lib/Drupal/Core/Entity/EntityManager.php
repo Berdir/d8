@@ -220,9 +220,9 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
   /**
    * {@inheritdoc}
    */
-  public function hasController($entity_type, $controller_type) {
+  public function hasHandler($entity_type, $controller_type) {
     if ($definition = $this->getDefinition($entity_type, FALSE)) {
-      return $definition->hasControllerClass($controller_type);
+      return $definition->hasHandlerClass($controller_type);
     }
     return FALSE;
   }
@@ -231,14 +231,14 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
    * {@inheritdoc}
    */
   public function getStorage($entity_type) {
-    return $this->getController($entity_type, 'storage', 'getStorageClass');
+    return $this->getHandler($entity_type, 'storage', 'getStorageClass');
   }
 
   /**
    * {@inheritdoc}
    */
   public function getListBuilder($entity_type) {
-    return $this->getController($entity_type, 'list_builder', 'getListBuilderClass');
+    return $this->getHandler($entity_type, 'list_builder', 'getListBuilderClass');
   }
 
   /**
@@ -265,14 +265,14 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
    * {@inheritdoc}
    */
   public function getViewBuilder($entity_type) {
-    return $this->getController($entity_type, 'view_builder', 'getViewBuilderClass');
+    return $this->getHandler($entity_type, 'view_builder', 'getViewBuilderClass');
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAccessControlHandler($entity_type) {
-    return $this->getController($entity_type, 'access', 'getAccessControlClass');
+    return $this->getHandler($entity_type, 'access', 'getAccessControlClass');
   }
 
   /**
@@ -290,19 +290,19 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  public function getController($entity_type, $controller_type, $controller_class_getter = NULL) {
+  public function getHandler($entity_type, $controller_type, $controller_class_getter = NULL) {
     if (!isset($this->controllers[$controller_type][$entity_type])) {
       $definition = $this->getDefinition($entity_type);
       if ($controller_class_getter) {
         $class = $definition->{$controller_class_getter}();
       }
       else {
-        $class = $definition->getControllerClass($controller_type);
+        $class = $definition->getHandlerClass($controller_type);
       }
       if (!$class) {
         throw new InvalidPluginDefinitionException($entity_type, sprintf('The "%s" entity type did not specify a %s class.', $entity_type, $controller_type));
       }
-      if (is_subclass_of($class, 'Drupal\Core\Entity\EntityControllerInterface')) {
+      if (is_subclass_of($class, 'Drupal\Core\Entity\EntityHandlerInterface')) {
         $controller = $class::createInstance($this->container, $definition);
       }
       else {

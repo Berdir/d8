@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Entity\EntityControllerBase.
+ * Contains \Drupal\Core\Entity\EntityHandlerBase.
  */
 
 namespace Drupal\Core\Entity;
@@ -10,14 +10,13 @@ namespace Drupal\Core\Entity;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
 
 /**
- * Provides a base class for entity controllers.
+ * Provides a base class for entity handlers.
  *
  * @todo Convert this to a trait.
  */
-abstract class EntityControllerBase {
+abstract class EntityHandlerBase {
   use StringTranslationTrait;
   use DependencySerializationTrait;
 

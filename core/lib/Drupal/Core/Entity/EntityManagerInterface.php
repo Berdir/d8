@@ -212,7 +212,7 @@ interface EntityManagerInterface extends PluginManagerInterface {
    * @return bool
    *   Returns TRUE if the entity type has the controller, else FALSE.
    */
-  public function hasController($entity_type, $controller_type);
+  public function hasHandler($entity_type, $controller_type);
 
   /**
    * Creates a new controller instance.
@@ -227,7 +227,7 @@ interface EntityManagerInterface extends PluginManagerInterface {
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  public function getController($entity_type, $controller_type);
+  public function getHandler($entity_type, $controller_type);
 
   /**
    * Get the bundle info of an entity type.

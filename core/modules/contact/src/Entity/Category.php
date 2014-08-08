@@ -18,7 +18,7 @@ use Drupal\contact\CategoryInterface;
  * @ConfigEntityType(
  *   id = "contact_category",
  *   label = @Translation("Contact category"),
- *   controllers = {
+ *   handlers = {
  *     "access" = "Drupal\contact\CategoryAccessControlHandler",
  *     "list_builder" = "Drupal\contact\CategoryListBuilder",
  *     "form" = {

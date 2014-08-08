@@ -13,7 +13,7 @@ use Drupal\Core\Entity\Query\QueryInterface;
 /**
  * A base entity storage class.
  */
-abstract class EntityStorageBase extends EntityControllerBase implements EntityStorageInterface, EntityControllerInterface {
+abstract class EntityStorageBase extends EntityHandlerBase implements EntityStorageInterface, EntityHandlerInterface {
 
   /**
    * Static cache of entities, keyed by entity ID.

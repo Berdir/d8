@@ -176,7 +176,7 @@ interface EntityTypeInterface {
    * @return bool
    *   TRUE if a controller of this type exists, FALSE otherwise.
    */
-  public function hasControllerClass($controller_type, $nested = FALSE);
+  public function hasHandlerClass($controller_type, $nested = FALSE);
 
   /**
    * @param string $controller_type
@@ -185,7 +185,7 @@ interface EntityTypeInterface {
    * @return array|string|null
    *   The controllers for a given type, or NULL if none exist.
    */
-  public function getControllerClass($controller_type);
+  public function getHandlerClass($controller_type);
 
   /**
    * Returns an array of controllers.
@@ -211,7 +211,7 @@ interface EntityTypeInterface {
    *     must implement \Drupal\Core\Entity\EntityAccessControlHandlerInterface.
    *     Defaults to \Drupal\Core\Entity\EntityAccessControlHandler.
    */
-  public function getControllerClasses();
+  public function getHandlerClasses();
 
   /**
    * Returns the storage class.
@@ -358,7 +358,7 @@ interface EntityTypeInterface {
    *
    * @return static
    */
-  public function setControllerClass($controller_type, $value);
+  public function setHandlerClass($controller_type, $value);
 
   /**
    * Returns the name of the default administrative permission.

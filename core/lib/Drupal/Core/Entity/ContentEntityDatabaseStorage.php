@@ -23,11 +23,9 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Defines a base entity controller class.
+ * A content entity database storage implementation
  *
- * Default implementation of Drupal\Core\Entity\EntityStorageInterface.
- *
- * This class can be used as-is by most simple entity types. Entity types
+ * This class can be used as-is by most content entity types. Entity types
  * requiring special handling can extend the class.
  *
  * The class uses \Drupal\Core\Entity\Schema\ContentEntitySchemaHandler

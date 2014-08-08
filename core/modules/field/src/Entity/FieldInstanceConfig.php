@@ -23,7 +23,7 @@ use Drupal\field\FieldInstanceConfigInterface;
  * @ConfigEntityType(
  *   id = "field_instance_config",
  *   label = @Translation("Field instance"),
- *   controllers = {
+ *   handlers = {
  *     "access" = "Drupal\field\FieldInstanceConfigAccessControlHandler",
  *     "storage" = "Drupal\field\FieldInstanceConfigStorage"
  *   },
@@ -381,7 +381,7 @@ class FieldInstanceConfig extends ConfigEntityBase implements FieldInstanceConfi
     // Invalidate the render cache for all affected entities.
     $entity_manager = \Drupal::entityManager();
     $entity_type = $this->getFieldStorageDefinition()->getTargetEntityTypeId();
-    if ($entity_manager->hasController($entity_type, 'view_builder')) {
+    if ($entity_manager->hasHandler($entity_type, 'view_builder')) {
       $entity_manager->getViewBuilder($entity_type)->resetCache();
     }
   }

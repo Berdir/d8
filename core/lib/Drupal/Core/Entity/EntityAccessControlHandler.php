@@ -15,7 +15,7 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Defines a default implementation for entity access control handler.
  */
-class EntityAccessControlHandler extends EntityControllerBase implements EntityAccessControlHandlerInterface {
+class EntityAccessControlHandler extends EntityHandlerBase implements EntityAccessControlHandlerInterface {
 
   /**
    * Stores calculated access check results.
