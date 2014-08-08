@@ -52,8 +52,8 @@ function entity_entity_type_alter(array &$entity_types) {
   $form_mode = $entity_types['form_mode'];
   $form_mode->setListBuilderClass('Drupal\entity\EntityFormModeListBuilder');
   $form_mode->setFormClass('add', 'Drupal\entity\Form\EntityFormModeAddForm');
-  $form_mode->setFormClass('edit', 'Drupal\entity\Form\EntityFormModeEditForm');
-  $form_mode->setFormClass('delete', 'Drupal\entity\Form\EntityFormModeDeleteForm');
+  $form_mode->setFormClass('edit', 'Drupal\entity\Form\EntityDisplayModeEditForm');
+  $form_mode->setFormClass('delete', 'Drupal\entity\Form\EntityDisplayModeDeleteForm');
   $form_mode->set('admin_permission', 'administer display modes');
   $form_mode->setLinkTemplate('delete-form', 'entity.form_mode.delete_form');
   $form_mode->setLinkTemplate('edit-form', 'entity.form_mode.edit_form');
