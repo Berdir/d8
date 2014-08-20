@@ -16,33 +16,18 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DatabaseStorageExpirableTest extends StorageTestBase {
 
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('system');
+
   protected function setUp() {
     parent::setUp();
     $this->factory = 'keyvalue.expirable';
-    module_load_install('system');
-    $schema = system_schema();
-    db_create_table('key_value_expire', $schema['key_value_expire']);
-    $this->container
-      ->register('database', 'Drupal\Core\Database\Connection')
-      ->setFactoryClass('Drupal\Core\Database\Database')
-      ->setFactoryMethod('getConnection')
-      ->addArgument('default');
-    $this->container
-      ->register('keyvalue.expirable.database', 'Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory')
-      ->addArgument(new Reference('serialization.phpserialize'))
-      ->addArgument(new Reference('database'));
-    $this->container
-      ->register('serialization.phpserialize', 'Drupal\Component\Serialization\PhpSerialize');
+    $this->installSchema('system', array('key_value_expire'));
     $this->settingsSet('keyvalue_expirable_default', 'keyvalue.expirable.database');
-  }
-
-  protected function tearDown() {
-    // The DatabaseExpirableStorage class has a destructor which deletes rows
-    // from the key_value_expire table. We need to make sure the destructor
-    // runs before the table is deleted.
-    $this->container->set('keyvalue.expirable', NULL);
-    db_drop_table('key_value_expire');
-    parent::tearDown();
   }
 
   /**

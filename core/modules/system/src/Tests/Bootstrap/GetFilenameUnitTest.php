@@ -7,14 +7,14 @@
 
 namespace Drupal\system\Tests\Bootstrap;
 
-use Drupal\simpletest\UnitTestBase;
+use Drupal\simpletest\KernelTestBase;
 
 /**
  * Tests that drupal_get_filename() works correctly.
  *
  * @group Bootstrap
  */
-class GetFilenameUnitTest extends UnitTestBase {
+class GetFilenameUnitTest extends KernelTestBase {
 
   /**
    * Tests that drupal_get_filename() works when the file is not in database.

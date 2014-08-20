@@ -8,6 +8,7 @@
 namespace Drupal\system\Tests\Database;
 
 use Drupal\Core\Database\Database;
+use Drupal\simpletest\KernelTestBase;
 use Drupal\simpletest\UnitTestBase;
 
 /**
@@ -15,7 +16,7 @@ use Drupal\simpletest\UnitTestBase;
  *
  * @group Database
  */
-class ConnectionUnitTest extends UnitTestBase {
+class ConnectionUnitTest extends KernelTestBase {
 
   protected $key;
   protected $target;

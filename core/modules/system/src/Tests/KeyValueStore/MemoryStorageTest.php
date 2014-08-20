@@ -7,6 +7,8 @@
 
 namespace Drupal\system\Tests\KeyValueStore;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+
 /**
  * Tests the key-value memory storage.
  *
@@ -14,18 +16,16 @@ namespace Drupal\system\Tests\KeyValueStore;
  */
 class MemoryStorageTest extends StorageTestBase {
 
-  /**
-   * Holds the original default key/value service name.
-   *
-   * @var String
-   */
-  protected $originalKeyValue = NULL;
-
   protected function setUp() {
     parent::setUp();
-    $this->container
-      ->register('keyvalue.memory', 'Drupal\Core\KeyValueStore\KeyValueMemoryFactory');
     $this->settingsSet('keyvalue_default', 'keyvalue.memory');
+  }
+
+  /**
+   * @param ContainerBuilder $container
+   */
+  public function containerBuild(ContainerBuilder $container) {
+    $container->register('keyvalue.memory', 'Drupal\Core\KeyValueStore\KeyValueMemoryFactory');
   }
 
 }

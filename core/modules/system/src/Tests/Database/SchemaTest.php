@@ -10,6 +10,7 @@ namespace Drupal\system\Tests\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\SchemaObjectExistsException;
+use Drupal\simpletest\KernelTestBase;
 use Drupal\simpletest\UnitTestBase;
 
 /**
@@ -17,7 +18,7 @@ use Drupal\simpletest\UnitTestBase;
  *
  * @group Database
  */
-class SchemaTest extends UnitTestBase {
+class SchemaTest extends KernelTestBase {
 
   /**
    * A global counter for table and field creation.
