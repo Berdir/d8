@@ -76,7 +76,7 @@ class TermStorage extends ContentEntityDatabaseStorage implements TermStorageInt
     foreach ($term->parent as $parent) {
       $query->values(array(
         'tid' => $term->id(),
-        'parent' => (int) $parent->value,
+        'parent' => (int) $parent->target_id,
       ));
     }
     $query->execute();
