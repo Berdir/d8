@@ -503,6 +503,11 @@ class User extends ContentEntityBase implements UserInterface {
       ->setDescription(t('The timezone of this user.'))
       ->setSetting('max_length', 32);
 
+    $config = \Drupal::config('system.date');
+    if ($config->get('timezone.user.configurable') &&  !$config->get('timezone.user.default')) {
+      $fields['timezone']->setDefaultValue($config->get('timezone.default'));
+    }
+
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('User status'))
       ->setDescription(t('Whether the user is active or blocked.'))

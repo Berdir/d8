@@ -677,6 +677,12 @@ function user_login_finalize(UserInterface $account) {
   // in place.
   \Drupal::service('session_manager')->regenerate();
 
+  $config = \Drupal::config('system.date');
+  // If the user has a NULL time zone, notify them to set a time zone.
+  if (!$account->getTimezone() && $config->get('timezone.user.configurable') && $config->get('timezone.user.warn')) {
+    drupal_set_message(t('Configure your <a href="@user-edit">account time zone setting</a>.', array('@user-edit' => url("user/$account->id()/edit", array('query' => drupal_get_destination(), 'fragment' => 'edit-timezone')))));
+  }
+
   \Drupal::moduleHandler()->invokeAll('user_login', array($account));
 }
 

@@ -298,6 +298,33 @@ abstract class AccountForm extends ContentEntityForm {
       '#weight' => 100,
     );
 
+    $config = $this->config('system.date');
+    if ($config->get('timezone.user.configurable')) {
+      if (!$register || $config->get('timezone.user.default') == DRUPAL_USER_TIMEZONE_SELECT) {
+        // Display the timezone selection form when enabled, only display it
+        // during registration if new users must select a timezone.
+        $form['timezone'] = array(
+          '#type' => 'details',
+          '#title' => t('Locale settings'),
+          '#open' => TRUE,
+          '#weight' => 6,
+        );
+        $form['timezone']['timezone'] = array(
+          '#type' => 'select',
+          '#title' => t('Time zone'),
+          '#default_value' => $account->getTimezone() ? $account->getTimezone() : $config->get('timezone.default'),
+          '#options' => system_time_zones($account->id() != $user->id()),
+          '#description' => t('Select the desired local time and time zone. Dates and times throughout this site will be displayed using this time zone.'),
+        );
+        $user_input = $form_state->getUserInput();
+        if (!$account->getTimezone() && $account->id() == $user->id() && empty($user_input['timezone'])) {
+          $form['timezone']['#description'] = t('Your time zone setting will be automatically detected if possible. Confirm the selection and click save.');
+          $form['timezone']['#attached']['library'][] = 'core/drupal.timezone';
+          $form['timezone']['timezone']['#attributes'] = array('class' => array('timezone-detect'));
+        }
+      }
+    }
+
     return parent::form($form, $form_state, $account);
   }
 
