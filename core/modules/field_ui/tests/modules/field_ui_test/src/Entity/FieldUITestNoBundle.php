@@ -7,7 +7,6 @@
 
 namespace Drupal\field_ui_test\Entity;
 
-use Drupal\Core\Entity\Entity;
 use Drupal\entity_test\Entity\EntityTest;
 
 /**
