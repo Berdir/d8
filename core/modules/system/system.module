@@ -145,6 +145,9 @@ function system_help($route_name, RouteMatchInterface $route_match) {
 
     case 'system.status':
       return '<p>' . t("Here you can find a short overview of your site's parameters as well as any problems detected with your installation. It may be useful to copy and paste this information into support requests filed on drupal.org's support forums and project issue queues. Before filing a support request, ensure that your web server meets the <a href=\"@system-requirements\">system requirements.</a>", array('@system-requirements' => 'http://drupal.org/requirements')) . '</p>';
+
+    case 'system.modules_config_clash':
+      return '<p>' . t('Here you can find a list of configuration that already exists. You need to either rename it or delete it before installing modules which have configuration with the same name.') . '</p>';
   }
 }
 

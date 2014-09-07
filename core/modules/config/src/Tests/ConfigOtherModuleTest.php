@@ -56,11 +56,6 @@ class ConfigOtherModuleTest extends WebTestBase {
 
     // Default configuration provided by config_test should still exist.
     $this->assertTrue(entity_load('config_test', 'dotted.default', TRUE), 'The configuration is not deleted.');
-
-    // Re-enable module to test that default config is unchanged.
-    $this->installModule('config_other_module_config_test');
-    $config_entity = entity_load('config_test', 'other_module_test', TRUE);
-    $this->assertEqual($config_entity->get('style'), "The piano ain't got no wrong notes.", 'Re-enabling the module does not install default config over the existing config entity.');
   }
 
   /**

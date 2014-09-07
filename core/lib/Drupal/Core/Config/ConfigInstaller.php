@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Config;
 
+use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Config\Entity\ConfigDependencyManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -147,16 +148,17 @@ class ConfigInstaller implements ConfigInstallerInterface {
     $extension_path = drupal_get_path($type, $name);
     if ($type !== 'core' && is_dir($extension_path . '/' . InstallStorage::CONFIG_INSTALL_DIRECTORY)) {
       $default_storage = new FileStorage($extension_path . '/' . InstallStorage::CONFIG_INSTALL_DIRECTORY, $collection);
-      $other_module_config = array_filter($default_storage->listAll(), function ($value) use ($name) {
-        return !preg_match('/^' . $name . '\./', $value);
-      });
-
-      $other_module_config = array_filter($other_module_config, function ($config_name) use ($enabled_extensions) {
+      $extension_provided_config = array_filter($default_storage->listAll(), function ($config_name) use ($config_to_install, $enabled_extensions) {
+        // Ensure that we have not already discovered the config to install.
+        if (in_array($config_name, $config_to_install)) {
+          return FALSE;
+        }
+        // Ensure the configuration is provided by an enabled module
         $provider = Unicode::substr($config_name, 0, strpos($config_name, '.'));
         return in_array($provider, $enabled_extensions);
       });
 
-      $config_to_install = array_merge($config_to_install, $other_module_config);
+      $config_to_install = array_merge($config_to_install, $extension_provided_config);
     }
 
     return $config_to_install;
@@ -323,5 +325,33 @@ class ConfigInstaller implements ConfigInstallerInterface {
    */
   public function isSyncing() {
     return $this->isSyncing;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function findPreExistingConfiguration($type, $name) {
+    $existing_configuration = array();
+    // Gather information about all the supported collections.
+    $collection_info = $this->configManager->getConfigCollectionInfo();
+
+    // Read enabled extensions directly from configuration to avoid circular
+    // dependencies with ModuleHandler and ThemeHandler.
+    $extension_config = $this->configFactory->get('core.extension');
+    $enabled_extensions = array_keys((array) $extension_config->get('module'));
+    $enabled_extensions += array_keys((array) $extension_config->get('theme'));
+    // Add the extensions that will be enabled to the list of enabled
+    // extensions.
+    $enabled_extensions[] = $name;
+    foreach ($collection_info->getCollectionNames(TRUE) as $collection) {
+      $config_to_install = $this->listDefaultConfigCollection($collection, $type, $name, $enabled_extensions);
+      $active_storage = $this->getActiveStorage($collection);
+      foreach ($config_to_install as $config_name) {
+        if ($active_storage->exists($config_name)) {
+          $existing_configuration[$collection][] = $config_name;
+        }
+      }
+    }
+    return $existing_configuration;
   }
 }

@@ -12,6 +12,8 @@ use Drupal\Component\Serialization\Yaml;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\PreExistingConfigException;
+use Drupal\Core\Config\StorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -684,8 +686,8 @@ class ModuleHandler implements ModuleHandlerInterface {
   public function install(array $module_list, $enable_dependencies = TRUE) {
     $extension_config = \Drupal::config('core.extension');
     if ($enable_dependencies) {
-      // Get all module data so we can find dependencies and sort.
       $module_data = system_rebuild_module_data();
+      // Get all module data so we can find dependencies and sort.
       $module_list = $module_list ? array_combine($module_list, $module_list) : array();
       if (array_diff_key($module_list, $module_data)) {
         // One or more of the given modules doesn't exist.
@@ -744,6 +746,19 @@ class ModuleHandler implements ModuleHandlerInterface {
             '%name' => $module,
             '@max' => DRUPAL_EXTENSION_NAME_MAX_LENGTH,
           )));
+        }
+
+        // Profiles can have config clashes.
+        if ($module != drupal_get_profile()) {
+          // Validate default configuration of this module. Bail if unable to
+          // install. Should not continue installing more modules because those
+          // may depend on this one.
+          $existing_configuration = \Drupal::service('config.installer')->findPreExistingConfiguration('module', $module);
+          if (count($existing_configuration)) {
+            throw new PreExistingConfigException(String::format('Configuration @config_names provided by @extension already exist in active configuration',
+              array('@config_names' => implode(',', $existing_configuration[StorageInterface::DEFAULT_COLLECTION]), '@extension' => $module)
+            ));
+          }
         }
 
         $extension_config

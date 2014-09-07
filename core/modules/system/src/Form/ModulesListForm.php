@@ -11,6 +11,7 @@ use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Controller\TitleResolverInterface;
 use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -92,6 +93,13 @@ class ModulesListForm extends FormBase {
   protected $menuLinkManager;
 
   /**
+   * The config installer.
+   *
+   * @var \Drupal\Core\Config\ConfigInstallerInterface
+   */
+  protected $configInstaller;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -104,7 +112,8 @@ class ModulesListForm extends FormBase {
       $container->get('current_route_match'),
       $container->get('title_resolver'),
       $container->get('router.route_provider'),
-      $container->get('plugin.manager.menu.link')
+      $container->get('plugin.manager.menu.link'),
+      $container->get('config.installer')
     );
   }
 
@@ -130,7 +139,7 @@ class ModulesListForm extends FormBase {
    * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
    *   The menu link manager.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, KeyValueStoreExpirableInterface $key_value_expirable, AccessManagerInterface $access_manager, EntityManagerInterface $entity_manager, AccountInterface $current_user,  RouteMatchInterface $route_match, TitleResolverInterface $title_resolver, RouteProviderInterface $route_provider, MenuLinkManagerInterface $menu_link_manager) {
+  public function __construct(ModuleHandlerInterface $module_handler, KeyValueStoreExpirableInterface $key_value_expirable, AccessManagerInterface $access_manager, EntityManagerInterface $entity_manager, AccountInterface $current_user,  RouteMatchInterface $route_match, TitleResolverInterface $title_resolver, RouteProviderInterface $route_provider, MenuLinkManagerInterface $menu_link_manager, ConfigInstallerInterface $config_installer) {
     $this->moduleHandler = $module_handler;
     $this->keyValueExpirable = $key_value_expirable;
     $this->accessManager = $access_manager;
@@ -140,6 +149,7 @@ class ModulesListForm extends FormBase {
     $this->titleResolver = $title_resolver;
     $this->routeProvider = $route_provider;
     $this->menuLinkManager = $menu_link_manager;
+    $this->configInstaller = $config_installer;
   }
 
   /**
@@ -477,6 +487,19 @@ class ModulesListForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Retrieve a list of modules to install and their dependencies.
     $modules = $this->buildModuleList($form_state);
+
+    // Check if we have any pre existing configuration.
+    $existing_configuration = array();
+    foreach (array_keys($modules['install']) as $module) {
+      $existing_configuration = array_merge_recursive($this->configInstaller->findPreExistingConfiguration('module', $module), $existing_configuration);
+    }
+    if (count($existing_configuration)) {
+      $account = $this->currentUser()->id();
+      $this->keyValueExpirable->setWithExpire($account, $modules, 60);
+      // Redirect to the system config clash page.
+      $form_state['redirect_route']['route_name'] = 'system.modules_config_clash';
+      return;
+    }
 
     // Check if we have to install any dependencies. If there is one or more
     // dependencies that are not installed yet, redirect to the confirmation

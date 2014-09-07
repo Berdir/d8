@@ -269,6 +269,14 @@ system.theme_enable:
     _permission: 'administer themes'
     _csrf_token: 'TRUE'
 
+system.modules_config_clash:
+  path: 'admin/modules/config_clash'
+  defaults:
+    _content: 'Drupal\system\Controller\ConfigClashController::moduleReport'
+    _title: 'Configuration clash'
+  requirements:
+    _permission: 'administer modules'
+
 system.status:
   path: '/admin/reports/status'
   defaults:

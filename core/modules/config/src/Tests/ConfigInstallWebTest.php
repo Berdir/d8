@@ -2,12 +2,14 @@
 
 /**
  * @file
- * Definition of Drupal\config\Tests\ConfigInstallTest.
+ * Contains \Drupal\config\Tests\ConfigInstallWebTest.
  */
 
 namespace Drupal\config\Tests;
 
 use Drupal\Core\Config\InstallStorage;
+use Drupal\Core\Config\PreExistingConfigException;
+use Drupal\Core\Config\StorageInterface;
 use Drupal\simpletest\WebTestBase;
 use Drupal\Core\Config\FileStorage;
 
@@ -78,6 +80,16 @@ class ConfigInstallWebTest extends WebTestBase {
     $this->assertIdentical($config_entity->get('label'), 'Customized integration config label');
 
     // Reinstall the integration module.
+    try {
+      \Drupal::moduleHandler()->install(array('config_integration_test'));
+      $this->fail('Expected PreExistingConfigException not thrown.');
+    }
+    catch (PreExistingConfigException $e) {
+      $this->assertEqual($e->getMessage(), 'Configuration config_test.dynamic.config_integration_test provided by config_integration_test already exist in active configuration');
+    }
+
+    // Delete the configuration entity so that the install will work.
+    $config_entity->delete();
     \Drupal::moduleHandler()->install(array('config_integration_test'));
 
     // Verify the integration module's config was re-installed.
@@ -87,10 +99,10 @@ class ConfigInstallWebTest extends WebTestBase {
     $this->assertIdentical($config_static->isNew(), FALSE);
     $this->assertIdentical($config_static->get('foo'), 'default setting');
 
-    // Verify the customized integration config still exists.
+    // Verify the integration config is using the default.
     $config_entity = \Drupal::config($default_configuration_entity);
     $this->assertIdentical($config_entity->isNew(), FALSE);
-    $this->assertIdentical($config_entity->get('label'), 'Customized integration config label');
+    $this->assertIdentical($config_entity->get('label'), 'Default integration config label');
   }
 
   /**
@@ -144,5 +156,12 @@ class ConfigInstallWebTest extends WebTestBase {
     // Verify that the data hasn't been altered by removing the test module.
     $config = \Drupal::config($config_name);
     $this->assertIdentical($config->get(), $expected_profile_data);
+  }
+
+  /**
+   * Tests pre existing configuration detection
+   */
+  public function testPreExistingConfigInstall() {
+
   }
 }
