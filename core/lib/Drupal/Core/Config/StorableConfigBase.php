@@ -128,7 +128,7 @@ abstract class StorableConfigBase extends ConfigBase {
     if (!isset($this->schemaWrapper)) {
       $definition = $this->typedConfigManager->getDefinition($this->name);
       $data_definition = $this->typedConfigManager->buildDataDefinition($definition, $this->data);
-      $this->schemaWrapper = $this->typedConfigManager->create($data_definition, $this->data);
+      $this->schemaWrapper = $this->typedConfigManager->create($data_definition, $this->data, $this->name);
     }
     return $this->schemaWrapper;
   }
@@ -178,7 +178,10 @@ abstract class StorableConfigBase extends ConfigBase {
   protected function castValue($key, $value) {
     $element = $this->getSchemaWrapper()->get($key);
     // Do not cast value if it is unknown or defined to be ignored.
-    if ($element && ($element instanceof Undefined || $element instanceof Ignore)) {
+    if ($element && ($element instanceof Undefined)) {
+      throw new ConfigException(String::format("The configuration property @key is undefined.", array('@key' => $element->getFullName())));
+    }
+    elseif ($element && ($element instanceof Ignore)) {
       // Do validate the value (may throw UnsupportedDataTypeConfigException)
       // to ensure unsupported types are not supported in this case either.
       $this->validateValue($key, $value);

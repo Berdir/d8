@@ -85,7 +85,6 @@ class BlockLanguageTest extends WebTestBase {
     $edit = array(
       'visibility' => array(
         'language' => array(
-          'language_type' => 'language_interface',
           'langcodes' => array(
             'fr' => 'fr',
           ),

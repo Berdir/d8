@@ -71,7 +71,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     $data = $this->configStorage->read($name);
     $type_definition = $this->getDefinition($name);
     $data_definition =  $this->buildDataDefinition($type_definition, $data);
-    return $this->create($data_definition, $data);
+    return $this->create($data_definition, $data, $name);
   }
 
   /**
@@ -91,7 +91,9 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       if (isset($name)) {
         $replace['%key'] = $name;
       }
+      $definition['debug']['dynamic_type'] = $type;
       $type = $this->replaceName($type, $replace);
+      $definition['debug']['resolved_type'] = $type;
       // Remove the type from the definition so that it is replaced with the
       // concrete type from schema definitions.
       unset($definition['type']);
@@ -135,6 +137,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       unset($definition['type']);
       $this->definitions[$type] = $definition;
     }
+    $definition['debug']['generic_type'] = $base_plugin_id;
     // Add type and default definition class.
     return $definition + array(
       'definition_class' => '\Drupal\Core\TypedData\DataDefinition',

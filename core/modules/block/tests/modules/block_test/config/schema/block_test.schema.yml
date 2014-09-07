@@ -1,0 +1,9 @@
+# Configuration schema for block test module.
+
+block.settings.test_block_instantiation:
+  type: block_settings
+  label: 'Block instantiation test'
+  mapping:
+    display_message:
+      type: string
+      label: 'Message to display'

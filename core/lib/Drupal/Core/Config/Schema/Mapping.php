@@ -63,7 +63,7 @@ class Mapping extends ArrayElement implements ComplexDataInterface {
       return $element;
     }
     else {
-      throw new \InvalidArgumentException(String::format("The configuration property @key doesn't exist.", array('@key' => $property_name)));
+      throw new \InvalidArgumentException(String::format("The configuration property @key.@element doesn't exist.", array('@key' => $this->getFullName(), '@element' => $property_name)));
     }
   }
 
@@ -131,6 +131,11 @@ class Mapping extends ArrayElement implements ComplexDataInterface {
       $this->propertyDefinitions = array();
       foreach ($this->getAllKeys() as $key) {
         $definition = isset($this->definition['mapping'][$key]) ? $this->definition['mapping'][$key] : array();
+        if (empty($definition)) {
+          debug($this->definition['type']);
+          debug($this->definition['debug']);
+          throw new \InvalidArgumentException(String::format("The configuration property @key.@element doesn't have schema.", array('@key' => $this->getFullName(), '@element' => $key)));
+        }
         $this->propertyDefinitions[$key] = $this->buildDataDefinition($definition, $this->value[$key], $key);
       }
     }

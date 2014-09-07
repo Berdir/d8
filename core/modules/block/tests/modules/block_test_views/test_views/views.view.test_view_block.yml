@@ -40,7 +40,7 @@ display:
     position: null
     provider: views
     display_options:
-      field:
+      fields:
         title:
           link_to_node: true
 label: test_view_block
