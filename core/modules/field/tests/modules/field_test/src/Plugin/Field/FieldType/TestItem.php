@@ -42,7 +42,6 @@ class TestItem extends FieldItemBase {
   public static function defaultInstanceSettings() {
     return array(
       'test_instance_setting' => 'dummy test string',
-      'test_cached_data' => FALSE,
     ) + parent::defaultInstanceSettings();
   }
 

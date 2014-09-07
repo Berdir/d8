@@ -115,7 +115,7 @@ class Link extends FieldPluginBase {
       $this->options['alter']['fragment'] = "comment-" . $cid;
     }
     // If there is no comment link to the node.
-    elseif ($this->options['link_to_node']) {
+    elseif ($this->options['link_to_entity']) {
       $entity = $comment->getCommentedEntity();
       $this->options['alter']['path'] = $entity->getSystemPath();
     }

@@ -147,8 +147,7 @@ class CKEditorAdminTest extends WebTestBase {
     $this->drupalGet('admin/config/content/formats/manage/filtered_html');
     $expected_settings['toolbar']['rows'][0][] = array(
       'name' => 'Action history',
-      'items' => array('Undo', '|', 'Redo'),
-      array('JustifyCenter')
+      'items' => array('Undo', '|', 'Redo', 'JustifyCenter'),
     );
     $edit = array(
       'editor[settings][toolbar][button_groups]' => json_encode($expected_settings['toolbar']['rows']),

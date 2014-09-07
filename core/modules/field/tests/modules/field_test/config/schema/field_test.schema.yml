@@ -21,3 +21,36 @@ entity_form_display.field.test_field_widget_multiple:
         test_widget_setting_multiple:
           type: string
           label: 'Test setting'
+
+field.test_field.settings:
+  type: mapping
+  label: 'Test field settings'
+  mapping:
+    test_field_storage_setting:
+      type: string
+      label: 'Storage test setting'
+    changeable:
+      type: string
+      label: 'Changeable setting'
+    unchangeable:
+      type: string
+      label: 'Unchangeable setting'
+
+field.test_field.instance_settings:
+  type: mapping
+  label: 'Text settings'
+  mapping:
+    test_instance_setting:
+      type: string
+      label: 'Instance setting'
+
+field.test_field.value:
+  type: sequence
+  label: 'Default value'
+  sequence:
+    - type: mapping
+      label: 'Default'
+      mapping:
+        value:
+          type: label
+          label: 'Value'
