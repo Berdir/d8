@@ -196,6 +196,8 @@ class LanguageManager implements LanguageManagerInterface {
       'default' => FALSE,
       'locked' => TRUE,
     );
+    // This is called very early while initializing the language system. Prevent
+    // early t() calls by using the TranslationWrapper.
     $languages[LanguageInterface::LANGCODE_NOT_SPECIFIED] = new Language(array(
       'id' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
       'name' => new TranslationWrapper('Not specified'),
