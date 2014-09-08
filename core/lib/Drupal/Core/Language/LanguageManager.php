@@ -10,6 +10,7 @@ namespace Drupal\Core\Language;
 use Drupal\Component\Utility\String;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\StringTranslation\TranslationWrapper;
 
 /**
  * Class responsible for providing language support on language-unaware sites.
@@ -197,13 +198,13 @@ class LanguageManager implements LanguageManagerInterface {
     );
     $languages[LanguageInterface::LANGCODE_NOT_SPECIFIED] = new Language(array(
       'id' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
-      'name' => $this->t('Not specified'),
+      'name' => new TranslationWrapper('Not specified'),
       'weight' => ++$weight,
     ) + $locked_language);
 
     $languages[LanguageInterface::LANGCODE_NOT_APPLICABLE] = new Language(array(
       'id' => LanguageInterface::LANGCODE_NOT_APPLICABLE,
-      'name' => $this->t('Not applicable'),
+      'name' => new TranslationWrapper('Not applicable'),
       'weight' => ++$weight,
     ) + $locked_language);
 
