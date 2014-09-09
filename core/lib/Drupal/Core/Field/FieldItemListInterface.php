@@ -246,8 +246,8 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
    *
    * @return mixed
    *   The default value for the field, as accepted by
-   *   \Drupal\field\Plugin\Core\Entity\FieldItemListInterface::setValue(). This
-   *   can be either:
+   *   \Drupal\Core\Field\FieldItemListInterface::setValue(). This can be
+   *   either:
    *   - a literal, in which case it will be assigned to the first property of
    *     the first item.
    *   - a numerically indexed array of items, each item being a property/value
