@@ -60,7 +60,7 @@ class EntityDefinitionUpdateTest extends EntityUnitTestBase {
   /**
    * Tests updating entity schema when there are no existing entities.
    */
-  public function testUpdateWithoutData() {
+  public function testEntityTypeUpdateWithoutData() {
     // Install every entity type's schema. Start with entity_test_rev not
     // supporting revisions, and ensure its revision table isn't created.
     $this->state->set('entity_test.entity_test_rev.disable_revisable', TRUE);
@@ -89,7 +89,7 @@ class EntityDefinitionUpdateTest extends EntityUnitTestBase {
   /**
    * Tests updating entity schema when there are existing entities.
    */
-  public function testUpdateWithData() {
+  public function testEntityTypeUpdateWithData() {
     // Install every entity type's schema. Start with entity_test_rev not
     // supporting revisions.
     $this->state->set('entity_test.entity_test_rev.disable_revisable', TRUE);
@@ -111,6 +111,59 @@ class EntityDefinitionUpdateTest extends EntityUnitTestBase {
     catch (EntityStorageException $e) {
       $this->pass('EntityStorageException thrown when trying to apply an update that requires data migration.');
     }
+  }
+
+  /**
+   * Tests creating and deleting fields when there are no existing entities.
+   */
+  public function testFieldCreateDeleteWithoutData() {
+    // Install every entity type's schema.
+    foreach ($this->entityManager->getDefinitions() as $entity_type_id => $entity_type) {
+      $this->installEntitySchema($entity_type_id);
+    }
+
+    // Install the entity_schema_test module, which adds a custom base field
+    // and a custom code-defined bundle field. Services need to be
+    // re-instantiated from the rebuilt container.
+    $this->enableModules(array('entity_schema_test'));
+    $this->entityDefinitionUpdateManager = $this->container->get('entity.definition_update_manager');
+    $this->database = $this->container->get('database');
+
+    // Ensure the update manager reports those additions.
+    $this->assertTrue($this->entityDefinitionUpdateManager->needsUpdates(), 'EntityDefinitionUpdateManager reports that updates are needed.');
+    $expected = array(
+      'entity_test' => array(
+        t('Create the %field_name field.', array('%field_name' => t('A custom base field'))),
+        t('Create the %field_name field.', array('%field_name' => t('A custom bundle field'))),
+      ),
+    );
+    $this->assertIdentical($this->entityDefinitionUpdateManager->getChangeSummary(), $expected, 'EntityDefinitionUpdateManager reports the expected change summary.');
+
+    // Run the update and ensure the base and bundle field schema are created.
+    // The base field uses shared table storage and the bundle field uses
+    // dedicated table storage.
+    $this->entityDefinitionUpdateManager->applyUpdates();
+    $this->assertTrue($this->database->schema()->fieldExists('entity_test', 'custom_base_field'), 'Column created in shared table for custom_base_field.');
+    $this->assertTrue($this->database->schema()->tableExists('entity_test__custom_bundle_field'), 'Dedicated table created for custom_bundle_field.');
+
+    // Uninstall the entity_schema_test module and ensure that field deletions
+    // are reported.
+    $this->disableModules(array('entity_schema_test'));
+    $this->entityDefinitionUpdateManager = $this->container->get('entity.definition_update_manager');
+    $this->database = $this->container->get('database');
+    $this->assertTrue($this->entityDefinitionUpdateManager->needsUpdates(), 'EntityDefinitionUpdateManager reports that updates are needed.');
+    $expected = array(
+      'entity_test' => array(
+        t('Delete the %field_name field.', array('%field_name' => t('A custom base field'))),
+        t('Delete the %field_name field.', array('%field_name' => t('A custom bundle field'))),
+      ),
+    );
+    $this->assertIdentical($this->entityDefinitionUpdateManager->getChangeSummary(), $expected, 'EntityDefinitionUpdateManager reports the expected change summary.');
+
+    // Run the update and ensure the base and bundle field schema are deleted.
+    $this->entityDefinitionUpdateManager->applyUpdates();
+    $this->assertFalse($this->database->schema()->fieldExists('entity_test', 'custom_base_field'), 'Column deleted from shared table for custom_base_field.');
+    $this->assertFalse($this->database->schema()->tableExists('entity_test__custom_bundle_field'), 'Dedicated table deleted for custom_bundle_field.');
   }
 
 }

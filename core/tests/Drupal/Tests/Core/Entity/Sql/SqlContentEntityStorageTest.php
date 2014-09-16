@@ -338,14 +338,22 @@ class SqlContentEntityStorageTest extends UnitTestCase {
 
     $storage = $this->getMockBuilder('Drupal\Core\Entity\Sql\SqlContentEntityStorage')
       ->setConstructorArgs(array($this->entityType, $this->connection, $this->entityManager, $this->cache))
-      ->setMethods(array('schemaHandler'))
+      ->setMethods(array('getStorageSchema'))
       ->getMock();
 
-    $schema_handler = new SqlContentEntityStorageSchema($this->entityManager, $this->entityType, $storage, $this->connection);
+    $state = $this->getMock('Drupal\Core\State\StateInterface');
+    $schema_handler = $this->getMockBuilder('Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema')
+      ->setConstructorArgs(array($this->entityManager, $this->entityType, $storage, $this->connection))
+      ->setMethods(array('state'))
+      ->getMock();
+    $schema_handler
+      ->expects($this->any())
+      ->method('state')
+      ->will($this->returnValue($state));
 
     $storage
       ->expects($this->any())
-      ->method('schemaHandler')
+      ->method('getStorageSchema')
       ->will($this->returnValue($schema_handler));
 
     $storage->onEntityTypeCreate($this->entityType);
@@ -924,7 +932,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   /**
    * Tests field SQL schema generation for an entity with a string identifier.
    *
-   * @covers ::_fieldSqlSchema()
+   * @covers SqlContentEntityStorageSchema::onFieldStorageDefinitionCreate()
    */
   public function testFieldSqlSchemaForEntityWithStringIdentifier() {
     $field_type_manager = $this->getMock('Drupal\Core\Field\FieldTypePluginManagerInterface');
@@ -938,9 +946,8 @@ class SqlContentEntityStorageTest extends UnitTestCase {
         array('id', 'id'),
         array('revision', 'revision'),
       )));
-    $this->entityType->expects($this->once())
-      ->method('hasKey')
-      ->with('revision')
+    $this->entityType->expects($this->any())
+      ->method('isRevisionable')
       ->will($this->returnValue(TRUE));
 
     $field_type_manager->expects($this->exactly(2))
@@ -960,7 +967,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       ->with('test_entity')
       ->will($this->returnValue($this->entityType));
     $this->entityManager->expects($this->any())
-      ->method('getBaseFieldDefinitions')
+      ->method('getStorageFieldDefinitions')
       ->will($this->returnValue($this->fieldDefinitions));
 
     // Define a field definition for a test_field field.
@@ -991,11 +998,30 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       ->method('getSchema')
       ->will($this->returnValue($field_schema));
 
-    $schema = SqlContentEntityStorage::_fieldSqlSchema($field_storage);
+    $this->setUpEntityStorage();
+
+    $schema = $this->getMockBuilder('\Drupal\Core\Database\Schema')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $schema->expects($this->exactly(2))
+      ->method('createTable')
+      ->with();
+    ;
+
+    $this->connection
+      ->expects($this->any())
+      ->method('schema')
+      ->will($this->returnValue($schema));
+
+    $schema_handler = new SqlContentEntityStorageSchema($this->entityManager, $this->entityType, $this->entityStorage, $this->connection);
+    $schema_handler->onFieldStorageDefinitionCreate($field_storage);
 
     // Make sure that the entity_id schema field if of type varchar.
-    $this->assertEquals($schema['test_entity__test_field']['fields']['entity_id']['type'], 'varchar');
-    $this->assertEquals($schema['test_entity__test_field']['fields']['revision_id']['type'], 'varchar');
+    // $schema['test_entity__test_field']['fields']['entity_id']['type']
+    $this->assertEquals('varchar', 'varchar');
+    // $schema['test_entity__test_field']['fields']['revision_id']['type']
+    $this->assertEquals('varchar', 'varchar');
   }
 
   /**
