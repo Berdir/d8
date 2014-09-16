@@ -298,7 +298,7 @@ display:
           provider: views
         rid:
           id: rid
-          table: users_roles
+          table: user__roles
           field: rid
           relationship: none
           group_type: group
@@ -657,7 +657,7 @@ display:
           plugin_id: combine
         rid:
           id: rid
-          table: users_roles
+          table: user__roles
           field: rid
           relationship: none
           group_type: group
@@ -698,7 +698,7 @@ display:
           provider: user
         permission:
           id: permission
-          table: users_roles
+          table: user__roles
           field: permission
           relationship: none
           group_type: group

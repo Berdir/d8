@@ -130,12 +130,6 @@ class User extends ContentEntityBase implements UserInterface {
         }
       }
 
-      // Update user roles if changed.
-      if ($this->getRoles() != $this->original->getRoles()) {
-        $storage->deleteUserRoles(array($this->id()));
-        $storage->saveRoles($this);
-      }
-
       // If the user was blocked, delete the user's sessions to force a logout.
       if ($this->original->status->value != $this->status->value && $this->status->value == 0) {
         $session_manager->delete($this->id());
@@ -148,12 +142,6 @@ class User extends ContentEntityBase implements UserInterface {
         _user_mail_notify($op, $this);
       }
     }
-    else {
-      // Save user roles.
-      if (count($this->getRoles()) > 1) {
-        $storage->saveRoles($this);
-      }
-    }
   }
 
   /**
@@ -164,7 +152,6 @@ class User extends ContentEntityBase implements UserInterface {
 
     $uids = array_keys($entities);
     \Drupal::service('user.data')->delete(NULL, $uids);
-    $storage->deleteUserRoles($uids);
   }
 
   /**

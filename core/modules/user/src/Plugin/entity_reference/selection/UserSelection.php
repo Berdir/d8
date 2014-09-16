@@ -131,16 +131,5 @@ class UserSelection extends SelectionBase {
         }
       }
     }
-
-    // Add the filter by role option.
-    if (!empty($this->fieldDefinition->getSetting('handler_settings')['filter'])) {
-      $filter_settings = $this->fieldDefinition->getSetting('handler_settings')['filter'];
-      if ($filter_settings['type'] == 'role') {
-        $tables = $query->getTables();
-        $base_table = $tables['base_table']['alias'];
-        $query->join('users_roles', 'ur', $base_table . '.uid = ur.uid');
-        $query->condition('ur.rid', $filter_settings['role']);
-      }
-    }
   }
 }

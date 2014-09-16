@@ -404,17 +404,17 @@ class UserViewsData implements EntityViewsDataInterface {
 
     // Define the base group of this table. Fields that don't have a group defined
     // will go into this field by default.
-    $data['users_roles']['table']['group']  = t('User');
+    $data['user__roles']['table']['group']  = t('User');
 
     // Explain how this table joins to others.
-    $data['users_roles']['table']['join'] = array(
+    $data['user__roles']['table']['join'] = array(
       'users' => array(
         'left_field' => 'uid',
         'field' => 'uid',
       ),
     );
 
-    $data['users_roles']['rid'] = array(
+    $data['user__roles']['rid'] = array(
       'title' => t('Roles'),
       'help' => t('Roles that a user belongs to.'),
       'field' => array(
@@ -426,7 +426,7 @@ class UserViewsData implements EntityViewsDataInterface {
         'allow empty' => TRUE,
       ),
       'argument' => array(
-        'id' => 'users_roles_rid',
+        'id' => 'user__roles_rid',
         'name table' => 'role',
         'name field' => 'name',
         'empty field name' => t('No role'),
@@ -435,7 +435,7 @@ class UserViewsData implements EntityViewsDataInterface {
       ),
     );
 
-    $data['users_roles']['permission'] = array(
+    $data['user__roles']['permission'] = array(
       'title' => t('Permission'),
       'help' => t('The user permissions.'),
       'field' => array(
