@@ -64,14 +64,6 @@ function user_schema() {
  * Implements hook_install().
  */
 function user_install() {
-  $manager = \Drupal::entityManager();
-  $definition = $manager->getFieldStorageDefinitions('user')['roles'];
-  $manager->getStorage('user')->onFieldStorageDefinitionCreate($definition);
-
-  $definition = $manager->getFieldDefinitions('user', 'user')['roles'];
-  $manager->getStorage('user')->onFieldDefinitionCreate($definition);
-
-
   $storage = \Drupal::entityManager()->getStorage('user');
   // @todo Rely on the default value for langcode in
   //   https://drupal.org/node/1966436
