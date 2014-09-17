@@ -98,6 +98,9 @@ class EntityUnitTest extends UnitTestCase {
     $this->entityTypeId = $this->randomMachineName();
 
     $this->entityType = $this->getMock('\Drupal\Core\Entity\EntityTypeInterface');
+    $this->entityType->expects($this->any())
+      ->method('getBundleEntityType')
+      ->will($this->returnValue($this->entityTypeId));
 
     $this->entityManager = $this->getMock('\Drupal\Core\Entity\EntityManagerInterface');
     $this->entityManager->expects($this->any())
@@ -248,6 +251,10 @@ class EntityUnitTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->setMethods($methods)
       ->getMock();
+
+    $this->entityManager->expects($this->any())
+      ->method('getEntityTypeFromClass')
+      ->will($this->returnValue($this->entityTypeId));
   }
 
   /**
@@ -389,6 +396,10 @@ class EntityUnitTest extends UnitTestCase {
    * @covers ::postSave
    */
   public function testPostSave() {
+    $this->entityManager->expects($this->any())
+      ->method('getEntityTypeFromClass')
+      ->will($this->returnValue($this->entityTypeId));
+
     $this->cacheBackend->expects($this->at(0))
       ->method('invalidateTags')
       ->with(array(
@@ -446,6 +457,10 @@ class EntityUnitTest extends UnitTestCase {
    * @covers ::postDelete
    */
   public function testPostDelete() {
+    $this->entityManager->expects($this->any())
+      ->method('getEntityTypeFromClass')
+      ->will($this->returnValue($this->entityTypeId));
+
     $this->cacheBackend->expects($this->once())
       ->method('invalidateTags')
       ->with(array(
@@ -454,14 +469,7 @@ class EntityUnitTest extends UnitTestCase {
       ));
     $storage = $this->getMock('\Drupal\Core\Entity\EntityStorageInterface');
 
-    $entity = $this->getMockBuilder('\Drupal\Core\Entity\Entity')
-      ->setConstructorArgs(array($this->values, $this->entityTypeId))
-      ->setMethods(array('onSaveOrDelete'))
-      ->getMock();
-    $entity->expects($this->once())
-      ->method('onSaveOrDelete');
-
-    $entities = array($this->values['id'] => $entity);
+    $entities = array($this->values['id'] => $this->entity);
     $this->entity->postDelete($storage, $entities);
   }
 

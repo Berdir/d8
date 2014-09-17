@@ -101,7 +101,7 @@ class DateFormat extends ConfigEntityBase implements DateFormatInterface {
   /**
    * {@inheritdoc}
    */
-  public function getListCacheTags() {
+  public static function getListCacheTag() {
     return array('rendered' => TRUE);
   }
 

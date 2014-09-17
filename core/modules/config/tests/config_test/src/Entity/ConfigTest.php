@@ -156,4 +156,11 @@ class ConfigTest extends ConfigEntityBase implements ConfigTestInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function getListCacheTag() {
+    return ['config_tests' => TRUE];
+  }
+
 }

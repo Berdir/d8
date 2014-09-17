@@ -121,6 +121,9 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->entityType->expects($this->any())
       ->method('getClass')
       ->will($this->returnValue(get_class($this->getMockEntity())));
+    $this->entityType->expects($this->any())
+      ->method('getBundleEntityType')
+      ->will($this->returnValue('bundle'));
 
 
     $this->moduleHandler = $this->getMock('Drupal\Core\Extension\ModuleHandlerInterface');
@@ -150,6 +153,9 @@ class ConfigEntityStorageTest extends UnitTestCase {
       ->method('getDefinition')
       ->with('test_entity_type')
       ->will($this->returnValue($this->entityType));
+    $this->entityManager->expects($this->any())
+      ->method('getEntityTypeFromClass')
+      ->will($this->returnValue('test_entity_type'));
 
     $this->cacheBackend = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
 
@@ -789,7 +795,6 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @return \Drupal\Core\Entity\EntityInterface|\PHPUnit_Framework_MockObject_MockObject
    */
   public function getMockEntity(array $values = array(), $methods = array()) {
-    $methods[] = 'onSaveOrDelete';
     $methods[] = 'onUpdateBundleEntity';
     return $this->getMockForAbstractClass('Drupal\Core\Config\Entity\ConfigEntityBase', array($values, 'test_entity_type'), '', TRUE, TRUE, TRUE, $methods);
   }

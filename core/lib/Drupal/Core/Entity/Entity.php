@@ -358,7 +358,6 @@ abstract class Entity implements EntityInterface {
    * {@inheritdoc}
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
-    $this->onSaveOrDelete();
     $this->invalidateTagsOnSave($update);
   }
 
@@ -410,9 +409,9 @@ abstract class Entity implements EntityInterface {
   /**
    * {@inheritdoc}
    */
-  public function getListCacheTags() {
-    // @todo Add bundle-specific listing cache tag? https://drupal.org/node/2145751
-    return array($this->entityTypeId . 's' => TRUE);
+  public static function getListCacheTag() {
+    $entity_type_id = \Drupal::entityManager()->getEntityTypeFromClass(get_called_class());
+    return [$entity_type_id . 's' => TRUE];
   }
 
   /**
@@ -439,26 +438,6 @@ abstract class Entity implements EntityInterface {
     return $entity_manager->getStorage($entity_manager->getEntityTypeFromClass(get_called_class()))->create($values);
   }
 
-
-  /**
-   * Acts on an entity after it was saved or deleted.
-   */
-  protected function onSaveOrDelete() {
-    $referenced_entities = array(
-      $this->getEntityTypeId() => array($this->id() => $this),
-    );
-
-    foreach ($this->referencedEntities() as $referenced_entity) {
-      $referenced_entities[$referenced_entity->getEntityTypeId()][$referenced_entity->id()] = $referenced_entity;
-    }
-
-    foreach ($referenced_entities as $entity_type => $entities) {
-      if ($this->entityManager()->hasHandler($entity_type, 'view_builder')) {
-        $this->entityManager()->getViewBuilder($entity_type)->resetCache($entities);
-      }
-    }
-  }
-
   /**
    * Invalidates an entity's cache tags upon save.
    *
@@ -470,7 +449,7 @@ abstract class Entity implements EntityInterface {
     // updated entity may start to appear in a listing because it now meets that
     // listing's filtering requirements. A newly created entity may start to
     // appear in listings because it did not exist before.)
-    $tags = $this->getListCacheTags();
+    $tags = static::getListCacheTag();
     if ($update) {
       // An existing entity was updated, also invalidate its unique cache tag.
       $tags = NestedArray::mergeDeep($tags, $this->getCacheTag());
@@ -486,15 +465,14 @@ abstract class Entity implements EntityInterface {
    *   An array of entities.
    */
   protected static function invalidateTagsOnDelete(array $entities) {
-    $tags = array();
+    $tags = static::getListCacheTag();
     foreach ($entities as $entity) {
       // An entity was deleted: invalidate its own cache tag, but also its list
       // cache tags. (A deleted entity may cause changes in a paged list on
       // other pages than the one it's on. The one it's on is handled by its own
       // cache tag, but subsequent list pages would not be invalidated, hence we
       // must invalidate its list cache tags as well.)
-      $tags = NestedArray::mergeDeepArray(array($tags, $entity->getCacheTag(), $entity->getListCacheTags()));
-      $entity->onSaveOrDelete();
+      $tags = NestedArray::mergeDeep($tags, $entity->getCacheTag());
     }
     Cache::invalidateTags($tags);
   }

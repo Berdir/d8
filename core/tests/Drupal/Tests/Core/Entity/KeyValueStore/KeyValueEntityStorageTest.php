@@ -426,7 +426,6 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->keyValueStore->expects($this->never())
       ->method('delete');
     $entity = $this->getMockEntity('Drupal\Core\Entity\ContentEntityBase', array(), array(
-      'onSaveOrDelete',
       'toArray',
       'id',
     ));

@@ -68,6 +68,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityUnitTestBase {
     $expected_cache_tags = array(
       'entity_test_view' => TRUE,
       'entity_test' => array($commented_entity->id()),
+      'comments' => TRUE,
     );
     $this->assertEqual($build['#cache']['tags'], $expected_cache_tags, 'The test entity has the expected cache tags before it has comments.');
 
@@ -95,7 +96,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityUnitTestBase {
     //   https://drupal.org/node/597236 lands, it's a temporary work-around.
     $commented_entity = entity_load('entity_test', $commented_entity->id(), TRUE);
 
-    // Verify cache tags on the rendered entity before it has comments.
+    // Verify cache tags on the rendered entity when it has comments.
     $build = \Drupal::entityManager()
       ->getViewBuilder('entity_test')
       ->view($commented_entity);
@@ -103,6 +104,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityUnitTestBase {
     $expected_cache_tags = array(
       'entity_test_view' => TRUE,
       'entity_test' => array($commented_entity->id()),
+      'comments' => TRUE,
       'comment_view' => TRUE,
       'comment' => array(1 => $comment->id()),
       'filter_format' => array(

@@ -230,8 +230,8 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
   /**
    * {@inheritdoc}
    */
-  public function getListCacheTags() {
-    return $this->shortcut_set->entity->getListCacheTags();
+  public static function getListCacheTag() {
+    return ShortcutSet::getListCacheTag();
   }
 
 }

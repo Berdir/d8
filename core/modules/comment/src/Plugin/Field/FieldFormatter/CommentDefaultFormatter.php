@@ -9,6 +9,7 @@ namespace Drupal\comment\Plugin\Field\FieldFormatter;
 
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentStorageInterface;
+use Drupal\comment\Entity\Comment;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
@@ -150,19 +151,24 @@ class CommentDefaultFormatter extends FormatterBase implements ContainerFactoryP
       // Unpublished comments are not included in
       // $entity->get($field_name)->comment_count, but unpublished comments
       // should display if the user is an administrator.
-      if ((($entity->get($field_name)->comment_count && $this->currentUser->hasPermission('access comments')) ||
-        $this->currentUser->hasPermission('administer comments'))) {
-        $mode = $comment_settings['default_mode'];
-        $comments_per_page = $comment_settings['per_page'];
-        $comments = $this->storage->loadThread($entity, $field_name, $mode, $comments_per_page, $this->getSetting('pager_id'));
-        if ($comments) {
-          comment_prepare_thread($comments);
-          $build = $this->viewBuilder->viewMultiple($comments);
-          $build['pager']['#theme'] = 'pager';
-          if ($this->getSetting('pager_id')) {
-            $build['pager']['#element'] = $this->getSetting('pager_id');
+      if ($this->currentUser->hasPermission('access comments') || $this->currentUser->hasPermission('administer comments')) {
+        // This is a listing of Comment entities, so associate its list cache
+        // tag for correct invalidation.
+        $output['comments']['#cache']['tags'] = Comment::getListCacheTag();
+
+        if ($entity->get($field_name)->comment_count || $this->currentUser->hasPermission('administer comments')) {
+          $mode = $comment_settings['default_mode'];
+          $comments_per_page = $comment_settings['per_page'];
+          $comments = $this->storage->loadThread($entity, $field_name, $mode, $comments_per_page, $this->getSetting('pager_id'));
+          if ($comments) {
+            comment_prepare_thread($comments);
+            $build = $this->viewBuilder->viewMultiple($comments);
+            $build['pager']['#theme'] = 'pager';
+            if ($this->getSetting('pager_id')) {
+              $build['pager']['#element'] = $this->getSetting('pager_id');
+            }
+            $output['comments'] += $build;
           }
-          $output['comments'] = $build;
         }
       }
 

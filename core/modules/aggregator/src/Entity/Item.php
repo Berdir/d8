@@ -215,8 +215,8 @@ class Item extends ContentEntityBase implements ItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function getListCacheTags() {
-    return Feed::load($this->getFeedId())->getListCacheTags();
+  public static function getListCacheTag() {
+    return Feed::getListCacheTag();
   }
 
 

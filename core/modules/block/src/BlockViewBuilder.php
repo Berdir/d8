@@ -74,7 +74,6 @@ class BlockViewBuilder extends EntityViewBuilder {
       $build[$entity_id]['#cache']['tags'] = NestedArray::mergeDeepArray(array(
         $this->getCacheTag(), // Block view builder cache tag.
         $entity->getCacheTag(), // Block entity cache tag.
-        $entity->getListCacheTags(), // Block entity list cache tags.
         $plugin->getCacheTags(), // Block plugin cache tags.
       ));
 

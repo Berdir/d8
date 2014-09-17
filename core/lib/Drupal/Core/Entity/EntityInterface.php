@@ -375,6 +375,6 @@ interface EntityInterface extends AccessibleInterface {
    * @return array
    *   An array of cache tags.
    */
-  public function getListCacheTags();
+  public static function getListCacheTag();
 
 }

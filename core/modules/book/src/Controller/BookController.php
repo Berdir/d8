@@ -10,6 +10,7 @@ namespace Drupal\book\Controller;
 use Drupal\book\BookExport;
 use Drupal\book\BookManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -110,6 +111,9 @@ class BookController implements ContainerInjectionInterface {
     return array(
       '#theme' => 'item_list',
       '#items' => $book_list,
+      '#cache' => [
+        'tags' => Node::getListCacheTag(),
+      ],
     );
   }
 
