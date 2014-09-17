@@ -1739,21 +1739,19 @@ function hook_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\Entit
  */
 function hook_entity_field_storage_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type) {
   // Expose storage definitions for all exposed bundle fields.
-  if ($entity_type->isFieldable()) {
-    // Query by filtering on the ID as this is more efficient than filtering
-    // on the entity_type property directly.
-    $ids = \Drupal::entityQuery('field_storage_config')
-      ->condition('id', $entity_type->id() . '.', 'STARTS_WITH')
-      ->execute();
+  // Query by filtering on the ID as this is more efficient than filtering
+  // on the entity_type property directly.
+  $ids = \Drupal::entityQuery('field_storage_config')
+    ->condition('id', $entity_type->id() . '.', 'STARTS_WITH')
+    ->execute();
 
-    // Fetch all fields and key them by field name.
-    $field_storages = entity_load_multiple('field_storage_config', $ids);
-    $result = array();
-    foreach ($field_storages as $field_storage) {
-      $result[$field_storage->getName()] = $field_storage;
-    }
-    return $result;
+  // Fetch all fields and key them by field name.
+  $field_storages = entity_load_multiple('field_storage_config', $ids);
+  $result = array();
+  foreach ($field_storages as $field_storage) {
+    $result[$field_storage->getName()] = $field_storage;
   }
+  return $result;
 }
 
 /**

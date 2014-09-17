@@ -987,9 +987,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     }
 
     $this->setLastInstalledDefinition($entity_type);
-    if ($entity_type->isFieldable()) {
-      $this->setLastInstalledFieldStorageDefinitions($entity_type_id, $this->getFieldStorageDefinitions($entity_type_id));
-    }
+    $this->setLastInstalledFieldStorageDefinitions($entity_type_id, $this->getFieldStorageDefinitions($entity_type_id));
   }
 
   /**

@@ -28,7 +28,7 @@ use Drupal\entity_test\Entity\EntityTest;
  *   },
  *   base_table = "entity_test_rev",
  *   revision_table = "entity_test_rev_revision",
- *   fieldable = TRUE,
+ *   field_ui = TRUE,
  *   entity_keys = {
  *     "id" = "id",
  *     "uuid" = "uuid",

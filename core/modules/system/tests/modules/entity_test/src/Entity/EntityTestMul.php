@@ -29,7 +29,7 @@ use Drupal\entity_test\Entity\EntityTest;
  *   },
  *   base_table = "entity_test_mul",
  *   data_table = "entity_test_mul_property_data",
- *   fieldable = TRUE,
+ *   field_ui = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "id",

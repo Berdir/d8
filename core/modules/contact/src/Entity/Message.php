@@ -31,7 +31,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   bundle_entity_type = "contact_form",
  *   field_ui_base_route = "entity.contact_form.edit_form",
- *   fieldable = TRUE,
+ *   field_ui = TRUE,
  * )
  */
 class Message extends ContentEntityBase implements MessageInterface {

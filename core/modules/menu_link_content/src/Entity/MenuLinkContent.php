@@ -31,7 +31,7 @@ use Drupal\menu_link_content\MenuLinkContentInterface;
  *   admin_permission = "administer menu",
  *   base_table = "menu_link_content",
  *   data_table = "menu_link_content_data",
- *   fieldable = TRUE,
+ *   field_ui = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "id",

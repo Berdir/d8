@@ -92,8 +92,8 @@ class EntityDisplayModeListBuilder extends ConfigEntityListBuilder {
         continue;
       }
 
-      // Filter entities
-      if ($this->entityTypes[$entity_type]->isFieldable() && !$this->isValidEntity($entity_type)) {
+      // Filter entities.
+      if (!$this->isValidEntity($entity_type)) {
         continue;
       }
 

@@ -103,11 +103,18 @@ class EntityType implements EntityTypeInterface {
   protected $permission_granularity = 'entity_type';
 
   /**
-   * Indicates whether fields can be attached to entities of this type.
+   * Indicates whether field UI should allow to add configurable fields.
    *
    * @var bool
    */
-  protected $fieldable = FALSE;
+  protected $field_ui = FALSE;
+
+  /**
+   * The route name used by field UI to attach its management pages.
+   *
+   * @var string
+   */
+  protected $field_ui_base_route;
 
   /**
    * Link templates using the URI template syntax.
@@ -202,13 +209,6 @@ class EntityType implements EntityTypeInterface {
    * The human-readable name of the entity type group.
    */
   protected $group_label;
-
-  /**
-   * The route name used by field UI to attach its management pages.
-   *
-   * @var string
-   */
-  protected $field_ui_base_route;
 
   /**
    * Constructs a new EntityType.
@@ -498,13 +498,6 @@ class EntityType implements EntityTypeInterface {
    */
   public function getPermissionGranularity() {
     return $this->permission_granularity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isFieldable() {
-    return $this->fieldable;
   }
 
   /**

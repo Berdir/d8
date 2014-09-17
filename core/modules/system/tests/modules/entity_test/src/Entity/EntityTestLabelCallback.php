@@ -16,7 +16,7 @@ namespace Drupal\entity_test\Entity;
  *   persistent_cache = FALSE,
  *   base_table = "entity_test",
  *   label_callback = "entity_test_label_callback",
- *   fieldable = TRUE,
+ *   field_ui = TRUE,
  *   entity_keys = {
  *     "id" = "id",
  *     "bundle" = "type"

@@ -544,9 +544,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $this->attachPropertyData($entities);
 
     // Attach field values.
-    if ($this->entityType->isFieldable()) {
-      $this->loadFieldItems($entities);
-    }
+    $this->loadFieldItems($entities);
 
     return $entities;
   }
@@ -1119,7 +1117,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    *   An array of entities keyed by entity ID.
    */
   protected function loadFieldItems(array $entities) {
-    if (empty($entities) || !$this->entityType->isFieldable()) {
+    if (empty($entities)) {
       return;
     }
 

@@ -38,7 +38,7 @@ use Drupal\aggregator\FeedInterface;
  *     "delete-form" = "entity.aggregator_feed.delete_form",
  *   },
  *   base_table = "aggregator_feed",
- *   fieldable = TRUE,
+ *   field_ui = TRUE,
  *   render_cache = FALSE,
  *   entity_keys = {
  *     "id" = "fid",

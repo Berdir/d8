@@ -7,6 +7,7 @@
 
 namespace Drupal\comment;
 
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -91,7 +92,7 @@ class CommentTypeForm extends EntityForm {
     if ($comment_type->isNew()) {
       $options = array();
       foreach ($this->entityManager->getDefinitions() as $entity_type) {
-        if ($entity_type->isFieldable()) {
+        if ($entity_type instanceof ContentEntityTypeInterface) {
           $options[$entity_type->id()] = $entity_type->getLabel();
         }
       }

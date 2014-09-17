@@ -49,7 +49,7 @@ class EntityDisplayModeAddForm extends EntityDisplayModeFormBase {
    */
   protected function prepareEntity() {
     $definition = $this->entityManager->getDefinition($this->targetEntityTypeId);
-    if (!$definition->isFieldable() || !$definition->hasViewBuilderClass()) {
+    if (!$definition->hasViewBuilderClass()) {
       throw new NotFoundHttpException();
     }
 

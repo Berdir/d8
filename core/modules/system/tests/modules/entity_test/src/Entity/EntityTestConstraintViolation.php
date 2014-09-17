@@ -21,7 +21,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     }
  *   },
  *   base_table = "entity_test",
- *   fieldable = TRUE,
+ *   field_ui = TRUE,
  *   persistent_cache = FALSE,
  *   entity_keys = {
  *     "id" = "id",

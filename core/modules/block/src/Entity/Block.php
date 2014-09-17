@@ -31,7 +31,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     }
  *   },
  *   admin_permission = "administer blocks",
- *   fieldable = FALSE,
+ *   field_ui = FALSE,
  *   entity_keys = {
  *     "id" = "id"
  *   },

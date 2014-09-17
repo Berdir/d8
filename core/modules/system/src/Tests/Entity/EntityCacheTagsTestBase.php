@@ -62,10 +62,11 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
     // Create an entity.
     $this->entity = $this->createEntity();
 
-    // If this is a fieldable entity, then add a configurable field. We will use
-    // this configurable field in later tests to ensure that modifications to
-    // field (instance) configuration invalidate render cache entries.
-    if ($this->entity->getEntityType()->isFieldable()) {
+    // If this is an entity with field UI enabled, then add a configurable
+    // field. We will use this configurable field in later tests to ensure that
+    // modifications to field (instance) configuration invalidate render cache
+    // entries.
+    if ($this->entity->getEntityType()->get('field_ui')) {
       // Add field, so we can modify the Field and FieldInstance entities to
       // verify that changes to those indeed clear cache tags.
       entity_create('field_storage_config', array(
@@ -398,7 +399,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
     }
 
 
-    if ($this->entity->getEntityType()->isFieldable()) {
+    if ($this->entity->getEntityType()->get('field_ui')) {
       // Verify that after modifying a configurable field on the entity, there
       // is a cache miss.
       $this->pass("Test modification of referenced entity's configurable field.", 'Debug');

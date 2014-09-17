@@ -171,33 +171,31 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
         $change_list[$entity_type_id]['entity_type'] = static::DEFINITION_UPDATED;
       }
 
-      if ($entity_type->isFieldable()) {
-        $field_changes = array();
-        $storage_definitions = $this->entityManager->getFieldStorageDefinitions($entity_type_id);
-        $original_storage_definitions = $this->entityManager->getLastInstalledFieldStorageDefinitions($entity_type_id);
+      $field_changes = array();
+      $storage_definitions = $this->entityManager->getFieldStorageDefinitions($entity_type_id);
+      $original_storage_definitions = $this->entityManager->getLastInstalledFieldStorageDefinitions($entity_type_id);
 
-        // Detect created field storage definitions.
-        foreach (array_diff_key($storage_definitions, $original_storage_definitions) as $field_name => $storage_definition) {
-          $field_changes[$field_name] = static::DEFINITION_CREATED;
-        }
+      // Detect created field storage definitions.
+      foreach (array_diff_key($storage_definitions, $original_storage_definitions) as $field_name => $storage_definition) {
+        $field_changes[$field_name] = static::DEFINITION_CREATED;
+      }
 
-        // Detect deleted field storage definitions.
-        foreach (array_diff_key($original_storage_definitions, $storage_definitions) as $field_name => $original_storage_definition) {
-          $field_changes[$field_name] = static::DEFINITION_DELETED;
-        }
+      // Detect deleted field storage definitions.
+      foreach (array_diff_key($original_storage_definitions, $storage_definitions) as $field_name => $original_storage_definition) {
+        $field_changes[$field_name] = static::DEFINITION_DELETED;
+      }
 
-        // Detect updated field storage definitions.
-        foreach (array_intersect_key($storage_definitions, $original_storage_definitions) as $field_name => $storage_definition) {
-          // @todo Support non-storage-schema-changing definition updates too:
-          //   https://www.drupal.org/node/2336895.
-          if ($this->requiresFieldStorageSchemaChanges($storage_definition, $original_storage_definitions[$field_name])) {
-            $field_changes[$field_name] = static::DEFINITION_UPDATED;
-          }
+      // Detect updated field storage definitions.
+      foreach (array_intersect_key($storage_definitions, $original_storage_definitions) as $field_name => $storage_definition) {
+        // @todo Support non-storage-schema-changing definition updates too:
+        //   https://www.drupal.org/node/2336895.
+        if ($this->requiresFieldStorageSchemaChanges($storage_definition, $original_storage_definitions[$field_name])) {
+          $field_changes[$field_name] = static::DEFINITION_UPDATED;
         }
+      }
 
-        if ($field_changes) {
-          $change_list[$entity_type_id]['field_storage_definitions'] = $field_changes;
-        }
+      if ($field_changes) {
+        $change_list[$entity_type_id]['field_storage_definitions'] = $field_changes;
       }
     }
 

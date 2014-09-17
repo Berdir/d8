@@ -38,7 +38,7 @@ use Drupal\user\UserInterface;
  *   base_table = "comment",
  *   data_table = "comment_field_data",
  *   uri_callback = "comment_uri",
- *   fieldable = TRUE,
+ *   field_ui = TRUE,
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "cid",
