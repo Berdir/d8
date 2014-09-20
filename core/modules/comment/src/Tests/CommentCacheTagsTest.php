@@ -77,7 +77,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
    */
   protected function getAdditionalCacheTagsForEntity(EntityInterface $entity) {
     /** @var \Drupal\comment\CommentInterface $entity */
-    return array('filter_format:plain_text', 'user:' . $entity->getOwnerId(), 'user_view:1');
+    return array('filter_format:plain_text', 'user:' . $entity->getOwnerId(), 'user_view');
   }
 
 }

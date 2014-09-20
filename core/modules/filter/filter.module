@@ -182,14 +182,14 @@ function filter_pre_render_text(array $element) {
   }
 
   // Perform filtering.
-  $all_cache_tags = array();
+  $cache_tags = array();
   $all_assets = array();
   $all_post_render_cache_callbacks = array();
   foreach ($filters as $filter) {
     if ($filter_must_be_applied($filter)) {
       $result = $filter->process($text, $langcode);
       $all_assets[] = $result->getAssets();
-      $all_cache_tags[] = $result->getCacheTags();
+      $cache_tags = Cache::mergeTags($cache_tags, $result->getCacheTags());
       $all_post_render_cache_callbacks[] = $result->getPostRenderCacheCallbacks();
       $text = $result->getProcessedText();
     }
@@ -200,12 +200,12 @@ function filter_pre_render_text(array $element) {
 
   // Collect all cache tags.
   if (isset($element['#cache']) && isset($element['#cache']['tags'])) {
-    // Prepend the original cache tags array.
-    array_unshift($all_cache_tags, $element['#cache']['tags']);
+    // Merge the original cache tags array.
+    $cache_tags = Cache::mergeTags($cache_tags, $element['#cache']['tags']);
   }
   // Prepend the text format's cache tags array.
-  array_unshift($all_cache_tags, $format->getCacheTag());
-  $element['#cache']['tags'] = NestedArray::mergeDeepArray($all_cache_tags);
+  $cache_tags = Cache::mergeTags($cache_tags, $format->getCacheTag());
+  $element['#cache']['tags'] = $cache_tags;
 
   // Collect all attached assets.
   if (isset($element['#attached'])) {
@@ -250,7 +250,7 @@ function filter_formats(AccountInterface $account = NULL) {
     else {
       $formats['all'] = \Drupal::entityManager()->getStorage('filter_format')->loadByProperties(array('status' => TRUE));
       uasort($formats['all'], 'Drupal\Core\Config\Entity\ConfigEntityBase::sort');
-      \Drupal::cache()->set("filter_formats:{$language_interface->id}", $formats['all'], Cache::PERMANENT, array('filter_formats' => TRUE));
+      \Drupal::cache()->set("filter_formats:{$language_interface->id}", $formats['all'], Cache::PERMANENT, array('filter_formats'));
     }
   }
 

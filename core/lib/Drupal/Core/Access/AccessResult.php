@@ -318,20 +318,7 @@ class AccessResult implements AccessResultInterface, CacheableInterface {
    * @return $this
    */
   public function addCacheTags(array $tags) {
-    foreach ($tags as $namespace => $values) {
-      if (is_array($values)) {
-        foreach ($values as $value) {
-          $this->tags[$namespace][$value] = $value;
-        }
-        ksort($this->tags[$namespace]);
-      }
-      else {
-        if (!isset($this->tags[$namespace])) {
-          $this->tags[$namespace] = $values;
-        }
-      }
-    }
-    ksort($this->tags);
+    $this->tags = Cache::mergeTags($this->tags, $tags);
     return $this;
   }
 

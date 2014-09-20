@@ -190,8 +190,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
     // the cache tag for this menu to be set: whenever the menu is changed, this
     // menu block must also be re-rendered for that user, because maybe a menu
     // link that is accessible for that user has been added.
-    $tags = array('menu' => array($this->getDerivativeId()));
-    return NestedArray::mergeDeep(parent::getCacheTags(), $tags);
+    return Cache::mergeTags(parent::getCacheTags(), ['menu:' . $this->getDerivativeId()]);
   }
 
   /**

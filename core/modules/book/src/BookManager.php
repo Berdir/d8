@@ -451,7 +451,7 @@ class BookManager implements BookManagerInterface {
     }
     $this->updateOriginalParent($original);
     $this->books = NULL;
-    \Drupal::cache('data')->deleteTags(array('bid' => $original['bid']));
+    \Drupal::cache('data')->deleteTags(array('bid:' . $original['bid']));
   }
 
   /**
@@ -666,7 +666,7 @@ class BookManager implements BookManagerInterface {
       $this->bookTreeCollectNodeLinks($data['tree'], $data['node_links']);
 
       // Cache the data, if it is not already in the cache.
-      \Drupal::cache('data')->set($tree_cid, $data, Cache::PERMANENT, array('bid' => $bid));
+      \Drupal::cache('data')->set($tree_cid, $data, Cache::PERMANENT, array('bid:' . $bid));
       $trees[$tree_cid] = $data;
     }
 
@@ -802,9 +802,11 @@ class BookManager implements BookManagerInterface {
       $query->condition('nid', $link['nid']);
       $query->execute();
     }
+    $cache_tags = [];
     foreach ($affected_bids as $bid) {
-      \Drupal::cache('data')->deleteTags(array('bid' => $bid));
+      $cache_tags[] = 'bid:' . $bid;
     }
+    \Drupal::cache('data')->deleteTags($cache_tags);
     return $link;
   }
 
@@ -1124,10 +1126,10 @@ class BookManager implements BookManagerInterface {
         // Cache the data, if it is not already in the cache.
 
         if (!\Drupal::cache('data')->get($tree_cid)) {
-          \Drupal::cache('data')->set($tree_cid, $data, Cache::PERMANENT, array('bid' => $link['bid']));
+          \Drupal::cache('data')->set($tree_cid, $data, Cache::PERMANENT, array('bid:' . $link['bid']));
         }
         // Cache the cid of the (shared) data using the book and item-specific cid.
-        \Drupal::cache('data')->set($cid, $tree_cid, Cache::PERMANENT, array('bid' => $link['bid']));
+        \Drupal::cache('data')->set($cid, $tree_cid, Cache::PERMANENT, array('bid:' . $link['bid']));
       }
       // Check access for the current user to each item in the tree.
       $this->bookTreeCheckAccess($data['tree'], $data['node_links']);

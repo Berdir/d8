@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Page;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 
@@ -72,7 +73,7 @@ class DefaultHtmlFragmentRenderer implements HtmlFragmentRendererInterface {
       $tags = $page_array['#cache']['tags'];
       // Tag every render cache item with the "rendered" cache tag. This allows us
       // to invalidate the entire render cache, regardless of the cache bin.
-      $tags['rendered'] = TRUE;
+      $tags = Cache::mergeTags($tags, ['rendered']);
       $page->setCacheTags($tags);
     }
 

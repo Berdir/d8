@@ -267,7 +267,7 @@ class ToolbarAdminMenuTest extends WebTestBase {
 
     // Log in admin_user and clear the caches for this user using a tag.
     $this->drupalLogin($this->admin_user);
-    Cache::deleteTags(array('user' => array($admin_user_id)));
+    Cache::deleteTags(array('user:' . $admin_user_id));
 
     // Assert that no toolbar cache exists for admin_user against the
     // language "en".

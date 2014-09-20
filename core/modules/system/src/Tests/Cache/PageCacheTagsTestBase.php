@@ -14,7 +14,7 @@ use Drupal\Component\Utility\String;
  * Provides helper methods for page cache tags tests.
  */
 abstract class PageCacheTagsTestBase extends WebTestBase {
-
+protected $dumpHeaders = TRUE;
   /**
    * {@inheritdoc}
    */

@@ -404,7 +404,7 @@ abstract class Entity implements EntityInterface {
    * {@inheritdoc}
    */
   public function getCacheTag() {
-    return array($this->entityTypeId => array($this->id()));
+    return [$this->entityTypeId . ':' . $this->id()];
   }
 
   /**
@@ -412,7 +412,7 @@ abstract class Entity implements EntityInterface {
    */
   public function getListCacheTags() {
     // @todo Add bundle-specific listing cache tag? https://drupal.org/node/2145751
-    return array($this->entityTypeId . 's' => TRUE);
+    return [$this->entityTypeId . 's'];
   }
 
   /**
@@ -493,7 +493,7 @@ abstract class Entity implements EntityInterface {
       // other pages than the one it's on. The one it's on is handled by its own
       // cache tag, but subsequent list pages would not be invalidated, hence we
       // must invalidate its list cache tags as well.)
-      $tags = NestedArray::mergeDeepArray(array($tags, $entity->getCacheTag(), $entity->getListCacheTags()));
+      $tags = Cache::mergeTags($tags, $entity->getCacheTag(), $entity->getListCacheTags());
       $entity->onSaveOrDelete();
     }
     Cache::invalidateTags($tags);
