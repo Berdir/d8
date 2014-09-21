@@ -27,36 +27,6 @@ class TermStorageSchema extends SqlContentEntityStorageSchema {
       'taxonomy_term__vid_name' => array('vid', 'name'),
     );
 
-    $schema['taxonomy_term_hierarchy'] = array(
-      'description' => 'Stores the hierarchical relationship between terms.',
-      'fields' => array(
-        'tid' => array(
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 0,
-          'description' => 'Primary Key: The {taxonomy_term_data}.tid of the term.',
-        ),
-        'parent' => array(
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 0,
-          'description' => "Primary Key: The {taxonomy_term_data}.tid of the term's parent. 0 indicates no parent.",
-        ),
-      ),
-      'indexes' => array(
-        'parent' => array('parent'),
-      ),
-      'foreign keys' => array(
-        'taxonomy_term_data' => array(
-          'table' => 'taxonomy_term_data',
-          'columns' => array('tid' => 'tid'),
-        ),
-      ),
-      'primary key' => array('tid', 'parent'),
-    );
-
     $schema['taxonomy_index'] = array(
       'description' => 'Maintains denormalized information about node/term relationships.',
       'fields' => array(

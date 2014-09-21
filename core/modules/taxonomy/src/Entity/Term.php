@@ -75,26 +75,8 @@ class Term extends ContentEntityBase implements TermInterface {
       }
     }
 
-    // Delete term hierarchy information after looking up orphans but before
-    // deleting them so that their children/parent information is consistent.
-    $storage->deleteTermHierarchy(array_keys($entities));
-
     if (!empty($orphans)) {
       entity_delete_multiple('taxonomy_term', $orphans);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
-    parent::postSave($storage, $update);
-
-    // Only change the parents if a value is set, keep the existing values if
-    // not.
-    if (isset($this->parent->target_id)) {
-      $storage->deleteTermHierarchy(array($this->id()));
-      $storage->updateTermHierarchy($this);
     }
   }
 
@@ -164,8 +146,7 @@ class Term extends ContentEntityBase implements TermInterface {
       ->setLabel(t('Term Parents'))
       ->setDescription(t('The parents of this term.'))
       ->setSetting('target_type', 'taxonomy_term')
-      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
-      ->setCustomStorage(TRUE);
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))

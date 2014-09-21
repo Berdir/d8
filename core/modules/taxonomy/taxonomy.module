@@ -421,7 +421,13 @@ function taxonomy_term_load_parents_all($tid) {
  *   Use \Drupal\taxonomy\TermStorageController::loadChildren()
  */
 function taxonomy_term_load_children($tid) {
-  return \Drupal::entityManager()->getStorage('taxonomy_term')->loadChildren($tid);
+  $tids = \Drupal::entityQuery('taxonomy_term')
+    ->condition('parent.target_id', $tid)
+    ->execute();
+  if (empty($tids)) {
+    return array();
+  }
+  return Term::loadMultiple($tids);
 }
 
 /**

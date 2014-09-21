@@ -7,40 +7,12 @@
 
 namespace Drupal\taxonomy;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines an interface for taxonomy_term entity storage classes.
  */
 interface TermStorageInterface extends EntityStorageInterface {
-
-  /**
-   * Removed reference to terms from term_hierarchy.
-   *
-   * @param array $tids
-   *   Array of terms that need to be removed from hierarchy.
-   */
-  public function deleteTermHierarchy($tids);
-
-  /**
-   * Updates terms hierarchy information with the hierarchy trail of it.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $term
-   *   Term entity that needs to be added to term hierarchy information.
-   */
-  public function updateTermHierarchy(EntityInterface $term);
-
-  /**
-   * Finds all parents of a given term ID.
-   *
-   * @param int $tid
-   *   Term ID to retrieve parents for.
-   *
-   * @return \Drupal\taxonomy\TermInterface[]
-   *   An array of term objects which are the parents of the term $tid.
-   */
-  public function loadParents($tid);
 
   /**
    * Finds all ancestors of a given term ID.
@@ -52,19 +24,6 @@ interface TermStorageInterface extends EntityStorageInterface {
    *   An array of term objects which are the ancestors of the term $tid.
    */
   public function loadAllParents($tid);
-
-  /**
-   * Finds all children of a term ID.
-   *
-   * @param int $tid
-   *   Term ID to retrieve parents for.
-   * @param string $vid
-   *   An optional vocabulary ID to restrict the child search.
-   *
-   * @return \Drupal\taxonomy\TermInterface[]
-   *   An array of term objects that are the children of the term $tid.
-   */
-  public function loadChildren($tid, $vid = NULL);
 
   /**
    * Finds all terms in a given vocabulary ID.

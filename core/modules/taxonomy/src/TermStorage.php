@@ -8,7 +8,6 @@
 namespace Drupal\taxonomy;
 
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 
 /**
@@ -67,22 +66,6 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
 
   /**
    * {@inheritdoc}
-   *
-   * @param array $values
-   *   An array of values to set, keyed by property name. A value for the
-   *   vocabulary ID ('vid') is required.
-   */
-  public function create(array $values = array()) {
-    // Save new terms with no parents by default.
-    if (empty($values['parent'])) {
-      $values['parent'] = array(0);
-    }
-    $entity = parent::create($values);
-    return $entity;
-  }
-
-  /**
-   * {@inheritdoc}
    */
   protected function buildPropertyQuery(QueryInterface $entity_query, array $values) {
     if (isset($values['name'])) {
@@ -110,53 +93,6 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function deleteTermHierarchy($tids) {
-    $this->database->delete('taxonomy_term_hierarchy')
-      ->condition('tid', $tids)
-      ->execute();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function updateTermHierarchy(EntityInterface $term) {
-    $query = $this->database->insert('taxonomy_term_hierarchy')
-      ->fields(array('tid', 'parent'));
-
-    foreach ($term->parent as $parent) {
-      $query->values(array(
-        'tid' => $term->id(),
-        'parent' => (int) $parent->target_id,
-      ));
-    }
-    $query->execute();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function loadParents($tid) {
-    if (!isset($this->parents[$tid])) {
-      $parents = array();
-      $query = $this->database->select('taxonomy_term_field_data', 't');
-      $query->join('taxonomy_term_hierarchy', 'h', 'h.parent = t.tid');
-      $query->addField('t', 'tid');
-      $query->condition('h.tid', $tid);
-      $query->condition('t.default_langcode', 1);
-      $query->addTag('term_access');
-      $query->orderBy('t.weight');
-      $query->orderBy('t.name');
-      if ($ids = $query->execute()->fetchCol()) {
-        $parents = $this->loadMultiple($ids);
-      }
-      $this->parents[$tid] = $parents;
-    }
-    return $this->parents[$tid];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function loadAllParents($tid) {
     if (!isset($this->parentsAll[$tid])) {
       $parents = array();
@@ -177,31 +113,6 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * {@inheritdoc}
    */
-  public function loadChildren($tid, $vid = NULL) {
-    if (!isset($this->children[$tid])) {
-      $children = array();
-      $query = $this->database->select('taxonomy_term_field_data', 't');
-      $query->join('taxonomy_term_hierarchy', 'h', 'h.tid = t.tid');
-      $query->addField('t', 'tid');
-      $query->condition('h.parent', $tid);
-      if ($vid) {
-        $query->condition('t.vid', $vid);
-      }
-      $query->condition('t.default_langcode', 1);
-      $query->addTag('term_access');
-      $query->orderBy('t.weight');
-      $query->orderBy('t.name');
-      if ($ids = $query->execute()->fetchCol()) {
-        $children = $this->loadMultiple($ids);
-      }
-      $this->children[$tid] = $children;
-    }
-    return $this->children[$tid];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function loadTree($vid, $parent = 0, $max_depth = NULL, $load_entities = FALSE) {
     $cache_key = implode(':', func_get_args());
     if (!isset($this->trees[$cache_key])) {
@@ -212,11 +123,11 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
         $this->treeParents[$vid] = array();
         $this->treeTerms[$vid] = array();
         $query = $this->database->select('taxonomy_term_field_data', 't');
-        $query->join('taxonomy_term_hierarchy', 'h', 'h.tid = t.tid');
+        $query->join('taxonomy_term__parent', 'h', 'h.entity_id = t.tid');
         $result = $query
           ->addTag('term_access')
           ->fields('t')
-          ->fields('h', array('parent'))
+          ->fields('h', array('parent_target_id'))
           ->condition('t.vid', $vid)
           ->condition('t.default_langcode', 1)
           ->orderBy('t.weight')
