@@ -99,7 +99,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
       if ($term = $this->load($tid)) {
         $parents[] = $term;
         $n = 0;
-        while ($parent = $this->loadParents($parents[$n]->id())) {
+        while ($parent = taxonomy_term_load_parents($parents[$n]->id())) {
           $parents = array_merge($parents, $parent);
           $n++;
         }
@@ -134,8 +134,8 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
           ->orderBy('t.name')
           ->execute();
         foreach ($result as $term) {
-          $this->treeChildren[$vid][$term->parent][] = $term->tid;
-          $this->treeParents[$vid][$term->tid][] = $term->parent;
+          $this->treeChildren[$vid][$term->parent_target_id][] = $term->tid;
+          $this->treeParents[$vid][$term->tid][] = $term->parent_target_id;
           $this->treeTerms[$vid][$term->tid] = $term;
         }
       }

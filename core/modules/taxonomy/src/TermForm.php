@@ -24,7 +24,7 @@ class TermForm extends ContentEntityForm {
     $vocab_storage = $this->entityManager->getStorage('taxonomy_vocabulary');
     $vocabulary = $vocab_storage->load($term->bundle());
 
-    $parent = array_keys(taxonomy_term_load_parents($term->id()));
+    $parent = !$term->isNew() ? array_keys(taxonomy_term_load_parents($term->id())) : array();
     $form_state->set(['taxonomy', 'parent'], $parent);
     $form_state->set(['taxonomy', 'vocabulary'], $vocabulary);
 
@@ -49,7 +49,7 @@ class TermForm extends ContentEntityForm {
     // before loading the full vocabulary. Contrib modules can then intercept
     // before hook_form_alter to provide scalable alternatives.
     if (!$this->config('taxonomy.settings')->get('override_selector')) {
-      $parent = array_keys(taxonomy_term_load_parents($term->id()));
+      $parent = !$term->isNew() ? array_keys(taxonomy_term_load_parents($term->id())) : array();
       $children = taxonomy_get_tree($vocabulary->id(), $term->id());
 
       // A term can't be the child of itself, nor of its children.

@@ -394,7 +394,16 @@ function taxonomy_vocabulary_get_names() {
  *   Use \Drupal\taxonomy\TermStorageController::loadParents()
  */
 function taxonomy_term_load_parents($tid) {
-  return \Drupal::entityManager()->getStorage('taxonomy_term')->loadParents($tid);
+  $term = Term::load($tid);
+  $parents = array();
+  if ($term) {
+    foreach ($term->parent as $item) {
+      if ($item->target_id > 0) {
+        $parents[] = $item->terget_id;
+      }
+    }
+  }
+  return $parents;
 }
 
 /**
