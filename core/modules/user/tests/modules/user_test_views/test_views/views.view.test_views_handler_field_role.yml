@@ -84,7 +84,7 @@ display:
           provider: user
         rid:
           id: rid
-          table: users_roles
+          table: user__roles
           field: rid
           relationship: none
           group_type: group

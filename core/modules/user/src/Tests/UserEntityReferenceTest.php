@@ -78,10 +78,14 @@ class UserEntityReferenceTest extends EntityUnitTestBase {
     $user3->addRole($this->role2->id());
     $user3->save();
 
+    debug(db_query('SELECT * FROM {users}')->fetchAll());
+    debug(db_query('SELECT * FROM {user__roles}')->fetchAll());
+
     /** @var \Drupal\entity_reference\EntityReferenceAutocomplete $autocomplete */
     $autocomplete = \Drupal::service('entity_reference.autocomplete');
 
     $matches = $autocomplete->getMatches($field_definition, 'user', 'user', 'NULL', '', 'aabb');
+    debug($matches);
     $this->assertEqual(count($matches), 2);
     $users = array();
     foreach ($matches as $match) {

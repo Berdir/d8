@@ -88,6 +88,12 @@ class UserSelection extends SelectionBase {
       $query->condition('name', $match, $match_operator);
     }
 
+    // Filter by role.
+    $handler_settings = $this->fieldDefinition->getSetting('handler_settings');
+    if (!empty($handler_settings['filter']['role'])) {
+      $query->condition('roles', $handler_settings['filter']['role'], 'IN');
+    }
+
     // Adding the permission check is sadly insufficient for users: core
     // requires us to also know about the concept of 'blocked' and 'active'.
     if (!\Drupal::currentUser()->hasPermission('administer users')) {
