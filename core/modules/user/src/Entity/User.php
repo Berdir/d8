@@ -74,18 +74,15 @@ class User extends ContentEntityBase implements UserInterface {
   /**
    * {@inheritdoc}
    */
-  static function preCreate(EntityStorageInterface $storage, array &$values) {
-    parent::preCreate($storage, $values);
-
-    // Users always have the authenticated user role.
-    $values['roles'][] = DRUPAL_AUTHENTICATED_RID;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
+
+    // Make sure that the authenticated/anonymous roles are not persisted.
+    foreach ($this->get('roles') as $index => $item) {
+      if (in_array($item->target_id, array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID))) {
+        $this->get('roles')->offsetUnset($index);
+      }
+    }
 
     // Update the user password if it has changed.
     if ($this->isNew() || ($this->pass->value && $this->pass->value != $this->original->pass->value)) {
@@ -160,8 +157,18 @@ class User extends ContentEntityBase implements UserInterface {
   public function getRoles($exclude_locked_roles = FALSE) {
     $roles = array();
 
+    // User with an ID always have the authenticated user role.
+    if (!$exclude_locked_roles) {
+      if ($this->isAuthenticated()) {
+        $roles[] = DRUPAL_AUTHENTICATED_RID;
+      }
+      else {
+        $roles[] = DRUPAL_ANONYMOUS_RID;
+      }
+    }
+
     foreach ($this->get('roles') as $role) {
-      if (!($exclude_locked_roles && in_array($role->target_id, array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID)))) {
+      if ($role->target_id) {
         $roles[] = $role->target_id;
       }
     }

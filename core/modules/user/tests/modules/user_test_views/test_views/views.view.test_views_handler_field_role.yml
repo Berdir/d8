@@ -82,10 +82,10 @@ display:
           format_username: '1'
           plugin_id: user_name
           provider: user
-        rid:
-          id: rid
+        roles_target_id:
+          id: roles_target_id
           table: user__roles
-          field: rid
+          field: roles_target_id
           relationship: none
           group_type: group
           admin_label: ''

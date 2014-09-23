@@ -410,11 +410,11 @@ class UserViewsData implements EntityViewsDataInterface {
     $data['user__roles']['table']['join'] = array(
       'users' => array(
         'left_field' => 'uid',
-        'field' => 'uid',
+        'field' => 'entity_id',
       ),
     );
 
-    $data['user__roles']['rid'] = array(
+    $data['user__roles']['roles_target_id'] = array(
       'title' => t('Roles'),
       'help' => t('Roles that a user belongs to.'),
       'field' => array(
@@ -426,7 +426,7 @@ class UserViewsData implements EntityViewsDataInterface {
         'allow empty' => TRUE,
       ),
       'argument' => array(
-        'id' => 'user__roles_rid',
+        'id' => 'user__roles_target_id',
         'name table' => 'role',
         'name field' => 'name',
         'empty field name' => t('No role'),
@@ -444,7 +444,7 @@ class UserViewsData implements EntityViewsDataInterface {
       ),
       'filter' => array(
         'id' => 'user_permissions',
-        'real field' => 'rid',
+        'real field' => 'roles_target_id',
       ),
     );
 
