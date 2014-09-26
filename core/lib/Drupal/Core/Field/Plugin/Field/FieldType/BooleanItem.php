@@ -7,11 +7,13 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
+use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslationWrapper;
 use Drupal\Core\TypedData\OptionsProviderInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
@@ -42,8 +44,10 @@ class BooleanItem extends FieldItemBase implements OptionsProviderInterface {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
+    // Use TranslationWrapper as those can be called during early bootstrap,
+    // before the translation system is ready.
     $properties['value'] = DataDefinition::create('boolean')
-      ->setLabel(t('Boolean value'));
+      ->setLabel(new TranslationWrapper('Boolean value'));
 
     return $properties;
   }

@@ -7,9 +7,11 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
+use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\StringTranslation\TranslationWrapper;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\DataReferenceDefinition;
 
@@ -34,12 +36,14 @@ class LanguageItem extends FieldItemBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
+    // Use TranslationWrapper as those can be called during early bootstrap,
+    // before the translation system is ready.
     $properties['value'] = DataDefinition::create('string')
-      ->setLabel(t('Language code'));
+      ->setLabel(new TranslationWrapper('Language code'));
 
     $properties['language'] = DataReferenceDefinition::create('language')
-      ->setLabel(t('Language object'))
-      ->setDescription(t('The referenced language'))
+      ->setLabel(new TranslationWrapper('Language object'))
+      ->setDescription(new TranslationWrapper('The referenced language'))
       // The language object is retrieved via the language code.
       ->setComputed(TRUE)
       ->setReadOnly(FALSE);

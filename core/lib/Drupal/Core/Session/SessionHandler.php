@@ -78,12 +78,11 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
 
     // Handle the case of first time visitors and clients that don't store
     // cookies (eg. web crawlers).
-    $session = '';
     $insecure_session_name = $this->sessionManager->getInsecureName();
     $cookies = $this->requestStack->getCurrentRequest()->cookies;
     if (!$cookies->has($this->getName()) && !$cookies->has($insecure_session_name)) {
       $user = new AnonymousUserSession();
-      return $session;
+      return '';
     }
 
     // Otherwise, if the session is still active, we have a record of the
@@ -126,17 +125,13 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
       if ($user->isBlocked()) {
         $user = NULL;
       }
-      else {
-        $session = $values['session'];
-      }
     }
 
     if (!$user && $values) {
-      // The user is anonymous or blocked. Only preserve two fields from the
+      // The user is anonymous or blocked. Only preserve the timestamp from the
       // {sessions} table.
       $user = new UserSession(array(
-        'session' => $values['session'],
-        'access' => $values['access'],
+        'access' => $values['timestamp'],
       ));
     }
     elseif (!$user) {
@@ -144,7 +139,7 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
       $user = new AnonymousUserSession();
     }
 
-    return $session;
+    return isset($values['session']) ? $values['session'] : '';
   }
 
   /**
