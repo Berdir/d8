@@ -78,11 +78,12 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
 
     // Handle the case of first time visitors and clients that don't store
     // cookies (eg. web crawlers).
+    $session = '';
     $insecure_session_name = $this->sessionManager->getInsecureName();
     $cookies = $this->requestStack->getCurrentRequest()->cookies;
     if (!$cookies->has($this->getName()) && !$cookies->has($insecure_session_name)) {
-      $user = new UserSession();
-      return '';
+      $user = new AnonymousUserSession();
+      return $session;
     }
 
     // Otherwise, if the session is still active, we have a record of the
@@ -94,7 +95,7 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
     // database.
     if ($this->requestStack->getCurrentRequest()->isSecure()) {
       // Try to load a session using the HTTPS-only secure session id.
-      $values = $this->connection->query("SELECT u.*, s.* FROM {users_field_data} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE u.default_langcode = 1 AND s.ssid = :ssid", array(
+      $values = $this->connection->query("SELECT s.* FROM {sessions} s WHERE s.ssid = :ssid", array(
         ':ssid' => Crypt::hashBase64($sid),
       ))->fetchAssoc();
       if (!$values) {
@@ -103,7 +104,7 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
         if ($cookies->has($insecure_session_name)) {
           $insecure_session_id = $cookies->get($insecure_session_name);
           $args = array(':sid' => Crypt::hashBase64($insecure_session_id));
-          $values = $this->connection->query("SELECT u.*, s.* FROM {users_field_data} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE u.default_langcode = 1 AND s.sid = :sid AND s.uid = 0", $args)->fetchAssoc();
+          $values = $this->connection->query("SELECT s.* FROM {sessions} s WHERE s.sid = :sid AND s.uid = 0", $args)->fetchAssoc();
           if ($values) {
             $this->sessionSetObsolete($insecure_session_id);
           }
@@ -112,22 +113,25 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
     }
     else {
       // Try to load a session using the non-HTTPS session id.
-      $values = $this->connection->query("SELECT u.*, s.* FROM {users_field_data} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE u.default_langcode = 1 AND s.sid = :sid", array(
+      $values = $this->connection->query("SELECT s.* FROM {sessions} s WHERE s.sid = :sid", array(
         ':sid' => Crypt::hashBase64($sid),
       ))->fetchAssoc();
     }
 
     // We found the client's session record and they are an authenticated,
     // active user.
-    if ($values && $values['uid'] > 0 && $values['status'] == 1) {
-      // Add roles element to $user.
-      $rids = $this->connection->query("SELECT ur.rid FROM {users_roles} ur WHERE ur.uid = :uid", array(
-        ':uid' => $values['uid'],
-      ))->fetchCol();
-      $values['roles'] = array_merge(array(DRUPAL_AUTHENTICATED_RID), $rids);
-      $user = new UserSession($values);
+    $user = NULL;
+    if ($values && $values['uid'] > 0) {
+      $user = \Drupal::entityManager()->getStorage('user')->load($values['uid']);
+      if ($user->isBlocked()) {
+        $user = NULL;
+      }
+      else {
+        $session = $values['session'];
+      }
     }
-    elseif ($values) {
+
+    if (!$user && $values) {
       // The user is anonymous or blocked. Only preserve two fields from the
       // {sessions} table.
       $user = new UserSession(array(
@@ -135,12 +139,12 @@ class SessionHandler extends AbstractProxy implements \SessionHandlerInterface {
         'access' => $values['access'],
       ));
     }
-    else {
+    elseif (!$user) {
       // The session has expired.
-      $user = new UserSession();
+      $user = new AnonymousUserSession();
     }
 
-    return $user->session;
+    return $session;
   }
 
   /**
