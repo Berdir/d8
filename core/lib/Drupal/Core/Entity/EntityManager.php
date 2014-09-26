@@ -698,7 +698,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
         foreach ($this->getDefinitions() as $type => $entity_type) {
           // If no bundles are provided, use the entity type name and label.
           if (!isset($this->bundleInfo[$type])) {
-            $this->bundleInfo[$type][$type]['label'] = $entity_type->getLabel();
+            $this->bundleInfo[$type][$type]['label'] = $entity_type->get('label');
           }
         }
         $this->moduleHandler->alter('entity_bundle_info', $this->bundleInfo);

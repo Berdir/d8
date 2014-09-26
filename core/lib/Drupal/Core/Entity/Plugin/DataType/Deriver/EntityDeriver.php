@@ -82,7 +82,8 @@ class EntityDeriver implements ContainerDeriverInterface {
     // Add definitions for each entity type and bundle.
     foreach ($this->entityManager->getDefinitions() as $entity_type_id => $entity_type) {
       $this->derivatives[$entity_type_id] = array(
-        'label' => $entity_type->getLabel(),
+        // Use get('label') to not get the already translated wrapper.
+        'label' => $entity_type->get('label'),
         'class' => $entity_type->getClass(),
         'constraints' => array('EntityType' => $entity_type_id),
       ) + $base_plugin_definition;

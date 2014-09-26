@@ -35,8 +35,8 @@ class BooleanItem extends FieldItemBase implements OptionsProviderInterface {
    */
   public static function defaultStorageSettings() {
     return array(
-      'on_label' => t('On'),
-      'off_label' => t('Off'),
+      'on_label' => new TranslationWrapper('On'),
+      'off_label' => new TranslationWrapper('Off'),
     ) + parent::defaultStorageSettings();
   }
 

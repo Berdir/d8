@@ -88,6 +88,9 @@ class ExceptionLoggingSubscriber implements EventSubscriberInterface {
    */
   public function onException(GetResponseForExceptionEvent $event) {
     $exception = $event->getException();
+    //debug($exception->getMessage());
+    debug($exception->getTraceAsString());
+
 
     $method = 'onError';
 
