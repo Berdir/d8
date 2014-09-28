@@ -61,7 +61,7 @@ class EntityReferenceItem extends FieldItemBase {
     $settings = $field_definition->getSettings();
     $target_type_info = \Drupal::entityManager()->getDefinition($settings['target_type']);
 
-    if ($target_type_info->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface')) {
+    if ($target_type_info->isSubclassOf('\Drupal\Core\Entity\FieldableEntityInterface')) {
       // @todo: Lookup the entity type's ID data type and use it here.
       // https://drupal.org/node/2107249
       $target_id_definition = DataDefinition::create('integer')

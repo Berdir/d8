@@ -7,7 +7,7 @@
 
 namespace Drupal\comment;
 
-use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 
 /**
  * Defines an interface for building comment links on a commented entity.
@@ -27,6 +27,6 @@ interface CommentLinkBuilderInterface {
    * @return array
    *   Array of entity links.
    */
-  public function buildCommentedEntityLinks(ContentEntityInterface $entity, array &$context);
+  public function buildCommentedEntityLinks(FieldableEntityInterface $entity, array &$context);
 
 }

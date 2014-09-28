@@ -189,10 +189,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Fie
    *
    * @param string $method
    *   The method name.
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
    *   The entity object.
    */
-  protected function invokeFieldMethod($method, ContentEntityInterface $entity) {
+  protected function invokeFieldMethod($method, FieldableEntityInterface $entity) {
     foreach (array_keys($entity->getTranslationLanguages()) as $langcode) {
       $translation = $entity->getTranslation($langcode);
       foreach ($translation->getProperties(TRUE) as $field) {

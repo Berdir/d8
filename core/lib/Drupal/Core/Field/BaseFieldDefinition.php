@@ -7,7 +7,7 @@
 
 namespace Drupal\Core\Field;
 
-use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
 use Drupal\Core\TypedData\ListDataDefinition;
@@ -378,7 +378,7 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   /**
    * {@inheritdoc}
    */
-  public function getDefaultValue(ContentEntityInterface $entity) {
+  public function getDefaultValue(FieldableEntityInterface $entity) {
     // Allow custom default values function.
     if (!empty($this->definition['default_value_callback'])) {
       $value = call_user_func($this->definition['default_value_callback'], $entity, $this);
@@ -400,7 +400,7 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
    *   The callback to invoke for getting the default value (pass NULL to unset
    *   a previously set callback). The callback will be invoked with the
    *   following arguments:
-   *   - \Drupal\Core\Entity\ContentEntityInterface $entity
+   *   - \Drupal\Core\Entity\FieldableEntityInterface $entity
    *     The entity being created.
    *   - \Drupal\Core\Field\FieldDefinitionInterface $definition
    *     The field definition.
