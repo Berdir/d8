@@ -93,7 +93,7 @@ class TextItem extends TextItemBase {
       '#min' => 1,
       '#disabled' => $has_data,
     );
-    $element += parent::settingsForm($form, $form_state, $has_data);
+    $element += parent::storageSettingsForm($form, $form_state, $has_data);
 
     return $element;
   }

@@ -46,7 +46,7 @@ class MigrateFieldTest extends MigrateDrupalTestBase {
     // Text field.
     /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
     $field_storage = entity_load('field_storage_config', 'node.field_test');
-    $expected = array('max_length' => 255);
+    $expected = array('max_length' => 255, 'case_sensitive' => FALSE);
     $this->assertEqual($field_storage->type, "text",  t('Field type is @fieldtype. It should be text.', array('@fieldtype' => $field_storage->type)));
     $this->assertEqual($field_storage->status(), TRUE, "Status is TRUE");
     $this->assertEqual($field_storage->settings, $expected, "Field type text settings are correct");
