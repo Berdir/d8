@@ -138,6 +138,7 @@ class Tables implements TablesInterface {
           // also use the property definitions for column.
           if ($key < $count) {
             $relationship_specifier = $specifiers[$key + 1];
+            $propertyDefinitions = $field_storage->getPropertyDefinitions();
 
             // Prepare the next index prefix.
             $next_index_prefix = "$relationship_specifier.$column";
