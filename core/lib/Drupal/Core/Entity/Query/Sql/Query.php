@@ -277,7 +277,8 @@ class Query extends QueryBase implements QueryInterface {
       return $base_property;
     }
     else {
-      return $this->tables->addField($field, 'LEFT', $langcode);
+      $definition = array('field' => $field, 'langcode' => $langcode);
+      return $this->tables->addField($definition, 'LEFT');
     }
   }
 

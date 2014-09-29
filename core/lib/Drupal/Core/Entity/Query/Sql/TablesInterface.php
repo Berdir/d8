@@ -15,13 +15,14 @@ interface TablesInterface {
   /**
    * Adds a field to a database query.
    *
-   * @param string $field
-   *   If it contains a dot, then field name dot field column. If it doesn't
-   *   then entity property name.
+   * @param array $field_definition
+   *   An array with two keys:
+   *   - field: If it contains a dot, then field name dot field column. If it
+   *    doesn't then entity property name. The function will set the binary
+   *    key in the array to TRUE if the field is a binary field.
+   *   - langcode: The language code the field values are to be shown in.
    * @param string $type
    *   Join type, can either be INNER or LEFT.
-   * @param $langcode
-   *   The language code the field values are to be shown in.
    *
    * @throws \Drupal\Core\Entity\Query\QueryException
    *   If $field specifies an invalid relationship.
@@ -31,6 +32,6 @@ interface TablesInterface {
    *   and the appropriate SQL column as passed in. This allows the direct use
    *   of this in a query for a condition or sort.
    */
-  public function addField($field, $type, $langcode);
+  public function addField(&$field_definition, $type);
 
 }

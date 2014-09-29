@@ -29,7 +29,7 @@ class TextLongItem extends TextItemBase {
     return array(
       'columns' => array(
         'value' => array(
-          'type' => 'text',
+          'type' => $field_definition->getSetting('case_sensitive') ? 'blob' : 'text',
           'size' => 'big',
           'not null' => FALSE,
         ),

@@ -844,6 +844,13 @@ abstract class Connection implements \Serializable {
    * Backslash is defined as escape character for LIKE patterns in
    * Drupal\Core\Database\Query\Condition::mapConditionOperator().
    *
+   * Drupal considers LIKE case insensitive and the following is often used
+   * to tell the database that case insensitive equivalence is desired:
+   * @code
+   * $this->connection->select('users')
+   * ->condition('name', $this->connection->escapeLike($name), 'LIKE')
+   * @encode
+   *
    * @param $string
    *   The string to escape.
    *

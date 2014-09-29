@@ -29,6 +29,7 @@ class TextItem extends TextItemBase {
   public static function defaultStorageSettings() {
     return array(
       'max_length' => 255,
+      'case_sensitive' => FALSE,
     ) + parent::defaultStorageSettings();
   }
 
@@ -42,6 +43,7 @@ class TextItem extends TextItemBase {
           'type' => 'varchar',
           'length' => $field_definition->getSetting('max_length'),
           'not null' => FALSE,
+          'binary' => $field_definition->getSetting('case_sensitive'),
         ),
         'format' => array(
           'type' => 'varchar',
@@ -91,6 +93,7 @@ class TextItem extends TextItemBase {
       '#min' => 1,
       '#disabled' => $has_data,
     );
+    $element += parent::settingsForm($form, $form_state, $has_data);
 
     return $element;
   }

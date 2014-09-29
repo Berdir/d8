@@ -61,8 +61,10 @@ class Tables implements TablesInterface {
   /**
    * {@inheritdoc}
    */
-  public function addField($field, $type, $langcode) {
+   public function addField(&$field_definition, $type) {
     $entity_type_id = $this->sqlQuery->getMetaData('entity_type');
+    $field = $field_definition['field'];
+    $langcode = $field_definition['langcode'];
     $age = $this->sqlQuery->getMetaData('age');
     // This variable ensures grouping works correctly. For example:
     // ->condition('tags', 2, '>')
@@ -136,7 +138,6 @@ class Tables implements TablesInterface {
           // also use the property definitions for column.
           if ($key < $count) {
             $relationship_specifier = $specifiers[$key + 1];
-            $propertyDefinitions = $field_storage->getPropertyDefinitions();
 
             // Prepare the next index prefix.
             $next_index_prefix = "$relationship_specifier.$column";
@@ -144,6 +145,9 @@ class Tables implements TablesInterface {
         }
         $table = $this->ensureFieldTable($index_prefix, $field_storage, $type, $langcode, $base_table, $entity_id_field, $field_id_field);
         $sql_column = $table_mapping->getFieldColumnName($field_storage, $column);
+        if (isset($propertyDefinitions[$column])) {
+          $field_definition['case sensitive'] = $propertyDefinitions[$column]->getSetting('case_sensitive');
+        }
       }
       // This is an entity base field (non-configurable field).
       else {
@@ -159,7 +163,7 @@ class Tables implements TablesInterface {
         $entity_base_table = $entity_type->getBaseTable();
         $entity_tables[$entity_base_table] = $this->getTableMapping($entity_base_table, $entity_type_id);
         $sql_column = $specifier;
-        $table = $this->ensureEntityTable($index_prefix, $specifier, $type, $langcode, $base_table, $entity_id_field, $entity_tables);
+        $table = $this->ensureEntityTable($index_prefix, $specifier, $type, $langcode, $base_table, $entity_id_field, $entity_tables, $field_definition);
       }
       // If there are more specifiers to come, it's a relationship.
       if ($field_storage && $key < $count) {
@@ -198,9 +202,10 @@ class Tables implements TablesInterface {
    * @return string
    * @throws \Drupal\Core\Entity\Query\QueryException
    */
-  protected function ensureEntityTable($index_prefix, $property, $type, $langcode, $base_table, $id_field, $entity_tables) {
+  protected function ensureEntityTable($index_prefix, $property, $type, $langcode, $base_table, $id_field, $entity_tables, $field_definition) {
     foreach ($entity_tables as $table => $mapping) {
       if (isset($mapping[$property])) {
+        $field_definition['case sensitive'] = !empty($schema['fields'][$property]['binary']);
         if (!isset($this->entityTables[$index_prefix . $table])) {
           $this->entityTables[$index_prefix . $table] = $this->addJoin($type, $table, "%alias.$id_field = $base_table.$id_field", $langcode);
         }

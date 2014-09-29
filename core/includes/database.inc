@@ -527,6 +527,13 @@ function db_escape_field($field) {
  * Backslash is defined as escape character for LIKE patterns in
  * DatabaseCondition::mapConditionOperator().
  *
+ * Drupal considers LIKE case insensitive and the following is often used
+ * to tell the database that case insensitive equivalence is desired:
+ * @code
+ * db_select('users')
+ *  ->condition('name', db_like($name), 'LIKE')
+ * @endcode
+ *
  * @param $string
  *   The string to escape.
  *
