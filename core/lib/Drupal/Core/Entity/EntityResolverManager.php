@@ -87,7 +87,9 @@ class EntityResolverManager {
       if (method_exists($controller, '__invoke')) {
         return array($controller, '__invoke');
       }
-      // What to do here? The controller could be a procedural function.
+      if (function_exists($controller)) {
+        return $controller;
+      }
       return NULL;
     }
 
