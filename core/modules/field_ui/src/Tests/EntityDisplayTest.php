@@ -293,7 +293,7 @@ class EntityDisplayTest extends KernelTestBase {
 
     $expected_view_dependencies = array(
       'entity' => array('field.field.node.article_rename.body', 'node.type.article_rename'),
-      'module' => array('entity_test', 'text')
+      'module' => array('entity_test', 'text', 'user'),
     );
     // Check that the display has dependencies on the bundle, fields and the
     // modules that provide the formatters.
