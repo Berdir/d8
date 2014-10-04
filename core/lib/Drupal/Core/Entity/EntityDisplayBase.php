@@ -108,6 +108,13 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
   protected $pluginManager;
 
   /**
+   * A boolean indicating whether or not this display has been initialized.
+   *
+   * @var bool
+   */
+  protected $initialized = FALSE;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(array $values, $entity_type) {
@@ -130,8 +137,6 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
     parent::__construct($values, $entity_type);
 
     $this->originalMode = $this->mode;
-
-    $this->init();
   }
 
   /**
@@ -231,40 +236,43 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
    * - or that are not supposed to be configurable.
    */
   protected function init() {
-    // Fill in defaults for extra fields.
-    $context = $this->displayContext == 'view' ? 'display' : $this->displayContext;
-    $extra_fields = \Drupal::entityManager()->getExtraFields($this->targetEntityType, $this->bundle);
-    $extra_fields = isset($extra_fields[$context]) ? $extra_fields[$context] : array();
-    foreach ($extra_fields as $name => $definition) {
-      if (!isset($this->content[$name]) && !isset($this->hidden[$name])) {
-        // Extra fields are visible by default unless they explicitly say so.
-        if (!isset($definition['visible']) || $definition['visible'] == TRUE) {
-          $this->content[$name] = array(
-            'weight' => $definition['weight']
-          );
-        }
-        else {
-          $this->hidden[$name] = TRUE;
+    if (!$this->initialized) {
+      // Fill in defaults for extra fields.
+      $context = $this->displayContext == 'view' ? 'display' : $this->displayContext;
+      $extra_fields = $this->entityManager()->getExtraFields($this->targetEntityType, $this->bundle)[$context];
+      foreach ($extra_fields as $name => $definition) {
+        if (!isset($this->content[$name]) && !isset($this->hidden[$name])) {
+          // Extra fields are visible by default unless they explicitly say so.
+          if (!isset($definition['visible']) || $definition['visible'] == TRUE) {
+            $this->content[$name] = array(
+              'weight' => $definition['weight']
+            );
+          }
+          else {
+            $this->hidden[$name] = TRUE;
+          }
         }
       }
-    }
 
-    // Fill in defaults for fields.
-    $fields = $this->getFieldDefinitions();
-    foreach ($fields as $name => $definition) {
-      if (!$definition->isDisplayConfigurable($this->displayContext) || (!isset($this->content[$name]) && !isset($this->hidden[$name]))) {
-        $options = $definition->getDisplayOptions($this->displayContext);
+      // Fill in defaults for fields.
+      $fields = $this->getFieldDefinitions();
+      foreach ($fields as $name => $definition) {
+        if (!$definition->isDisplayConfigurable($this->displayContext) || (!isset($this->content[$name]) && !isset($this->hidden[$name]))) {
+          $options = $definition->getDisplayOptions($this->displayContext);
 
-        if (!empty($options['type']) && $options['type'] == 'hidden') {
-          $this->hidden[$name] = TRUE;
+          if (!empty($options['type']) && $options['type'] == 'hidden') {
+            $this->hidden[$name] = TRUE;
+          }
+          elseif ($options) {
+            $this->content[$name] = $this->pluginManager->prepareConfiguration($definition->getType(), $options);
+          }
+          // Note: (base) fields that do not specify display options are not
+          // tracked in the display at all, in order to avoid cluttering the
+          // configuration that gets saved back.
         }
-        elseif ($options) {
-          $this->content[$name] = $this->pluginManager->prepareConfiguration($definition->getType(), $options);
-        }
-        // Note: (base) fields that do not specify display options are not
-        // tracked in the display at all, in order to avoid cluttering the
-        // configuration that gets saved back.
       }
+
+      $this->initialized = TRUE;
     }
   }
 
@@ -281,6 +289,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
    * {@inheritdoc}
    */
   public function getComponents() {
+    $this->init();
     return $this->content;
   }
 
@@ -288,6 +297,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
    * {@inheritdoc}
    */
   public function getComponent($name) {
+    $this->init();
     return isset($this->content[$name]) ? $this->content[$name] : NULL;
   }
 
@@ -295,6 +305,8 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
    * {@inheritdoc}
    */
   public function setComponent($name, array $options = array()) {
+    $this->init();
+
     // If no weight specified, make sure the field sinks at the bottom.
     if (!isset($options['weight'])) {
       $max = $this->getHighestWeight();
@@ -317,6 +329,8 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
    * {@inheritdoc}
    */
   public function removeComponent($name) {
+    $this->init();
+
     $this->hidden[$name] = TRUE;
     unset($this->content[$name]);
     unset($this->plugins[$name]);
@@ -328,6 +342,8 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
    * {@inheritdoc}
    */
   public function getHighestWeight() {
+    $this->init();
+
     $weights = array();
 
     // Collect weights for the components in the display.
