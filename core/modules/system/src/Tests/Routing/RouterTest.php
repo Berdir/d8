@@ -191,7 +191,7 @@ class RouterTest extends WebTestBase {
    */
   public function testRouterUninstall() {
     \Drupal::moduleHandler()->uninstall(array('router_test'));
-    $route_count = \Drupal::database()->query('SELECT COUNT(*) FROM {router} WHERE name = :route_name', array(':route_name' => 'router_test.1'))->fetchField();
-    $this->assertEqual(0, $route_count, 'All router_test routes have been removed on uninstall.');
+    $route = \Drupal::service('router.route_provider')->getRouteByName('router_test.1');
+    $this->assertNull($route, 'All router_test routes have been removed on uninstall.');
   }
 }
