@@ -54,7 +54,7 @@ class EntityResolverManager {
    *
    * Rather than creating an instance of every controller determine the class
    * and method that would be used. This is not possible for the service:method
-   * notation.
+   * notation as the runtime container does not allow static introspection.
    *
    * @see \Drupal\Core\Controller\ControllerResolver::getControllerFromDefinition()
    * @see \Drupal\Core\Controller\ClassResolver::getInstanceFromDefinition()
@@ -95,11 +95,10 @@ class EntityResolverManager {
 
     $count = substr_count($controller, ':');
     if ($count == 1) {
-      // Controller in the service:method notation. Should we be getting the
-      // service from the container? Or can we get the definition somehow?
-      // Considering that this is called during the kernel destruct event this
-      // is very dangerous as the controller could depend on services that can
-      // not exist at this point.
+      // Controller in the service:method notation. Get the information from the
+      // service. This is dangerous as the controller could depend on services
+      // that could not exist at this point. There is however no other way to
+      // do it, as the container does not allow static introspection.
       list($class_or_service, $method) = explode(':', $controller, 2);
       return array($this->classResolver->getInstanceFromDefinition($class_or_service), $method);
     }
