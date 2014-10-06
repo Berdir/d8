@@ -119,7 +119,7 @@ abstract class FormTestBase extends UnitTestCase {
   /**
    * @var \Drupal\Core\DrupalKernelInterface|\PHPUnit_Framework_MockObject_MockObject
    */
-  protected $httpKernel;
+  protected $kernel;
 
   /**
    * @var \PHPUnit_Framework_MockObject_MockObject|\Psr\Log\LoggerInterface
@@ -142,7 +142,7 @@ abstract class FormTestBase extends UnitTestCase {
     $this->csrfToken = $this->getMockBuilder('Drupal\Core\Access\CsrfTokenGenerator')
       ->disableOriginalConstructor()
       ->getMock();
-    $this->httpKernel = $this->getMockBuilder('\Drupal\Core\DrupalKernel')
+    $this->kernel = $this->getMockBuilder('\Drupal\Core\DrupalKernel')
       ->disableOriginalConstructor()
       ->getMock();
     $this->account = $this->getMock('Drupal\Core\Session\AccountInterface');
@@ -161,7 +161,7 @@ abstract class FormTestBase extends UnitTestCase {
       ->setMethods(array('batchGet', 'drupalInstallationAttempted'))
       ->getMock();
 
-    $this->formBuilder = new TestFormBuilder($this->formValidator, $this->formSubmitter, $this->formCache, $this->moduleHandler, $this->eventDispatcher, $this->requestStack, $this->classResolver, $this->themeManager, $this->csrfToken, $this->httpKernel);
+    $this->formBuilder = new TestFormBuilder($this->formValidator, $this->formSubmitter, $this->formCache, $this->moduleHandler, $this->eventDispatcher, $this->requestStack, $this->classResolver, $this->themeManager, $this->csrfToken, $this->kernel);
     $this->formBuilder->setCurrentUser($this->account);
   }
 

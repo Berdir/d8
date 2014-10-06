@@ -64,6 +64,10 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
   /**
    * The kernel to handle forms returning response objects.
    *
+   * Explicitly use the DrupalKernel as that is consistent with index.php for
+   * terminating the request and in case someone rebuilds the container,
+   * this kernel is synthetic and always points to the new container.
+   *
    * @var \Drupal\Core\DrupalKernelInterface
    */
   protected $kernel;
