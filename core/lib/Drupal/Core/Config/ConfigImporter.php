@@ -999,4 +999,21 @@ class ConfigImporter {
     return !$this->lock->lockMayBeAvailable(static::LOCK_ID);
   }
 
+  /**
+   * Gets all the service dependencies from \Drupal.
+   *
+   * Since the ConfigImporter handles module installation the kernel and the
+   * container can be rebuilt and altered during processing. It is necessary to
+   * keep the services used by the importer in sync.
+   */
+  protected function reInjectMe() {
+    $this->eventDispatcher = \Drupal::service('event_dispatcher');
+    $this->configManager = \Drupal::service('config.manager');
+    $this->lock = \Drupal::lock();
+    $this->typedConfigManager = \Drupal::service('config.typed');
+    $this->moduleHandler = \Drupal::moduleHandler();
+    $this->themeHandler = \Drupal::service('theme_handler');
+    $this->stringTranslation = \Drupal::service('string_translation');
+  }
+
 }
