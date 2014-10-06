@@ -530,7 +530,6 @@ class ConfigImporter {
     // We have extensions to process.
     if ($this->totalExtensionsToProcess > 0) {
       $sync_steps[] = 'processExtensions';
-      $sync_steps[] = 'flush';
     }
     $sync_steps[] = 'processConfigurations';
 
@@ -538,14 +537,6 @@ class ConfigImporter {
     $this->moduleHandler->alter('config_import_steps', $sync_steps, $this);
     $sync_steps[] = 'finish';
     return $sync_steps;
-  }
-
-  /**
-   * Flushes Drupal's caches.
-   */
-  public function flush(array &$context) {
-    $context['message'] = $this->t('Flushed all caches.');
-    $context['finished'] = 1;
   }
 
   /**
@@ -1006,23 +997,6 @@ class ConfigImporter {
    */
   public function alreadyImporting() {
     return !$this->lock->lockMayBeAvailable(static::LOCK_ID);
-  }
-
-  /**
-   * Gets all the service dependencies from \Drupal.
-   *
-   * Since the ConfigImporter handles module installation the kernel and the
-   * container can be rebuilt and altered during processing. It is necessary to
-   * keep the services used by the importer in sync.
-   */
-  protected function reInjectMe() {
-    $this->eventDispatcher = \Drupal::service('event_dispatcher');
-    $this->configManager = \Drupal::service('config.manager');
-    $this->lock = \Drupal::lock();
-    $this->typedConfigManager = \Drupal::service('config.typed');
-    $this->moduleHandler = \Drupal::moduleHandler();
-    $this->themeHandler = \Drupal::service('theme_handler');
-    $this->stringTranslation = \Drupal::service('string_translation');
   }
 
 }
