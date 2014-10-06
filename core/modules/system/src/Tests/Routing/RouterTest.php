@@ -8,6 +8,7 @@
 namespace Drupal\system\Tests\Routing;
 
 use Drupal\simpletest\WebTestBase;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Functional class for the full integrated routing system.
@@ -189,9 +190,18 @@ class RouterTest extends WebTestBase {
   /**
    * Tests that routes no longer exist for a module that has been uninstalled.
    */
-  public function testRouterUninstall() {
+  public function testRouterUninstallInstall() {
     \Drupal::moduleHandler()->uninstall(array('router_test'));
+    try {
+      \Drupal::service('router.route_provider')->getRouteByName('router_test.1');
+      $this->fail('Route was delete on uninstall.');
+    }
+    catch (RouteNotFoundException $e) {
+      $this->pass('Route was delete on uninstall.');
+    }
+    // Install the module again.
+    \Drupal::moduleHandler()->install(array('router_test'));
     $route = \Drupal::service('router.route_provider')->getRouteByName('router_test.1');
-    $this->assertNull($route, 'All router_test routes have been removed on uninstall.');
+    $this->assertNotNull($route, 'Route exists after module installation');
   }
 }
