@@ -81,8 +81,8 @@ class ViewAjaxController implements ContainerInjectionInterface {
       $args = isset($args) && $args !== '' ? explode('/', $args) : array();
 
       // Replace empty argument strings with NULL.
-      array_map(function ($arg) {
-        $arg === '' ? NULL : $arg;
+      $args = array_map(function ($arg) {
+        return ($arg == '' ? NULL : $arg);
       }, $args);
 
       $path = $request->request->get('view_path');
