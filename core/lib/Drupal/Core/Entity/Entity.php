@@ -468,7 +468,6 @@ abstract class Entity implements EntityInterface {
     if ($update) {
       // An existing entity was updated, also invalidate its unique cache tag.
       $tags = Cache::mergeTags($tags, $this->getCacheTag());
-      $this->onUpdateBundleEntity();
     }
     Cache::invalidateTags($tags);
   }
@@ -492,25 +491,6 @@ abstract class Entity implements EntityInterface {
       $tags = Cache::mergeTags($tags, $entity->getCacheTag());
     }
     Cache::invalidateTags($tags);
-  }
-
-  /**
-   * Acts on entities of which this entity is a bundle entity type.
-   */
-  protected function onUpdateBundleEntity() {
-    $bundle_of = $this->getEntityType()->getBundleOf();
-    if ($bundle_of !== FALSE) {
-      // If this entity is a bundle entity type of another entity type, and we're
-      // updating an existing entity, and that other entity type has a view
-      // builder class, then invalidate the render cache of entities for which
-      // this entity is a bundle.
-      $entity_manager = $this->entityManager();
-      if ($entity_manager->hasHandler($bundle_of, 'view_builder')) {
-        $entity_manager->getViewBuilder($bundle_of)->resetCache();
-      }
-      // Entity bundle field definitions may depend on bundle settings.
-      $entity_manager->clearCachedFieldDefinitions();
-    }
   }
 
   /**
