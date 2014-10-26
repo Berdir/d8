@@ -142,11 +142,11 @@ class ImageItem extends FileItem {
 
     $properties['alt'] = DataDefinition::create('string')
       ->setLabel('Alternative text')
-      ->setDescription("Alternative image text, for the image's 'alt' attribute."));
+      ->setDescription("Alternative image text, for the image's 'alt' attribute.");
 
     $properties['title'] = DataDefinition::create('string')
       ->setLabel('Title')
-      ->setDescription("Image title text, for the image's 'title' attribute."));
+      ->setDescription("Image title text, for the image's 'title' attribute.");
 
     $properties['width'] = DataDefinition::create('integer')
       ->setLabel('Width')
