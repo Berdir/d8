@@ -264,7 +264,7 @@ class File extends ContentEntityBase implements FileInterface {
 
     $fields['filemime'] = BaseFieldDefinition::create('string')
       ->setLabel('File MIME type')
-      ->setDescription("The file's MIME type."));
+      ->setDescription("The file's MIME type.");
 
     $fields['filesize'] = BaseFieldDefinition::create('integer')
       ->setLabel('File size')
