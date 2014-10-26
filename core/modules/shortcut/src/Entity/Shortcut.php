@@ -169,25 +169,25 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('ID'))
-      ->setDescription(t('The ID of the shortcut.'))
+      ->setLabel('ID')
+      ->setDescription('The ID of the shortcut.')
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The UUID of the shortcut.'))
+      ->setLabel('UUID')
+      ->setDescription('The UUID of the shortcut.')
       ->setReadOnly(TRUE);
 
     $fields['shortcut_set'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Shortcut set'))
-      ->setDescription(t('The bundle of the shortcut.'))
+      ->setLabel('Shortcut set')
+      ->setDescription('The bundle of the shortcut.')
       ->setSetting('target_type', 'shortcut_set')
       ->setRequired(TRUE);
 
     $fields['title'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The name of the shortcut.'))
+      ->setLabel('Name')
+      ->setDescription('The name of the shortcut.')
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setDefaultValue('')
@@ -201,24 +201,24 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
       ));
 
     $fields['weight'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Weight'))
-      ->setDescription(t('Weight among shortcuts in the same shortcut set.'));
+      ->setLabel('Weight')
+      ->setDescription('Weight among shortcuts in the same shortcut set.');
 
     $fields['route_name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Route name'))
-      ->setDescription(t('The machine name of a defined Route this shortcut represents.'));
+      ->setLabel('Route name')
+      ->setDescription('The machine name of a defined Route this shortcut represents.');
 
     $fields['route_parameters'] = BaseFieldDefinition::create('map')
-      ->setLabel(t('Route parameters'))
-      ->setDescription(t('A serialized array of route parameters of this shortcut.'));
+      ->setLabel('Route parameters')
+      ->setDescription('A serialized array of route parameters of this shortcut.');
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The language code of the shortcut.'));
+      ->setLabel('Language code')
+      ->setDescription('The language code of the shortcut.');
 
     $fields['path'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Path'))
-      ->setDescription(t('The computed shortcut path.'))
+      ->setLabel('Path')
+      ->setDescription('The computed shortcut path.')
       ->setComputed(TRUE)
       ->setCustomStorage(TRUE);
 

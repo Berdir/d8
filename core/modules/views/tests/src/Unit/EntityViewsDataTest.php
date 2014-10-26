@@ -124,8 +124,8 @@ class EntityViewsDataTest extends UnitTestCase {
     // Add a description field to the fields supplied by the EntityTest
     // classes. This example comes from the taxonomy Term entity.
     $base_fields['description'] = BaseFieldDefinition::create('text_long')
-      ->setLabel(t('Description'))
-      ->setDescription(t('A description of the term.'))
+      ->setLabel('Description')
+      ->setDescription('A description of the term.')
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', array(
           'label' => 'hidden',
@@ -141,8 +141,8 @@ class EntityViewsDataTest extends UnitTestCase {
 
     // Add a URL field; this example is from the Comment entity.
     $base_fields['homepage'] = BaseFieldDefinition::create('uri')
-      ->setLabel(t('Homepage'))
-      ->setDescription(t("The comment author's home page address."))
+      ->setLabel('Homepage')
+      ->setDescription("The comment author's home page address.")
       ->setTranslatable(TRUE)
       ->setSetting('max_length', 255);
 

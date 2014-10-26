@@ -28,7 +28,7 @@ class ListStringItem extends ListItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('string')
-      ->setLabel(t('Text value'))
+      ->setLabel('Text value')
       ->addConstraint('Length', array('max' => 255));
 
     return $properties;

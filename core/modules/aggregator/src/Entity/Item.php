@@ -52,14 +52,14 @@ class Item extends ContentEntityBase implements ItemInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['iid'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Aggregator item ID'))
-      ->setDescription(t('The ID of the feed item.'))
+      ->setLabel('Aggregator item ID')
+      ->setDescription('The ID of the feed item.')
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     $fields['fid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Source feed'))
-      ->setDescription(t('The aggregator feed entity associated with this item.'))
+      ->setLabel('Source feed')
+      ->setDescription('The aggregator feed entity associated with this item.')
       ->setSetting('target_type', 'aggregator_feed')
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
@@ -69,24 +69,24 @@ class Item extends ContentEntityBase implements ItemInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['title'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Title'))
-      ->setDescription(t('The title of the feed item.'));
+      ->setLabel('Title')
+      ->setDescription('The title of the feed item.');
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The feed item language code.'));
+      ->setLabel('Language code')
+      ->setDescription('The feed item language code.');
 
     $fields['link'] = BaseFieldDefinition::create('uri')
-      ->setLabel(t('Link'))
-      ->setDescription(t('The link of the feed item.'))
+      ->setLabel('Link')
+      ->setDescription('The link of the feed item.')
       ->setDisplayOptions('view', array(
         'type' => 'hidden',
       ))
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['author'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Author'))
-      ->setDescription(t('The author of the feed item.'))
+      ->setLabel('Author')
+      ->setDescription('The author of the feed item.')
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
         'weight' => 3,
@@ -94,12 +94,12 @@ class Item extends ContentEntityBase implements ItemInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['description'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Description'))
-      ->setDescription(t('The body of the feed item.'));
+      ->setLabel('Description')
+      ->setDescription('The body of the feed item.');
 
     $fields['timestamp'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Posted on'))
-      ->setDescription(t('Posted date of the feed item, as a Unix timestamp.'))
+      ->setLabel('Posted on')
+      ->setDescription('Posted date of the feed item, as a Unix timestamp.')
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
         'type' => 'timestamp_ago',
@@ -109,8 +109,8 @@ class Item extends ContentEntityBase implements ItemInterface {
 
     // @todo Convert to a real UUID field in https://drupal.org/node/2149851.
     $fields['guid'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('GUID'))
-      ->setDescription(t('Unique identifier for the feed item.'));
+      ->setLabel('GUID')
+      ->setDescription('Unique identifier for the feed item.');
 
     return $fields;
   }

@@ -498,7 +498,7 @@ class EntityDefinitionUpdateTest extends EntityUnitTestBase {
   protected function addBaseField($type = 'string') {
     $definitions['new_base_field'] = BaseFieldDefinition::create($type)
       ->setName('new_base_field')
-      ->setLabel(t('A new base field'));
+      ->setLabel('A new base field');
     $this->state->set('entity_test_update.additional_base_field_definitions', $definitions);
     $this->entityManager->clearCachedDefinitions();
   }
@@ -543,7 +543,7 @@ class EntityDefinitionUpdateTest extends EntityUnitTestBase {
   protected function addBundleField($type = 'string') {
     $definitions['new_bundle_field'] = FieldStorageDefinition::create($type)
       ->setName('new_bundle_field')
-      ->setLabel(t('A new bundle field'))
+      ->setLabel('A new bundle field')
       ->setTargetEntityTypeId('entity_test_update');
     $this->state->set('entity_test_update.additional_field_storage_definitions', $definitions);
     $this->state->set('entity_test_update.additional_bundle_field_definitions.test_bundle', $definitions);

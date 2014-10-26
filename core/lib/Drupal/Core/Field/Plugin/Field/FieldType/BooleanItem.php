@@ -43,7 +43,7 @@ class BooleanItem extends FieldItemBase implements OptionsProviderInterface {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('boolean')
-      ->setLabel(t('Boolean value'));
+      ->setLabel('Boolean value');
 
     return $properties;
   }

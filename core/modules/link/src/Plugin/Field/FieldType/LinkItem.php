@@ -45,19 +45,19 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['url'] = DataDefinition::create('string')
-      ->setLabel(t('URL'));
+      ->setLabel('URL');
 
     $properties['title'] = DataDefinition::create('string')
-      ->setLabel(t('Link text'));
+      ->setLabel('Link text');
 
     $properties['route_name'] = DataDefinition::create('string')
-      ->setLabel(t('Route name'));
+      ->setLabel('Route name');
 
     $properties['route_parameters'] = MapDataDefinition::create()
-      ->setLabel(t('Route parameters'));
+      ->setLabel('Route parameters');
 
     $properties['options'] = MapDataDefinition::create()
-      ->setLabel(t('Options'));
+      ->setLabel('Options');
 
     return $properties;
   }

@@ -51,11 +51,11 @@ class DateTimeItem extends FieldItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('datetime_iso8601')
-      ->setLabel(t('Date value'));
+      ->setLabel('Date value');
 
     $properties['date'] = DataDefinition::create('any')
-      ->setLabel(t('Computed date'))
-      ->setDescription(t('The computed DateTime object.'))
+      ->setLabel('Computed date')
+      ->setDescription('The computed DateTime object.')
       ->setComputed(TRUE)
       ->setClass('\Drupal\datetime\DateTimeComputed')
       ->setSetting('date source', 'value');

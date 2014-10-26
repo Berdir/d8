@@ -17,8 +17,8 @@ function contact_storage_test_entity_base_field_info(\Drupal\Core\Entity\EntityT
     $fields = array();
 
     $fields['id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Message ID'))
-      ->setDescription(t('The message ID.'))
+      ->setLabel('Message ID')
+      ->setDescription('The message ID.')
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 

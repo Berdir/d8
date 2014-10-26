@@ -55,25 +55,25 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['status'] = DataDefinition::create('integer')
-      ->setLabel(t('Comment status'));
+      ->setLabel('Comment status');
 
     $properties['cid'] = DataDefinition::create('integer')
-      ->setLabel(t('Last comment ID'));
+      ->setLabel('Last comment ID');
 
     $properties['last_comment_timestamp'] = DataDefinition::create('integer')
-      ->setLabel(t('Last comment timestamp'))
-      ->setDescription(t('The time that the last comment was created.'));
+      ->setLabel('Last comment timestamp')
+      ->setDescription('The time that the last comment was created.');
 
     $properties['last_comment_name'] = DataDefinition::create('string')
-      ->setLabel(t('Last comment name'))
-      ->setDescription(t('The name of the user posting the last comment.'));
+      ->setLabel('Last comment name')
+      ->setDescription('The name of the user posting the last comment.');
 
     $properties['last_comment_uid'] = DataDefinition::create('integer')
-      ->setLabel(t('Last comment user ID'));
+      ->setLabel('Last comment user ID');
 
     $properties['comment_count'] = DataDefinition::create('integer')
-      ->setLabel(t('Number of comments'))
-      ->setDescription(t('The number of comments.'));
+      ->setLabel('Number of comments')
+      ->setDescription('The number of comments.');
 
     return $properties;
   }

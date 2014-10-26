@@ -130,19 +130,19 @@ class Feed extends ContentEntityBase implements FeedInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['fid'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Feed ID'))
-      ->setDescription(t('The ID of the aggregator feed.'))
+      ->setLabel('Feed ID')
+      ->setDescription('The ID of the aggregator feed.')
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The aggregator feed UUID.'))
+      ->setLabel('UUID')
+      ->setDescription('The aggregator feed UUID.')
       ->setReadOnly(TRUE);
 
     $fields['title'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Title'))
-      ->setDescription(t('The name of the feed (or the name of the website providing the feed).'))
+      ->setLabel('Title')
+      ->setDescription('The name of the feed (or the name of the website providing the feed).')
       ->setRequired(TRUE)
       ->setSetting('max_length', 255)
       ->setDisplayOptions('form', array(
@@ -152,12 +152,12 @@ class Feed extends ContentEntityBase implements FeedInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The feed language code.'));
+      ->setLabel('Language code')
+      ->setDescription('The feed language code.');
 
     $fields['url'] = BaseFieldDefinition::create('uri')
-      ->setLabel(t('URL'))
-      ->setDescription(t('The fully-qualified URL of the feed.'))
+      ->setLabel('URL')
+      ->setDescription('The fully-qualified URL of the feed.')
       ->setRequired(TRUE)
       ->setDisplayOptions('form', array(
         'type' => 'uri',
@@ -170,8 +170,8 @@ class Feed extends ContentEntityBase implements FeedInterface {
     $period[AGGREGATOR_CLEAR_NEVER] = t('Never');
 
     $fields['refresh'] = BaseFieldDefinition::create('list_integer')
-      ->setLabel(t('Update interval'))
-      ->setDescription(t('The length of time between feed updates. Requires a correctly configured cron maintenance task.'))
+      ->setLabel('Update interval')
+      ->setDescription('The length of time between feed updates. Requires a correctly configured cron maintenance task.')
       ->setSetting('unsigned', TRUE)
       ->setRequired(TRUE)
       ->setSetting('allowed_values', $period)
@@ -182,8 +182,8 @@ class Feed extends ContentEntityBase implements FeedInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['checked'] = BaseFieldDefinition::create('timestamp')
-      ->setLabel(t('Checked'))
-      ->setDescription(t('Last time feed was checked for new items, as Unix timestamp.'))
+      ->setLabel('Checked')
+      ->setDescription('Last time feed was checked for new items, as Unix timestamp.')
       ->setDefaultValue(0)
       ->setDisplayOptions('view', array(
         'label' => 'inline',
@@ -193,13 +193,13 @@ class Feed extends ContentEntityBase implements FeedInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['queued'] = BaseFieldDefinition::create('timestamp')
-      ->setLabel(t('Queued'))
-      ->setDescription(t('Time when this feed was queued for refresh, 0 if not queued.'))
+      ->setLabel('Queued')
+      ->setDescription('Time when this feed was queued for refresh, 0 if not queued.')
       ->setDefaultValue(0);
 
     $fields['link'] = BaseFieldDefinition::create('uri')
-      ->setLabel(t('URL'))
-      ->setDescription(t('The link of the feed.'))
+      ->setLabel('URL')
+      ->setDescription('The link of the feed.')
       ->setDisplayOptions('view', array(
         'label' => 'inline',
         'weight' => 4,
@@ -207,26 +207,26 @@ class Feed extends ContentEntityBase implements FeedInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['description'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Description'))
-      ->setDescription(t("The parent website's description that comes from the !description element in the feed.", array('!description' => '<description>')));
+      ->setLabel('Description')
+      ->setDescription("The parent website's description that comes from the !description element in the feed.", array('!description' => '<description>'));
 
     $fields['image'] = BaseFieldDefinition::create('uri')
-      ->setLabel(t('Image'))
-      ->setDescription(t('An image representing the feed.'));
+      ->setLabel('Image')
+      ->setDescription('An image representing the feed.');
 
     $fields['hash'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Hash'))
-      ->setDescription(t('Calculated hash of the feed data, used for validating cache.'));
+      ->setLabel('Hash')
+      ->setDescription('Calculated hash of the feed data, used for validating cache.');
 
     $fields['etag'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Etag'))
-      ->setDescription(t('Entity tag HTTP response header, used for validating cache.'));
+      ->setLabel('Etag')
+      ->setDescription('Entity tag HTTP response header, used for validating cache.');
 
     // This is updated by the fetcher and not when the feed is saved, therefore
     // it's a timestamp and not a changed field.
     $fields['modified'] = BaseFieldDefinition::create('timestamp')
-      ->setLabel(t('Modified'))
-      ->setDescription(t('When the feed was last modified, as a Unix timestamp.'));
+      ->setLabel('Modified')
+      ->setDescription('When the feed was last modified, as a Unix timestamp.');
 
     return $fields;
   }

@@ -102,28 +102,28 @@ class Term extends ContentEntityBase implements TermInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['tid'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Term ID'))
-      ->setDescription(t('The term ID.'))
+      ->setLabel('Term ID')
+      ->setDescription('The term ID.')
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The term UUID.'))
+      ->setLabel('UUID')
+      ->setDescription('The term UUID.')
       ->setReadOnly(TRUE);
 
     $fields['vid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Vocabulary'))
-      ->setDescription(t('The vocabulary to which the term is assigned.'))
+      ->setLabel('Vocabulary')
+      ->setDescription('The vocabulary to which the term is assigned.')
       ->setSetting('target_type', 'taxonomy_vocabulary');
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The term language code.'));
+      ->setLabel('Language code')
+      ->setDescription('The term language code.');
 
     $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The term name.'))
+      ->setLabel('Name')
+      ->setDescription('The term name.')
       ->setTranslatable(TRUE)
       ->setRequired(TRUE)
       ->setSetting('max_length', 255)
@@ -139,8 +139,8 @@ class Term extends ContentEntityBase implements TermInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['description'] = BaseFieldDefinition::create('text_long')
-      ->setLabel(t('Description'))
-      ->setDescription(t('A description of the term.'))
+      ->setLabel('Description')
+      ->setDescription('A description of the term.')
       ->setTranslatable(TRUE)
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
@@ -155,20 +155,20 @@ class Term extends ContentEntityBase implements TermInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['weight'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Weight'))
-      ->setDescription(t('The weight of this term in relation to other terms.'))
+      ->setLabel('Weight')
+      ->setDescription('The weight of this term in relation to other terms.')
       ->setDefaultValue(0);
 
     $fields['parent'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Term Parents'))
-      ->setDescription(t('The parents of this term.'))
+      ->setLabel('Term Parents')
+      ->setDescription('The parents of this term.')
       ->setSetting('target_type', 'taxonomy_term')
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
       ->setCustomStorage(TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the term was last edited.'));
+      ->setLabel('Changed')
+      ->setDescription('The time that the term was last edited.');
 
     return $fields;
   }

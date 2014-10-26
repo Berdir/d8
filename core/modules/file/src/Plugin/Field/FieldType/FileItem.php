@@ -100,11 +100,11 @@ class FileItem extends EntityReferenceItem {
     $properties = parent::propertyDefinitions($field_definition);
 
     $properties['display'] = DataDefinition::create('boolean')
-      ->setLabel(t('Display'))
-      ->setDescription(t('Flag to control whether this file should be displayed when viewing content'));
+      ->setLabel('Display')
+      ->setDescription('Flag to control whether this file should be displayed when viewing content');
 
     $properties['description'] = DataDefinition::create('string')
-      ->setLabel(t('Description'));
+      ->setLabel('Description');
 
     return $properties;
   }

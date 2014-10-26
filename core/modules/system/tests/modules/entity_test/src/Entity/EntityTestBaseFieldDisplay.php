@@ -44,10 +44,10 @@ class EntityTestBaseFieldDisplay extends EntityTest {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['test_no_display'] = BaseFieldDefinition::create('text')
-      ->setLabel(t('Field with no display'));
+      ->setLabel('Field with no display');
 
     $fields['test_display_configurable'] = BaseFieldDefinition::create('text')
-      ->setLabel(t('Field with configurable display'))
+      ->setLabel('Field with configurable display')
       ->setDisplayOptions('view', array(
         'type' => 'text_default',
         'weight' => 10,
@@ -60,7 +60,7 @@ class EntityTestBaseFieldDisplay extends EntityTest {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['test_display_non_configurable'] = BaseFieldDefinition::create('text')
-      ->setLabel(t('Field with non-configurable display'))
+      ->setLabel('Field with non-configurable display')
       ->setDisplayOptions('view', array(
         'type' => 'text_default',
         'weight' => 11,

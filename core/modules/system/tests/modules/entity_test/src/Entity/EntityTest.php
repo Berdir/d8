@@ -65,23 +65,23 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('ID'))
-      ->setDescription(t('The ID of the test entity.'))
+      ->setLabel('ID')
+      ->setDescription('The ID of the test entity.')
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The UUID of the test entity.'))
+      ->setLabel('UUID')
+      ->setDescription('The UUID of the test entity.')
       ->setReadOnly(TRUE);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The language code of the test entity.'));
+      ->setLabel('Language code')
+      ->setDescription('The language code of the test entity.');
 
     $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The name of the test entity.'))
+      ->setLabel('Name')
+      ->setDescription('The name of the test entity.')
       ->setTranslatable(TRUE)
       ->setSetting('max_length', 32)
       ->setDisplayOptions('view', array(
@@ -96,13 +96,13 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
 
     // @todo: Add allowed values validation.
     $fields['type'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Type'))
-      ->setDescription(t('The bundle of the test entity.'))
+      ->setLabel('Type')
+      ->setDescription('The bundle of the test entity.')
       ->setRequired(TRUE);
 
     $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('User ID'))
-      ->setDescription(t('The ID of the associated user.'))
+      ->setLabel('User ID')
+      ->setDescription('The ID of the associated user.')
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
       // Default EntityTest entities to have the root user as the owner, to

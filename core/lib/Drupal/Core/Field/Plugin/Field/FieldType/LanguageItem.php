@@ -35,11 +35,11 @@ class LanguageItem extends FieldItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('string')
-      ->setLabel(t('Language code'));
+      ->setLabel('Language code');
 
     $properties['language'] = DataReferenceDefinition::create('language')
-      ->setLabel(t('Language object'))
-      ->setDescription(t('The referenced language'))
+      ->setLabel('Language object')
+      ->setDescription('The referenced language')
       // The language object is retrieved via the language code.
       ->setComputed(TRUE)
       ->setReadOnly(FALSE);

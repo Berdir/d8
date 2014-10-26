@@ -23,14 +23,14 @@ abstract class TextItemBase extends FieldItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('string')
-      ->setLabel(t('Text'));
+      ->setLabel('Text');
 
     $properties['format'] = DataDefinition::create('filter_format')
-      ->setLabel(t('Text format'));
+      ->setLabel('Text format');
 
     $properties['processed'] = DataDefinition::create('string')
-      ->setLabel(t('Processed text'))
-      ->setDescription(t('The text with the text format applied.'))
+      ->setLabel('Processed text')
+      ->setDescription('The text with the text format applied.')
       ->setComputed(TRUE)
       ->setClass('\Drupal\text\TextProcessed')
       ->setSetting('text source', 'value');

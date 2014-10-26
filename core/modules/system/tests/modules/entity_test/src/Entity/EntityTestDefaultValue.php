@@ -33,7 +33,7 @@ class EntityTestDefaultValue extends EntityTest {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['description'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Some custom description'))
+      ->setLabel('Some custom description')
       ->setDefaultValueCallback('entity_test_field_default_value');
 
     return $fields;

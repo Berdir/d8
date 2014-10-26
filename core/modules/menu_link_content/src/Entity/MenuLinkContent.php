@@ -269,25 +269,25 @@ class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterf
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Entity ID'))
-      ->setDescription(t('The entity ID for this menu link content entity.'))
+      ->setLabel('Entity ID')
+      ->setDescription('The entity ID for this menu link content entity.')
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The content menu link UUID.'))
+      ->setLabel('UUID')
+      ->setDescription('The content menu link UUID.')
       ->setReadOnly(TRUE);
 
     $fields['bundle'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Bundle'))
-      ->setDescription(t('The content menu link bundle.'))
+      ->setLabel('Bundle')
+      ->setDescription('The content menu link bundle.')
       ->setSetting('max_length', EntityTypeInterface::BUNDLE_MAX_LENGTH)
       ->setReadOnly(TRUE);
 
     $fields['title'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Menu link title'))
-      ->setDescription(t('The text to be used for this link in the menu.'))
+      ->setLabel('Menu link title')
+      ->setDescription('The text to be used for this link in the menu.')
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setSettings(array(
@@ -305,8 +305,8 @@ class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterf
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['description'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Description'))
-      ->setDescription(t('Shown when hovering over the menu link.'))
+      ->setLabel('Description')
+      ->setDescription('Shown when hovering over the menu link.')
       ->setTranslatable(TRUE)
       ->setSettings(array(
         'max_length' => 255,
@@ -322,36 +322,36 @@ class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterf
       ));
 
     $fields['menu_name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Menu name'))
-      ->setDescription(t('The menu name. All links with the same menu name (such as "tools") are part of the same menu.'))
+      ->setLabel('Menu name')
+      ->setDescription('The menu name. All links with the same menu name (such as "tools") are part of the same menu.')
       ->setSetting('default_value', 'tools');
 
     // @todo Use a link field https://www.drupal.org/node/2302205.
     $fields['route_name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Route name'))
-      ->setDescription(t('The machine name of a defined Symfony Route this menu item represents.'));
+      ->setLabel('Route name')
+      ->setDescription('The machine name of a defined Symfony Route this menu item represents.');
 
     $fields['route_parameters'] = BaseFieldDefinition::create('map')
-      ->setLabel(t('Route parameters'))
-      ->setDescription(t('A serialized array of route parameters of this menu link.'));
+      ->setLabel('Route parameters')
+      ->setDescription('A serialized array of route parameters of this menu link.');
 
     $fields['url'] = BaseFieldDefinition::create('uri')
-      ->setLabel(t('External link url'))
-      ->setDescription(t('The url of the link, in case you have an external link.'));
+      ->setLabel('External link url')
+      ->setDescription('The url of the link, in case you have an external link.');
 
     $fields['options'] = BaseFieldDefinition::create('map')
-      ->setLabel(t('Options'))
-      ->setDescription(t('A serialized array of options to be passed to the _url() or _l() function, such as a query string or HTML attributes.'))
+      ->setLabel('Options')
+      ->setDescription('A serialized array of options to be passed to the _url() or _l() function, such as a query string or HTML attributes.')
       ->setSetting('default_value', array());
 
     $fields['external'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('External'))
-      ->setDescription(t('A flag to indicate if the link points to a full URL starting with a protocol, like http:// (1 = external, 0 = internal).'))
+      ->setLabel('External')
+      ->setDescription('A flag to indicate if the link points to a full URL starting with a protocol, like http:// (1 = external, 0 = internal).')
       ->setSetting('default_value', FALSE);
 
     $fields['weight'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Weight'))
-      ->setDescription(t('Link weight among links in the same menu at the same depth. In the menu, the links with high weight will sink and links with a low weight will be positioned nearer the top.'))
+      ->setLabel('Weight')
+      ->setDescription('Link weight among links in the same menu at the same depth. In the menu, the links with high weight will sink and links with a low weight will be positioned nearer the top.')
       ->setDefaultValue(0)
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
@@ -364,8 +364,8 @@ class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterf
       ));
 
     $fields['expanded'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Show as expanded'))
-      ->setDescription(t('If selected and this menu link has children, the menu will always appear expanded.'))
+      ->setLabel('Show as expanded')
+      ->setDescription('If selected and this menu link has children, the menu will always appear expanded.')
       ->setDefaultValue(FALSE)
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
@@ -378,8 +378,8 @@ class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterf
       ));
 
     $fields['enabled'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Enabled'))
-      ->setDescription(t('A flag for whether the link should be enabled in menus or hidden.'))
+      ->setLabel('Enabled')
+      ->setDescription('A flag for whether the link should be enabled in menus or hidden.')
       ->setDefaultValue(TRUE)
       ->setDisplayOptions('view', array(
         'label' => 'hidden',
@@ -392,16 +392,16 @@ class MenuLinkContent extends ContentEntityBase implements MenuLinkContentInterf
       ));
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The node language code.'));
+      ->setLabel('Language code')
+      ->setDescription('The node language code.');
 
     $fields['parent'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Parent plugin ID'))
-      ->setDescription(t('The ID of the parent menu link plugin, or empty string when at the top level of the hierarchy.'));
+      ->setLabel('Parent plugin ID')
+      ->setDescription('The ID of the parent menu link plugin, or empty string when at the top level of the hierarchy.');
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the menu link was last edited.'));
+      ->setLabel('Changed')
+      ->setDescription('The time that the menu link was last edited.');
 
     return $fields;
   }

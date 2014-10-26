@@ -29,7 +29,7 @@ class HiddenTestItem extends TestItem {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('integer')
-      ->setLabel(t('Test integer value'));
+      ->setLabel('Test integer value');
 
     return $properties;
   }

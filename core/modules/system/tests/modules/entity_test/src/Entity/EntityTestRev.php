@@ -51,8 +51,8 @@ class EntityTestRev extends EntityTest {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['revision_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Revision ID'))
-      ->setDescription(t('The version id of the test entity.'))
+      ->setLabel('Revision ID')
+      ->setDescription('The version id of the test entity.')
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 

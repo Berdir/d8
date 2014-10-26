@@ -141,20 +141,20 @@ class ImageItem extends FileItem {
     $properties = parent::propertyDefinitions($field_definition);
 
     $properties['alt'] = DataDefinition::create('string')
-      ->setLabel(t('Alternative text'))
-      ->setDescription(t("Alternative image text, for the image's 'alt' attribute."));
+      ->setLabel('Alternative text')
+      ->setDescription("Alternative image text, for the image's 'alt' attribute."));
 
     $properties['title'] = DataDefinition::create('string')
-      ->setLabel(t('Title'))
-      ->setDescription(t("Image title text, for the image's 'title' attribute."));
+      ->setLabel('Title')
+      ->setDescription("Image title text, for the image's 'title' attribute."));
 
     $properties['width'] = DataDefinition::create('integer')
-      ->setLabel(t('Width'))
-      ->setDescription(t('The width of the image in pixels.'));
+      ->setLabel('Width')
+      ->setDescription('The width of the image in pixels.');
 
     $properties['height'] = DataDefinition::create('integer')
-      ->setLabel(t('Height'))
-      ->setDescription(t('The height of the image in pixels.'));
+      ->setLabel('Height')
+      ->setDescription('The height of the image in pixels.');
 
     return $properties;
   }

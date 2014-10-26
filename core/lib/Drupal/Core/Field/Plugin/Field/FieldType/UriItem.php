@@ -41,7 +41,7 @@ class UriItem extends StringItem {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('uri')
-      ->setLabel(t('URI value'));
+      ->setLabel('URI value');
 
     return $properties;
   }

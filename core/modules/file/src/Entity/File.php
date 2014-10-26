@@ -234,55 +234,55 @@ class File extends ContentEntityBase implements FileInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['fid'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('File ID'))
-      ->setDescription(t('The file ID.'))
+      ->setLabel('File ID')
+      ->setDescription('The file ID.')
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The file UUID.'))
+      ->setLabel('UUID')
+      ->setDescription('The file UUID.')
       ->setReadOnly(TRUE);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The file language code.'));
+      ->setLabel('Language code')
+      ->setDescription('The file language code.');
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('User ID'))
-      ->setDescription(t('The user ID of the file.'))
+      ->setLabel('User ID')
+      ->setDescription('The user ID of the file.')
       ->setSetting('target_type', 'user');
 
     $fields['filename'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Filename'))
-      ->setDescription(t('Name of the file with no path components.'));
+      ->setLabel('Filename')
+      ->setDescription('Name of the file with no path components.');
 
     $fields['uri'] = BaseFieldDefinition::create('uri')
-      ->setLabel(t('URI'))
-      ->setDescription(t('The URI to access the file (either local or remote).'))
+      ->setLabel('URI')
+      ->setDescription('The URI to access the file (either local or remote).')
       ->setSetting('max_length', 255);
 
     $fields['filemime'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('File MIME type'))
-      ->setDescription(t("The file's MIME type."));
+      ->setLabel('File MIME type')
+      ->setDescription("The file's MIME type."));
 
     $fields['filesize'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('File size'))
-      ->setDescription(t('The size of the file in bytes.'))
+      ->setLabel('File size')
+      ->setDescription('The size of the file in bytes.')
       ->setSetting('unsigned', TRUE)
       ->setSetting('size', 'big');
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Status'))
-      ->setDescription(t('The status of the file, temporary (FALSE) and permanent (TRUE).'));
+      ->setLabel('Status')
+      ->setDescription('The status of the file, temporary (FALSE) and permanent (TRUE).');
 
     $fields['created'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Created'))
-      ->setDescription(t('The timestamp that the file was created.'));
+      ->setLabel('Created')
+      ->setDescription('The timestamp that the file was created.');
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The timestamp that the file was last changed.'));
+      ->setLabel('Changed')
+      ->setDescription('The timestamp that the file was last changed.');
 
     return $fields;
   }

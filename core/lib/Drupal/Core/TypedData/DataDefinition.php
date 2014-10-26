@@ -7,10 +7,14 @@
 
 namespace Drupal\Core\TypedData;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+
 /**
  * A typed data definition class for defining data based on defined data types.
  */
 class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
+
+  use StringTranslationTrait;
 
   /**
    * The array holding values for all definition keys.
@@ -75,7 +79,10 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    * {@inheritdoc}
    */
   public function getLabel() {
-    return isset($this->definition['label']) ? $this->definition['label'] : NULL;
+    if (isset($this->definition['label_arguments'])) {
+      return t($this->definition['llabel'], $this->definition['label_arguments']);
+    }
+    return isset($this->definition['label']) ? $this->t($this->definition['label']) : NULL;
   }
 
   /**
@@ -83,12 +90,17 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    *
    * @param string $label
    *   The label to set.
+   * @param array $arguments
+   *   An associative array of replacements to make after translation. Based
+   *   on the first character of the key, the value is escaped and/or themed.
+   *   See \Drupal\Component\Utility\String::format() for details.
    *
    * @return static
    *   The object itself for chaining.
    */
-  public function setLabel($label) {
+  public function setLabel($label, $arguments = array()) {
     $this->definition['label'] = $label;
+    $this->definition['label_arguments'] = $arguments;
     return $this;
   }
 
@@ -96,7 +108,7 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    * {@inheritdoc}
    */
   public function getDescription() {
-    return isset($this->definition['description']) ? $this->definition['description'] : NULL;
+    return isset($this->definition['description']) ? $this->t($this->definition['description']) : NULL;
   }
 
   /**

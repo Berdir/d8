@@ -28,7 +28,7 @@ class ListIntegerItem extends ListItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('integer')
-      ->setLabel(t('Integer value'));
+      ->setLabel('Integer value');
 
     return $properties;
   }

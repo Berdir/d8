@@ -1639,8 +1639,8 @@ function hook_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $en
   if ($entity_type->id() == 'node') {
     $fields = array();
     $fields['mymodule_text'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('The text'))
-      ->setDescription(t('A text property added by mymodule.'))
+      ->setLabel('The text')
+      ->setDescription('A text property added by mymodule.')
       ->setComputed(TRUE)
       ->setClass('\Drupal\mymodule\EntityComputedText');
 
@@ -1703,7 +1703,7 @@ function hook_entity_bundle_field_info(\Drupal\Core\Entity\EntityTypeInterface $
   if ($entity_type->id() == 'node' && $bundle == 'article') {
     $fields = array();
     $fields['mymodule_text_more'] = BaseFieldDefinition::create('string')
-        ->setLabel(t('More text'))
+        ->setLabel('More text')
         ->setComputed(TRUE)
         ->setClass('\Drupal\mymodule\EntityComputedMoreText');
     return $fields;

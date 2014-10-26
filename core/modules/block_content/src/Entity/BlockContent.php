@@ -139,30 +139,30 @@ class BlockContent extends ContentEntityBase implements BlockContentInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Custom block ID'))
-      ->setDescription(t('The custom block ID.'))
+      ->setLabel('Custom block ID')
+      ->setDescription('The custom block ID.')
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The custom block UUID.'))
+      ->setLabel('UUID')
+      ->setDescription('The custom block UUID.')
       ->setReadOnly(TRUE);
 
     $fields['revision_id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Revision ID'))
-      ->setDescription(t('The revision ID.'))
+      ->setLabel('Revision ID')
+      ->setDescription('The revision ID.')
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The custom block language code.'))
+      ->setLabel('Language code')
+      ->setDescription('The custom block language code.')
       ->setRevisionable(TRUE);
 
     $fields['info'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Block description'))
-      ->setDescription(t('A brief description of your block.'))
+      ->setLabel('Block description')
+      ->setDescription('A brief description of your block.')
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setRequired(TRUE)
@@ -173,18 +173,18 @@ class BlockContent extends ContentEntityBase implements BlockContentInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['type'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Block type'))
-      ->setDescription(t('The block type.'))
+      ->setLabel('Block type')
+      ->setDescription('The block type.')
       ->setSetting('target_type', 'block_content_type');
 
     $fields['revision_log'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Revision log message'))
-      ->setDescription(t('The log entry explaining the changes in this revision.'))
+      ->setLabel('Revision log message')
+      ->setDescription('The log entry explaining the changes in this revision.')
       ->setRevisionable(TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the custom block was last edited.'))
+      ->setLabel('Changed')
+      ->setDescription('The time that the custom block was last edited.')
       ->setRevisionable(TRUE);
 
     return $fields;

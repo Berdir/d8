@@ -37,7 +37,7 @@ interface FieldableEntityInterface extends EntityInterface {
    * for example a 'name' field could be defined as the following:
    * @code
    * $fields['name'] = BaseFieldDefinition::create('string')
-   *   ->setLabel(t('Name'));
+   *   ->setLabel('Name');
    * @endcode
    *
    * By definition, base fields are fields that exist for every bundle. To

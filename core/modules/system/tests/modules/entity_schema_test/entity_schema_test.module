@@ -31,7 +31,7 @@ function entity_schema_test_entity_base_field_info(EntityTypeInterface $entity_t
   if ($entity_type->id() == 'entity_test') {
     $definitions['custom_base_field'] = BaseFieldDefinition::create('string')
       ->setName('custom_base_field')
-      ->setLabel(t('A custom base field'));
+      ->setLabel('A custom base field');
     if (\Drupal::state()->get('entity_schema_update')) {
       $definitions += EntityTestMulRev::baseFieldDefinitions($entity_type);
     }
@@ -46,7 +46,7 @@ function entity_schema_test_entity_field_storage_info(EntityTypeInterface $entit
   if ($entity_type->id() == 'entity_test') {
     $definitions['custom_bundle_field'] = FieldStorageDefinition::create('string')
       ->setName('custom_bundle_field')
-      ->setLabel(t('A custom bundle field'))
+      ->setLabel('A custom bundle field')
       ->setTargetEntityTypeId($entity_type->id());
     return $definitions;
   }

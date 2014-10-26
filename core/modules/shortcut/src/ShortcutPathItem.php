@@ -21,7 +21,7 @@ class ShortcutPathItem extends StringItem {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('string')
-      ->setLabel(t('String value'))
+      ->setLabel('String value')
       ->setComputed(TRUE)
       ->setClass('\Drupal\shortcut\ShortcutPathValue');
     return $properties;

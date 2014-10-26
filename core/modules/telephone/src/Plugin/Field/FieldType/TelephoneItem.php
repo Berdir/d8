@@ -45,7 +45,7 @@ class TelephoneItem extends FieldItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('string')
-      ->setLabel(t('Telephone number'));
+      ->setLabel('Telephone number');
 
     return $properties;
   }

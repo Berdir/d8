@@ -41,7 +41,7 @@ class DecimalItem extends NumericItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('string')
-      ->setLabel(t('Decimal value'));
+      ->setLabel('Decimal value');
 
     return $properties;
   }

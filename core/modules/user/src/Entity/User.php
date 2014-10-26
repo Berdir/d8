@@ -442,34 +442,34 @@ class User extends ContentEntityBase implements UserInterface {
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['uid'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('User ID'))
-      ->setDescription(t('The user ID.'))
+      ->setLabel('User ID')
+      ->setDescription('The user ID.')
       ->setReadOnly(TRUE)
       ->setSetting('unsigned', TRUE);
 
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The user UUID.'))
+      ->setLabel('UUID')
+      ->setDescription('The user UUID.')
       ->setReadOnly(TRUE);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The user language code.'));
+      ->setLabel('Language code')
+      ->setDescription('The user language code.');
 
     $fields['preferred_langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Preferred language code'))
-      ->setDescription(t("The user's preferred language code for receiving emails and viewing the site."));
+      ->setLabel('Preferred language code')
+      ->setDescription("The user's preferred language code for receiving emails and viewing the site.");
 
     $fields['preferred_admin_langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Preferred admin language code'))
-      ->setDescription(t("The user's preferred language code for viewing administration pages."))
+      ->setLabel('Preferred admin language code')
+      ->setDescription("The user's preferred language code for viewing administration pages.")
       ->setDefaultValue('');
 
     // The name should not vary per language. The username is the visual
     // identifier for a user and needs to be consistent in all languages.
     $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The name of this user.'))
+      ->setLabel('Name')
+      ->setDescription('The name of this user.')
       ->setDefaultValue('')
       ->setConstraints(array(
         // No Length constraint here because the UserName constraint also covers
@@ -479,62 +479,62 @@ class User extends ContentEntityBase implements UserInterface {
       ));
 
     $fields['pass'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Password'))
-      ->setDescription(t('The password of this user (hashed).'));
+      ->setLabel('Password')
+      ->setDescription('The password of this user (hashed).');
 
     $fields['mail'] = BaseFieldDefinition::create('email')
-      ->setLabel(t('Email'))
-      ->setDescription(t('The email of this user.'))
+      ->setLabel('Email')
+      ->setDescription('The email of this user.')
       ->setDefaultValue('')
       ->setConstraints(array('UserMailUnique' => array()));
 
     // @todo Convert to a text field in https://drupal.org/node/1548204.
     $fields['signature'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Signature'))
-      ->setDescription(t('The signature of this user.'))
+      ->setLabel('Signature')
+      ->setDescription('The signature of this user.')
       ->setTranslatable(TRUE);
     $fields['signature_format'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Signature format'))
-      ->setDescription(t('The signature format of this user.'));
+      ->setLabel('Signature format')
+      ->setDescription('The signature format of this user.');
 
     $fields['timezone'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Timezone'))
-      ->setDescription(t('The timezone of this user.'))
+      ->setLabel('Timezone')
+      ->setDescription('The timezone of this user.')
       ->setSetting('max_length', 32);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('User status'))
-      ->setDescription(t('Whether the user is active or blocked.'))
+      ->setLabel('User status')
+      ->setDescription('Whether the user is active or blocked.')
       ->setDefaultValue(FALSE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Created'))
-      ->setDescription(t('The time that the user was created.'));
+      ->setLabel('Created')
+      ->setDescription('The time that the user was created.');
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the user was last edited.'));
+      ->setLabel('Changed')
+      ->setDescription('The time that the user was last edited.');
 
     $fields['access'] = BaseFieldDefinition::create('timestamp')
-      ->setLabel(t('Last access'))
-      ->setDescription(t('The time that the user last accessed the site.'))
+      ->setLabel('Last access')
+      ->setDescription('The time that the user last accessed the site.')
       ->setDefaultValue(0);
 
     $fields['login'] = BaseFieldDefinition::create('timestamp')
-      ->setLabel(t('Last login'))
-      ->setDescription(t('The time that the user last logged in.'))
+      ->setLabel('Last login')
+      ->setDescription('The time that the user last logged in.')
       ->setDefaultValue(0);
 
     $fields['init'] = BaseFieldDefinition::create('email')
-      ->setLabel(t('Initial email'))
-      ->setDescription(t('The email address used for initial account creation.'))
+      ->setLabel('Initial email')
+      ->setDescription('The email address used for initial account creation.')
       ->setDefaultValue('');
 
     $fields['roles'] = BaseFieldDefinition::create('entity_reference')
       ->setCustomStorage(TRUE)
-      ->setLabel(t('Roles'))
+      ->setLabel('Roles')
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED)
-      ->setDescription(t('The roles the user has.'))
+      ->setDescription('The roles the user has.')
       ->setSetting('target_type', 'user_role');
 
     return $fields;
