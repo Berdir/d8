@@ -80,7 +80,7 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    */
   public function getLabel() {
     if (isset($this->definition['label_arguments'])) {
-      return t($this->definition['llabel'], $this->definition['label_arguments']);
+      return $this->t($this->definition['label'], $this->definition['label_arguments']);
     }
     return isset($this->definition['label']) ? $this->t($this->definition['label']) : NULL;
   }

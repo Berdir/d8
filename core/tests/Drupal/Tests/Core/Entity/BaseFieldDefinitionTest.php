@@ -71,6 +71,7 @@ class BaseFieldDefinitionTest extends UnitTestCase {
 
     $container = new ContainerBuilder();
     $container->set('plugin.manager.field.field_type', $field_type_manager);
+    $container->set('string_translation', $this->getStringTranslationStub());
     \Drupal::setContainer($container);
   }
 
