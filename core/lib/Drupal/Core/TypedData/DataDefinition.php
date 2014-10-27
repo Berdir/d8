@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\TypedData;
 
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -15,6 +16,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
 
   use StringTranslationTrait;
+  use DependencySerializationTrait;
 
   /**
    * The array holding values for all definition keys.
