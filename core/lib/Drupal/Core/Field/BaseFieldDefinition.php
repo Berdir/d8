@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Field;
 
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
@@ -519,10 +520,10 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
    * {@inheritdoc}
    */
   public function __sleep() {
+    $vars = parent::__sleep();
     // Do not serialize the statically cached property definitions.
-    $vars = get_object_vars($this);
-    unset($vars['propertyDefinitions']);
-    return array_keys($vars);
+    unset($vars[array_search('propertyDefinitions', $vars)]);
+    return $vars;
   }
 
   /**

@@ -16,7 +16,11 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
 
   use StringTranslationTrait;
-  use DependencySerializationTrait;
+
+  use DependencySerializationTrait {
+    __sleep as traitSleep;
+  }
+
 
   /**
    * The array holding values for all definition keys.
@@ -380,6 +384,13 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
    */
   public function toArray() {
     return $this->definition;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __sleep() {
+    return $this->traitSleep();
   }
 
 }
