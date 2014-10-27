@@ -33,7 +33,14 @@ class DataEntityRow extends RowPluginBase {
    * Overrides \Drupal\views\Plugin\views\row\RowPluginBase::render().
    */
   public function render($row) {
-    return $row->_entity;
+    $entity = clone $row->_entity;
+    // Remove field values the user is not allowed to see.
+    foreach ($entity as $field_name => $field) {
+      if (!$field->access('view')) {
+        unset($entity->{$field_name});
+      }
+    }
+    return $entity;
   }
 
 }
