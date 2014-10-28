@@ -29,6 +29,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Composer\Autoload\ClassLoader;
 
@@ -314,7 +315,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (!$script_name) {
       $script_name = $request->server->get('SCRIPT_FILENAME');
     }
-    $http_host = $request->server->get('HTTP_HOST');
+    try {
+      $http_host = $request->getHost();
+    }
+    catch (\UnexpectedValueException $exception) {
+      throw new BadRequestHttpException(t('Bad request'));
+    }
 
     $sites = array();
     include DRUPAL_ROOT . '/sites/sites.php';
@@ -810,7 +816,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     else {
       // Create base URL.
       $http_protocol = $request->isSecure() ? 'https' : 'http';
-      $base_root = $http_protocol . '://' . $request->server->get('HTTP_HOST');
+      try {
+        $base_root = $http_protocol . '://' . $request->getHost();
+      }
+      catch (\UnexpectedValueException $exception) {
+        throw new BadRequestHttpException(t('Bad request'));
+      }
 
       $base_url = $base_root;
 
@@ -892,9 +903,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // Replace "core" out of session_name so core scripts redirect properly,
       // specifically install.php.
       $session_name = preg_replace('/\/core$/', '', $session_name);
-      // HTTP_HOST can be modified by a visitor, but has been sanitized already
-      // in DrupalKernel::bootEnvironment().
-      if ($cookie_domain = $request->server->get('HTTP_HOST')) {
+      if ($cookie_domain = $request->getHost()) {
         // Strip leading periods, www., and port numbers from cookie domain.
         $cookie_domain = ltrim($cookie_domain, '.');
         if (strpos($cookie_domain, 'www.') === 0) {
