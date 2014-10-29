@@ -163,8 +163,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
           $schema[$table_name] = $this->getSharedTableFieldSchema($storage_definition, $table_name, $column_names);
         }
       }
-      $return = $schema != $this->loadFieldSchemaData($original);
-      return $return;
+      return $schema != $this->loadFieldSchemaData($original);
     }
     else {
       // The field has custom storage, so we don't know if a schema change is
