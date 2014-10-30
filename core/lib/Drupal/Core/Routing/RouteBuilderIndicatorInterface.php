@@ -15,6 +15,11 @@ interface RouteBuilderIndicatorInterface {
   const REBUILD_NEEDED = 'router_rebuild_needed';
 
   /**
+   * Reset the router cache.
+   */
+  public function resetCache();
+
+  /**
    * Sets the router to be rebuilt next time the kernel is terminated.
    *
    * @see \Drupal\Core\EventSubscriber\RouterRebuildSubscriber::onKernelTerminate()

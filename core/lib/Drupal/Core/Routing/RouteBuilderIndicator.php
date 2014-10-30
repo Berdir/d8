@@ -34,6 +34,13 @@ class RouteBuilderIndicator implements RouteBuilderIndicatorInterface {
   /**
    * {@inheritdoc}
    */
+  public function resetCache() {
+    $this->state->resetCache();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function setRebuildNeeded() {
     $this->state->set(static::REBUILD_NEEDED, TRUE);
   }
