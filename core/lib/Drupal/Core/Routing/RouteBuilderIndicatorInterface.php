@@ -15,7 +15,7 @@ interface RouteBuilderIndicatorInterface {
   const REBUILD_NEEDED = 'router_rebuild_needed';
 
   /**
-   * Reset the router cache.
+   * Reset the router builder indicator cache.
    */
   public function resetCache();
 

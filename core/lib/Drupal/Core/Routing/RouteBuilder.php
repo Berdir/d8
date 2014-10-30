@@ -121,13 +121,14 @@ class RouteBuilder implements RouteBuilderInterface {
   }
 
   /**
-   * Checks that there is really no rebuild needed.
+   * Refreshes the local cache and rechecks if a rebuild is needed.
    *
-   * @see https://drupal.org/node/356399
+   * @return bool
+   *   TRUE if the rebuild is needed, FALSE otherwise.
    */
-  protected function checkRebuildNeeded() {
-    // To absolutely ensure that the router rebuild is required, re-load the
-    // variables in case they were set by another process.
+  protected function isRebuildNeededUncached() {
+    // To absolutely ensure that the router rebuild is required, reset the cache
+    // in case they were set by another process.
     $this->routeBuilderIndicator->resetCache();
     if ($this->routeBuilderIndicator->isRebuildNeeded()) {
       return TRUE;
@@ -139,10 +140,6 @@ class RouteBuilder implements RouteBuilderInterface {
    * {@inheritdoc}
    */
   public function rebuild() {
-    if (!$this->checkRebuildNeeded()) {
-      return FALSE;
-    }
-
     if ($this->building) {
       throw new \RuntimeException('Recursive router rebuild detected.');
     }
@@ -153,7 +150,7 @@ class RouteBuilder implements RouteBuilderInterface {
       // available, resulting in a 404.
       $this->lock->wait('router_rebuild');
 
-      if ($this->checkRebuildNeeded()) {
+      if ($this->isRebuildNeededUncached()) {
         $this->rebuild();
       }
 
@@ -239,6 +236,9 @@ class RouteBuilder implements RouteBuilderInterface {
    */
   public function rebuildIfNeeded() {
     if ($this->routeBuilderIndicator->isRebuildNeeded()) {
+      if (!$this->isRebuildNeededUncached()) {
+        return FALSE;
+      }
       return $this->rebuild();
     }
     return FALSE;

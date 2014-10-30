@@ -278,9 +278,9 @@ class RouteBuilderTest extends UnitTestCase {
     $this->routeBuilderIndicator->expects($this->once())
                 ->method('setRebuildDone');
 
-    $this->routeBuilderIndicator->expects($this->exactly(2))
+    $this->routeBuilderIndicator->expects($this->exactly(3))
                 ->method('isRebuildNeeded')
-                ->will($this->onConsecutiveCalls(TRUE, FALSE));
+                ->will($this->onConsecutiveCalls(TRUE, TRUE, FALSE));
 
     $this->yamlDiscovery->expects($this->any())
                         ->method('findAll')
