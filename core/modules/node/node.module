@@ -583,14 +583,9 @@ function node_theme_suggestions_node(array $variables) {
 function template_preprocess_node(&$variables) {
   $variables['view_mode'] = $variables['elements']['#view_mode'];
   // Provide a distinct $teaser boolean.
-  $variables['teaser'] = $variables['view_mode'] == 'teaser';
   $variables['node'] = $variables['elements']['#node'];
   /** @var \Drupal\node\NodeInterface $node */
   $node = $variables['node'];
-  $variables['date'] = drupal_render($variables['elements']['created']);
-  unset($variables['elements']['created']);
-  $variables['author_name'] = drupal_render($variables['elements']['uid']);
-  unset($variables['elements']['uid']);
 
   $variables['url'] = $node->url('canonical', array(
     'language' => $node->language(),
@@ -611,9 +606,13 @@ function template_preprocess_node(&$variables) {
   // Display post information only on certain node types.
   $node_type = $node->type->entity;
   // Used by RDF to add attributes around the author and date submitted.
-  $variables['author_attributes'] = new Attribute();
   $variables['display_submitted'] = $node_type->displaySubmitted();
   if ($variables['display_submitted']) {
+    $variables['author_attributes'] = new Attribute();
+    $variables['date'] = drupal_render($variables['elements']['created']);
+    unset($variables['elements']['created']);
+    $variables['author_name'] = drupal_render($variables['elements']['uid']);
+    unset($variables['elements']['uid']);
     if (theme_get_setting('features.node_user_picture')) {
       // To change user picture settings (e.g. image style), edit the 'compact'
       // view mode on the User entity. Note that the 'compact' view mode might
