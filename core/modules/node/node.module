@@ -597,12 +597,6 @@ function template_preprocess_node(&$variables) {
   //   - The node is in preview and view mode is either 'full' or 'default'.
   $variables['page'] = ($variables['view_mode'] == 'full' && (node_is_page($node)) || (isset($node->in_preview) && in_array($node->preview_view_mode, array('full', 'default'))));
 
-  // Helpful $content variable for templates.
-  $variables += array('content' => array());
-  foreach (Element::children($variables['elements']) as $key) {
-    $variables['content'][$key] = $variables['elements'][$key];
-  }
-
   // Display post information only on certain node types.
   $node_type = $node->type->entity;
   // Used by RDF to add attributes around the author and date submitted.
@@ -610,15 +604,21 @@ function template_preprocess_node(&$variables) {
   if ($variables['display_submitted']) {
     $variables['author_attributes'] = new Attribute();
     $variables['date'] = drupal_render($variables['elements']['created']);
-    unset($variables['elements']['created']);
     $variables['author_name'] = drupal_render($variables['elements']['uid']);
-    unset($variables['elements']['uid']);
     if (theme_get_setting('features.node_user_picture')) {
       // To change user picture settings (e.g. image style), edit the 'compact'
       // view mode on the User entity. Note that the 'compact' view mode might
       // not be configured, so remember to always check the theme setting first.
       $variables['author_picture'] = user_view($node->getOwner(), 'compact');
     }
+  }
+  unset($variables['elements']['uid']);
+  unset($variables['elements']['created']);
+
+  // Helpful $content variable for templates.
+  $variables += array('content' => array());
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
   }
 
   // Add article ARIA role.

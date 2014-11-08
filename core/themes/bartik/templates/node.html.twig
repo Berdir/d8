@@ -1,7 +1,7 @@
 {#
 /**
  * @file
- * Bartik's theme implementation to display a node.
+ * Default theme implementation to display a node.
  *
  * Available variables:
  * - node: Full node entity.
@@ -16,13 +16,16 @@
  *   or print a subset such as {{ content.field_example }}. Use
  *   {{ content|without('field_example') }} to temporarily suppress the printing
  *   of a given child element.
- * - author_picture: The node author user entity, rendered using the "compact"
- *   view mode.
  * - metadata: Metadata for this node.
- * - date: Themed creation date field.
- * - author_name: Themed author name field.
  * - url: Direct URL of the current node.
  * - display_submitted: Whether submission information should be displayed.
+ *   If display_submitted is set, additional variables are prepared:
+ *    - author_picture: The node author user entity, rendered using the "compact"
+ *      view mode.
+ *    -  date: Themed creation date field.
+ *    -  author_name: Themed author name field.
+ *    - author_attributes: Same as attributes, except applied to the author of
+ *      the node that appears in the template.
  * - attributes: HTML attributes for the containing element.
  *   The attributes.class element may contain one or more of the following
  *   classes:
@@ -43,17 +46,12 @@
  *   tag that appears in the template.
  * - content_attributes: Same as attributes, except applied to the main
  *   content tag that appears in the template.
- * - author_attributes: Same as attributes, except applied to the author of
- *   the node tag that appears in the template.
  * - title_prefix: Additional output populated by modules, intended to be
  *   displayed in front of the main title tag that appears in the template.
  * - title_suffix: Additional output populated by modules, intended to be
  *   displayed after the main title tag that appears in the template.
  * - view_mode: View mode; for example, "teaser" or "full".
- * - teaser: Flag for the teaser state. Will be true if view_mode is 'teaser'.
  * - page: Flag for the full page state. Will be true if view_mode is 'full'.
- * - readmore: Flag for more state. Will be true if the teaser content of the
- *   node cannot hold the main body content.
  * - is_front: Flag for front. Will be true when presented on the front page.
  * - logged_in: Flag for authenticated user status. Will be true when the
  *   current user is a logged-in member.
