@@ -49,6 +49,7 @@ class PageCacheTagsIntegrationTest extends WebTestBase {
     ));
     $author_2 = $this->drupalCreateUser();
     $node_2 = $this->drupalCreateNode(array(
+      'type' => 'article',
       'uid' => $author_2->id(),
       'title' => 'Node 2',
       'body' => array(
@@ -88,7 +89,6 @@ class PageCacheTagsIntegrationTest extends WebTestBase {
       'block_plugin:system_powered_by_block',
       'node_view',
       'node:' . $node_1->id(),
-      'user:' . $author_1->id(),
       'filter_format:basic_html',
       'menu:account',
       'menu:tools',
@@ -121,6 +121,8 @@ class PageCacheTagsIntegrationTest extends WebTestBase {
       'node_view',
       'node:' . $node_2->id(),
       'user:' . $author_2->id(),
+      'user_view',
+      'comment_list',
       'filter_format:full_html',
       'menu:account',
       'menu:tools',
