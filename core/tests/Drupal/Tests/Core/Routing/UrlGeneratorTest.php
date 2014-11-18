@@ -209,25 +209,53 @@ class UrlGeneratorTest extends UnitTestCase {
     $url = $this->generator->generate('test_2', array('narf' => '5'));
     $this->assertEquals('/goodbye/cruel/world', $url);
 
-    $this->routeProcessorManager->expects($this->exactly(4))
-      ->method('processOutbound')
-      ->with($this->anything());
-
-    $options = array('fragment' => 'top');
-    // Extra parameters should appear in the query string.
-    $url = $this->generator->generateFromRoute('test_1', array('zoo' => '5'), $options);
-    $this->assertEquals('/hello/world?zoo=5#top', $url);
-
-    $options = array('query' => array('page' => '1'), 'fragment' => 'bottom');
-    $url = $this->generator->generateFromRoute('test_2', array('narf' => '5'), $options);
-    $this->assertEquals('/goodbye/cruel/world?page=1#bottom', $url);
-
-    // Changing the parameters, the route still matches but there is no alias.
-    $url = $this->generator->generateFromRoute('test_2', array('narf' => '7'), $options);
-    $this->assertEquals('/test/two/7?page=1#bottom', $url);
-
     $path = $this->generator->getPathFromRoute('test_2', array('narf' => '5'));
     $this->assertEquals('test/two/5', $path);
+  }
+
+  /**
+   * Confirms that generated routes will have aliased paths with options.
+   *
+   * @dataProvider providerTestAliasGenerationWithOptions
+   */
+  public function testAliasGenerationWithOptions($route_name, $route_parameters, $options, $expected) {
+    $url = $this->generator->generateFromRoute($route_name, $route_parameters, $options);
+    $this->assertSame($expected, $url);
+  }
+
+  /**
+   * Provides test data for testAliasGenerationWithOptions.
+   */
+  public function providerTestAliasGenerationWithOptions() {
+    $data = [];
+    // Extra parameters should appear in the query string.
+    $data[] = [
+      'test_1',
+      ['zoo' => '5'],
+      ['fragment' => 'top'],
+      '/hello/world?zoo=5#top',
+    ];
+    $data[] = [
+      'test_2',
+      ['narf' => '5'],
+      ['query' => ['page' => '1'], 'fragment' => 'bottom'],
+      '/goodbye/cruel/world?page=1#bottom',
+    ];
+    // Changing the parameters, the route still matches but there is no alias.
+    $data[] = [
+      'test_2',
+      ['narf' => '7'],
+      ['query' => ['page' => '1'], 'fragment' => 'bottom'],
+      '/test/two/7?page=1#bottom',
+    ];
+    // Query string values containing '/' should be decoded.
+    $data[] = [
+      'test_2',
+      ['narf' => '7'],
+      ['query' => ['page' => '1/2'], 'fragment' => 'bottom'],
+      '/test/two/7?page=1/2#bottom',
+    ];
+    return $data;
   }
 
   /**
