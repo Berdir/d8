@@ -83,7 +83,8 @@ class UserLoginForm extends FormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Username'),
       '#size' => 60,
-      '#maxlength' => USERNAME_MAX_LENGTH,
+      //'#maxlength' => USERNAME_MAX_LENGTH,
+      '#maxlength' => 60,
       '#description' => $this->t('Enter your @s username.', array('@s' => $this->config('system.site')->get('name'))),
       '#required' => TRUE,
       '#attributes' => array(

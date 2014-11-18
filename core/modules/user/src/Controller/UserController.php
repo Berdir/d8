@@ -159,6 +159,7 @@ class UserController extends ControllerBase {
    *   A redirection to home page.
    */
   public function logout() {
+    \Drupal::moduleHandler()->load('user');
     user_logout();
     return $this->redirect('<front>');
   }

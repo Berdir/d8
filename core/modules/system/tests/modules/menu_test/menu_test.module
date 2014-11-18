@@ -81,6 +81,7 @@ function menu_test_menu_local_tasks_alter(&$data, $route_name) {
 }
 
 /**
+<<<<<<< ours
  * Page callback: Provides a dummy function which can be used as a placeholder.
  *
  * @return string
@@ -121,6 +122,8 @@ function menu_test_theme_page_callback($inherited = FALSE) {
 }
 
 /**
+=======
+>>>>>>> theirs
  * Sets a static variable for the testMenuName() test.
  *
  * Used to change the menu_name parameter of a menu.
@@ -139,19 +142,3 @@ function menu_test_menu_name($new_name = '') {
   return $menu_name;
 }
 
-/**
- * Title callback: Concatenates the title and case number.
- *
- * @param string $title
- *   Title string.
- * @param int $case_number
- *   (optional) The current case number which it tests (defaults to 3).
- *
- * @return string
- *   A string containing the title and case number.
- *
- * @see menu_test_menu().
- */
-function menu_test_title_callback($title, $case_number = 3) {
-  return t($title) . ' - Case ' . $case_number;
-}

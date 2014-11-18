@@ -29,6 +29,7 @@ class LanguageConfigurationElementTest extends WebTestBase {
    * Tests the language settings have been saved.
    */
   public function testLanguageConfigurationElement() {
+    \Drupal::moduleHandler()->load('language');
     $this->drupalGet('language-tests/language_configuration_element');
     $edit['lang_configuration[langcode]'] = 'current_interface';
     $edit['lang_configuration[language_show]'] = FALSE;

@@ -107,6 +107,8 @@ class FilterFormatListBuilder extends DraggableListBuilder {
     }
     else {
       $row['label'] = $this->getLabel($entity);
+      \Drupal::moduleHandler()->load('user');
+      \Drupal::moduleHandler()->load('filter');
       $roles = array_map('\Drupal\Component\Utility\String::checkPlain', filter_get_roles_by_format($entity));
       $roles_markup = $roles ? implode(', ', $roles) : $this->t('No roles may use this format');
     }

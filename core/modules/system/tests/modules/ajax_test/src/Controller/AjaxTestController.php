@@ -18,6 +18,7 @@ class AjaxTestController {
    * Returns example content for dialog testing.
    */
   public function dialogContents() {
+    \Drupal::moduleHandler()->load('ajax_test');
     // Re-use the utility method that returns the example content.
     return ajax_test_dialog_contents();
   }
@@ -26,6 +27,7 @@ class AjaxTestController {
    * @todo Remove ajax_test_render().
    */
   public function render() {
+    \Drupal::moduleHandler()->load('ajax_test');
     return ajax_test_render();
   }
 
@@ -33,6 +35,7 @@ class AjaxTestController {
    * @todo Remove ajax_test_order().
    */
   public function order() {
+    \Drupal::moduleHandler()->load('ajax_test');
     return ajax_test_order();
   }
 
@@ -40,6 +43,7 @@ class AjaxTestController {
    * @todo Remove ajax_test_error().
    */
   public function renderError() {
+    \Drupal::moduleHandler()->load('ajax_test');
     return ajax_test_error();
   }
 
@@ -140,6 +144,7 @@ class AjaxTestController {
    * @todo Remove ajax_test_dialog_close().
    */
   public function dialogClose() {
+    \Drupal::moduleHandler()->load('ajax_test');
     return ajax_test_dialog_close();
   }
 

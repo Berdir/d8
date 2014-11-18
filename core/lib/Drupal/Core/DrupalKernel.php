@@ -427,7 +427,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   public function preHandle(Request $request) {
     // Load all enabled modules.
-    $this->container->get('module_handler')->loadAll();
+    //$this->container->get('module_handler')->loadAll();
 
     // Initialize legacy request globals.
     $this->initializeRequestGlobals($request);

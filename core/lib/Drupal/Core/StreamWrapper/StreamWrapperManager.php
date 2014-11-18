@@ -279,7 +279,7 @@ class StreamWrapperManager extends ContainerAware {
    * Internal use only.
    */
   public function register() {
-    $this->moduleHandler->alter('stream_wrappers', $this->info);
+    //$this->moduleHandler->alter('stream_wrappers', $this->info);
 
     foreach ($this->info as $scheme => $info) {
       $this->registerWrapper($scheme, $info['class'], $info['type']);

@@ -25,6 +25,7 @@ class LanguageConfigurationElement extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    \Drupal::moduleHandler()->load('language');
     $conf = language_get_default_configuration('some_custom_type', 'some_bundle');
 
     $form['lang_configuration'] = array(

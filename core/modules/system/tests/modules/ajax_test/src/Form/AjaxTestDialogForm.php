@@ -97,6 +97,7 @@ class AjaxTestDialogForm extends FormBase {
    *   An ajax response object.
    */
   protected function dialog($is_modal = FALSE) {
+    \Drupal::moduleHandler()->load('ajax_test');
     $content = ajax_test_dialog_contents();
     $response = new AjaxResponse();
     $title = $this->t('AJAX Dialog contents');

@@ -50,6 +50,11 @@ use Drupal\aggregator\FeedInterface;
 class Feed extends ContentEntityBase implements FeedInterface {
 
   /**
+   * Denotes that a feed's items should never expire.
+   */
+  const CLEAR_NEVER = 0;
+
+  /**
    * Implements Drupal\Core\Entity\EntityInterface::label().
    */
   public function label() {
@@ -167,7 +172,7 @@ class Feed extends ContentEntityBase implements FeedInterface {
 
     $intervals = array(900, 1800, 3600, 7200, 10800, 21600, 32400, 43200, 64800, 86400, 172800, 259200, 604800, 1209600, 2419200);
     $period = array_map(array(\Drupal::service('date.formatter'), 'formatInterval'), array_combine($intervals, $intervals));
-    $period[AGGREGATOR_CLEAR_NEVER] = t('Never');
+    $period[static::CLEAR_NEVER] = t('Never');
 
     $fields['refresh'] = BaseFieldDefinition::create('list_integer')
       ->setLabel(t('Update interval'))

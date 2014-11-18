@@ -44,6 +44,7 @@ function update_check_incompatibility($name, $type = 'module') {
     // We need to do a full rebuild here to make sure the database reflects any
     // code changes that were made in the filesystem before the update script
     // was initiated.
+    \Drupal::moduleHandler()->load('system');
     $themes = system_rebuild_theme_data();
     $modules = system_rebuild_module_data();
   }

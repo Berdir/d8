@@ -76,7 +76,8 @@ class UserPasswordForm extends FormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Username or email address'),
       '#size' => 60,
-      '#maxlength' => max(USERNAME_MAX_LENGTH, Email::EMAIL_MAX_LENGTH),
+      '#maxlength' => max(60, Email::EMAIL_MAX_LENGTH),
+      //'#maxlength' => max(USERNAME_MAX_LENGTH, Email::EMAIL_MAX_LENGTH),
       '#required' => TRUE,
       '#attributes' => array(
         'autocorrect' => 'off',

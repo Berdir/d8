@@ -16,7 +16,15 @@ class TestPageTestController {
    * @todo Remove test_page_test_page().
    */
   public function testPage() {
-    return test_page_test_page();
+    $attached['js'][] = array(
+      'data' => array('test-setting' => 'azAZ09();.,\\\/-_{}'),
+      'type' => 'setting',
+    );
+    return array(
+      '#title' => t('Test page'),
+      '#markup' => t('Test page text.'),
+      '#attached' => $attached,
+    );
   }
 
 }

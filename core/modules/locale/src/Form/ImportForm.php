@@ -78,6 +78,7 @@ class ImportForm extends FormBase {
     // Initialize a language list to the ones available, including English if we
     // are to translate Drupal to English as well.
     $existing_languages = array();
+    \Drupal::moduleHandler()->load('locale');
     foreach ($languages as $langcode => $language) {
       if ($langcode != 'en' || locale_translate_english()) {
         $existing_languages[$langcode] = $language->getName();

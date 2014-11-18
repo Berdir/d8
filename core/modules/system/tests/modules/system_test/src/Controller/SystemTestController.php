@@ -79,6 +79,7 @@ class SystemTestController extends ControllerBase {
    * @todo Remove system_test_lock_acquire().
    */
   public function lockAcquire() {
+    \Drupal::moduleHandler()->load('system_test');
     return system_test_lock_acquire();
   }
 
@@ -86,6 +87,7 @@ class SystemTestController extends ControllerBase {
    * @todo Remove system_test_lock_exit().
    */
   public function lockExit() {
+    \Drupal::moduleHandler()->load('system_test');
     return system_test_lock_exit();
   }
 
@@ -135,6 +137,7 @@ class SystemTestController extends ControllerBase {
    * @todo Remove system_test_authorize_init_page().
    */
   public function authorizeInit($page_title) {
+    \Drupal::moduleHandler()->load('system_test');
     return system_test_authorize_init_page($page_title);
   }
 
@@ -154,6 +157,7 @@ class SystemTestController extends ControllerBase {
    * @todo Remove system_test_page_shutdown_functions().
    */
   public function shutdownFunctions($arg1, $arg2) {
+    \Drupal::moduleHandler()->load('system_test');
     system_test_page_shutdown_functions($arg1, $arg2);
     // If using PHP-FPM then fastcgi_finish_request() will have been fired
     // preventing further output to the browser which means that the escaping of
