@@ -1,10 +1,58 @@
-base_table: views_test_data
+langcode: und
+status: true
+dependencies:
+  module:
+    - rest
+    - user
 id: test_serializer_display_field
+label: 'Test serializer display field rows'
+module: rest
 description: ''
 tag: ''
-label: 'Test serializer display field rows'
+base_table: views_test_data
+base_field: id
 core: 8.x
 display:
+  rest_export_2:
+    display_plugin: rest_export
+    id: rest_export_2
+    display_title: 'serialize - access denied'
+    position: null
+    display_options:
+      defaults:
+        access: false
+        style: false
+        row: false
+      path: test/serialize/denied
+      access:
+        type: perm
+        options:
+          perm: 'administer views'
+      style:
+        type: serializer
+      row:
+        type: data_field
+      field_langcode: '***LANGUAGE_language_content***'
+      field_langcode_add_to_query: null
+  rest_export_1:
+    display_plugin: rest_export
+    id: rest_export_1
+    display_title: serializer
+    position: null
+    display_options:
+      defaults:
+        access: false
+        style: false
+        row: false
+      path: test/serialize/field
+      access:
+        type: none
+      style:
+        type: serializer
+      row:
+        type: data_field
+      field_langcode: '***LANGUAGE_language_content***'
+      field_langcode_add_to_query: null
   default:
     display_plugin: default
     id: default
@@ -59,46 +107,5 @@ display:
           plugin_id: date
       title: 'Test serialize'
       arguments: {  }
-  rest_export_1:
-    display_plugin: rest_export
-    id: rest_export_1
-    display_title: serializer
-    position: null
-    display_options:
-      defaults:
-        access: false
-        style: false
-        row: false
-      path: test/serialize/field
-      access:
-        type: none
-      style:
-        type: serializer
-      row:
-        type: data_field
-  rest_export_2:
-    display_plugin: rest_export
-    id: rest_export_2
-    display_title: 'serialize - access denied'
-    position: null
-    display_options:
-      defaults:
-        access: false
-        style: false
-        row: false
-      path: test/serialize/denied
-      access:
-        type: perm
-        options:
-          perm: 'administer views'
-      style:
-        type: serializer
-      row:
-        type: data_field
-base_field: id
-status: true
-module: rest
-langcode: und
-dependencies:
-  module:
-    - rest
+      field_langcode: '***LANGUAGE_language_content***'
+      field_langcode_add_to_query: null

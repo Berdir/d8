@@ -1,9 +1,9 @@
-uuid: bd845a9c-6c2e-4d53-965c-92b170bb79e4
 langcode: en
 status: true
 dependencies:
   module:
     - node
+    - user
 id: test_field_filters
 label: 'Test field filters'
 module: views
@@ -156,17 +156,30 @@ display:
       arguments: {  }
       field_langcode: '***LANGUAGE_language_content***'
       field_langcode_add_to_query: null
-  page_tf:
+  page_tfp:
     display_plugin: page
-    id: page_tf
-    display_title: 'Title filter page'
+    id: page_tfp
+    display_title: 'Title filter page Paris'
     position: 1
     display_options:
       field_langcode: '***LANGUAGE_language_content***'
       field_langcode_add_to_query: null
-      path: test-title-filter
+      path: test-title-paris
       display_description: ''
       title: 'Test title filter'
+      defaults:
+        title: false
+  page_bfp:
+    display_plugin: page
+    id: page_bfp
+    display_title: 'Body filter page Paris'
+    position: 1
+    display_options:
+      field_langcode: '***LANGUAGE_language_content***'
+      field_langcode_add_to_query: null
+      path: test-body-paris
+      display_description: ''
+      title: 'Test body filters'
       defaults:
         title: false
         filters: false
@@ -180,15 +193,15 @@ display:
           expose:
             operator: ''
           group: 1
-        title:
-          id: title
-          table: node_field_data
-          field: title
+        body_value:
+          id: body_value
+          table: node__body
+          field: body_value
           relationship: none
           group_type: group
           admin_label: ''
           operator: contains
-          value: Comida
+          value: Paris
           group: 1
           exposed: false
           expose:
@@ -284,17 +297,17 @@ display:
         operator: AND
         groups:
           1: AND
-  page_bfp:
+  page_tf:
     display_plugin: page
-    id: page_bfp
-    display_title: 'Body filter page Paris'
+    id: page_tf
+    display_title: 'Title filter page'
     position: 1
     display_options:
       field_langcode: '***LANGUAGE_language_content***'
       field_langcode_add_to_query: null
-      path: test-body-paris
+      path: test-title-filter
       display_description: ''
-      title: 'Test body filters'
+      title: 'Test title filter'
       defaults:
         title: false
         filters: false
@@ -308,15 +321,15 @@ display:
           expose:
             operator: ''
           group: 1
-        body_value:
-          id: body_value
-          table: node__body
-          field: body_value
+        title:
+          id: title
+          table: node_field_data
+          field: title
           relationship: none
           group_type: group
           admin_label: ''
           operator: contains
-          value: Paris
+          value: Comida
           group: 1
           exposed: false
           expose:
@@ -348,16 +361,3 @@ display:
         operator: AND
         groups:
           1: AND
-  page_tfp:
-    display_plugin: page
-    id: page_tfp
-    display_title: 'Title filter page Paris'
-    position: 1
-    display_options:
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
-      path: test-title-paris
-      display_description: ''
-      title: 'Test title filter'
-      defaults:
-        title: false

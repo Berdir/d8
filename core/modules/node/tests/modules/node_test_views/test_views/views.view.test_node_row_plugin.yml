@@ -1,9 +1,27 @@
-base_field: nid
-base_table: node
-core: 8
-description: ''
+langcode: en
 status: true
+dependencies:
+  module:
+    - node
+    - user
+id: test_node_row_plugin
+label: test_node_row_plugin
+module: views
+description: ''
+tag: default
+base_table: node
+base_field: nid
+core: '8'
 display:
+  page_1:
+    display_options:
+      path: test-node-row-plugin
+      field_langcode: '***LANGUAGE_language_content***'
+      field_langcode_add_to_query: null
+    display_plugin: page
+    display_title: Page
+    id: page_1
+    position: 0
   default:
     display_options:
       access:
@@ -37,19 +55,9 @@ display:
       style:
         type: default
       title: test_node_row_plugin
+      field_langcode: '***LANGUAGE_language_content***'
+      field_langcode_add_to_query: null
     display_plugin: default
     display_title: Master
     id: default
     position: 0
-  page_1:
-    display_options:
-      path: test-node-row-plugin
-    display_plugin: page
-    display_title: Page
-    id: page_1
-    position: 0
-label: test_node_row_plugin
-langcode: en
-module: views
-id: test_node_row_plugin
-tag: default
