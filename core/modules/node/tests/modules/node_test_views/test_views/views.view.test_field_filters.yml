@@ -1,9 +1,9 @@
-uuid: bd845a9c-6c2e-4d53-965c-92b170bb79e4
 langcode: en
 status: true
 dependencies:
   module:
     - node
+    - user
 id: test_field_filters
 label: 'Test field filters'
 module: views

@@ -1,9 +1,10 @@
-uuid: b9f5216c-231d-477b-b312-18020246cbb0
 langcode: en
 status: true
 dependencies:
   module:
     - comment
+    - node
+    - user
 id: test_field_filters
 label: 'Test field filters'
 module: views
@@ -144,25 +145,15 @@ display:
       arguments: {  }
       field_langcode: '***LANGUAGE_language_content***'
       field_langcode_add_to_query: null
-  page_tc:
+  page_bf:
     display_plugin: page
-    id: page_tc
-    display_title: 'Title Comida'
+    id: page_bf
+    display_title: 'Body Comida'
     position: 1
     display_options:
       field_langcode: '***LANGUAGE_language_content***'
       field_langcode_add_to_query: null
-      path: test-title-filter
-      display_description: ''
-  page_bp:
-    display_plugin: page
-    id: page_bp
-    display_title: 'Body Paris'
-    position: 1
-    display_options:
-      field_langcode: '***LANGUAGE_language_content***'
-      field_langcode_add_to_query: null
-      path: test-body-paris
+      path: test-body-filter
       display_description: ''
       filters:
         comment_body_value:
@@ -173,7 +164,7 @@ display:
           group_type: group
           admin_label: ''
           operator: contains
-          value: Paris
+          value: Comida
           group: 1
           exposed: false
           expose:
@@ -264,15 +255,15 @@ display:
         operator: AND
         groups:
           1: AND
-  page_bf:
+  page_bp:
     display_plugin: page
-    id: page_bf
-    display_title: 'Body Comida'
+    id: page_bp
+    display_title: 'Body Paris'
     position: 1
     display_options:
       field_langcode: '***LANGUAGE_language_content***'
       field_langcode_add_to_query: null
-      path: test-body-filter
+      path: test-body-paris
       display_description: ''
       filters:
         comment_body_value:
@@ -283,7 +274,7 @@ display:
           group_type: group
           admin_label: ''
           operator: contains
-          value: Comida
+          value: Paris
           group: 1
           exposed: false
           expose:
@@ -320,3 +311,13 @@ display:
         groups:
           1: AND
       title: 'Body filter page'
+  page_tc:
+    display_plugin: page
+    id: page_tc
+    display_title: 'Title Comida'
+    position: 1
+    display_options:
+      field_langcode: '***LANGUAGE_language_content***'
+      field_langcode_add_to_query: null
+      path: test-title-filter
+      display_description: ''

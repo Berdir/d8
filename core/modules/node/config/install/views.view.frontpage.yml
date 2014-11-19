@@ -3,6 +3,7 @@ status: true
 dependencies:
   module:
     - node
+    - user
 id: frontpage
 label: Frontpage
 module: node

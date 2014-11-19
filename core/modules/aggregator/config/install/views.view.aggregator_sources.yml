@@ -1,3 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - aggregator
+    - user
 id: aggregator_sources
 label: 'Aggregator sources'
 module: aggregator
@@ -6,11 +12,6 @@ tag: aggregator
 base_table: aggregator_feed
 base_field: fid
 core: 8.x
-langcode: en
-status: true
-dependencies:
-  module:
-    - aggregator
 display:
   default:
     display_plugin: default

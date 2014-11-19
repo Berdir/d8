@@ -1,8 +1,26 @@
-base_table: users
-core: '8'
+langcode: und
+status: true
+dependencies:
+  module:
+    - user
+id: test_user_name
+label: ''
+module: views
 description: ''
-status: '1'
+tag: ''
+base_table: users
+base_field: nid
+core: '8'
 display:
+  page_1:
+    display_options:
+      path: test_user_name
+      field_langcode: '***LANGUAGE_language_content***'
+      field_langcode_add_to_query: null
+    display_plugin: page
+    display_title: Page
+    id: page_1
+    position: 0
   default:
     display_options:
       access:
@@ -35,18 +53,10 @@ display:
             identifier: uid
             remember_roles:
               authenticated: authenticated
-              anonymous: 0
+              anonymous: '0'
+      field_langcode: '***LANGUAGE_language_content***'
+      field_langcode_add_to_query: null
     display_plugin: default
     display_title: Master
     id: default
     position: 0
-  page_1:
-    display_options:
-      path: test_user_name
-    display_plugin: page
-    display_title: Page
-    id: page_1
-    position: 0
-label: ''
-id: test_user_name
-tag: ''
