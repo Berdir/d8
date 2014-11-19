@@ -67,6 +67,7 @@ class DisplayFeedTest extends UITestBase {
       }
     }
 
+    sort($options);
     $this->assertEqual($options, array('default', 'page'), 'Make sure all displays appears as expected.');
 
     // Post and save this and check the output.

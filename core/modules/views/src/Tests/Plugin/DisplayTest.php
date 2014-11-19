@@ -155,7 +155,9 @@ class DisplayTest extends PluginTestBase {
 
     // Both the feed_1 and the feed_2 display are attached to the page display.
     $view->setDisplay('page_1');
-    $this->assertEqual($view->display_handler->getAttachedDisplays(), array('feed_1', 'feed_2'));
+    $attached_displays = $view->display_handler->getAttachedDisplays();
+    sort($attached_displays);
+    $this->assertEqual($attached_displays, array('feed_1', 'feed_2'));
 
     $view->setDisplay('feed_1');
     $this->assertEqual($view->display_handler->getAttachedDisplays(), array());
