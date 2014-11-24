@@ -156,6 +156,9 @@ class PasswordHashingTest extends UnitTestCase {
     }
   }
 
+  /**
+   * Provides the test matrix for testLongPassword().
+   */
   public function providerLongPasswords() {
     // '512 byte long password is allowed.'
     $passwords['allowed'] = array(str_repeat('x', 512), TRUE);
