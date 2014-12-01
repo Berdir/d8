@@ -447,8 +447,9 @@ function locale_cache_flush() {
  */
 function locale_js_alter(&$javascript) {
   $files = array();
+  // Collect all local javascript files to translate them.
   foreach ($javascript as $item) {
-    if (isset($item['type']) && $item['type'] == 'file') {
+    if (isset($item['type']) && $item['type'] == 'file' && !UrlHelper::isExternal($item['data'])) {
       $files[] = $item['data'];
     }
   }
