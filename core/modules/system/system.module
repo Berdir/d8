@@ -2974,7 +2974,7 @@ function _system_default_theme_features() {
  *   Possible values: REGIONS_ALL or REGIONS_VISIBLE. Visible excludes hidden
  *   regions.
  * @return
- *   An array of regions in the form $region['name'] = 'description'.
+ *   An array of regions names.
  */
 function system_region_list($theme_key, $show = REGIONS_ALL) {
   $themes = list_themes();
@@ -2982,16 +2982,38 @@ function system_region_list($theme_key, $show = REGIONS_ALL) {
     return array();
   }
 
-  $list = array();
   $info = $themes[$theme_key]->info;
+  $list = array_keys($info['regions']);
   // If requested, suppress hidden regions. See block_admin_display_form().
-  foreach ($info['regions'] as $name => $label) {
-    if ($show == REGIONS_ALL || !isset($info['regions_hidden']) || !in_array($name, $info['regions_hidden'])) {
-      $list[$name] = t($label);
-    }
+  if ($show == REGIONS_VISIBLE && isset($info['regions_hidden'])) {
+    $list = array_values(array_diff($list, $info['regions_hidden']));
+  }
+  return $list;
+}
+
+/**
+ * Get a list of available region labels from a specified theme.
+ *
+ * @param $theme_key
+ *   The name of a theme.
+ * @param $show
+ *   Possible values: REGIONS_ALL or REGIONS_VISIBLE. Visible excludes hidden
+ *   regions.
+ * @return
+ *   An array of regions labels keyed by the region name.
+ */
+function system_region_labels($theme_key, $show = REGIONS_ALL) {
+  $themes = list_themes();
+  if (!isset($themes[$theme_key])) {
+    return array();
   }
 
-  return $list;
+  $info = $themes[$theme_key]->info;
+  $labels = array();
+  foreach (system_region_list($theme_key, $show) as $name) {
+    $labels[$name] = t($info['regions'][$name]);
+  }
+  return $labels;
 }
 
 /**
@@ -3015,7 +3037,7 @@ function system_system_info_alter(&$info, $file, $type) {
  *   A string that is the region name.
  */
 function system_default_region($theme) {
-  $regions = array_keys(system_region_list($theme, REGIONS_VISIBLE));
+  $regions = system_region_list($theme, REGIONS_VISIBLE);
   return isset($regions[0]) ? $regions[0] : '';
 }
 
@@ -3806,8 +3828,7 @@ function system_retrieve_file($url, $destination = NULL, $managed = FALSE, $repl
 function system_page_alter(&$page) {
   // Find all non-empty page regions, and add a theme wrapper function that
   // allows them to be consistently themed.
-  $regions = system_region_list($GLOBALS['theme']);
-  foreach (array_keys($regions) as $region) {
+  foreach (system_region_list($GLOBALS['theme']) as $region) {
     if (!empty($page[$region])) {
       $page[$region]['#theme_wrappers'][] = 'region';
       $page[$region]['#region'] = $region;

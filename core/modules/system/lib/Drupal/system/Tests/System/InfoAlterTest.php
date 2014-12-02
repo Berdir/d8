@@ -36,7 +36,7 @@ class InfoAlterTest extends WebTestBase {
     $info = $this->getSystemInfo('seven', 'theme');
     $this->assertTrue(isset($info['regions']['test_region']), t('Altered theme info was added to {system}.info.'));
     $seven_regions = system_region_list('seven');
-    $this->assertTrue(isset($seven_regions['test_region']), t('Altered theme info was returned by system_region_list().'));
+    $this->assertTrue(in_array('test_region', $seven_regions), t('Altered theme info was returned by system_region_list().'));
     $system_list_themes = system_list('theme');
     $info = $system_list_themes['seven']->info;
     $this->assertTrue(isset($info['regions']['test_region']), t('Altered theme info was returned by system_list().'));
@@ -51,7 +51,7 @@ class InfoAlterTest extends WebTestBase {
     $info = $this->getSystemInfo('seven', 'theme');
     $this->assertFalse(isset($info['regions']['test_region']), t('Altered theme info was removed from {system}.info.'));
     $seven_regions = system_region_list('seven');
-    $this->assertFalse(isset($seven_regions['test_region']), t('Altered theme info was not returned by system_region_list().'));
+    $this->assertFalse(in_array('test_region', $seven_regions), t('Altered theme info was not returned by system_region_list().'));
     $system_list_themes = system_list('theme');
     $info = $system_list_themes['seven']->info;
     $this->assertFalse(isset($info['regions']['test_region']), t('Altered theme info was not returned by system_list().'));
