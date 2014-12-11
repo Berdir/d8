@@ -927,7 +927,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         $this->database
           ->update($this->baseTable)
           ->fields((array) $record)
-          ->condition($this->idKey, $record->{$this->idKey})
+          ->condition($this->idKey, $entity->id())
           ->execute();
         $return = SAVED_UPDATED;
       }
@@ -960,14 +960,14 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       // Even if this is a new entity the ID key might have been set, in which
       // case we should not override the provided ID. An ID key that is not set
       // to any value is interpreted as NULL (or DEFAULT) and thus overridden.
-      if (!isset($record->{$this->idKey})) {
-        $record->{$this->idKey} = $insert_id;
+      $entity_id = $entity->id();
+      if (empty($entity_id)) {
+        $entity->{$this->idKey}->value = (string) $insert_id;
       }
       $return = SAVED_NEW;
-      $entity->{$this->idKey}->value = (string) $record->{$this->idKey};
       if ($this->revisionTable) {
         $entity->setNewRevision();
-        $record->{$this->revisionKey} = $this->saveRevision($entity);
+        $entity->{$this->revisionKey}->value = $this->saveRevision($entity);
       }
       if ($this->dataTable) {
         $this->savePropertyData($entity);
@@ -1085,14 +1085,31 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         if (!empty($definition->getSchema()['columns'][$column_name]['serialize'])) {
           $value = serialize($value);
         }
-
-        // Do not set serial fields if we do not have a value. This supports all
-        // SQL database drivers.
-        // @see https://www.drupal.org/node/2279395
         $value = drupal_schema_get_field_value($definition->getSchema()['columns'][$column_name], $value);
-        if (!(empty($value) && $this->isColumnSerial($table_name, $schema_name))) {
-          $record->$schema_name = $value;
+
+        // Allow IDENTITY inserts (basically for D6 migration path)
+        // but most database engines will not allow an IDENTITY updates.
+        // MySQL's loose behaviour will swallow anything thrown at it
+        // but other engines are more strict in serial column handling.
+        if ($this->isColumnSerial($table_name, $schema_name)) {
+          $new = $entity->isNew();
+          // Do not add to storage record if the serial
+          // value is empty when creating and entity.
+          // (PostgreSQL)
+          // @see https://www.drupal.org/node/2279395
+          if ($new && empty($value)) {
+            continue;
+          }
+          // If this entity is not new, serial column
+          // is already populated and needs not to be set.
+          // (MS SQL Server)
+          // @see https://www.drupal.org/node/2342699
+          if (!$new) {
+            continue;
+          }
         }
+
+        $record->$schema_name = $value;
       }
     }
 
@@ -1113,16 +1130,26 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @see \Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema::processBaseTable()
    * @see \Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema::processRevisionTable()
    */
-  protected function isColumnSerial($table_name, $schema_name) {
+  protected function isColumnSerial($table_name, $column) {
+    // Entities can only have a key, and this key must be serial. Also,
+    // there cannot be any other serial fields in an entity besides it's key.
+    // This behaviour is locked into SqlContentEntityStorageSchema.
+    // You actually define your entity key as 'integer' and it is
+    // SqlContentEntityStorageSchema::processIdentifierSchema that
+    // converts int to serial when generating the definitive schema
+    // used to populate database tables during their creation.
+    // There is no way to take a peek at the true schema from outside
+    // SqlContentEntityStorageSchema.
+    // @see https://www.drupal.org/node/2342699
     $result = FALSE;
 
     switch ($table_name) {
       case $this->baseTable:
-        $result = $schema_name == $this->idKey;
+        $result = $column == $this->idKey;
         break;
 
       case $this->revisionTable:
-        $result = $schema_name == $this->revisionKey;
+        $result = $column == $this->revisionKey;
         break;
     }
 
@@ -1171,13 +1198,14 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         ->execute();
       // Even if this is a new revision, the revision ID key might have been
       // set in which case we should not override the provided revision ID.
-      if (!isset($record->{$this->revisionKey})) {
-        $record->{$this->revisionKey} = $insert_id;
+      $revision_id = $entity->getRevisionId();
+      if (empty($revision_id)) {
+        $entity->{$this->revisionKey}->value = $insert_id;
       }
       if ($entity->isDefaultRevision()) {
         $this->database->update($this->entityType->getBaseTable())
-          ->fields(array($this->revisionKey => $record->{$this->revisionKey}))
-          ->condition($this->idKey, $record->{$this->idKey})
+          ->fields(array($this->revisionKey => $entity->getRevisionId()))
+          ->condition($this->idKey, $entity->id())
           ->execute();
       }
     }
@@ -1185,14 +1213,11 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $this->database
         ->update($this->revisionTable)
         ->fields((array) $record)
-        ->condition($this->revisionKey, $record->{$this->revisionKey})
+        ->condition($this->revisionKey, $entity->getRevisionId())
         ->execute();
     }
 
-    // Make sure to update the new revision key for the entity.
-    $entity->{$this->revisionKey}->value = $record->{$this->revisionKey};
-
-    return $record->{$this->revisionKey};
+    return $entity->getRevisionId();
   }
 
   /**
