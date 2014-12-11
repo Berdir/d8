@@ -76,6 +76,7 @@ class ChainedFastBackendTest extends UnitTestCase {
       'data' => 'baz',
       'created' => time(),
       'expire' => time() + 3600,
+      'tags' => [],
     );
 
     $consistent_cache = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
