@@ -71,9 +71,6 @@ abstract class OverviewBase extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state, $entity_type_id = NULL, $bundle = NULL) {
     $stored_bundle = $form_state->get('bundle');
     if (!$stored_bundle) {
-      if (!$bundle) {
-        $bundle = $this->getRequest()->attributes->get('_raw_variables')->get('bundle');
-      }
       $stored_bundle = $bundle;
       $form_state->set('bundle', $bundle);
     }

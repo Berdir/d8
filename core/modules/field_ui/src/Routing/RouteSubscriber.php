@@ -49,11 +49,11 @@ class RouteSubscriber extends RouteSubscriberBase {
         $path = $entity_route->getPath();
 
         $options = array();
-        // @todo Probably better remove this upcasting.
         if ($bundle_entity_type = $entity_type->getBundleEntityType()) {
-          $options['parameters']['bundle'] = array(
-            'type' => 'entity:' . $bundle_entity_type,
-          );
+          // If the entity type has a bundle entity type, support that as a
+          // placeholder in the base route, but replace it with {bundle} for
+          // the field_ui routes.
+          $path = str_replace('{' . $bundle_entity_type . '}', '{bundle}', $path);
         }
 
         $route = new Route(
