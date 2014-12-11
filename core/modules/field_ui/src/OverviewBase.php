@@ -33,13 +33,6 @@ abstract class OverviewBase extends FormBase {
   protected $bundle = '';
 
   /**
-   * The entity type of the entity bundle.
-   *
-   * @var string
-   */
-  protected $bundleEntityType;
-
-  /**
    * The entity view or form mode.
    *
    * @var string
@@ -76,12 +69,10 @@ abstract class OverviewBase extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $entity_type_id = NULL, $bundle = NULL) {
-    $entity_type = $this->entityManager->getDefinition($entity_type_id);
-    $this->bundleEntityType = $entity_type->getBundleEntityType();
     $stored_bundle = $form_state->get('bundle');
     if (!$stored_bundle) {
       if (!$bundle) {
-        $bundle = $this->getRequest()->attributes->get('_raw_variables')->get($this->bundleEntityType);
+        $bundle = $this->getRequest()->attributes->get('_raw_variables')->get('bundle');
       }
       $stored_bundle = $bundle;
       $form_state->set('bundle', $bundle);

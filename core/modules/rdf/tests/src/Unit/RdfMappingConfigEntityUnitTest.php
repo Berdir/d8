@@ -80,7 +80,7 @@ class RdfMappingConfigEntityUnitTest extends UnitTestCase {
     $values = array('targetEntityType' => $target_entity_type_id);
     $target_entity_type->expects($this->any())
       ->method('getBundleEntityType')
-      ->will($this->returnValue('bundle'));
+      ->will($this->returnValue(NULL));
 
     $this->entityManager->expects($this->at(0))
       ->method('getDefinition')

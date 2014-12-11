@@ -431,9 +431,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
       $this->verifyPageCache($listing_path, 'HIT');
     }
 
-
-    $bundle_entity_type = $this->entity->getEntityType()->getBundleEntityType();
-    if ($bundle_entity_type !== 'bundle') {
+    if ($bundle_entity_type = $this->entity->getEntityType()->getBundleEntityType()) {
       // Verify that after modifying the corresponding bundle entity, there is a
       // cache miss for both the referencing entity, and the listing of
       // referencing entities, but not for any other routes.

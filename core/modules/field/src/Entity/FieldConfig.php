@@ -278,7 +278,10 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
   protected function urlRouteParameters($rel) {
     $parameters = parent::urlRouteParameters($rel);
     $entity_type = \Drupal::entityManager()->getDefinition($this->entity_type);
-    $parameters[$entity_type->getBundleEntityType()] = $this->bundle;
+    if ($entity_type->hasKey('bundle')) {
+      // Add parameter for entities with bundles.
+      $parameters['bundle'] = $this->bundle;
+    }
     return $parameters;
   }
 

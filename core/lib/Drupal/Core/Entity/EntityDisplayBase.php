@@ -158,8 +158,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
     parent::calculateDependencies();
     $target_entity_type = \Drupal::entityManager()->getDefinition($this->targetEntityType);
 
-    $bundle_entity_type_id = $target_entity_type->getBundleEntityType();
-    if ($bundle_entity_type_id != 'bundle') {
+    if ($bundle_entity_type_id = $target_entity_type->getBundleEntityType()) {
       // If the target entity type uses entities to manage its bundles then
       // depend on the bundle entity.
       if (!$bundle_entity = \Drupal::entityManager()->getStorage($bundle_entity_type_id)->load($this->bundle)) {

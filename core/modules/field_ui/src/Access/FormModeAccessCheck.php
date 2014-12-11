@@ -65,8 +65,8 @@ class FormModeAccessCheck implements AccessInterface {
     $access = AccessResult::neutral();
     if ($entity_type_id = $route->getDefault('entity_type_id')) {
       if (!isset($bundle)) {
-        $entity_type = $this->entityManager->getDefinition($entity_type_id);
-        $bundle = $route_match->getRawParameter($entity_type->getBundleEntityType());
+        // Find bundle to load display.
+        $bundle = $route_match->getRawParameter('bundle');
       }
 
       $visibility = FALSE;

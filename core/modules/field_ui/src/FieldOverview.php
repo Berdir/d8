@@ -122,7 +122,7 @@ class FieldOverview extends OverviewBase {
     foreach ($fields as $name => $field) {
       $field_storage = $field->getFieldStorageDefinition();
       $route_parameters = array(
-        $this->bundleEntityType => $this->bundle,
+        'bundle' => $this->bundle,
         'field_config' => $field->id(),
       );
       $table[$name] = array(
@@ -408,7 +408,7 @@ class FieldOverview extends OverviewBase {
         // Always show the field settings step, as the cardinality needs to be
         // configured for new fields.
         $route_parameters = array(
-          $this->bundleEntityType => $this->bundle,
+          'bundle' => $this->bundle,
           'field_config' => $new_field->id(),
         );
         $destinations[] = array('route_name' => 'field_ui.storage_edit_' . $this->entity_type, 'route_parameters' => $route_parameters);

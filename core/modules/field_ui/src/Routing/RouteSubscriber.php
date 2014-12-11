@@ -49,9 +49,10 @@ class RouteSubscriber extends RouteSubscriberBase {
         $path = $entity_route->getPath();
 
         $options = array();
-        if (($bundle_entity_type = $entity_type->getBundleEntityType()) && $bundle_entity_type !== 'bundle') {
-          $options['parameters'][$entity_type->getBundleEntityType()] = array(
-            'type' => 'entity:' . $entity_type->getBundleEntityType(),
+        // @todo Probably better remove this upcasting.
+        if ($bundle_entity_type = $entity_type->getBundleEntityType()) {
+          $options['parameters']['bundle'] = array(
+            'type' => 'entity:' . $bundle_entity_type,
           );
         }
 
