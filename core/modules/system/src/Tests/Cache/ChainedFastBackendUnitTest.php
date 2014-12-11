@@ -33,7 +33,7 @@ class ChainedFastBackendUnitTest extends GenericCacheBackendUnitTestBase {
   /**
    * Tests the expiration when the fast backend is invalidated.
    */
-  public function dtestExpirationonWriteThrough() {
+  public function testExpirationonWriteThrough() {
     $backend = $this->getCacheBackend();
 
     $backend->set('expired_data', 'foobar', REQUEST_TIME - 3);
