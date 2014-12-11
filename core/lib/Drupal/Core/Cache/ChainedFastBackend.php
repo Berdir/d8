@@ -142,14 +142,16 @@ class ChainedFastBackend implements CacheBackendInterface {
       }
 
       // Even if items were successfully fetched from the fast backend, they
-      // are potentially invalid if older than the last time the bin was
-      // written to in the consistent backend, so only keep ones that aren't.
+      // are potentially invalid. They may have been created before the the bin
+      // was last written to, or they may have expired.
       foreach ($items as $item) {
-        if ($item->created < $last_write_timestamp) {
-          $cids[array_search($item->cid, $cids_copy)] = $item->cid;
+        $expire_is_valid = $item->expire == Cache::PERMANENT || $item->expire >= REQUEST_TIME;
+        $last_write_is_valid = $item->created >= $last_write_timestamp;
+        if ($expire_is_valid && $last_write_is_valid) {
+          $cache[$item->cid] = $item;
         }
         else {
-          $cache[$item->cid] = $item;
+          $cids[array_search($item->cid, $cids_copy)] = $item->cid;
         }
       }
     }
@@ -160,7 +162,7 @@ class ChainedFastBackend implements CacheBackendInterface {
     if ($cids) {
       foreach ($this->consistentBackend->getMultiple($cids, $allow_invalid) as $item) {
         $cache[$item->cid] = $item;
-        $this->fastBackend->set($item->cid, $item->data);
+        $this->fastBackend->set($item->cid, $item->data, $item->expire, $item->tags);
       }
     }
 
