@@ -172,8 +172,8 @@ class ChainedFastBackend implements CacheBackendInterface {
    */
   public function set($cid, $data, $expire = Cache::PERMANENT, array $tags = array()) {
     $this->consistentBackend->set($cid, $data, $expire, $tags);
-    $this->fastBackend->set($cid, $data, $expire, $tags);
     $this->markAsOutdated();
+    $this->fastBackend->set($cid, $data, $expire, $tags);
   }
 
   /**
@@ -181,8 +181,8 @@ class ChainedFastBackend implements CacheBackendInterface {
    */
   public function setMultiple(array $items) {
     $this->consistentBackend->setMultiple($items);
-    $this->fastBackend->setMultiple($items);
     $this->markAsOutdated();
+    $this->fastBackend->setMultiple($items);
   }
 
   /**
