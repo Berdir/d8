@@ -39,7 +39,7 @@ services:
       - [setContainer, ['@service_container']]
   cache.backend.database:
     class: Drupal\Core\Cache\DatabaseBackendFactory
-    arguments: ['@database']
+    arguments: ['@database.secondary']
   cache.backend.apcu:
     class: Drupal\Core\Cache\ApcuBackendFactory
     arguments: ['@app.root']
@@ -172,6 +172,11 @@ services:
     factory_class: Drupal\Core\Database\Database
     factory_method: getConnection
     arguments: [default]
+  database.secondary:
+    class: Drupal\Core\Database\Connection
+    factory_class: Drupal\Core\Database\Database
+    factory_method: getConnection
+    arguments: [secondary]
   form_builder:
     class: Drupal\Core\Form\FormBuilder
     arguments: ['@form_validator', '@form_submitter', '@form_cache', '@module_handler', '@event_dispatcher', '@request_stack', '@class_resolver', '@theme.manager', '@?csrf_token']
@@ -246,7 +251,7 @@ services:
       - [setContainer, ['@service_container']]
   queue.database:
     class: Drupal\Core\Queue\QueueDatabaseFactory
-    arguments: ['@database']
+    arguments: ['@database.secondary']
   path.alias_whitelist:
     class: Drupal\Core\Path\AliasWhitelist
     tags:
@@ -456,12 +461,12 @@ services:
     parent: default_plugin_manager
   lock:
     class: Drupal\Core\Lock\DatabaseLockBackend
-    arguments: ['@database']
+    arguments: ['@database.secondary']
     tags:
       - { name: backend_overridable }
   lock.persistent:
     class: Drupal\Core\Lock\PersistentDatabaseLockBackend
-    arguments: ['@database']
+    arguments: ['@database.secondary']
   router.request_context:
     class: Drupal\Core\Routing\RequestContext
     tags:
