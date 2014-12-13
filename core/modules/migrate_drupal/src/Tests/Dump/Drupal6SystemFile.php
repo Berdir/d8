@@ -22,11 +22,6 @@ class Drupal6SystemFile extends Drupal6DumpBase {
       'value',
     ))
     ->values(array(
-      'name' => 'file_directory_path',
-      // This sets up MigrateDrupal6Test to pass. Do not change.
-      'value' => 's:29:"core/modules/simpletest/files";',
-    ))
-    ->values(array(
       'name' => 'file_directory_temp',
       'value' => 's:10:"files/temp";',
     ))

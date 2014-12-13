@@ -14,6 +14,7 @@ use Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\user\UserInterface;
@@ -311,7 +312,7 @@ function system_theme_suggestions_field(array $variables) {
  */
 function system_stream_wrappers_alter(&$wrappers) {
   // Only register the private file stream wrapper if a file path has been set.
-  if (!\Drupal::config('system.file')->get('path.private')) {
+  if (!Settings::get('file_private_path')) {
     unset($wrappers['private']);
   }
 }

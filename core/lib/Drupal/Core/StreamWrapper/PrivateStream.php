@@ -41,20 +41,29 @@ class PrivateStream extends LocalStream {
   }
 
   /**
-   * Implements Drupal\Core\StreamWrapper\LocalStream::getDirectoryPath()
+   * {@inheritdoc}
    */
   public function getDirectoryPath() {
-    return \Drupal::config('system.file')->get('path.private');
+    return static::basePath();
   }
 
   /**
-   * Implements Drupal\Core\StreamWrapper\StreamWrapperInterface::getExternalUrl().
-   *
-   * @return string
-   *   Returns the HTML URI of a private file.
+   * {@inheritdoc}
    */
-  function getExternalUrl() {
+  public function getExternalUrl() {
     $path = str_replace('\\', '/', $this->getTarget());
     return $this->url('system.private_file_download', ['filepath' => $path], ['absolute' => TRUE]);
   }
+
+  /**
+   * Returns the base path for private://.
+   *
+   * @return string
+   *   The base path for private://, defaults to ''.
+   */
+  public static function basePath() {
+    $base_path = settings()->get('file_private_path', '');
+    return $base_path;
+  }
+
 }
