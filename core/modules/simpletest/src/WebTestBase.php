@@ -794,7 +794,7 @@ abstract class WebTestBase extends TestBase {
       'value' => $this->public_files_directory,
       'required' => TRUE,
     );
-    $settings['settings']['file_public_path'] = (object) array(
+    $settings['settings']['file_private_path'] = (object) array(
       'value' => $this->private_files_directory,
       'required' => TRUE,
     );
