@@ -8,6 +8,7 @@
 namespace Drupal\Core\StreamWrapper;
 
 use Drupal\Core\Routing\UrlGeneratorTrait;
+use Drupal\Core\Site\Settings;
 
 /**
  * Drupal private (private://) stream wrapper class.
@@ -59,11 +60,10 @@ class PrivateStream extends LocalStream {
    * Returns the base path for private://.
    *
    * @return string
-   *   The base path for private://, defaults to ''.
+   *   The base path for private://.
    */
   public static function basePath() {
-    $base_path = settings()->get('file_private_path', '');
-    return $base_path;
+    return Settings::get('file_private_path');
   }
 
 }
