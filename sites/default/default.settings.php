@@ -434,8 +434,8 @@ if ($settings['hash_salt']) {
  * Private file path:
  *
  * A local file system path where private files will be stored. This directory
- * must be absolute and outside of the the Drupal installation directory and
- * not accessible over the web.
+ * must be absolute, outside of the the Drupal installation directory and not
+ * accessible over the web.
  *
  * See http://drupal.org/documentation/modules/file for more information about
  * securing private files.

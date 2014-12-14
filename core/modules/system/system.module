@@ -14,7 +14,6 @@ use Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
-use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\user\UserInterface;
