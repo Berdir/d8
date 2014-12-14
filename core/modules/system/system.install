@@ -285,7 +285,7 @@ function system_requirements($phase) {
       'title' => t('Public files directory'),
       'directory' => drupal_realpath('public://'),
     );
-    if (\Drupal::config('system.file')->get('path.private')) {
+    if (PrivateStream::basePath()) {
       $htaccess_files['private://.htaccess'] = array(
         'title' => t('Private files directory'),
         'directory' => drupal_realpath('private://'),
