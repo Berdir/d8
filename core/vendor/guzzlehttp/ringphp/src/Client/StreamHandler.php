@@ -131,13 +131,13 @@ class StreamHandler
             $e = new ConnectException($e->getMessage(), 0, $e);
         }
 
-        return [
+        return new CompletedFutureArray([
             'status'        => null,
             'body'          => null,
             'headers'       => [],
             'effective_url' => $url,
             'error'         => $e
-        ];
+        ]);
     }
 
     /**
@@ -316,6 +316,10 @@ class StreamHandler
 
     private function add_debug(array $request, &$options, $value, &$params)
     {
+        if ($value === false) {
+            return;
+        }
+
         static $map = [
             STREAM_NOTIFY_CONNECT       => 'CONNECT',
             STREAM_NOTIFY_AUTH_REQUIRED => 'AUTH_REQUIRED',
