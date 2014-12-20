@@ -8,6 +8,7 @@
 namespace Drupal\Component\Discovery;
 
 use Drupal\Component\Serialization\Yaml;
+use Drupal\Component\Cache\ApcuFileCache;
 
 /**
  * Provides discovery for YAML files within a given set of directories.
@@ -48,7 +49,13 @@ class YamlDiscovery implements DiscoverableInterface {
   public function findAll() {
     $all = array();
     foreach ($this->findFiles() as $provider => $file) {
-      $all[$provider] = Yaml::decode(file_get_contents($file));
+      if ($data = ApcuFileCache::get($file)) {
+        $all[$provider] = $data;
+      }
+      else {
+        $all[$provider] = Yaml::decode(file_get_contents($file));
+        ApcuFileCache::set($file, $all[$provider]);
+      }
     }
 
     return $all;

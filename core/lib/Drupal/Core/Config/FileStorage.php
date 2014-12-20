@@ -10,6 +10,7 @@ namespace Drupal\Core\Config;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Utility\String;
+use Drupal\Component\Cache\ApcuFileCache;
 
 /**
  * Defines the file storage.
@@ -93,12 +94,18 @@ class FileStorage implements StorageInterface {
    * @throws \Drupal\Core\Config\UnsupportedDataTypeConfigException
    */
   public function read($name) {
+    $filename = $this->getFilePath($name);
+    if ($data = ApcuFileCache::get($filename)) {
+      return $data;
+    }
+
     if (!$this->exists($name)) {
       return FALSE;
     }
-    $data = file_get_contents($this->getFilePath($name));
+    $data = file_get_contents($filename);
     try {
       $data = $this->decode($data);
+      ApcuFileCache::set($filename, $data);
     }
     catch (InvalidDataTypeException $e) {
       throw new UnsupportedDataTypeConfigException(String::format('Invalid data type in config @name: !message', array(
@@ -127,7 +134,7 @@ class FileStorage implements StorageInterface {
    */
   public function write($name, array $data) {
     try {
-      $data = $this->encode($data);
+      $encoded_data = $this->encode($data);
     }
     catch (InvalidDataTypeException $e) {
       throw new StorageException(String::format('Invalid data type in config @name: !message', array(
@@ -137,11 +144,11 @@ class FileStorage implements StorageInterface {
     }
 
     $target = $this->getFilePath($name);
-    $status = @file_put_contents($target, $data);
+    $status = @file_put_contents($target, $encoded_data);
     if ($status === FALSE) {
       // Try to make sure the directory exists and try writing again.
       $this->ensureStorage();
-      $status = @file_put_contents($target, $data);
+      $status = @file_put_contents($target, $encoded_data);
     }
     if ($status === FALSE) {
       throw new StorageException('Failed to write configuration file: ' . $this->getFilePath($name));
@@ -149,6 +156,9 @@ class FileStorage implements StorageInterface {
     else {
       drupal_chmod($target);
     }
+
+    ApcuFileCache::set($target, $data);
+
     return TRUE;
   }
 
@@ -163,6 +173,7 @@ class FileStorage implements StorageInterface {
       }
       return FALSE;
     }
+    ApcuFileCache::delete($this->getFilePath($name));
     return drupal_unlink($this->getFilePath($name));
   }
 
@@ -174,6 +185,8 @@ class FileStorage implements StorageInterface {
     if ($status === FALSE) {
       throw new StorageException('Failed to rename configuration file from: ' . $this->getFilePath($name) . ' to: ' . $this->getFilePath($new_name));
     }
+    ApcuFileCache::delete($this->getFilePath($name));
+    ApcuFileCache::delete($this->getFilePath($new_name));
     return TRUE;
   }
 
