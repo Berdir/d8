@@ -517,6 +517,7 @@ abstract class Connection implements \Serializable {
    *
    * @throws \PDOException
    * @throws \Drupal\Core\Database\IntegrityConstraintViolationException
+   * @throws \InvalidArgumentException
    */
   public function query($query, array $args = array(), $options = array()) {
 
@@ -581,12 +582,12 @@ abstract class Connection implements \Serializable {
    * Drupal supports an alternate syntax for doing arrays of values. We
    * therefore need to expand them out into a full, executable query string.
    *
-   * @param $query
+   * @param string $query
    *   The query string to modify.
-   * @param $args
+   * @param array $args
    *   The arguments for the query.
    *
-   * @return
+   * @return bool
    *   TRUE if the query was modified, FALSE otherwise.
    */
   protected function expandArguments(&$query, &$args) {
@@ -596,23 +597,23 @@ abstract class Connection implements \Serializable {
     // to expand it out into a comma-delimited set of placeholders.
     foreach (array_filter($args, 'is_array') as $key => $data) {
       $new_keys = array();
+      // We require placeholders to have trailing brackets if the developer
+      // intends them to be expanded to an array to make the intent explicit.
+      if (substr($key, -2) != '[]') {
+        throw new \InvalidArgumentException('Placeholders must have a trailing [] if they are to be expanded with an array of values.');
+      }
+      $key_name = substr($key, 0, -2);
       foreach (array_values($data) as $i => $value) {
         // This assumes that there are no other placeholders that use the same
-        // name.  For example, if the array placeholder is defined as :example
+        // name.  For example, if the array placeholder is defined as :example[]
         // and there is already an :example_2 placeholder, this will generate
         // a duplicate key.  We do not account for that as the calling code
         // is already broken if that happens.
-        $new_keys[$key . '_' . $i] = $value;
+        $new_keys[$key_name . '_' . $i] = $value;
       }
 
       // Update the query with the new placeholders.
-      // preg_replace is necessary to ensure the replacement does not affect
-      // placeholders that start with the same exact text. For example, if the
-      // query contains the placeholders :foo and :foobar, and :foo has an
-      // array of values, using str_replace would affect both placeholders,
-      // but using the following preg_replace would only affect :foo because
-      // it is followed by a non-word character.
-      $query = preg_replace('#' . $key . '\b#', implode(', ', array_keys($new_keys)), $query);
+      $query = str_replace($key, implode(', ', array_keys($new_keys)), $query);
 
       // Update the args array with the new placeholders.
       unset($args[$key]);

@@ -76,7 +76,7 @@ class DatabaseBackend implements CacheBackendInterface {
     // ::select() is a much smaller proportion of the request.
     $result = array();
     try {
-      $result = $this->connection->query('SELECT cid, data, created, expire, serialized, tags, checksum_invalidations, checksum_deletions FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE cid IN (:cids)', array(':cids' => array_keys($cid_mapping)));
+      $result = $this->connection->query('SELECT cid, data, created, expire, serialized, tags, checksum_invalidations, checksum_deletions FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE cid IN (:cids[])', array(':cids[]' => array_keys($cid_mapping)));
     }
     catch (\Exception $e) {
       // Nothing to do.
@@ -461,7 +461,7 @@ class DatabaseBackend implements CacheBackendInterface {
 
     $query_tags = array_diff($tags, array_keys($tag_cache));
     if ($query_tags) {
-      $db_tags = $this->connection->query('SELECT tag, invalidations, deletions FROM {cachetags} WHERE tag IN (:tags)', array(':tags' => $query_tags))->fetchAllAssoc('tag', \PDO::FETCH_ASSOC);
+      $db_tags = $this->connection->query('SELECT tag, invalidations, deletions FROM {cachetags} WHERE tag IN (:tags[])', array(':tags[]' => $query_tags))->fetchAllAssoc('tag', \PDO::FETCH_ASSOC);
       $tag_cache += $db_tags;
 
       // Fill static cache with empty objects for tags not found in the database.

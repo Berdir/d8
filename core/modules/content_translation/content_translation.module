@@ -351,8 +351,8 @@ function content_translation_entity_storage_load(array $entities, $entity_type) 
  *   The type of the entities.
  */
 function content_translation_load_translation_metadata(array $entities, $entity_type) {
-  $query = 'SELECT * FROM {content_translation} te WHERE te.entity_type = :entity_type AND te.entity_id IN (:entity_id)';
-  $result = db_query($query, array(':entity_type' => $entity_type, ':entity_id' => array_keys($entities)));
+  $query = 'SELECT * FROM {content_translation} te WHERE te.entity_type = :entity_type AND te.entity_id IN (:entity_id[])';
+  $result = db_query($query, array(':entity_type' => $entity_type, ':entity_id[]' => array_keys($entities)));
   $exclude = array('entity_type', 'entity_id', 'langcode');
   foreach ($result as $record) {
     $entity = $entities[$record->entity_id];
