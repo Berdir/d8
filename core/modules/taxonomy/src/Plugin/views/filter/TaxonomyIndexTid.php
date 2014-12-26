@@ -364,7 +364,7 @@ class TaxonomyIndexTid extends ManyToOne {
 
     $query = \Drupal::entityQuery('taxonomy_term')
       ->condition('name', $names)
-      ->condition('vid', $this->options['vid'])
+      ->condition('vid', $this->options['vid'], 'IN')
       ->addTag('term_access');
     $terms = Term::loadMultiple($query->execute());
     foreach ($terms as $term) {

@@ -446,7 +446,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    */
   protected function buildPropertyQuery(QueryInterface $entity_query, array $values) {
     foreach ($values as $name => $value) {
-      $entity_query->condition($name, $value);
+      $entity_query->condition($name, $value, is_array($value) ? 'IN' : '=');
     }
   }
 

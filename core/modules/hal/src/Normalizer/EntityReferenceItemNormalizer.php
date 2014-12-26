@@ -118,6 +118,10 @@ class EntityReferenceItemNormalizer extends FieldItemNormalizer implements UuidR
       if (is_array($uuid)) {
         $uuid = reset($uuid);
       }
+      // ...
+      if (is_array($uuid)) {
+        $uuid = reset($uuid);
+      }
       return $uuid;
     }
   }
