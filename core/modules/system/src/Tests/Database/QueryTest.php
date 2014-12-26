@@ -34,7 +34,7 @@ class QueryTest extends DatabaseTestBase {
       '1' => '',
     );
     try {
-      db_query("SELECT * FROM {test} WHERE name = :name", array(':name' => $condition))->fetchObject();
+      db_query("SELECT * FROM {test} WHERE name IN (:names)", array(':names[]' => $condition))->fetchObject();
       $this->fail('SQL injection attempt via array arguments should result in a database exception.');
     }
     catch (DatabaseExceptionWrapper $e) {

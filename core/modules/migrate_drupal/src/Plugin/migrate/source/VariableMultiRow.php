@@ -22,7 +22,7 @@ class VariableMultiRow extends DrupalSqlBase {
   public function query() {
     return $this->select('variable', 'v')
       ->fields('v', array('name', 'value'))
-      ->condition('name', $this->configuration['variables']);
+      ->condition('name', $this->configuration['variables'], is_array($this->configuration['variables']) ? 'IN' : '=');
   }
 
   /**

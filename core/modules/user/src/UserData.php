@@ -107,13 +107,13 @@ class UserData implements UserDataInterface {
   public function delete($module = NULL, $uid = NULL, $name = NULL) {
     $query = $this->connection->delete('users_data');
     if (isset($module)) {
-      $query->condition('module', $module);
+      $query->condition('module', $module, is_array($module) ? 'IN' : '=');
     }
     if (isset($uid)) {
-      $query->condition('uid', $uid);
+      $query->condition('uid', $uid, is_array($uid) ? 'IN' : '=');
     }
     if (isset($name)) {
-      $query->condition('name', $name);
+      $query->condition('name', $name, is_array($name) ? 'IN' : '=');
     }
     $query->execute();
   }

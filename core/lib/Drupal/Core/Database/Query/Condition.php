@@ -206,7 +206,7 @@ class Condition implements ConditionInterface, \Countable {
             // We assume that if there is a delimiter, then the value is an
             // array. If not, it is a scalar. For simplicity, we first convert
             // up to an array so that we can build the placeholders in the same way.
-            elseif (!$operator['delimiter'] && is_scalar($condition['value'])) {
+            elseif (!$operator['delimiter']) {
               $condition['value'] = array($condition['value']);
             }
             if ($operator['use_value']) {

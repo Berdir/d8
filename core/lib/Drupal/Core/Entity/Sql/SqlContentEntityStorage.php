@@ -663,7 +663,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         foreach ($entities as $values) {
           $revision_ids[] = is_object($values) ? $values->getRevisionId() : $values[$this->revisionKey][LanguageInterface::LANGCODE_DEFAULT];
         }
-        $query->condition($this->revisionKey, $revision_ids);
+        $query->condition($this->revisionKey, $revision_ids, 'IN');
       }
 
       $data = $query->execute();
