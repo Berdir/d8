@@ -43,9 +43,7 @@ abstract class TextItemBase extends FieldItemBase {
    * {@inheritdoc}
    */
   public function applyDefaultValue($notify = TRUE) {
-    // Default to a simple \Drupal\Component\Utility\String::checkPlain().
-    // @todo: Add in the filter default format here.
-    $this->setValue(array('format' => NULL), $notify);
+    $this->setValue(array('format' => filter_default_format()), $notify);
     return $this;
   }
 
