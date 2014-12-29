@@ -411,15 +411,23 @@ class FieldSqlStorageTest extends EntityUnitTestBase {
     $entity->enforceIsNew();
     $entity->save();
 
-    // Add an index.
-    $field_storage->indexes = array('value' => array(array('value', 255)));
+    // Add an index. Since $indexes is protected, we have to use reflection.
+    $ref_field_storage_indexes = new \ReflectionProperty($field_storage, 'indexes');
+    $ref_field_storage_indexes->setAccessible(TRUE);
+    $ref_field_storage_indexes->setValue(
+      $field_storage,
+      array('value' => array(array('value', 255)))
+    );
     $field_storage->save();
     foreach ($tables as $table) {
       $this->assertTrue(Database::getConnection()->schema()->indexExists($table, "{$field_name}_value"), t("Index on value created in @table", array('@table' => $table)));
     }
 
     // Add a different index, removing the existing custom one.
-    $field_storage->indexes = array('value_format' => array(array('value', 127), array('format', 127)));
+    $ref_field_storage_indexes->setValue(
+      $field_storage,
+      array('value_format' => array(array('value', 127), array('format', 127)))
+    );
     $field_storage->save();
     foreach ($tables as $table) {
       $this->assertTrue(Database::getConnection()->schema()->indexExists($table, "{$field_name}_value_format"), t("Index on value_format created in @table", array('@table' => $table)));

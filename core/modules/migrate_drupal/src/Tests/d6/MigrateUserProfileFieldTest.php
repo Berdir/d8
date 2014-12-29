@@ -41,7 +41,7 @@ class MigrateUserProfileFieldTest extends MigrateDrupalTestBase {
     // Migrated a text field.
     $field_storage = entity_load('field_storage_config', 'user.profile_color');
     $this->assertEqual($field_storage->type, 'text', 'Field type is text.');
-    $this->assertEqual($field_storage->cardinality, 1, 'Text field has correct cardinality');
+    $this->assertEqual($field_storage->getCardinality(), 1, 'Text field has correct cardinality');
 
     // Migrated a textarea.
     $field_storage = entity_load('field_storage_config', 'user.profile_biography');
@@ -69,7 +69,7 @@ class MigrateUserProfileFieldTest extends MigrateDrupalTestBase {
     // Migrated list field.
     $field_storage = entity_load('field_storage_config', 'user.profile_bands');
     $this->assertEqual($field_storage->type, 'text', 'Field type is text.');
-    $this->assertEqual($field_storage->cardinality, -1, 'List field has correct cardinality');
+    $this->assertEqual($field_storage->getCardinality(), -1, 'List field has correct cardinality');
 
 /*
     // Migrated URL field.

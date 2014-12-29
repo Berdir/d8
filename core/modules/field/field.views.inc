@@ -23,7 +23,7 @@ function field_views_data() {
 
   foreach (\Drupal::entityManager()->getStorage('field_storage_config')->loadMultiple() as $field_storage) {
     if (_field_views_get_entity_type_storage($field_storage)) {
-      $result = (array) $module_handler->invoke($field_storage->module, 'field_views_data', array($field_storage));
+      $result = (array) $module_handler->invoke($field_storage->getModule(), 'field_views_data', array($field_storage));
       if (empty($result)) {
         $result = field_views_field_default_views_data($field_storage);
       }
@@ -49,7 +49,7 @@ function field_views_data() {
 function field_views_data_alter(&$data) {
   foreach (\Drupal::entityManager()->getStorage('field_storage_config')->loadMultiple() as $field_storage) {
     if (_field_views_get_entity_type_storage($field_storage)) {
-      $function = $field_storage->module . '_field_views_data_views_data_alter';
+      $function = $field_storage->getModule() . '_field_views_data_views_data_alter';
       if (function_exists($function)) {
         $function($data, $field_storage);
       }

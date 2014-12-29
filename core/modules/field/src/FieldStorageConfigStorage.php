@@ -135,13 +135,24 @@ class FieldStorageConfigStorage extends ConfigEntityStorage {
       foreach ($conditions as $key => $value) {
         // Extract the actual value against which the condition is checked.
         switch ($key) {
-          case 'uuid';
+          case 'uuid':
             $checked_value = $field->uuid();
+            break;
+
+          case 'deleted':
+            $checked_value = $field->isDeleted();
+            break;
+
+          case 'module':
+            $checked_value = $field->getModule();
+            break;
+
+          case 'type':
+            $checked_value = $field->getType();
             break;
 
           default:
             $checked_value = $field->$key;
-            break;
         }
 
         // Skip to the next field as soon as one condition does not match.

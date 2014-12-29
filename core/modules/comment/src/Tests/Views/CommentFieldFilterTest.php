@@ -47,7 +47,7 @@ class CommentFieldFilterTest extends CommentTestBase {
     // Make the comment body field translatable. The title is already
     // translatable by definition.
     $field_storage = FieldStorageConfig::loadByName('comment', 'comment_body');
-    $field_storage->translatable = TRUE;
+    $field_storage->setTranslatable(TRUE);
     $field_storage->save();
 
     // Set up comment titles.
