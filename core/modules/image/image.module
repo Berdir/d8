@@ -7,6 +7,7 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\file\Entity\File;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field\FieldConfigInterface;
@@ -321,42 +322,45 @@ function image_filter_keyword($value, $current_pixels, $new_pixels) {
  * Transforms default image of image field from array into single value at save.
  */
 function image_entity_presave(EntityInterface $entity) {
-  $field_storage = FALSE;
-  $entity_type_id = $entity->getEntityTypeId();
-  if ($entity_type_id == 'field_config') {
-    $field_storage = $entity->getFieldStorageDefinition();
-    $default_settings = \Drupal::service('plugin.manager.field.field_type')->getDefaultFieldSettings('image');
+
+  // Get the default image settings, return if not saving an image field storage
+  // or image field entity.
+  if (($entity instanceof FieldStorageConfigInterface || $entity instanceof FieldConfigInterface) && $entity->getType() == 'image') {
+    $default_image = $entity->getSetting('default_image');
   }
-  elseif ($entity_type_id == 'field_storage_config') {
-    $field_storage = $entity;
-    $default_settings = \Drupal::service('plugin.manager.field.field_type')->getDefaultStorageSettings('image');
-  }
-  // Exit, if not saving an image field storage or image field entity.
-  if (!$field_storage || $field_storage->type != 'image') {
+  else {
     return;
   }
 
-  if ($field_storage->isSyncing()) {
+  if ($entity->isSyncing()) {
     return;
   }
 
-  $fid = $entity->settings['default_image']['fid'];
+  $fid = $default_image['fid'];
   if ($fid) {
     $original_fid = isset($entity->original) ? $entity->original->settings['default_image']['fid'] : NULL;
     if ($fid != $original_fid) {
       $file = file_load($fid);
       if ($file) {
         $image = \Drupal::service('image.factory')->get($file->getFileUri());
-        $entity->settings['default_image']['width'] = $image->getWidth();
-        $entity->settings['default_image']['height'] = $image->getHeight();
+        $default_image['width'] = $image->getWidth();
+        $default_image['height'] = $image->getHeight();
       }
       else {
-        $entity->settings['default_image']['fid'] = NULL;
+        $default_image['fid'] = NULL;
       }
     }
   }
 
-  $entity->settings['default_image'] += $default_settings['default_image'];
+  // @todo Simplify this in https://www.drupal.org/node/2030637, when both
+  //   interfaces have a setSetting() method.
+  if ($entity instanceof FieldStorageConfigInterface) {
+    $entity->setSetting('default_image', $default_image);
+  }
+  elseif ($entity instanceof FieldConfig) {
+    $entity->settings['default_image'] = $default_image;
+  }
+
 }
 
 /**
