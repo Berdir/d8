@@ -7,7 +7,7 @@
 
 namespace Drupal\block_content\Form;
 
-use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides a confirmation form for deleting a custom block type entity.
  */
-class BlockContentTypeDeleteForm extends EntityConfirmFormBase {
+class BlockContentTypeDeleteForm extends EntityDeleteForm {
 
   /**
    * The query factory to create entity queries.
@@ -47,22 +47,8 @@ class BlockContentTypeDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getQuestion() {
-    return $this->t('Are you sure you want to delete %label?', array('%label' => $this->entity->label()));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getCancelUrl() {
     return new Url('block_content.type_list');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfirmText() {
-    return $this->t('Delete');
   }
 
   /**
@@ -84,10 +70,8 @@ class BlockContentTypeDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->entity->delete();
-    drupal_set_message(t('Custom block type %label has been deleted.', array('%label' => $this->entity->label())));
+    parent::submitForm($form, $form_state);
     $this->logger('block_content')->notice('Custom block type %label has been deleted.', array('%label' => $this->entity->label()));
-    $form_state->setRedirectUrl($this->getCancelUrl());
   }
 
 }

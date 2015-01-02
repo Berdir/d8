@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\contact\ContactFormEditForm.
+ * Contains \Drupal\contact\Form\ContactFormEditFormBase.
  */
 
-namespace Drupal\contact;
+namespace Drupal\contact\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -14,7 +14,7 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Base form for contact form edit forms.
  */
-class ContactFormEditForm extends EntityForm {
+class ContactFormEditFormBase extends EntityForm {
 
   /**
    * {@inheritdoc}
@@ -92,8 +92,9 @@ class ContactFormEditForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    $status = parent::save($form, $form_state);
+
     $contact_form = $this->entity;
-    $status = $contact_form->save();
     $contact_settings = $this->config('contact.settings');
 
     $edit_link = $this->entity->link($this->t('Edit'));

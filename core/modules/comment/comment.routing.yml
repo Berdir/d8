@@ -20,7 +20,7 @@ entity.comment.edit_form:
   path: '/comment/{comment}/edit'
   defaults:
     _title: 'Edit'
-    _entity_form: 'comment.default'
+    _entity_form: 'comment.edit'
   requirements:
     _entity_access: 'comment.update'
 

@@ -31,7 +31,7 @@ class MenuController extends ControllerBase {
       'menu_name' => $menu->id(),
       'bundle' => 'menu_link_content',
     ));
-    return $this->entityFormBuilder()->getForm($menu_link);
+    return $this->entityFormBuilder()->getForm($menu_link, 'add');
   }
 
 }

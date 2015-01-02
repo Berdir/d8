@@ -193,7 +193,7 @@ class CommentDefaultFormatter extends FormatterBase implements ContainerFactoryP
               'comment_type' => $this->getFieldSetting('comment_type'),
               'pid' => NULL,
             ));
-            $output['comment_form'] = $this->entityFormBuilder->getForm($comment);
+            $output['comment_form'] = $this->entityFormBuilder->getForm($comment, 'add');
           }
           // All other users need a user-specific form, which would break the
           // render cache: hence use a #post_render_cache callback.

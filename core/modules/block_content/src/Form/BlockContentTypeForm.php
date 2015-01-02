@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\block_content\BlockContentTypeForm.
+ * Contains \Drupal\block_content\Form\BlockContentTypeForm.
  */
 
-namespace Drupal\block_content;
+namespace Drupal\block_content\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -15,9 +15,9 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ContentLanguageSettings;
 
 /**
- * Base form for category edit forms.
+ * Provides a common base form for block content type forms.
  */
-class BlockContentTypeForm extends EntityForm {
+abstract class BlockContentTypeForm extends EntityForm {
 
   /**
    * {@inheritdoc}
@@ -92,8 +92,8 @@ class BlockContentTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    $status = parent::save($form, $form_state);
     $block_type = $this->entity;
-    $status = $block_type->save();
 
     $edit_link = $this->entity->link($this->t('Edit'));
     $logger = $this->logger('block_content');

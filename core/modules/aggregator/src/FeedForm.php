@@ -54,7 +54,11 @@ class FeedForm extends ContentEntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $feed = $this->entity;
     $insert = (bool) $feed->id();
-    $feed->save();
+
+    parent::save($form, $form_state);
+
+    // @todo Split this into dedicated add and edit forms in
+    //   https://www.drupal.org/node/2324853
     if ($insert) {
       drupal_set_message($this->t('The feed %feed has been updated.', array('%feed' => $feed->label())));
       $form_state->setRedirectUrl($feed->urlInfo('canonical'));

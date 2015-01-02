@@ -333,7 +333,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
     $values_2[1]['value'] = 0;
 
     // Pretend the form has been built.
-    $form_state->setFormObject(\Drupal::entityManager()->getFormObject($entity_type, 'default'));
+    $form_state->setFormObject(\Drupal::entityManager()->getFormObject($entity_type, 'add'));
     \Drupal::formBuilder()->prepareForm('field_test_entity_form', $form, $form_state);
     \Drupal::formBuilder()->processForm('field_test_entity_form', $form, $form_state);
     $form_state->setValue($this->fieldTestData->field_name, $values);
@@ -352,13 +352,13 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
         $expected_values[] = array('value' => $values[$key]['value']);
       }
     }
-    $this->assertIdentical($entity->{$this->fieldTestData->field_name}->getValue(), $expected_values, 'Submit filters empty values');
+    $this->assertIdentical($entity->{$this->fieldTestData->field_name}->getValue(), $expected_values);
     foreach ($weights_2 as $key => $value) {
       if ($key != 1) {
         $expected_values_2[] = array('value' => $values_2[$key]['value']);
       }
     }
-    $this->assertIdentical($entity->{$this->fieldTestData->field_name_2}->getValue(), $expected_values_2, 'Submit filters empty values');
+    $this->assertIdentical($entity->{$this->fieldTestData->field_name_2}->getValue(), $expected_values_2);
 
     // Call EntityFormDisplayInterface::extractFormValues() for a single field (the second field).
     foreach ($display->getComponents() as $name => $options) {
@@ -375,7 +375,7 @@ class FieldAttachOtherTest extends FieldUnitTestBase {
       }
     }
     $this->assertTrue($entity->{$this->fieldTestData->field_name}->isEmpty(), 'The first field is empty in the entity object');
-    $this->assertIdentical($entity->{$this->fieldTestData->field_name_2}->getValue(), $expected_values_2, 'Submit filters empty values');
+    $this->assertIdentical($entity->{$this->fieldTestData->field_name_2}->getValue(), $expected_values_2);
   }
 
 }

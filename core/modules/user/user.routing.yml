@@ -154,7 +154,7 @@ user.login:
 entity.user.edit_form:
   path: '/user/{user}/edit'
   defaults:
-    _entity_form: 'user.default'
+    _entity_form: 'user.profile'
     _title_callback: 'Drupal\user\Controller\UserController::userTitle'
   options:
     _admin_route: TRUE

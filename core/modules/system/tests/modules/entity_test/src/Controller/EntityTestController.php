@@ -57,7 +57,7 @@ class EntityTestController extends ControllerBase {
    */
   public function testAdd($entity_type_id) {
     $entity = entity_create($entity_type_id, array());
-    $form = $this->entityFormBuilder()->getForm($entity);
+    $form = $this->entityFormBuilder()->getForm($entity, 'add');
     $form['#title'] = $this->t('Create an @type', array('@type' => $entity_type_id));
     return $form;
   }
@@ -77,7 +77,7 @@ class EntityTestController extends ControllerBase {
    */
   public function testEdit(Request $request, $entity_type_id) {
     $entity = $request->attributes->get($entity_type_id);
-    $form = $this->entityFormBuilder()->getForm($entity);
+    $form = $this->entityFormBuilder()->getForm($entity, 'edit');
     $form['#title'] = $entity->label();
     return $form;
   }

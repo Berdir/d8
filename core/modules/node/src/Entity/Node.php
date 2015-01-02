@@ -30,9 +30,9 @@ use Drupal\user\UserInterface;
  *     "access" = "Drupal\node\NodeAccessControlHandler",
  *     "views_data" = "Drupal\node\NodeViewsData",
  *     "form" = {
- *       "default" = "Drupal\node\NodeForm",
+ *       "add" = "Drupal\node\Form\NodeAddForm",
+ *       "edit" = "Drupal\node\Form\NodeEditForm",
  *       "delete" = "Drupal\node\Form\NodeDeleteForm",
- *       "edit" = "Drupal\node\NodeForm"
  *     },
  *     "list_builder" = "Drupal\node\NodeListBuilder",
  *     "translation" = "Drupal\node\NodeTranslationHandler"

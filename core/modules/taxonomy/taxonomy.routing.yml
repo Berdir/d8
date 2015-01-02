@@ -17,7 +17,7 @@ entity.taxonomy_term.add_form:
 entity.taxonomy_term.edit_form:
   path: '/taxonomy/term/{taxonomy_term}/edit'
   defaults:
-    _entity_form: 'taxonomy_term.default'
+    _entity_form: 'taxonomy_term.edit'
     _title: 'Edit term'
   options:
     _admin_route: TRUE
@@ -37,7 +37,7 @@ entity.taxonomy_term.delete_form:
 entity.taxonomy_vocabulary.add_form:
   path: '/admin/structure/taxonomy/add'
   defaults:
-    _entity_form: 'taxonomy_vocabulary'
+    _entity_form: 'taxonomy_vocabulary.add'
     _title: 'Add vocabulary'
   requirements:
     _entity_create_access: 'taxonomy_vocabulary'
@@ -45,7 +45,7 @@ entity.taxonomy_vocabulary.add_form:
 entity.taxonomy_vocabulary.edit_form:
   path: '/admin/structure/taxonomy/manage/{taxonomy_vocabulary}'
   defaults:
-    _entity_form: 'taxonomy_vocabulary.default'
+    _entity_form: 'taxonomy_vocabulary.edit'
     _title_callback: '\Drupal\taxonomy\Controller\TaxonomyController::vocabularyTitle'
   requirements:
     _entity_access: 'taxonomy_vocabulary.update'

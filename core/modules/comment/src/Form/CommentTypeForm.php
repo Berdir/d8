@@ -2,12 +2,11 @@
 
 /**
  * @file
- * Contains \Drupal\comment\CommentTypeForm.
+ * Contains \Drupal\comment\Form\CommentTypeForm.
  */
 
-namespace Drupal\comment;
+namespace Drupal\comment\Form;
 
-use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -17,9 +16,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Base form controller for category edit forms.
+ * Provides a common base form for comment type forms.
  */
-class CommentTypeForm extends EntityForm {
+abstract class CommentTypeForm extends EntityForm {
 
   /**
    * Entity manager service.
@@ -159,8 +158,8 @@ class CommentTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    $status = parent::save($form, $form_state);
     $comment_type = $this->entity;
-    $status = $comment_type->save();
 
     $edit_link = $this->entity->link($this->t('Edit'));
     if ($status == SAVED_UPDATED) {

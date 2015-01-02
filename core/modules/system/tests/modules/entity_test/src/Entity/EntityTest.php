@@ -25,8 +25,9 @@ use Drupal\user\UserInterface;
  *     "view_builder" = "Drupal\entity_test\EntityTestViewBuilder",
  *     "access" = "Drupal\entity_test\EntityTestAccessControlHandler",
  *     "form" = {
- *       "default" = "Drupal\entity_test\EntityTestForm",
- *       "delete" = "Drupal\entity_test\EntityTestDeleteForm"
+ *       "add" = "Drupal\entity_test\Form\EntityTestAddForm",
+ *       "edit" = "Drupal\entity_test\Form\EntityTestEditForm",
+ *       "delete" = "Drupal\Core\Entity\ContentEntityDeleteForm"
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler",
  *     "views_data" = "Drupal\views\EntityViewsData"

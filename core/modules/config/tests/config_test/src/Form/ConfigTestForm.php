@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Contains Drupal\config_test\ConfigTestForm.
+ * Contains Drupal\config_test\Form\ConfigTestFormBase.
  */
 
-namespace Drupal\config_test;
+namespace Drupal\config_test\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Form controller for the test config edit forms.
+ * Provides a common base form for the "Test configuration" entity.
  */
-class ConfigTestForm extends EntityForm {
+abstract class ConfigTestFormBase extends EntityForm {
 
   /**
    * {@inheritdoc}
@@ -71,15 +71,7 @@ class ConfigTestForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $entity = $this->entity;
-    $status = $entity->save();
-
-    if ($status === SAVED_UPDATED) {
-      drupal_set_message(format_string('%label configuration has been updated.', array('%label' => $entity->label())));
-    }
-    else {
-      drupal_set_message(format_string('%label configuration has been created.', array('%label' => $entity->label())));
-    }
+    parent::save($form, $form_state);
 
     $form_state->setRedirect('config_test.list_page');
   }

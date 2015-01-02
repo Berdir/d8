@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\node\NodeTypeForm.
+ * Contains \Drupal\node\Form\NodeTypeFormBase.
  */
 
-namespace Drupal\node;
+namespace Drupal\node\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
@@ -17,9 +17,9 @@ use Drupal\language\Entity\ContentLanguageSettings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Form controller for node type forms.
+ * Provides a common base form for node type forms.
  */
-class NodeTypeForm extends EntityForm {
+abstract class NodeTypeFormBase extends EntityForm {
 
   /**
    * The entity manager.
@@ -217,26 +217,21 @@ class NodeTypeForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, FormStateInterface $form_state) {
+  public function submit(array $form, FormStateInterface $form_state) {
+    parent::submit($form, $form_state);
+
     $type = $this->entity;
     $type->setNewRevision($form_state->getValue(array('options', 'revision')));
     $type->type = trim($type->id());
     $type->name = trim($type->name);
+  }
+  /**
+   * {@inheritdoc}
+   */
+  public function save(array $form, FormStateInterface $form_state) {
+    parent::save($form, $form_state);
 
-    $status = $type->save();
-
-    $t_args = array('%name' => $type->label());
-
-    if ($status == SAVED_UPDATED) {
-      drupal_set_message(t('The content type %name has been updated.', $t_args));
-    }
-    elseif ($status == SAVED_NEW) {
-      node_add_body_field($type);
-      drupal_set_message(t('The content type %name has been added.', $t_args));
-      $context = array_merge($t_args, array('link' => $this->l(t('View'), new Url('node.overview_types'))));
-      $this->logger('node')->notice('Added content type %name.', $context);
-    }
-
+    $type = $this->entity;
     $fields = $this->entityManager->getFieldDefinitions('node', $type->id());
     // Update title field definition.
     $title_field = $fields['title'];

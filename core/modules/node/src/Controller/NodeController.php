@@ -110,7 +110,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
       'type' => $node_type->type,
     ));
 
-    $form = $this->entityFormBuilder()->getForm($node);
+    $form = $this->entityFormBuilder()->getForm($node, 'add');
 
     return $form;
   }

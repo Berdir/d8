@@ -183,7 +183,7 @@ abstract class DateFormatFormBase extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $status = $this->entity->save();
+    $status = parent::save($form, $form_state);
     if ($status == SAVED_UPDATED) {
       drupal_set_message(t('Custom date format updated.'));
     }

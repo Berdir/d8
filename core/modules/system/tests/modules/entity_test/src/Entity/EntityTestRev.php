@@ -20,7 +20,8 @@ use Drupal\entity_test\Entity\EntityTest;
  *   handlers = {
  *     "access" = "Drupal\entity_test\EntityTestAccessControlHandler",
  *     "form" = {
- *       "default" = "Drupal\entity_test\EntityTestForm",
+ *       "add" = "Drupal\entity_test\Form\EntityTestAddForm",
+ *       "edit" = "Drupal\entity_test\Form\EntityTestEditForm",
  *       "delete" = "Drupal\entity_test\EntityTestDeleteForm"
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler",

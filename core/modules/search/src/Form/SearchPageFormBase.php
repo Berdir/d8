@@ -177,7 +177,7 @@ abstract class SearchPageFormBase extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $this->entity->save();
+    parent::save($form, $form_state);
 
     $form_state->setRedirect('search.settings');
   }

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\menu_ui\MenuForm.
+ * Contains \Drupal\menu_ui\Form\MenuFormBase.
  */
 
-namespace Drupal\menu_ui;
+namespace Drupal\menu_ui\Form;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityForm;
@@ -23,9 +23,9 @@ use Drupal\Core\Utility\LinkGeneratorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Base form for menu edit forms.
+ * Provides a base form for menu forms.
  */
-class MenuForm extends EntityForm {
+abstract class MenuFormBase extends EntityForm {
 
   /**
    * The factory for entity queries.
@@ -63,7 +63,7 @@ class MenuForm extends EntityForm {
   protected $overviewTreeForm = array('#tree' => TRUE);
 
   /**
-   * Constructs a MenuForm object.
+   * Constructs a MenuFormBase object.
    *
    * @param \Drupal\Core\Entity\Query\QueryFactory $entity_query_factory
    *   The factory for entity queries.

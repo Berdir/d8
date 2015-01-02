@@ -8,7 +8,7 @@
 namespace Drupal\menu_ui\Form;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Defines a confirmation form for deletion of a custom menu.
  */
-class MenuDeleteForm extends EntityConfirmFormBase {
+class MenuDeleteForm extends EntityDeleteForm {
 
   /**
    * The menu link manager.
@@ -80,13 +80,6 @@ class MenuDeleteForm extends EntityConfirmFormBase {
     }
     $caption .= '<p>' . t('This action cannot be undone.') . '</p>';
     return $caption;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfirmText() {
-    return t('Delete');
   }
 
   /**

@@ -122,8 +122,9 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    parent::save($form, $form_state);
+
     drupal_set_message(t('Saved the %label @entity-type.', array('%label' => $this->entity->label(), '@entity-type' => $this->entityType->getLowercaseLabel())));
-    $this->entity->save();
     \Drupal::entityManager()->clearCachedFieldDefinitions();
     $form_state->setRedirect('field_ui.' . $this->entity->getEntityTypeId() . '_list');
   }

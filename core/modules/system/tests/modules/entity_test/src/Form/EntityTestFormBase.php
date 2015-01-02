@@ -1,10 +1,10 @@
 <?php
 /**
  * @file
- * Definition of Drupal\entity_test\EntityTestForm.
+ * Definition of Drupal\entity_test\Form\EntityTestFormBase.
  */
 
-namespace Drupal\entity_test;
+namespace Drupal\entity_test\Form;
 
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Entity\ContentEntityForm;
@@ -12,9 +12,9 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 
 /**
- * Form controller for the test entity edit forms.
+ * Provides a common base form for the "Test entity" entity.
  */
-class EntityTestForm extends ContentEntityForm {
+abstract class EntityTestFormBase extends ContentEntityForm {
 
   /**
    * {@inheritdoc}
@@ -51,23 +51,13 @@ class EntityTestForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $entity = $this->entity;
-
     // Save as a new revision if requested to do so.
     if (!$form_state->isValueEmpty('revision')) {
-      $entity->setNewRevision();
+      $this->entity->setNewRevision();
     }
 
-    $is_new = $entity->isNew();
-    $entity->save();
-
-    if ($is_new) {
-     $message = t('%entity_type @id has been created.', array('@id' => $entity->id(), '%entity_type' => $entity->getEntityTypeId()));
-    }
-    else {
-      $message = t('%entity_type @id has been updated.', array('@id' => $entity->id(), '%entity_type' => $entity->getEntityTypeId()));
-    }
-    drupal_set_message($message);
+    parent::save($form, $form_state);
+    $entity = $this->entity;
 
     if ($entity->id()) {
       $entity_type = $entity->getEntityTypeId();

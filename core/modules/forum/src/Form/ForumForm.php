@@ -9,12 +9,12 @@ namespace Drupal\forum\Form;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Drupal\taxonomy\TermForm;
+use Drupal\taxonomy\Form\TermFormBase;
 
 /**
  * Base form for forum term edit forms.
  */
-class ForumForm extends TermForm {
+class ForumForm extends TermFormBase {
 
   /**
    * Reusable type field to use in status messages.

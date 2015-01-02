@@ -2,17 +2,17 @@
 
 /**
  * @file
- * Contains \Drupal\user\RoleForm.
+ * Contains \Drupal\user\Form\RoleForm.
  */
 
-namespace Drupal\user;
+namespace Drupal\user\Form;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Form controller for the role entity edit forms.
+ * Provides a common base form for role forms.
  */
 class RoleForm extends EntityForm {
 

@@ -146,7 +146,7 @@ abstract class ActionFormBase extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $this->entity->save();
+    parent::save($form, $form_state);
     drupal_set_message($this->t('The action has been successfully saved.'));
 
     $form_state->setRedirect('action.admin');

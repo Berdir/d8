@@ -322,7 +322,7 @@ class ViewEditForm extends ViewFormBase {
       $form_state->setRedirectUrl(Url::fromUri("base://$destination"));
     }
 
-    $view->save();
+    parent::save($form, $form_state);
 
     drupal_set_message($this->t('The view %name has been saved.', array('%name' => $view->label())));
 

@@ -7,7 +7,7 @@
 
 namespace Drupal\shortcut\Form;
 
-use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\shortcut\ShortcutSetStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -16,7 +16,7 @@ use Drupal\Core\Database\Connection;
 /**
  * Builds the shortcut set deletion form.
  */
-class ShortcutSetDeleteForm extends EntityConfirmFormBase {
+class ShortcutSetDeleteForm extends EntityDeleteForm {
 
   /**
    * The database connection.
@@ -53,22 +53,8 @@ class ShortcutSetDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getQuestion() {
-    return t('Are you sure you want to delete the shortcut set %title?', array('%title' => $this->entity->label()));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getCancelUrl() {
     return $this->entity->urlInfo('customize-form');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfirmText() {
-    return t('Delete');
   }
 
   /**
@@ -96,15 +82,6 @@ class ShortcutSetDeleteForm extends EntityConfirmFormBase {
     );
 
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->entity->delete();
-    $form_state->setRedirect('shortcut.set_admin');
-    drupal_set_message(t('The shortcut set %title has been deleted.', array('%title' => $this->entity->label())));
   }
 
 }

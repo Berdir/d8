@@ -2,11 +2,12 @@
 
 /**
  * @file
- * Definition of Drupal\comment\CommentForm.
+ * Definition of Drupal\comment\Form\CommentForm.
  */
 
-namespace Drupal\comment;
+namespace Drupal\comment\Form;
 
+use Drupal\comment\CommentInterface;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Unicode;
@@ -19,7 +20,7 @@ use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Base for controller for comment forms.
+ * Provides a base form for comment forms.
  */
 class CommentForm extends ContentEntityForm {
 

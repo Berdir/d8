@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\node\NodeForm.
+ * Definition of Drupal\node\Form\NodeFormBase.
  */
 
-namespace Drupal\node;
+namespace Drupal\node\Form;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\ContentEntityForm;
@@ -16,9 +16,9 @@ use Drupal\user\TempStoreFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Form controller for the node edit forms.
+ * Provides a base form for nodes.
  */
-class NodeForm extends ContentEntityForm {
+abstract class NodeFormBase extends ContentEntityForm {
 
   /**
    * The tempstore factory.
@@ -404,6 +404,8 @@ class NodeForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    parent::save($form, $form_state);
+
     $node = $this->entity;
     $insert = $node->isNew();
     $node->save();

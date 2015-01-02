@@ -99,14 +99,12 @@ class RegisterForm extends AccountForm {
   public function save(array $form, FormStateInterface $form_state) {
     $account = $this->entity;
     $pass = $account->getPassword();
+
+    parent::save($form, $form_state);
+
     $admin = $form_state->getValue('administer_users');
     $notify = !$form_state->isValueEmpty('notify');
 
-    // Save has no return value so this cannot be tested.
-    // Assume save has gone through correctly.
-    $account->save();
-
-    $form_state->set('user', $account);
     $form_state->setValue('uid', $account->id());
 
     $this->logger('user')->notice('New user: %name %email.', array('%name' => $form_state->getValue('name'), '%email' => '<' . $form_state->getValue('mail') . '>', 'type' => $account->link($this->t('Edit'), 'edit-form')));

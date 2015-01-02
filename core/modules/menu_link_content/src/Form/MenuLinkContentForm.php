@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * Provides a form to add/update content menu links.
+ * Provides a base form for content menu link forms.
  *
  * Note: This is not only a content entity form, but also implements the
  * MenuLinkFormInterface, so the same class can be used in places expecting a

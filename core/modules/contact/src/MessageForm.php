@@ -194,7 +194,7 @@ class MessageForm extends ContentEntityForm {
     // Save the message. In core this is a no-op but should contrib wish to
     // implement message storage, this will make the task of swapping in a real
     // storage controller straight-forward.
-    $message->save();
+    parent::save($form, $form_state);
   }
 
   /**

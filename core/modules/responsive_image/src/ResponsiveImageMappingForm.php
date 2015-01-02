@@ -137,6 +137,8 @@ class ResponsiveImageMappingForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+
+
     /** @var \Drupal\responsive_image\ResponsiveImageMappingInterface $responsive_image_mapping */
     $responsive_image_mapping = $this->entity;
     // Remove all the existing mappings and replace with submitted values.
@@ -148,7 +150,7 @@ class ResponsiveImageMappingForm extends EntityForm {
         }
       }
     }
-    $responsive_image_mapping->save();
+    parent::save($form, $form_state);
 
     $this->logger('responsive_image')->notice('Responsive image mapping @label saved.', array('@label' => $responsive_image_mapping->label()));
     drupal_set_message($this->t('Responsive image mapping %label saved.', array('%label' => $responsive_image_mapping->label())));

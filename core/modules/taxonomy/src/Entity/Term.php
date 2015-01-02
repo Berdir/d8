@@ -27,7 +27,8 @@ use Drupal\taxonomy\TermInterface;
  *     "access" = "Drupal\taxonomy\TermAccessControlHandler",
  *     "views_data" = "Drupal\taxonomy\TermViewsData",
  *     "form" = {
- *       "default" = "Drupal\taxonomy\TermForm",
+ *       "add" = "Drupal\taxonomy\Form\TermAddForm",
+ *       "edit" = "Drupal\taxonomy\Form\TermEditForm",
  *       "delete" = "Drupal\taxonomy\Form\TermDeleteForm"
  *     },
  *     "translation" = "Drupal\taxonomy\TermTranslationHandler"

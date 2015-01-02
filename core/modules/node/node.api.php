@@ -411,7 +411,7 @@ function hook_node_update_index(\Drupal\node\NodeInterface $node, $langcode) {
 /**
  * Perform node validation before a node is created or updated.
  *
- * This hook is invoked from NodeForm::validate(), after a user has
+ * This hook is invoked from NodeFormBase::validate(), after a user has
  * finished editing the node and is previewing or submitting it. It is invoked
  * at the end of all the standard validation steps.
  *

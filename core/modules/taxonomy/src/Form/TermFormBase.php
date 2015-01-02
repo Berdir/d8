@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Definition of Drupal\taxonomy\TermForm.
+ * Contains Drupal\taxonomy\Form\TermFormBase.
  */
 
-namespace Drupal\taxonomy;
+namespace Drupal\taxonomy\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Base for controller for taxonomy term edit forms.
+ * Provides a base form for term forms.
  */
-class TermForm extends ContentEntityForm {
+class TermFormBase extends ContentEntityForm {
 
   /**
    * {@inheritdoc}
@@ -122,21 +122,9 @@ class TermForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    parent::save($form, $form_state);
+
     $term = $this->entity;
-
-    $result = $term->save();
-
-    $link = $term->link($this->t('Edit'), 'edit-form');
-    switch ($result) {
-      case SAVED_NEW:
-        drupal_set_message($this->t('Created new term %term.', array('%term' => $term->getName())));
-        $this->logger('taxonomy')->notice('Created new term %term.', array('%term' => $term->getName(), 'link' => $link));
-        break;
-      case SAVED_UPDATED:
-        drupal_set_message($this->t('Updated term %term.', array('%term' => $term->getName())));
-        $this->logger('taxonomy')->notice('Updated term %term.', array('%term' => $term->getName(), 'link' => $link));
-        break;
-    }
 
     $current_parent_count = count($form_state->getValue('parent'));
     $previous_parent_count = count($form_state->get(['taxonomy', 'parent']));

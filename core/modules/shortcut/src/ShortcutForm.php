@@ -99,9 +99,12 @@ class ShortcutForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $entity = $this->entity;
-    $entity->save();
+    parent::save($form, $form_state);
 
+    $entity = $this->entity;
+
+    // @todo Split this into dedicated add and edit forms in
+    //   https://www.drupal.org/node/2324873
     if ($entity->isNew()) {
       $message = $this->t('The shortcut %link has been updated.', array('%link' => $entity->getTitle()));
     }

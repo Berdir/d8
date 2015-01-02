@@ -66,8 +66,11 @@ class ShortcutSetForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $entity = $this->entity;
     $is_new = !$entity->getOriginalId();
-    $entity->save();
 
+    parent::save($form, $form_state);
+
+    // @todo Split this form into dedicated add and edit forms in
+    //   https://www.drupal.org/node/2324877
     if ($is_new) {
       drupal_set_message(t('The %set_name shortcut set has been created. You can edit it from this page.', array('%set_name' => $entity->label())));
     }

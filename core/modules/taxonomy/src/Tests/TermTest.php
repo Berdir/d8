@@ -358,7 +358,7 @@ class TermTest extends TaxonomyTestBase {
       'description[0][value]' => $this->randomMachineName(100),
     );
     // Explicitly set the parents field to 'root', to ensure that
-    // TermForm::save() handles the invalid term ID correctly.
+    // TermFormBase::save() handles the invalid term ID correctly.
     $edit['parent[]'] = array(0);
 
     // Create the term to edit.

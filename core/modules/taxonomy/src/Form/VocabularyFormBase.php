@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\taxonomy\VocabularyForm.
+ * Contains \Drupal\taxonomy\Form\VocabularyFormBase.
  */
 
-namespace Drupal\taxonomy;
+namespace Drupal\taxonomy\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -16,7 +16,7 @@ use Drupal\language\Entity\ContentLanguageSettings;
 /**
  * Base form for vocabulary edit forms.
  */
-class VocabularyForm extends EntityForm {
+abstract class VocabularyFormBase extends EntityForm {
 
   /**
    * {@inheritdoc}
@@ -110,27 +110,22 @@ class VocabularyForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
     $vocabulary = $this->entity;
 
     // Prevent leading and trailing spaces in vocabulary names.
     $vocabulary->name = trim($vocabulary->name);
+  }
 
-    $status = $vocabulary->save();
-    $edit_link = $this->entity->link($this->t('Edit'));
-    switch ($status) {
-      case SAVED_NEW:
-        drupal_set_message($this->t('Created new vocabulary %name.', array('%name' => $vocabulary->name)));
-        $this->logger('taxonomy')->notice('Created new vocabulary %name.', array('%name' => $vocabulary->name, 'link' => $edit_link));
-        $form_state->setRedirectUrl($vocabulary->urlInfo('overview-form'));
-        break;
+  /**
+   * {@inheritdoc}
+   */
+  public function save(array $form, FormStateInterface $form_state) {
+    parent::save($form, $form_state);
 
-      case SAVED_UPDATED:
-        drupal_set_message($this->t('Updated vocabulary %name.', array('%name' => $vocabulary->name)));
-        $this->logger('taxonomy')->notice('Updated vocabulary %name.', array('%name' => $vocabulary->name, 'link' => $edit_link));
-        $form_state->setRedirect('taxonomy.vocabulary_list');
-        break;
-    }
+    $vocabulary = $this->entity;
 
     $form_state->setValue('vid', $vocabulary->id());
     $form_state->set('vid', $vocabulary->id());

@@ -249,10 +249,16 @@ abstract class FilterFormatFormBase extends EntityForm {
         }
       }
     }
-    $format->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function save(array $form, FormStateInterface $form_state) {
+    parent::save($form, $form_state);
 
     // Save user permissions.
-    if ($permission = $format->getPermissionName()) {
+    if ($permission = $this->entity->getPermissionName()) {
       foreach ($form_state->getValue('roles') as $rid => $enabled) {
         user_role_change_permissions($rid, array($permission => $enabled));
       }

@@ -7,28 +7,20 @@
 
 namespace Drupal\field_ui\Form;
 
-use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**
  * Provides the delete form for entity display modes.
  */
-class EntityDisplayModeDeleteForm extends EntityConfirmFormBase {
+class EntityDisplayModeDeleteForm extends EntityDeleteForm {
 
   /**
    * {@inheritdoc}
    */
   public function getCancelUrl() {
     return new Url('field_ui.' . $this->entity->getEntityTypeId() . '_list');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getQuestion() {
-    $entity_type = $this->entity->getEntityType();
-    return t('Are you sure you want to delete the %label @entity-type?', array('%label' => $this->entity->label(), '@entity-type' => $entity_type->getLowercaseLabel()));
   }
 
   /**
@@ -42,19 +34,9 @@ class EntityDisplayModeDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getConfirmText() {
-    return t('Delete');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $entity_type = $this->entity->getEntityType();
-    drupal_set_message(t('Deleted the %label @entity-type.', array('%label' => $this->entity->label(), '@entity-type' => strtolower($entity_type->getLabel()))));
-    $this->entity->delete();
+    parent::submitForm($form, $form_state);
     \Drupal::entityManager()->clearCachedFieldDefinitions();
-    $form_state->setRedirectUrl($this->getCancelUrl());
   }
 
 }

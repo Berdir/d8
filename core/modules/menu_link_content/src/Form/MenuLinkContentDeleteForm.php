@@ -7,7 +7,7 @@
 
 namespace Drupal\menu_link_content\Form;
 
-use Drupal\Core\Entity\ContentEntityConfirmFormBase;
+use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides a delete form for content menu links.
  */
-class MenuLinkContentDeleteForm extends ContentEntityConfirmFormBase {
+class MenuLinkContentDeleteForm extends ContentEntityDeleteForm {
 
   /**
    * Logger channel.
@@ -52,13 +52,6 @@ class MenuLinkContentDeleteForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getQuestion() {
-    return $this->t('Are you sure you want to delete the custom menu link %item?', array('%item' => $this->entity->getTitle()));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getCancelUrl() {
     return new Url('entity.menu.edit_form', array('menu' => $this->entity->getMenuName()));
   }
@@ -67,9 +60,8 @@ class MenuLinkContentDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
     $t_args = array('%title' => $this->entity->getTitle());
-    $this->entity->delete();
-    drupal_set_message($this->t('The menu link %title has been deleted.', $t_args));
     $this->logger->notice('Deleted menu link %title.', $t_args);
     $form_state->setRedirect('<front>');
   }

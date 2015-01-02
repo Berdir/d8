@@ -9,7 +9,7 @@ entity.menu.add_link_form:
 entity.menu_link_content.canonical:
   path: '/admin/structure/menu/item/{menu_link_content}/edit'
   defaults:
-    _entity_form: 'menu_link_content.default'
+    _entity_form: 'menu_link_content.edit'
     _title: 'Edit menu link'
   requirements:
     _entity_access: 'menu_link_content.update'

@@ -47,8 +47,9 @@ class ProfileForm extends AccountForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    parent::save($form, $form_state);
+
     $account = $this->entity;
-    $account->save();
     $form_state->setValue('uid', $account->id());
 
     drupal_set_message($this->t('The changes have been saved.'));

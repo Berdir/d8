@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\block_content\BlockContentForm.
+ * Contains \Drupal\block_content\Form\BlockContentForm.
  */
 
-namespace Drupal\block_content;
+namespace Drupal\block_content\Form;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\ContentEntityForm;
@@ -16,9 +16,9 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Form controller for the custom block edit forms.
+ * Provides a common base form for custom blocks.
  */
-class BlockContentForm extends ContentEntityForm {
+abstract class BlockContentForm extends ContentEntityForm {
 
   /**
    * The custom block storage.
@@ -35,6 +35,7 @@ class BlockContentForm extends ContentEntityForm {
   protected $languageManager;
 
   /**
+<<<<<<< HEAD:core/modules/block_content/src/BlockContentForm.php
    * The block content entity.
    *
    * @var \Drupal\block_content\BlockContentInterface
@@ -43,6 +44,9 @@ class BlockContentForm extends ContentEntityForm {
 
   /**
    * Constructs a BlockContentForm object.
+=======
+   * Constructs a BlockContentForm object.
+>>>>>>> applied patch:core/modules/block_content/src/Form/BlockContentForm.php
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.

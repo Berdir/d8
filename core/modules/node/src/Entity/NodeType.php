@@ -21,8 +21,8 @@ use Drupal\node\NodeTypeInterface;
  *   handlers = {
  *     "access" = "Drupal\node\NodeTypeAccessControlHandler",
  *     "form" = {
- *       "add" = "Drupal\node\NodeTypeForm",
- *       "edit" = "Drupal\node\NodeTypeForm",
+ *       "add" = "Drupal\node\Form\NodeTypeAddForm",
+ *       "edit" = "Drupal\node\Form\NodeTypeEditForm",
  *       "delete" = "Drupal\node\Form\NodeTypeDeleteConfirm"
  *     },
  *     "list_builder" = "Drupal\node\NodeTypeListBuilder",

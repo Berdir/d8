@@ -24,7 +24,8 @@ use Drupal\menu_link_content\MenuLinkContentInterface;
  *     "storage" = "Drupal\Core\Entity\Sql\SqlContentEntityStorage",
  *     "access" = "Drupal\menu_link_content\MenuLinkContentAccessControlHandler",
  *     "form" = {
- *       "default" = "Drupal\menu_link_content\Form\MenuLinkContentForm",
+ *       "add" = "Drupal\menu_link_content\Form\MenuLinkContentForm",
+ *       "edit" = "Drupal\menu_link_content\Form\MenuLinkContentForm",
  *       "delete" = "Drupal\menu_link_content\Form\MenuLinkContentDeleteForm"
  *     }
  *   },
