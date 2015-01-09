@@ -29,4 +29,9 @@ class AllowToolbarPath implements RequestPolicyInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function alterCid(array &$cid_parts, Request $request) { }
+
 }

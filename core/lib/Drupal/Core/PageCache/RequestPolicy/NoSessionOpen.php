@@ -46,4 +46,9 @@ class NoSessionOpen implements RequestPolicyInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function alterCid(array &$cid_parts, Request $request) { }
+
 }

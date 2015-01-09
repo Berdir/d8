@@ -51,4 +51,17 @@ interface RequestPolicyInterface {
    */
   public function check(Request $request);
 
+  /**
+   * Alter the page cache ID.
+   *
+   * @param array $cid_parts
+   *   Array of cache ID parts. Contains the uri and content_type keys by
+   *   default.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The incoming request object.
+   *
+   * @return mixed
+   */
+  public function alterCid(array &$cid_parts, Request $request);
+
 }

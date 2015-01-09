@@ -57,6 +57,15 @@ class ChainRequestPolicy implements ChainRequestPolicyInterface {
   /**
    * {@inheritdoc}
    */
+  public function alterCid(array &$cid_parts, Request $request) {
+    foreach ($this->rules as $rule) {
+      $rule->alterCid($cid_parts, $request);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function addPolicy(RequestPolicyInterface $policy) {
     $this->rules[] = $policy;
     return $this;

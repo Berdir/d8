@@ -304,9 +304,12 @@ function drupal_get_filename($type, $name, $filename = NULL) {
  */
 function drupal_page_cache_get_cid(Request $request) {
   $cid_parts = array(
-    $request->getUri(),
-    \Drupal::service('content_negotiation')->getContentType($request),
+    'uri' => $request->getUri(),
+    'content_type' => \Drupal::service('content_negotiation')->getContentType($request),
   );
+  $request_policy = \Drupal::service('page_cache_request_policy');
+  $request_policy->alterCid($cid_parts);
+
   return implode(':', $cid_parts);
 }
 

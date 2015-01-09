@@ -29,6 +29,11 @@ class CommandLineOrUnsafeMethod implements RequestPolicyInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function alterCid(array &$cid_parts, Request $request) { }
+
+  /**
    * Indicates whether this is a CLI request.
    */
   protected function isCli() {
