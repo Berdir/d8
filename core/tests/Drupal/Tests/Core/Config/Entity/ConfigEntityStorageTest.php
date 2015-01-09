@@ -302,7 +302,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(array(
-        $this->entityTypeId . ':foo', // Own cache tag.
+        'config:the_config_prefix.foo', // Own cache tag.
         $this->entityTypeId . '_list', // List cache tag.
       ));
 
@@ -362,7 +362,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(array(
-        $this->entityTypeId .':bar', // Own cache tag.
+        'config:the_config_prefix.bar', // Own cache tag.
         $this->entityTypeId . '_list', // List cache tag.
       ));
 
@@ -728,8 +728,8 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(array(
-        $this->entityTypeId . ':bar', // Own cache tag.
-        $this->entityTypeId . ':foo', // Own cache tag.
+        'config:the_config_prefix.bar', // Own cache tag.
+        'config:the_config_prefix.foo', // Own cache tag.
         $this->entityTypeId . '_list', // List cache tag.
       ));
 

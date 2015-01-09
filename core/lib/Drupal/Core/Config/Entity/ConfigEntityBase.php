@@ -372,6 +372,15 @@ abstract class ConfigEntityBase extends Entity implements ConfigEntityInterface 
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    // Use cache tags that match the underlying config object's name.
+    // @see \Drupal\Core\Config\ConfigBase::getCacheTags()
+    return ['config:' . $this->getConfigDependencyName()];
+  }
+
+  /**
    * Overrides \Drupal\Core\Entity\DependencyTrait:addDependency().
    *
    * Note that this function should only be called from implementations of

@@ -7,6 +7,7 @@
 
 namespace Drupal\Tests\Core\Config;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Config\Config;
 use Drupal\Component\Utility\String;
@@ -50,11 +51,23 @@ class ConfigTest extends UnitTestCase {
    */
   protected $typedConfig;
 
+  /**
+   * The mocked cache tags invalidator.
+   *
+   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $cacheTagsInvalidator;
+
   public function setUp() {
     $this->storage = $this->getMock('Drupal\Core\Config\StorageInterface');
     $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
     $this->typedConfig = $this->getMock('\Drupal\Core\Config\TypedConfigManagerInterface');
     $this->config = new Config('config.test', $this->storage, $this->eventDispatcher, $this->typedConfig);
+    $this->cacheTagsInvalidator = $this->getMock('Drupal\Core\Cache\CacheTagsInvalidatorInterface');
+
+    $container = new ContainerBuilder();
+    $container->set('cache_tags.invalidator', $this->cacheTagsInvalidator);
+    \Drupal::setContainer($container);
   }
 
   /**
@@ -118,6 +131,10 @@ class ConfigTest extends UnitTestCase {
    * @dataProvider nestedDataProvider
    */
   public function testSave($data) {
+    $this->cacheTagsInvalidator->expects($this->once())
+      ->method('invalidateTags')
+      ->with(['config:config.test']);
+
     // Set initial data.
     $this->config->setData($data);
 
@@ -276,6 +293,12 @@ class ConfigTest extends UnitTestCase {
    * @dataProvider overrideDataProvider
    */
   public function testDelete($data, $module_data) {
+    // Verifying that invalidateTags() is invoked *twice*: once for saving, once
+    // for deleting.
+    $this->cacheTagsInvalidator->expects($this->exactly(2))
+      ->method('invalidateTags')
+      ->with(['config:config.test']);
+
     // Set initial data.
     foreach ($data as $key => $value) {
       $this->config->set($key, $value);
@@ -353,6 +376,13 @@ class ConfigTest extends UnitTestCase {
   public function testValidateNameException($name, $exception_message) {
     $this->setExpectedException('\Drupal\Core\Config\ConfigNameException', $exception_message);
     $this->config->validateName($name);
+  }
+
+  /**
+   * @covers ::getCacheTags
+   */
+  public function testGetCacheTags() {
+    $this->assertSame(['config:' . $this->config->getName()], $this->config->getCacheTags());
   }
 
   /**
