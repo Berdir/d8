@@ -88,6 +88,7 @@ function field_ui_entity_type_build(array &$entity_types) {
   $entity_types['field_config']->setFormClass('delete', 'Drupal\field_ui\Form\FieldConfigDeleteForm');
   $entity_types['field_config']->setListBuilderClass('Drupal\field_ui\FieldConfigListBuilder');
   $entity_types['field_storage_config']->setListBuilderClass('Drupal\field_ui\FieldStorageConfigListBuilder');
+  $entity_types['field_storage_config']->setLinkTemplate('collection', '/admin/reports/fields');
 
   foreach ($entity_types as $entity_type) {
     if ($bundle = $entity_type->getBundleOf()) {
@@ -306,6 +307,7 @@ function field_ui_entity_type_alter(array &$entity_types) {
   $form_mode->set('admin_permission', 'administer display modes');
   $form_mode->setLinkTemplate('delete-form', '/admin/structure/display-modes/form/manage/{entity_form_mode}/delete');
   $form_mode->setLinkTemplate('edit-form', '/admin/structure/display-modes/form/manage/{entity_form_mode}');
+  $form_mode->setLinkTemplate('collection', '/admin/structure/display-modes/form');
 
   $view_mode = $entity_types['entity_view_mode'];
   $view_mode->setListBuilderClass('Drupal\field_ui\EntityDisplayModeListBuilder');
@@ -315,4 +317,5 @@ function field_ui_entity_type_alter(array &$entity_types) {
   $view_mode->set('admin_permission', 'administer display modes');
   $view_mode->setLinkTemplate('delete-form', '/admin/structure/display-modes/view/manage/{entity_view_mode}/delete');
   $view_mode->setLinkTemplate('edit-form', '/admin/structure/display-modes/view/manage/{entity_view_mode}');
+  $view_mode->setLinkTemplate('collection', '/admin/structure/display-modes/view');
 }

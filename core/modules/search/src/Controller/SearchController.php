@@ -191,7 +191,8 @@ class SearchController extends ControllerBase {
       drupal_set_message($this->t('The %label search page has been disabled.', array('%label' => $search_page->label())));
     }
 
-    return $this->redirect('search.settings');
+    $url = $search_page->urlInfo('collection');
+    return $this->redirect($url->getRouteName(), $url->getRouteParameters());
   }
 
   /**

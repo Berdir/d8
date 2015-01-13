@@ -45,5 +45,6 @@ function action_entity_type_build(array &$entity_types) {
     ->setFormClass('delete', 'Drupal\action\Form\ActionDeleteForm')
     ->setListBuilderClass('Drupal\action\ActionListBuilder')
     ->setLinkTemplate('delete-form', '/admin/config/system/actions/configure/{action}/delete')
-    ->setLinkTemplate('edit-form', '/admin/config/system/actions/configure/{action}');
+    ->setLinkTemplate('edit-form', '/admin/config/system/actions/configure/{action}')
+    ->setLinkTemplate('collection', '/admin/config/system/actions');
 }

@@ -60,7 +60,8 @@ function views_ui_entity_type_build(array &$entity_types) {
     ->setLinkTemplate('delete-form', '/admin/structure/views/view/{view}/delete')
     ->setLinkTemplate('enable', '/admin/structure/views/view/{view}/enable')
     ->setLinkTemplate('disable', '/admin/structure/views/view/{view}/disable')
-    ->setLinkTemplate('break-lock-form', '/admin/structure/views/view/{view}/break-lock');
+    ->setLinkTemplate('break-lock-form', '/admin/structure/views/view/{view}/break-lock')
+    ->setLinkTemplate('collection', '/admin/structure/views');
 }
 
 /**

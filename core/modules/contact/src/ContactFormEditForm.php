@@ -119,7 +119,7 @@ class ContactFormEditForm extends EntityForm {
         ->save();
     }
 
-    $form_state->setRedirect('contact.form_list');
+    $form_state->setRedirectUrl($contact_form->urlInfo('collection'));
   }
 
 }

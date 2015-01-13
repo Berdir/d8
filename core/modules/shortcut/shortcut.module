@@ -373,7 +373,7 @@ function shortcut_toolbar() {
         'tab' => array(
           '#type' => 'link',
           '#title' => t('Shortcuts'),
-          '#url' => Url::fromRoute('shortcut.set_admin'),
+          '#url' => $shortcut_set->urlInfo('collection'),
           '#attributes' => array(
             'title' => t('Shortcuts'),
             'class' => array('toolbar-icon', 'toolbar-icon-shortcut'),

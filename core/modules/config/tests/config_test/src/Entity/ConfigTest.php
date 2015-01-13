@@ -38,6 +38,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "delete-form" = "/admin/structure/config_test/manage/{config_test}/delete",
  *     "enable" = "/admin/structure/config_test/manage/{config_test}/enable",
  *     "disable" = "/admin/structure/config_test/manage/{config_test}/disable"
+ *     "collection" = "/admin/structure/config_test",
  *   }
  * )
  */

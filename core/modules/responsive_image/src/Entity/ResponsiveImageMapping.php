@@ -35,6 +35,7 @@ use Drupal\responsive_image\ResponsiveImageMappingInterface;
  *   links = {
  *     "edit-form" = "/admin/config/media/responsive-image-mapping/{responsive_image_mapping}",
  *     "duplicate-form" = "/admin/config/media/responsive-image-mapping/{responsive_image_mapping}/duplicate"
+ *     "collection" = "/admin/config/media/responsive-image-mapping",
  *   }
  * )
  */
