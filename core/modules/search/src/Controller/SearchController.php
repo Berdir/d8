@@ -192,7 +192,7 @@ class SearchController extends ControllerBase {
     }
 
     $url = $search_page->urlInfo('collection');
-    return $this->redirect($url->getRouteName(), $url->getRouteParameters());
+    return $this->redirect($url->getRouteName(), $url->getRouteParameters(), $url->getOptions());
   }
 
   /**
