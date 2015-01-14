@@ -87,7 +87,7 @@ class EngineTwigTest extends WebTestBase {
    * Tests the file_url Twig functions.
    */
   public function testTwigFileUrls() {
-    $this->drupalGet('/twig-theme-test/file-url');
+    $this->drupalGet('twig-theme-test/file-url');
     $filepath = file_create_url('core/modules/system/tests/modules/twig_theme_test/twig_theme_test.js');
     $this->assertRaw('<div>file_url: ' . $filepath . '</div>');
   }

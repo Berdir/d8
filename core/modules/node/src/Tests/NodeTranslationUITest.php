@@ -92,7 +92,6 @@ class NodeTranslationUITest extends ContentTranslationUITest {
    */
   protected function doTestPublishedStatus() {
     $entity = entity_load($this->entityTypeId, $this->entityId, TRUE);
-    $path = $entity->getSystemPath('edit-form');
     $languages = $this->container->get('language_manager')->getLanguages();
 
     $actions = array(
@@ -104,7 +103,9 @@ class NodeTranslationUITest extends ContentTranslationUITest {
       // (Un)publish the node translations and check that the translation
       // statuses are (un)published accordingly.
       foreach ($this->langcodes as $langcode) {
-        $this->drupalPostForm($path, array(), $action . $this->getFormSubmitSuffix($entity, $langcode), array('language' => $languages[$langcode]));
+        $options = array('language' => $languages[$langcode]);
+        $path = $entity->url('edit-form', $options);
+        $this->drupalPostForm($path, array(), $action . $this->getFormSubmitSuffix($entity, $langcode), $options);
       }
       $entity = entity_load($this->entityTypeId, $this->entityId, TRUE);
       foreach ($this->langcodes as $langcode) {
@@ -123,7 +124,6 @@ class NodeTranslationUITest extends ContentTranslationUITest {
    */
   protected function doTestAuthoringInfo() {
     $entity = entity_load($this->entityTypeId, $this->entityId, TRUE);
-    $path = $entity->getSystemPath('edit-form');
     $languages = $this->container->get('language_manager')->getLanguages();
     $values = array();
 
@@ -143,7 +143,9 @@ class NodeTranslationUITest extends ContentTranslationUITest {
         'sticky[value]' => $values[$langcode]['sticky'],
         'promote[value]' => $values[$langcode]['promote'],
       );
-      $this->drupalPostForm($path, $edit, $this->getFormSubmitAction($entity, $langcode), array('language' => $languages[$langcode]));
+      $options = array('language' => $languages[$langcode]);
+      $path = $entity->url('edit-form', $options);
+      $this->drupalPostForm($path, $edit, $this->getFormSubmitAction($entity, $langcode), $options);
     }
 
     $entity = entity_load($this->entityTypeId, $this->entityId, TRUE);

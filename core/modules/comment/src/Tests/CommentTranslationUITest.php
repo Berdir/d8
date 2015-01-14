@@ -118,7 +118,7 @@ class CommentTranslationUITest extends ContentTranslationUITest {
     $languages = $this->container->get('language_manager')->getLanguages();
 
     // Check that simple users cannot see unpublished field translations.
-    $path = $entity->getSystemPath();
+    $path = $entity->url();
     foreach ($this->langcodes as $index => $langcode) {
       $translation = $this->getTranslation($entity, $langcode);
       $value = $this->getValue($translation, 'comment_body', $langcode);

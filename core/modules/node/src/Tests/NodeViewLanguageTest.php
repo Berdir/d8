@@ -38,7 +38,7 @@ class NodeViewLanguageTest extends NodeTestBase {
     // Create a node in Spanish.
     $node = $this->drupalCreateNode(array('langcode' => 'es'));
 
-    $this->drupalGet($node->getSystemPath());
+    $this->drupalGet($node->url());
     $this->assertText('Spanish','The language field is displayed properly.');
   }
 

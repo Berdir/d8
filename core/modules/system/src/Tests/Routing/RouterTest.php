@@ -121,7 +121,7 @@ class RouterTest extends WebTestBase {
    * Checks that a request with text/html response gets rendered as a page.
    */
   public function testControllerResolutionPage() {
-    $this->drupalGet('/router_test/test10');
+    $this->drupalGet('router_test/test10');
 
     $this->assertRaw('abcde', 'Correct body was found.');
 
@@ -182,7 +182,7 @@ class RouterTest extends WebTestBase {
   public function testControllerResolutionAjax() {
     // This will fail with a JSON parse error if the request is not routed to
     // The correct controller.
-    $this->drupalGetAJAX('/router_test/test10');
+    $this->drupalGetAJAX('router_test/test10');
 
     $this->assertEqual($this->drupalGetHeader('Content-Type'), 'application/json', 'Correct mime content type was returned');
 

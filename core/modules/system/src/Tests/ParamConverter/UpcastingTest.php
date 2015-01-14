@@ -76,7 +76,7 @@ class UpcastingTest extends WebTestBase {
     $translation = $node->addTranslation('de');
     $translation->setTitle('Deutscher Titel')->save();
 
-    $this->drupalGet("/paramconverter_test/node/" . $node->id() . "/test_language");
+    $this->drupalGet("paramconverter_test/node/" . $node->id() . "/test_language");
     $this->assertRaw("English label");
     $this->drupalGet("paramconverter_test/node/" . $node->id() . "/test_language", array('language' => $language));
     $this->assertRaw("Deutscher Titel");

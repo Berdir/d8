@@ -121,6 +121,11 @@ class EntityReferenceFieldTranslatedReferenceViewTest extends WebTestBase {
     $this->translatedLabel = $this->randomMachineName();
 
     $this->setUpLanguages();
+
+    // We setup languages, so we need to ensure that the language manager
+    // and language path processor is updated.
+    $this->rebuildContainer();
+
     $this->setUpContentTypes();
     $this->enableTranslation();
     $this->setUpEntityReferenceField();
@@ -131,8 +136,8 @@ class EntityReferenceFieldTranslatedReferenceViewTest extends WebTestBase {
    * Tests if the translated entity is displayed in an entity reference field.
    */
   public function testTranslatedEntityReferenceDisplay() {
-    $path = $this->referrerEntity->getSystemPath();
-    $translation_path = $this->translateToLangcode . '/' . $path;
+    $path = $this->referrerEntity->url();
+    $translation_path = $this->referrerEntity->url('canonical', ['language' => ConfigurableLanguage::load($this->translateToLangcode)]);
 
     $this->drupalGet($path);
     $this->assertText($this->labelOfNotTranslatedReference, 'The label of not translated reference is displayed.');

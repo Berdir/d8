@@ -240,7 +240,7 @@ class StandardProfileTest extends WebTestBase {
    */
   protected function doArticleRdfaTests() {
     // Feed the HTML into the parser.
-    $graph = $this->getRdfGraph($this->article->getSystemPath());
+    $graph = $this->getRdfGraph($this->article->url());
 
     // Type.
     $this->assertEqual($graph->type($this->articleUri), 'schema:Article', 'Article type was found (schema:Article).');
@@ -277,7 +277,7 @@ class StandardProfileTest extends WebTestBase {
     $node_type->save();
 
     // Feed the HTML into the parser.
-    $graph = $this->getRdfGraph($this->page->getSystemPath());
+    $graph = $this->getRdfGraph($this->page->url());
 
     // Type.
     $this->assertEqual($graph->type($this->pageUri), 'schema:WebPage', 'Page type was found (schema:WebPage).');
@@ -293,7 +293,7 @@ class StandardProfileTest extends WebTestBase {
     $this->drupalLogin($this->rootUser);
 
     // Feed the HTML into the parser.
-    $graph = $this->getRdfGraph($this->adminUser->getSystemPath());
+    $graph = $this->getRdfGraph($this->adminUser->url());
 
     // User type.
     $this->assertEqual($graph->type($this->authorUri), 'schema:Person', "User type was found (schema:Person) on user page.");
@@ -313,7 +313,7 @@ class StandardProfileTest extends WebTestBase {
    */
   protected function doTermRdfaTests() {
     // Feed the HTML into the parser.
-    $graph = $this->getRdfGraph($this->term->getSystemPath());
+    $graph = $this->getRdfGraph($this->term->url());
 
     // Term type.
     $this->assertEqual($graph->type($this->termUri), 'schema:Thing', "Term type was found (schema:Thing) on term page.");
