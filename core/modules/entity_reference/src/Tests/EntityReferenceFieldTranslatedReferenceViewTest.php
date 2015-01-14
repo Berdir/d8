@@ -136,14 +136,14 @@ class EntityReferenceFieldTranslatedReferenceViewTest extends WebTestBase {
    * Tests if the translated entity is displayed in an entity reference field.
    */
   public function testTranslatedEntityReferenceDisplay() {
-    $path = $this->referrerEntity->url();
-    $translation_path = $this->referrerEntity->url('canonical', ['language' => ConfigurableLanguage::load($this->translateToLangcode)]);
+    $url = $this->referrerEntity->urlInfo();
+    $translation_url = $this->referrerEntity->urlInfo('canonical', ['language' => ConfigurableLanguage::load($this->translateToLangcode)]);
 
-    $this->drupalGet($path);
+    $this->drupalGet($url);
     $this->assertText($this->labelOfNotTranslatedReference, 'The label of not translated reference is displayed.');
     $this->assertText($this->originalLabel, 'The default label of translated reference is displayed.');
     $this->assertNoText($this->translatedLabel, 'The translated label of translated reference is not displayed.');
-    $this->drupalGet($translation_path);
+    $this->drupalGet($translation_url);
     $this->assertText($this->labelOfNotTranslatedReference, 'The label of not translated reference is displayed.');
     $this->assertNoText($this->originalLabel, 'The default label of translated reference is not displayed.');
     $this->assertText($this->translatedLabel, 'The translated label of translated reference is displayed.');

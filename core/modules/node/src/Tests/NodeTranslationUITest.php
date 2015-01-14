@@ -105,8 +105,8 @@ class NodeTranslationUITest extends ContentTranslationUITest {
       // statuses are (un)published accordingly.
       foreach ($this->langcodes as $langcode) {
         $options = array('language' => $languages[$langcode]);
-        $path = $entity->url('edit-form', $options);
-        $this->drupalPostForm($path, array(), $action . $this->getFormSubmitSuffix($entity, $langcode), $options);
+        $url = $entity->urlInfo('edit-form', $options);
+        $this->drupalPostForm($url, array(), $action . $this->getFormSubmitSuffix($entity, $langcode), $options);
       }
       $entity = entity_load($this->entityTypeId, $this->entityId, TRUE);
       foreach ($this->langcodes as $langcode) {

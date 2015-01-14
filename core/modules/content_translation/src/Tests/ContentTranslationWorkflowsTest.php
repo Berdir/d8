@@ -62,10 +62,8 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
 
     // Create a translation.
     $this->drupalLogin($this->translator);
-    $path = $this->entity->url('drupal:content-translation-overview');
-
-    $add_translation_path = $path . "/add/$default_langcode/{$this->langcodes[2]}";
-    $this->drupalPostForm($add_translation_path, array(), t('Save'));
+    $add_translation_url = Url::fromRoute('content_translation.translation_add_' . $this->entityTypeId, [$this->entityTypeId => $this->entity->id(), 'source' => $default_langcode, 'target' => $this->langcodes[2]]);
+    $this->drupalPostForm($add_translation_url, array(), t('Save'));
     $this->rebuildContainer();
   }
 
@@ -87,11 +85,11 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
 
     // Check that translation permissions governate the associated operations.
     $ops = array('create' => t('Add'), 'update' => t('Edit'), 'delete' => t('Delete'));
-    $translations_path = $this->entity->url('drupal:content-translation-overview');
+    $translations_url = $this->entity->urlInfo('drupal:content-translation-overview');
     foreach ($ops as $current_op => $item) {
       $user = $this->drupalCreateUser(array($this->getTranslatePermission(), "$current_op content translations"));
       $this->drupalLogin($user);
-      $this->drupalGet($translations_path);
+      $this->drupalGet($translations_url);
 
       foreach ($ops as $op => $label) {
         if ($op != $current_op) {
@@ -121,22 +119,22 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
 
     // Check whether the user is allowed to access the entity form in edit mode.
     $options = array('language' => $languages[$default_langcode], 'absolute' => TRUE);
-    $edit_path = $this->entity->url('edit-form', $options);
-    $this->drupalGet($edit_path, $options);
+    $edit_url = $this->entity->urlInfo('edit-form', $options);
+    $this->drupalGet($edit_url, $options);
     $this->assertResponse($expected_status['edit'], format_string('The @user_label has the expected edit access.', $args));
 
     // Check whether the user is allowed to access the translation overview.
     $langcode = $this->langcodes[1];
     $options = array('language' => $languages[$langcode], 'absolute' => TRUE);
-    $translations_path = $this->entity->url('drupal:content-translation-overview', $options);
-    $this->drupalGet($translations_path);
+    $translations_url = $this->entity->url('drupal:content-translation-overview', $options);
+    $this->drupalGet($translations_url);
     $this->assertResponse($expected_status['overview'], format_string('The @user_label has the expected translation overview access.', $args));
 
     // Check whether the user is allowed to create a translation.
-    $add_translation_path = Url::fromRoute('content_translation.translation_add_' . $this->entityTypeId, [$this->entityTypeId => $this->entity->id(), 'source' => $default_langcode, 'target' => $langcode], $options)->toString();
+    $add_translation_url = Url::fromRoute('content_translation.translation_add_' . $this->entityTypeId, [$this->entityTypeId => $this->entity->id(), 'source' => $default_langcode, 'target' => $langcode], $options);
     if ($expected_status['add_translation'] == 200) {
       $this->clickLink('Add');
-      $this->assertUrl($add_translation_path, array(), 'The translation overview points to the translation form when creating translations.');
+      $this->assertUrl($add_translation_url->toString(), array(), 'The translation overview points to the translation form when creating translations.');
       // Check that the translation form does not contain shared elements for
       // translators.
       if ($expected_status['edit'] == 403) {
@@ -144,17 +142,17 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
       }
     }
     else {
-      $this->drupalGet($add_translation_path);
+      $this->drupalGet($add_translation_url);
     }
     $this->assertResponse($expected_status['add_translation'], format_string('The @user_label has the expected translation creation access.', $args));
 
     // Check whether the user is allowed to edit a translation.
     $langcode = $this->langcodes[2];
     $options['language'] = $languages[$langcode];
-    $edit_translation_path = Url::fromRoute('content_translation.translation_edit_' . $this->entityTypeId, [$this->entityTypeId => $this->entity->id(), 'language' => $langcode], $options)->toString();
+    $edit_translation_url = Url::fromRoute('content_translation.translation_edit_' . $this->entityTypeId, [$this->entityTypeId => $this->entity->id(), 'language' => $langcode], $options);
     $options = ['language' => $languages[$langcode], 'absolute' => TRUE];
     if ($expected_status['edit_translation'] == 200) {
-      $this->drupalGet($translations_path);
+      $this->drupalGet($translations_url);
       $editor = $expected_status['edit'] == 200;
 
       if ($editor) {
@@ -168,13 +166,13 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
       else {
         $this->clickLink('Edit');
         // While a translator should be pointed to the translation form.
-        $this->assertUrl($edit_translation_path, array(), 'The translation overview points to the translation form for translators when editing translations.');
+        $this->assertUrl($edit_translation_url->toString(), array(), 'The translation overview points to the translation form for translators when editing translations.');
         // Check that the translation form does not contain shared elements.
         $this->assertNoSharedElements();
       }
     }
     else {
-      $this->drupalGet($edit_translation_path, array());
+      $this->drupalGet($edit_translation_url, array());
     }
     $this->assertResponse($expected_status['edit_translation'], format_string('The @user_label has the expected translation creation access.', $args));
   }

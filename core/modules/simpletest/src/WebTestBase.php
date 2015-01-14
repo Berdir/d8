@@ -1463,7 +1463,7 @@ abstract class WebTestBase extends TestBase {
    *   Url::()->toString()
    * @endcode
    *
-   * @param $path
+   * @param \Drupal\Core\Url|string $path
    *   Drupal path or URL to load into internal browser
    * @param $options
    *   Options to be forwarded to the url generator.
@@ -1477,12 +1477,6 @@ abstract class WebTestBase extends TestBase {
   protected function drupalGet($path, array $options = array(), array $headers = array()) {
     if ($path instanceof Url) {
       $url = $path->setOption('absolute', TRUE)->toString();
-    }
-    // Assume that paths that start with a / are already fully generated
-    // URL's that are just missing $base_root.
-    elseif (isset($path[0]) && $path[0] == '/') {
-      throw new \Exception($path);
-      $url = $GLOBALS['base_root'] . $path;
     }
     // The URL generator service is not necessarily available yet; e.g., in
     // interactive installer tests.
