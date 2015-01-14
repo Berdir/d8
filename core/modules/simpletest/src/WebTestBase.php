@@ -27,6 +27,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\block\Entity\Block;
+use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\user\Entity\Role;
 
@@ -1474,9 +1475,13 @@ abstract class WebTestBase extends TestBase {
    *   The retrieved HTML string, also available as $this->getRawContent()
    */
   protected function drupalGet($path, array $options = array(), array $headers = array()) {
+    if ($path instanceof Url) {
+      $url = $path->setOption('absolute', TRUE)->toString();
+    }
     // Assume that paths that start with a / are already fully generated
     // URL's that are just missing $base_root.
-    if (isset($path[0]) && $path[0] == '/') {
+    elseif (isset($path[0]) && $path[0] == '/') {
+      throw new \Exception($path);
       $url = $GLOBALS['base_root'] . $path;
     }
     // The URL generator service is not necessarily available yet; e.g., in
