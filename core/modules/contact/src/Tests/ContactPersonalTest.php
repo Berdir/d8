@@ -86,7 +86,7 @@ class ContactPersonalTest extends WebTestBase {
     $this->drupalLogout();
     $this->drupalLogin($this->adminUser);
     // Verify that the correct watchdog message has been logged.
-    $this->drupalGet('admin/reports/dblog');
+    $this->drupalGet('/admin/reports/dblog');
     $placeholders = array(
       '@sender_name' => $this->webUser->username,
       '@sender_email' => $this->webUser->getEmail(),

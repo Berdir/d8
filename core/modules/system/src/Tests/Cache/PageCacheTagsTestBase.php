@@ -39,7 +39,7 @@ abstract class PageCacheTagsTestBase extends WebTestBase {
   /**
    * Verify that when loading a given page, it's a page cache hit or miss.
    *
-   * @param string $path
+   * @param \Drupal\Core\Url|string $path
    *   The page at this path will be loaded.
    * @param string $hit_or_miss
    *   'HIT' if a page cache hit is expected, 'MISS' otherwise.

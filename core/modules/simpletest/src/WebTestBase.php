@@ -1458,11 +1458,6 @@ abstract class WebTestBase extends TestBase {
   /**
    * Retrieves a Drupal path or an absolute path.
    *
-   * You can pass along a full generated url for example via:
-   * @code
-   *   Url::()->toString()
-   * @endcode
-   *
    * @param \Drupal\Core\Url|string $path
    *   Drupal path or URL to load into internal browser
    * @param $options
@@ -1476,7 +1471,7 @@ abstract class WebTestBase extends TestBase {
    */
   protected function drupalGet($path, array $options = array(), array $headers = array()) {
     if ($path instanceof Url) {
-      $url = $path->setOption('absolute', TRUE)->toString();
+      $url = $path->setAbsolute()->toString();
     }
     // The URL generator service is not necessarily available yet; e.g., in
     // interactive installer tests.
@@ -2490,8 +2485,8 @@ abstract class WebTestBase extends TestBase {
   /**
    * Passes if the internal browser's URL matches the given path.
    *
-   * @param $path
-   *   The expected system path.
+   * @param \Drupal\Core\Url|string$path
+   *   The expected system path or URL.
    * @param $options
    *   (optional) Any additional options to pass for $path to the url generator.
    * @param $message
@@ -2508,9 +2503,12 @@ abstract class WebTestBase extends TestBase {
    *   TRUE on pass, FALSE on fail.
    */
   protected function assertUrl($path, array $options = array(), $message = '', $group = 'Other') {
-    if (!$path || $path[0] != '/') {
+    if ($path instanceof Url)  {
+      $url = $path->setAbsolute()->toString();
+    }
+    else {
       $options['absolute'] = TRUE;
-      $path = $this->container->get('url_generator')->generateFromPath($path, $options);
+      $url = $this->container->get('url_generator')->generateFromPath($path, $options);
     }
     if (!$message) {
       $message = String::format('Expected @url matches current URL (@current_url).', array(
@@ -2521,7 +2519,7 @@ abstract class WebTestBase extends TestBase {
     // Paths in query strings can be encoded or decoded with no functional
     // difference, decode them for comparison purposes.
     $actual_url = urldecode($this->getUrl());
-    $expected_url = urldecode($path);
+    $expected_url = urldecode($url);
     return $this->assertEqual($actual_url, $expected_url, $message, $group);
   }
 
