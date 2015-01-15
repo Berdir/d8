@@ -37,8 +37,8 @@ class LanguageLocalTasksTest extends LocalTaskIntegrationTest {
    */
   public function getLanguageAdminOverviewRoutes() {
     return array(
-      array('language.admin_overview', array(array('language.admin_overview', 'language.negotiation'))),
-      array('language.negotiation', array(array('language.admin_overview', 'language.negotiation'))),
+      array('entity.configurable_language.list', array(array('entity.configurable_language.list', 'language.negotiation'))),
+      array('language.negotiation', array(array('entity.configurable_language.list', 'language.negotiation'))),
     );
   }
 

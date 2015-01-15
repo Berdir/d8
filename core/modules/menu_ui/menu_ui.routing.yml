@@ -1,4 +1,4 @@
-menu_ui.overview_page:
+entity.menu.list:
   path: '/admin/structure/menu'
   defaults:
     _entity_list: 'menu'

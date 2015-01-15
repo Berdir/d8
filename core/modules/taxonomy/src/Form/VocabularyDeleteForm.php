@@ -34,7 +34,7 @@ class VocabularyDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('taxonomy.vocabulary_list');
+    return new Url('entity.taxonomy_vocabulary.list');
   }
 
   /**

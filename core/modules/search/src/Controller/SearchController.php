@@ -89,7 +89,7 @@ class SearchController extends ControllerBase {
     if ($request->query->has('keys')) {
       if ($plugin->isSearchExecutable()) {
         // Log the search.
-        if ($this->config('search.settings')->get('logging')) {
+        if ($this->config('entity.search_page.list')->get('logging')) {
           $this->logger->notice('Searched %type for %keys.', array('%keys' => $keys, '%type' => $entity->label()));
         }
 
@@ -191,7 +191,7 @@ class SearchController extends ControllerBase {
       drupal_set_message($this->t('The %label search page has been disabled.', array('%label' => $search_page->label())));
     }
 
-    return $this->redirect('search.settings');
+    return $this->redirect('entity.search_page.list');
   }
 
   /**
@@ -208,7 +208,7 @@ class SearchController extends ControllerBase {
     $this->searchPageRepository->setDefaultSearchPage($search_page);
 
     drupal_set_message($this->t('The default search page is now %label. Be sure to check the ordering of your search pages.', array('%label' => $search_page->label())));
-    return $this->redirect('search.settings');
+    return $this->redirect('entity.search_page.list');
   }
 
 }

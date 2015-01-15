@@ -1,4 +1,4 @@
 action.admin:
-  route_name: action.admin
+  route_name: entity.action.list
   title: 'Manage actions'
-  base_route: action.admin
+  base_route: entity.action.list

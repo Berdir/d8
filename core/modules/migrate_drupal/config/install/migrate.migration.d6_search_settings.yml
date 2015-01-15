@@ -19,4 +19,4 @@ process:
   logging: 'constants/status'
 destination:
   plugin: config
-  config_name: search.settings
+  config_name: entity.search_page.list

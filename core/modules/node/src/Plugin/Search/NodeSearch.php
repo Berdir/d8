@@ -59,7 +59,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
   protected $moduleHandler;
 
   /**
-   * A config object for 'search.settings'.
+   * A config object for 'entity.search_page.list'.
    *
    * @var \Drupal\Core\Config\Config
    */
@@ -110,7 +110,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
       $container->get('database'),
       $container->get('entity.manager'),
       $container->get('module_handler'),
-      $container->get('config.factory')->get('search.settings'),
+      $container->get('config.factory')->get('entity.search_page.list'),
       $container->get('current_user')
     );
   }
@@ -131,7 +131,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   A module manager object.
    * @param \Drupal\Core\Config\Config $search_settings
-   *   A config object for 'search.settings'.
+   *   A config object for 'entity.search_page.list'.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The $account object to use for checking for access to advanced search.
    */

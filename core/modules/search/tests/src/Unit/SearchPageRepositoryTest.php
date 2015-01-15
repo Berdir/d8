@@ -152,7 +152,7 @@ class SearchPageRepositoryTest extends UnitTestCase {
       ->will($this->returnValue($config));
     $this->configFactory->expects($this->once())
       ->method('get')
-      ->with('search.settings')
+      ->with('entity.search_page.list')
       ->will($this->returnValue($config));
     $this->searchPageRepository->clearDefaultSearchPage();
   }
@@ -178,7 +178,7 @@ class SearchPageRepositoryTest extends UnitTestCase {
       ->will($this->returnValue('test'));
     $this->configFactory->expects($this->once())
       ->method('get')
-      ->with('search.settings')
+      ->with('entity.search_page.list')
       ->will($this->returnValue($config));
 
     $this->assertSame('test', $this->searchPageRepository->getDefaultSearchPage());
@@ -205,7 +205,7 @@ class SearchPageRepositoryTest extends UnitTestCase {
       ->will($this->returnValue('other_test'));
     $this->configFactory->expects($this->once())
       ->method('get')
-      ->with('search.settings')
+      ->with('entity.search_page.list')
       ->will($this->returnValue($config));
 
     $this->assertSame('test', $this->searchPageRepository->getDefaultSearchPage());
@@ -228,7 +228,7 @@ class SearchPageRepositoryTest extends UnitTestCase {
       ->will($this->returnValue($config));
     $this->configFactory->expects($this->once())
       ->method('get')
-      ->with('search.settings')
+      ->with('entity.search_page.list')
       ->will($this->returnValue($config));
 
     $search_page = $this->getMock('Drupal\search\SearchPageInterface');

@@ -27,7 +27,7 @@ class ViewDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('views_ui.list');
+    return new Url('entity.view.list');
   }
 
   /**

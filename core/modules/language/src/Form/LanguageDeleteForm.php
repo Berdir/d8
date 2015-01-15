@@ -70,7 +70,7 @@ class LanguageDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('language.admin_overview');
+    return new Url('entity.configurable_language.list');
   }
 
   /**

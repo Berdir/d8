@@ -27,7 +27,7 @@ class ContactFormDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('contact.form_list');
+    return new Url('entity.contact_form.list');
   }
 
   /**

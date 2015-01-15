@@ -25,7 +25,7 @@ class ActionLocalTasksTest extends LocalTaskIntegrationTest {
    * Tests local task existence.
    */
   public function testActionLocalTasks() {
-    $this->assertLocalTasks('action.admin', array(array('action.admin')));
+    $this->assertLocalTasks('entity.action.list', array(array('action.admin')));
   }
 
 }

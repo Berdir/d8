@@ -1,4 +1,4 @@
-views_ui.list:
+entity.view.list:
   path: '/admin/structure/views'
   defaults:
     _entity_list: 'view'

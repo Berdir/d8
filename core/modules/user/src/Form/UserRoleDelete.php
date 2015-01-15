@@ -27,7 +27,7 @@ class UserRoleDelete extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('user.role_list');
+    return new Url('entity.user_role.list');
   }
 
   /**

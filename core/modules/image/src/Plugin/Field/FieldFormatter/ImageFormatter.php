@@ -122,7 +122,7 @@ class ImageFormatter extends ImageFormatterBase implements ContainerFactoryPlugi
       '#empty_option' => t('None (original image)'),
       '#options' => $image_styles,
       '#description' => array(
-        '#markup' => $this->linkGenerator->generate($this->t('Configure Image Styles', array('@url' => $this->urlGenerator->generateFromRoute('image.style_list'))), new Url('image.style_list')),
+        '#markup' => $this->linkGenerator->generate($this->t('Configure Image Styles', array('@url' => $this->urlGenerator->generateFromRoute('entity.image_style.list'))), new Url('entity.image_style.list')),
         '#access' => $this->currentUser->hasPermission('administer image styles'),
       ),
     );

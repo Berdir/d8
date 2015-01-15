@@ -81,7 +81,7 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
       ->execute();
 
     // If the default page is active, return it.
-    $default = $this->configFactory->get('search.settings')->get('default_page');
+    $default = $this->configFactory->get('entity.search_page.list')->get('default_page');
     if (isset($search_pages[$default])) {
       return $default;
     }
@@ -94,14 +94,14 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
    * {@inheritdoc}
    */
   public function clearDefaultSearchPage() {
-    $this->configFactory->get('search.settings')->clear('default_page')->save();
+    $this->configFactory->get('entity.search_page.list')->clear('default_page')->save();
   }
 
   /**
    * {@inheritdoc}
    */
   public function setDefaultSearchPage(SearchPageInterface $search_page) {
-    $this->configFactory->get('search.settings')->set('default_page', $search_page->id())->save();
+    $this->configFactory->get('entity.search_page.list')->set('default_page', $search_page->id())->save();
     $search_page->enable()->save();
   }
 

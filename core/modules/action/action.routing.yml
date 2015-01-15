@@ -1,4 +1,4 @@
-action.admin:
+entity.action.list:
   path: '/admin/config/system/actions'
   defaults:
     _title: 'Actions'

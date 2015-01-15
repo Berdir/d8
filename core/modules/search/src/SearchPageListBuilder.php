@@ -157,7 +157,7 @@ class SearchPageListBuilder extends DraggableListBuilder implements FormInterfac
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
     $old_state = $this->configFactory->getOverrideState();
-    $search_settings = $this->configFactory->setOverrideState(FALSE)->get('search.settings');
+    $search_settings = $this->configFactory->setOverrideState(FALSE)->get('entity.search_page.list');
     $this->configFactory->setOverrideState($old_state);
     // Collect some stats.
     $remaining = 0;
@@ -328,7 +328,7 @@ class SearchPageListBuilder extends DraggableListBuilder implements FormInterfac
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    $search_settings = $this->configFactory->get('search.settings');
+    $search_settings = $this->configFactory->get('entity.search_page.list');
     // If these settings change, the default index needs to be rebuilt.
     if (($search_settings->get('index.minimum_word_size') != $form_state->getValue('minimum_word_size')) || ($search_settings->get('index.overlap_cjk') != $form_state->getValue('overlap_cjk'))) {
       $search_settings->set('index.minimum_word_size', $form_state->getValue('minimum_word_size'));

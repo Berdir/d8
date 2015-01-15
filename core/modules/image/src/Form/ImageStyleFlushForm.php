@@ -41,7 +41,7 @@ class ImageStyleFlushForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('image.style_list');
+    return new Url('entity.image_style.list');
   }
 
   /**

@@ -65,7 +65,7 @@ class DateFormatDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('system.date_format_list');
+    return new Url('entity.date_format.list');
   }
 
   /**

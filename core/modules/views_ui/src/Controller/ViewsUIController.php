@@ -162,7 +162,7 @@ class ViewsUIController extends ControllerBase {
     }
 
     // Otherwise, redirect back to the page.
-    return $this->redirect('views_ui.list');
+    return $this->redirect('entity.view.list');
   }
 
   /**

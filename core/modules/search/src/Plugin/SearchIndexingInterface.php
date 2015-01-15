@@ -41,7 +41,7 @@ interface SearchIndexingInterface {
    * When implementing this method, your module should index content items that
    * were modified or added since the last run. There is a time limit for cron,
    * so it is advisable to limit how many items you index per run using
-   * config('search.settings')->get('index.cron_limit') or with your own
+   * config('entity.search_page.list')->get('index.cron_limit') or with your own
    * setting. And since the cron run could time out and abort in the middle of
    * your run, you should update any needed internal bookkeeping on when items
    * have last been indexed as you go rather than waiting to the end of

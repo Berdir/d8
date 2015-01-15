@@ -42,7 +42,7 @@ class SearchQuery extends SelectExtender {
    * Positive keywords are words that are searched for, as opposed to negative
    * keywords, which are words that are excluded. To count as a keyword, a
    * word must be at least
-   * \Drupal::config('search.settings')->get('index.minimum_word_size')
+   * \Drupal::config('entity.search_page.list')->get('index.minimum_word_size')
    * characters.
    *
    * @see SearchQuery::getStatus()
@@ -53,7 +53,7 @@ class SearchQuery extends SelectExtender {
    * Indicates that part of the search expression was ignored.
    *
    * To prevent Denial of Service attacks, only
-   * \Drupal::config('search.settings')->get('and_or_limit') expressions
+   * \Drupal::config('entity.search_page.list')->get('and_or_limit') expressions
    * (positive keywords, phrases, negative keywords) are allowed; this flag
    * indicates that expressions existed past that limit and they were removed.
    *
@@ -237,7 +237,7 @@ class SearchQuery extends SelectExtender {
 
     // Classify tokens.
     $in_or = FALSE;
-    $limit_combinations = \Drupal::config('search.settings')->get('and_or_limit');
+    $limit_combinations = \Drupal::config('entity.search_page.list')->get('and_or_limit');
     // The first search expression does not count as AND.
     $and_count = -1;
     $or_count = 0;
@@ -368,7 +368,7 @@ class SearchQuery extends SelectExtender {
     $split = explode(' ', $word);
     foreach ($split as $s) {
       $num = is_numeric($s);
-      if ($num || Unicode::strlen($s) >= \Drupal::config('search.settings')->get('index.minimum_word_size')) {
+      if ($num || Unicode::strlen($s) >= \Drupal::config('entity.search_page.list')->get('index.minimum_word_size')) {
         if (!isset($this->words[$s])) {
           $this->words[$s] = $s;
           $num_new_scores++;

@@ -1,6 +1,6 @@
 # Schema for the configuration files of the search module.
 
-search.settings:
+entity.search_page.list:
   type: mapping
   label: 'Search settings'
   mapping:

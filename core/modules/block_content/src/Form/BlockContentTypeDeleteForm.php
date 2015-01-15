@@ -55,7 +55,7 @@ class BlockContentTypeDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('block_content.type_list');
+    return new Url('entity.block_content_type.list');
   }
 
   /**
