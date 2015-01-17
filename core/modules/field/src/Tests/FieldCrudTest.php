@@ -68,6 +68,10 @@ class FieldCrudTest extends FieldUnitTestBase {
    * Test the creation of a field.
    */
   function testCreateField() {
+    // Set a state flag so that field_test.module knows to add an in-memory
+    // constraint for this field.
+    \Drupal::state()->set('field_test_add_constraint', $this->fieldStorage->getName());
+    /** @var \Drupal\Core\Field\FieldConfigInterface $field */
     $field = entity_create('field_config', $this->fieldDefinition);
     $field->save();
 
@@ -87,6 +91,21 @@ class FieldCrudTest extends FieldUnitTestBase {
 
     // Check that the denormalized 'field_type' was properly written.
     $this->assertEqual($config['field_type'], $this->fieldStorageDefinition['type']);
+
+    // Test constraints are applied. A NotNull constraint is added dynamically.
+    // @see field_test_entity_bundle_field_info_alter()
+    $entity = entity_create('entity_test');
+    $entity->set($this->fieldStorage->getName(), 1);
+    $violations = $entity->validate();
+    $this->assertEqual(count($violations), 0, 'No violations found when value passed.');
+
+    $entity->set($this->fieldStorage->getName(), 33);
+    $violations = $entity->validate();
+    $this->assertEqual(count($violations), 1, 'Violations found when using NULL value.');
+    $this->assertEqual($violations[0]->getPropertyPath(), $this->fieldStorage->getName() . '.0.value');
+    $this->assertEqual($violations[0]->getMessage(), t('This value should be %limit or less.', [
+      '%limit' => 32,
+    ]));
 
     // Guarantee that the field/bundle combination is unique.
     try {

@@ -191,6 +191,13 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   protected $bundleRenameAllowed = FALSE;
 
   /**
+   * Array of constraint options keyed by ID.
+   *
+   * @var array
+   */
+  protected $constraints = [];
+
+  /**
    * {@inheritdoc}
    */
   public function id() {
@@ -448,6 +455,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
     if (!isset($this->itemDefinition)) {
       $this->itemDefinition = FieldItemDataDefinition::create($this)
         ->setSettings($this->getSettings());
+      $this->itemDefinition->setConstraints($this->constraints);
     }
     return $this->itemDefinition;
   }
@@ -480,6 +488,23 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
    */
   public function getConfig($bundle) {
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setConstraints(array $constraints) {
+    $this->constraints = [];
+    $this->getItemDefinition()->setConstraints($constraints);
+    $this->constraints = $constraints;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addConstraint($constraint_name, $options = NULL) {
+    $this->getItemDefinition()->addConstraint($constraint_name, $options);
+    $this->constraints[$constraint_name] = $options;
   }
 
 }

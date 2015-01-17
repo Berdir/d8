@@ -11,6 +11,7 @@ use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldConfigBase;
 use Drupal\Core\Field\FieldException;
+use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\field\FieldStorageConfigInterface;
 use Drupal\field\FieldConfigInterface;
 
