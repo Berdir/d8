@@ -30,6 +30,11 @@ block.block.*:
       sequence:
         - type: condition.plugin.[id]
           label: 'Visibility Condition'
+    third_party_settings:
+      type: sequence
+      label: 'Third party settings'
+      sequence:
+        - type: block.third_party.[%key]
 
 block.settings.*:
   type: block_settings

@@ -8,11 +8,12 @@
 namespace Drupal\block;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
 
 /**
  * Provides an interface defining a block entity.
  */
-interface BlockInterface extends ConfigEntityInterface {
+interface BlockInterface extends ConfigEntityInterface, ThirdPartySettingsInterface {
 
   /**
    * Indicates the block label (title) should be displayed to end users.

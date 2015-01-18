@@ -14,6 +14,7 @@ use Drupal\block\BlockPluginCollection;
 use Drupal\block\BlockInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\Core\Config\Entity\ThirdPartySettingsTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
@@ -42,6 +43,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * )
  */
 class Block extends ConfigEntityBase implements BlockInterface, EntityWithPluginCollectionInterface {
+
+  use ThirdPartySettingsTrait;
 
   /**
    * The ID of the block.
