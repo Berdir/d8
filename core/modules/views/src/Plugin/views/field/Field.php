@@ -22,6 +22,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\field\Views\FieldStorageViewsTrait;
 use Drupal\views\Plugin\CacheablePluginInterface;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
@@ -40,30 +41,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Field extends FieldPluginBase implements CacheablePluginInterface, MultiItemsFieldHandlerInterface {
 
+  use FieldStorageViewsTrait;
+
   /**
    * An array to store field renderable arrays for use by renderItems().
    *
    * @var array
    */
   public $items = array();
-
-  /**
-   * The field definition to use.
-   *
-   * A field storage definition turned into a field definition, so it can be
-   * used with widgets and formatters. See
-   * BaseFieldDefinition::createFromFieldStorageDefinition().
-   *
-   * @var \Drupal\Core\Field\FieldDefinitionInterface
-   */
-  protected $fieldDefinition;
-
-  /**
-   * The field config.
-   *
-   * @var \Drupal\field\FieldStorageConfigInterface
-   */
-  protected $fieldStorageConfig;
 
   /**
    * Does the field supports multiple field values.
@@ -162,33 +147,6 @@ class Field extends FieldPluginBase implements CacheablePluginInterface, MultiIt
       $container->get('language_manager'),
       $container->get('renderer')
     );
-  }
-
-  /**
-   * Gets the field definition.
-   *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface
-   *   The field definition used by this handler.
-   */
-  protected function getFieldDefinition() {
-    if (!$this->fieldDefinition) {
-      $field_storage_config = $this->getFieldStorageConfig();
-      $this->fieldDefinition = BaseFieldDefinition::createFromFieldStorageDefinition($field_storage_config);
-    }
-    return $this->fieldDefinition;
-  }
-
-  /**
-   * Gets the field configuration.
-   *
-   * @return \Drupal\field\FieldStorageConfigInterface
-   */
-  protected function getFieldStorageConfig() {
-    if (!$this->fieldStorageConfig) {
-      $field_storage_definitions = \Drupal::entityManager()->getFieldStorageDefinitions($this->definition['entity_type']);
-      $this->fieldStorageConfig = $field_storage_definitions[$this->definition['field_name']];
-    }
-    return $this->fieldStorageConfig;
   }
 
   /**
@@ -955,7 +913,7 @@ class Field extends FieldPluginBase implements CacheablePluginInterface, MultiIt
     $dependencies = parent::calculateDependencies();
 
     // Add the module providing the configured field storage as a dependency.
-    $dependencies['config'][] = $this->getFieldStorageConfig()->getConfigDependencyName();
+    $dependencies['config'][] = $this->getFieldStorageDefinition()->getConfigDependencyName();
     // Add the module providing the formatter.
     if ($this->options['type']) {
       $dependencies['module'][] = $this->formatterPluginManager->getDefinition($this->options['type'])['provider'];
