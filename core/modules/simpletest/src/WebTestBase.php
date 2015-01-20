@@ -2740,10 +2740,11 @@ abstract class WebTestBase extends TestBase {
     if ($path instanceof Url) {
       return $path->setAbsolute()->toString();
     }
-    // The URL assembler service is not necessarily available yet; e.g., in
+    // The URL generator service is not necessarily available yet; e.g., in
     // interactive installer tests.
-    elseif ($this->container->has('unrouted_url_assembler')) {
-      return Url::fromUri('base://' . $path, $options)->setAbsolute()->toString();
+    else if ($this->container->has('url_generator')) {
+      $options['absolute'] = TRUE;
+      return $this->container->get('url_generator')->generateFromPath($path, $options);
     }
     else {
       return $this->getAbsoluteUrl($path);
