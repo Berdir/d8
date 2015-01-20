@@ -155,13 +155,24 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
    *   The options to merge in the defaults.
    */
   protected function addOptionDefaults(array &$options) {
+    $request = $this->requestStack->getCurrentRequest();
+    $current_base_path = $request->getBasePath() . '/';
+    $current_script_path = '';
+    $base_path_with_script = $request->getBaseUrl();
+    if (!empty($base_path_with_script)) {
+      $script_name = $request->getScriptName();
+      if (strpos($base_path_with_script, $script_name) !== FALSE) {
+        $current_script_path = ltrim(substr($script_name, strlen($current_base_path)), '/') . '/';
+      }
+    }
+
     // Merge in defaults.
     $options += [
       'fragment' => '',
       'query' => [],
       'absolute' => FALSE,
       'prefix' => '',
-      'script' => '',
+      'script' => $current_script_path,
     ];
 
     if (isset($options['fragment']) && $options['fragment'] !== '') {

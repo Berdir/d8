@@ -7,6 +7,7 @@
 
 namespace Drupal\rest\Tests;
 
+use Drupal\core\Url;
 use Drupal\rest\Tests\RESTTestBase;
 
 /**
@@ -70,9 +71,9 @@ class DeleteTest extends RESTTestBase {
     $this->enableService(FALSE);
     $account = $this->drupalCreateUser();
     $this->drupalLogin($account);
-    $this->httpRequest('entity/user/' . $account->id(), 'DELETE');
+    $this->httpRequest($account->urlInfo(), 'DELETE');
     $user = entity_load('user', $account->id(), TRUE);
     $this->assertEqual($account->id(), $user->id(), 'User still exists in the database.');
-    $this->assertResponse(404);
+    $this->assertResponse(405);
   }
 }
