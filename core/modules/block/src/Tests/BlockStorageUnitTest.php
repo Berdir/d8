@@ -104,6 +104,7 @@ class BlockStorageUnitTest extends KernelTestBase {
         ),
       ),
       'visibility' => array(),
+      'third_party_settings' => array(),
     );
 
     $this->assertIdentical($actual_properties, $expected_properties);
