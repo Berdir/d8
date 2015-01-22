@@ -371,18 +371,4 @@ abstract class RESTTestBase extends WebTestBase {
     return $node;
   }
 
-  /**
-   * Remove user fields where a non-admin user cannot write to.
-   *
-   * @param UserInterface $user
-   * @return UserInterface
-   */
-  protected function removeUserFieldsForNonAdminUsers(UserInterface $user) {
-    unset($user->status);
-    unset($user->created);
-    unset($user->changed);
-
-    return $user;
-  }
-
 }

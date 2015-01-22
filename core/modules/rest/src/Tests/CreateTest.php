@@ -171,18 +171,16 @@ class CreateTest extends RESTTestBase {
       $entity_values = $this->entityValues($entity_type);
       $entity = entity_create($entity_type, $entity_values);
 
-      // Verify that user cannot create content when trying to write to fields where it is not possible.
+      // Verify that only administrative users can create users.
       if (!$account->hasPermission('administer users')) {
         $serialized = $this->serializer->serialize($entity, $this->defaultFormat, ['account' => $account]);
         $this->httpRequest('entity/' . $entity_type, 'POST', $serialized, $this->defaultMimeType);
         $this->assertResponse(403);
-        // Remove fields where non-admin users cannot write.
-        $entity = $this->removeUserFieldsForNonAdminUsers($entity);
+        continue;
       }
-      else {
-        // Changed field can never be added.
-        unset($entity->changed);
-      }
+
+      // Changed field can never be added.
+      unset($entity->changed);
 
       $serialized = $this->serializer->serialize($entity, $this->defaultFormat, ['account' => $account]);
 
@@ -195,9 +193,6 @@ class CreateTest extends RESTTestBase {
       $this->createEntityNoData($entity_type);
 
       $this->createEntityInvalidSerialized($entity, $entity_type);
-
-      $this->createEntityWithoutProperPermissions($entity_type, $serialized);
-
     }
 
   }
