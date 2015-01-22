@@ -9,7 +9,9 @@ namespace Drupal\rest\Tests;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\node\NodeInterface;
 use Drupal\simpletest\WebTestBase;
+use Drupal\user\UserInterface;
 
 /**
  * Test helper class that provides a REST client method to send HTTP requests.
@@ -349,6 +351,38 @@ abstract class RESTTestBase extends WebTestBase {
     $url_parts = explode('/', $location_url);
     $id = end($url_parts);
     return entity_load($this->testEntityType, $id);
+  }
+
+  /**
+   * Remove node fields where a non-admin user cannot write to.
+   *
+   * @param NodeInterface $node
+   * @return NodeInterface
+   */
+  protected function removeNodeFieldsForNonAdminUsers(NodeInterface $node) {
+    unset($node->status);
+    unset($node->created);
+    unset($node->changed);
+    unset($node->promote);
+    unset($node->sticky);
+    unset($node->revision_timestamp);
+    unset($node->uid);
+
+    return $node;
+  }
+
+  /**
+   * Remove user fields where a non-admin user cannot write to.
+   *
+   * @param UserInterface $user
+   * @return UserInterface
+   */
+  protected function removeUserFieldsForNonAdminUsers(UserInterface $user) {
+    unset($user->status);
+    unset($user->created);
+    unset($user->changed);
+
+    return $user;
   }
 
 }
