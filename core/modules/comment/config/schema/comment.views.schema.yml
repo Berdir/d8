@@ -46,18 +46,6 @@ views.field.comment_link_approve:
   type: views.field.comment_link
   label: 'Comment approve link'
 
-views.field.comment_link_delete:
-  type: views.field.comment_link
-  label: 'Comment delete link'
-
-views.field.comment_link_edit:
-  type: views.field.comment_link
-  label: 'Comment edit link'
-  mapping:
-    destination:
-      type: boolean
-      label: 'Use destination'
-
 views.field.comment_link_reply:
   type: views.field.comment_link
   label: 'Comment reply link'

@@ -256,7 +256,7 @@ display:
           label: ''
           exclude: true
           text: Edit
-          plugin_id: node_link_edit
+          plugin_id: entity_link_edit
           entity_type: node
         delete_node:
           id: delete_node
@@ -265,7 +265,7 @@ display:
           label: ''
           exclude: true
           text: Delete
-          plugin_id: node_link_delete
+          plugin_id: entity_link_delete
           entity_type: node
         dropbutton:
           id: dropbutton

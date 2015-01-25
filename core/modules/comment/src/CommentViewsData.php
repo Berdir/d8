@@ -108,30 +108,6 @@ class CommentViewsData extends EntityViewsData {
     $data['comment_field_data']['status']['filter']['label'] = t('Approved comment status');
     $data['comment_field_data']['status']['filter']['type'] = 'yes-no';
 
-    $data['comment']['view_comment'] = array(
-      'field' => array(
-        'title' => t('Link to comment'),
-        'help' => t('Provide a simple link to view the comment.'),
-        'id' => 'comment_link',
-      ),
-    );
-
-    $data['comment']['edit_comment'] = array(
-      'field' => array(
-        'title' => t('Link to edit comment'),
-        'help' => t('Provide a simple link to edit the comment.'),
-        'id' => 'comment_link_edit',
-      ),
-    );
-
-    $data['comment']['delete_comment'] = array(
-      'field' => array(
-        'title' => t('Link to delete comment'),
-        'help' => t('Provide a simple link to delete the comment.'),
-        'id' => 'comment_link_delete',
-      ),
-    );
-
     $data['comment']['approve_comment'] = array(
       'field' => array(
         'title' => t('Link to approve comment'),

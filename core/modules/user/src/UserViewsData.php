@@ -250,15 +250,6 @@ class UserViewsData extends EntityViewsData {
       );
     }
 
-    $data['users']['edit_node'] = array(
-      'field' => array(
-        'title' => t('Link to edit user'),
-        'help' => t('Provide a simple link to edit the user.'),
-        'id' => 'user_link_edit',
-        'click sortable' => FALSE,
-      ),
-    );
-
     $data['users']['cancel_node'] = array(
       'field' => array(
         'title' => t('Link to cancel user'),

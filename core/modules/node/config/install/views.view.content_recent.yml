@@ -263,7 +263,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           text: edit
-          plugin_id: node_link_edit
+          plugin_id: entity_link_edit
           entity_type: node
         delete_node:
           id: delete_node
@@ -314,7 +314,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           text: delete
-          plugin_id: node_link_delete
+          plugin_id: entity_link_delete
           entity_type: node
       filters:
         status_extra:

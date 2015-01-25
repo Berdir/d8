@@ -102,36 +102,12 @@ views.field.node_language:
       label: 'Native language'
 
 views.field.node:
-  type: views_field
+  type: views.field.entity_link
   label: 'Node'
   mapping:
     link_to_node:
       type: boolean
       label: 'Link this field to the original piece of content'
-
-views.field.node_link:
-  type: views_field
-  label: 'Node link'
-  mapping:
-    text:
-      type: label
-      label: 'Text to display'
-
-views.field.node_link_delete:
-  type: views_field
-  label: 'Node delete link'
-  mapping:
-    text:
-      type: label
-      label: 'Text to display'
-
-views.field.node_link_edit:
-  type: views_field
-  label: 'Node edit link'
-  mapping:
-    text:
-      type: label
-      label: 'Text to display'
 
 views.field.node_bulk_form:
   type: views_field_bulk_form

@@ -36,7 +36,6 @@ class NodeViewsData extends EntityViewsData implements EntityViewsDataInterface 
     $data['node_field_data']['title']['field']['id'] = 'node';
     $data['node_field_data']['title']['field']['link_to_node default'] = TRUE;
 
-    $data['node_field_data']['type']['field']['id'] = 'node_type';
     $data['node_field_data']['type']['argument']['id'] = 'node_type';
 
     $data['node_field_data']['langcode']['help'] = t('The language of the content or translation.');
@@ -82,30 +81,6 @@ class NodeViewsData extends EntityViewsData implements EntityViewsDataInterface 
         ),
       );
     }
-
-    $data['node']['view_node'] = array(
-      'field' => array(
-        'title' => t('Link to content'),
-        'help' => t('Provide a simple link to the content.'),
-        'id' => 'node_link',
-      ),
-    );
-
-    $data['node']['edit_node'] = array(
-      'field' => array(
-        'title' => t('Link to edit content'),
-        'help' => t('Provide a simple link to edit the content.'),
-        'id' => 'node_link_edit',
-      ),
-    );
-
-    $data['node']['delete_node'] = array(
-      'field' => array(
-        'title' => t('Link to delete content'),
-        'help' => t('Provide a simple link to delete the content.'),
-        'id' => 'node_link_delete',
-      ),
-    );
 
     $data['node']['path'] = array(
       'field' => array(

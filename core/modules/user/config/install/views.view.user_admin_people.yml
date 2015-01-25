@@ -458,10 +458,10 @@ display:
           plugin_id: date
           entity_type: user
           entity_field: access
-        edit_node:
-          id: edit_node
+        edit_user:
+          id: edit_user
           table: users
-          field: edit_node
+          field: edit_user
           relationship: none
           group_type: group
           admin_label: ''
@@ -507,7 +507,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           text: Edit
-          plugin_id: user_link_edit
+          plugin_id: entity_link_edit
           entity_type: user
         dropbutton:
           id: dropbutton

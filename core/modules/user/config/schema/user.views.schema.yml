@@ -83,10 +83,6 @@ views.field.user_link_cancel:
   type: views.field.user_link
   label: 'User cancel link'
 
-views.field.user_link_edit:
-  type: views.field.user_link
-  label: 'User edit link'
-
 views.field.user_mail:
   type: views_field_user
   label: 'User language'

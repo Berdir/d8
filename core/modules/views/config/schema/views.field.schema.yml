@@ -178,3 +178,27 @@ views.field.xss:
 views.field.language:
   type: views_field
   label: 'Language'
+
+views.field.entity_link:
+  type: views_field
+  label: 'Entity link'
+  mapping:
+    text:
+      type: label
+      label: 'Text to display'
+
+views.field.entity_link_delete:
+  type: views.field.entity_link
+  label: 'Entity delete link'
+  mapping:
+    text:
+      type: label
+      label: 'Text to display'
+
+views.field.entity_link_edit:
+  type: views.field.entity_link
+  label: 'Entity edit link'
+  mapping:
+    text:
+      type: label
+      label: 'Text to display'

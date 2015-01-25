@@ -9,7 +9,7 @@ namespace Drupal\aggregator\Plugin\views\field;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
-use Drupal\views\Plugin\views\field\FieldPluginBase;
+use Drupal\views\Plugin\views\field\EntityLink;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 
@@ -21,7 +21,7 @@ use Drupal\views\ViewExecutable;
  *
  * @ViewsField("aggregator_title_link")
  */
-class TitleLink extends FieldPluginBase {
+class TitleLink extends EntityLink {
 
   /**
    * {@inheritdoc}
@@ -75,12 +75,8 @@ class TitleLink extends FieldPluginBase {
    *   Returns a string for the link text.
    */
   protected function renderLink($data, ResultRow $values) {
-    $link = $this->getValue($values, 'link');
     if (!empty($this->options['display_as_link'])) {
-      $this->options['alter']['make_link'] = TRUE;
-      $this->options['alter']['path'] = $link;
-      $this->options['alter']['html'] = TRUE;
-      $this->options['alter']['absolute'] = TRUE;
+      parent::renderLink($this->getEntity($values), $values);
     }
 
     return $data;

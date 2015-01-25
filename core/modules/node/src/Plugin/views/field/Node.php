@@ -8,10 +8,10 @@
 namespace Drupal\node\Plugin\views\field;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\Plugin\views\field\EntityLink;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
-use Drupal\views\Plugin\views\field\FieldPluginBase;
 
 /**
  * Field handler to provide simple renderer that allows linking to a node.
@@ -22,10 +22,10 @@ use Drupal\views\Plugin\views\field\FieldPluginBase;
  *
  * @ViewsField("node")
  */
-class Node extends FieldPluginBase {
+class Node extends EntityLink {
 
   /**
-   * Overrides \Drupal\views\Plugin\views\field\FieldPluginBase::init().
+   * {@inheritdoc}
    */
   public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
     parent::init($view, $display, $options);
@@ -34,6 +34,18 @@ class Node extends FieldPluginBase {
     if (!empty($this->options['link_to_node'])) {
       $this->additional_fields['nid'] = array('table' => 'node', 'field' => 'nid');
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function query() {
+    $this->ensureMyTable();
+    // Add the field.
+    $params = $this->options['group_type'] != 'group' ? array('function' => $this->options['group_type']) : array();
+    $this->field_alias = $this->query->addField($this->tableAlias, $this->realField, NULL, $params);
+
+    $this->addAdditionalFields();
   }
 
   protected function defineOptions() {
@@ -72,16 +84,6 @@ class Node extends FieldPluginBase {
       if ($data !== NULL && $data !== '') {
         $this->options['alter']['make_link'] = TRUE;
         $this->options['alter']['path'] = "node/" . $this->getValue($values, 'nid');
-        if (isset($this->aliases['langcode'])) {
-          $languages = \Drupal::languageManager()->getLanguages();
-          $langcode = $this->getValue($values, 'langcode');
-          if (isset($languages[$langcode])) {
-            $this->options['alter']['language'] = $languages[$langcode];
-          }
-          else {
-            unset($this->options['alter']['language']);
-          }
-        }
       }
       else {
         $this->options['alter']['make_link'] = FALSE;
