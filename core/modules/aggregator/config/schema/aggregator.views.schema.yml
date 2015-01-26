@@ -9,7 +9,7 @@ views.argument.aggregator_iid:
   label: 'Aggregator item ID'
 
 views.field.aggregator_title_link:
-  type: views_field
+  type: views.field.entity_link
   label: 'Title link'
   mapping:
     display_as_link:

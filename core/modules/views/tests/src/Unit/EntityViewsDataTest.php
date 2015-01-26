@@ -630,9 +630,9 @@ class EntityViewsDataTest extends UnitTestCase {
    * Tests add link types.
    */
   public function testEntityLinks() {
-    $this->baseEntityType->setLinkTemplate('canonical', 'entity.entity_test.canonical');
-    $this->baseEntityType->setLinkTemplate('edit-form', 'entity.entity_test.edit_form');
-    $this->baseEntityType->setLinkTemplate('delete-form', 'entity.entity_test.delete_form');
+    $this->baseEntityType->setLinkTemplate('canonical', '/entity_test/{entity_test}');
+    $this->baseEntityType->setLinkTemplate('edit-form', '/entity_test/{entity_test}/edit');
+    $this->baseEntityType->setLinkTemplate('delete-form', '/entity_test/{entity_test}/delete');
 
     $data = $this->viewsData->getViewsData();
     $this->assertEquals('entity_link', $data['entity_test']['view_entity_test']['field']['id']);
@@ -644,7 +644,7 @@ class EntityViewsDataTest extends UnitTestCase {
    * Tests additional edit links.
    */
   public function testEntityLinksJustEditForm() {
-    $this->baseEntityType->setLinkTemplate('edit-form', 'entity.entity_test.edit_form');
+    $this->baseEntityType->setLinkTemplate('edit-form', '/entity_test/{entity_test}/edit');
 
     $data = $this->viewsData->getViewsData();
     $this->assertFalse(isset($data['entity_test']['view_entity_test']));
