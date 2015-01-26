@@ -40,9 +40,7 @@ class DeleteForm extends ContentEntityDeleteForm {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    parent::submitForm($form, $form_state);
-
+  public function logDeletionMessage() {
     $this->logger('content')->notice('Deleted comment @cid and its replies.', array('@cid' => $this->entity->id()));
   }
 
