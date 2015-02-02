@@ -267,7 +267,7 @@ function menu_ui_node_prepare_form(NodeInterface $node, $operation, FormStateInt
  *
  * Adds menu item fields to the node form.
  *
- * @see menu_ui_node_submit()
+ * @see menu_ui_form_node_form_submit()
  */
 function menu_ui_form_node_form_alter(&$form, FormStateInterface $form_state) {
   // Generate a list of possible parents (not including this link or descendants).
@@ -353,14 +353,16 @@ function menu_ui_form_node_form_alter(&$form, FormStateInterface $form_state) {
     '#default_value' => $definition['weight'],
     '#description' => t('Menu links with lower weights are displayed before links with higher weights.'),
   );
+  array_unshift($form['actions']['submit']['#submit'], 'menu_ui_form_node_form_submit');
 }
 
 /**
- * Implements hook_node_submit().
+ * Form submission handler for menu item field on the node form.
  *
  * @see menu_ui_form_node_form_alter()
  */
-function menu_ui_node_submit(EntityInterface $node, $form, FormStateInterface $form_state) {
+function menu_ui_form_node_form_submit($form, FormStateInterface $form_state) {
+  $node = $form_state->getFormObject()->getEntity();
   if (!$form_state->isValueEmpty('menu')) {
     $definition = $form_state->getValue('menu');
     if (empty($definition['enabled'])) {
