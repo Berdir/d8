@@ -8,7 +8,6 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Config\Entity\ThirdPartySettingsTrait;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\field\Entity\FieldConfig;
@@ -19,8 +18,6 @@ use Drupal\Component\Utility\String;
  * Provides a common base class for entity view and form displays.
  */
 abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDisplayInterface {
-
-  use ThirdPartySettingsTrait;
 
   /**
    * The 'mode' for runtime EntityDisplay objects used to render entities with

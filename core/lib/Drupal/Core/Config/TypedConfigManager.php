@@ -238,6 +238,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    * their value or some of these special strings:
    * - '%key', will be replaced by the element's key.
    * - '%parent', to reference the parent element.
+   * - '%definition_type', to reference the definition type of the parent.
    *
    * There may be nested configuration keys separated by dots or more complex
    * patterns like '%parent.name' which references the 'name' value of the
@@ -260,6 +261,13 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     $parts = explode('.', $value);
     // Process each value part, one at a time.
     while ($name = array_shift($parts)) {
+      if ($name == '%definition_type') {
+        if ($data['%parent']) {
+          /** @var \Drupal\Core\Config\Schema\ArrayElement $parent */
+          $parent = $data['%parent'];
+          return $parent->getDataDefinition()->getDataType();
+        }
+      }
       if (!is_array($data) || !isset($data[$name])) {
         // Key not found, return original value
         return $value;

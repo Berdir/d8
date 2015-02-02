@@ -9,7 +9,6 @@ namespace Drupal\Tests\Core\Config\Entity\Fixtures;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
-use Drupal\Core\Config\Entity\ThirdPartySettingsTrait;
 
 /**
  * Enables testing of dependency calculation.
@@ -18,6 +17,5 @@ use Drupal\Core\Config\Entity\ThirdPartySettingsTrait;
  * @see \Drupal\Core\Config\Entity\ConfigEntityBase::calculateDependencies()
  */
 abstract class ConfigEntityBaseWithThirdPartySettings extends ConfigEntityBase implements ThirdPartySettingsInterface {
-  use ThirdPartySettingsTrait;
 
 }
