@@ -11,7 +11,7 @@ field.field.*.*.*.third_party.content_translation:
         - type: string
           label: 'Field column for which to synchronize translations'
 
-language.entity.*.third_party.content_translation:
+language.content_settings.*.*.third_party.content_translation:
   type: mapping
   label: 'Content translation content settings'
   mapping:
