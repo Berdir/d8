@@ -22,9 +22,8 @@ class DependencySerializationTraitPass implements CompilerPassInterface {
    */
   public function process(ContainerBuilder $container) {
     foreach ($container->getDefinitions() as $service_id => $definition) {
-      // Some services might have strings internally.
-      // Given that you can just reload a service which is accessible via
-      // Container::get, you need to filter out public services here.
+      // Only add the property to services that are public (as private services
+      // can not be reloaded through Container::get()) and are objects.
       if (!$definition->hasTag('non_class') && $definition->isPublic()) {
         $definition->setProperty('_serviceId', $service_id);
       }
