@@ -1737,6 +1737,7 @@ function drupal_flush_all_caches() {
   foreach (Cache::getBins() as $service_id => $cache_backend) {
     $cache_backend->deleteAll();
   }
+  \Drupal::service('cache_tags.invalidator.checksum')->resetTagInvalidations();
 
   // Flush asset file caches.
   \Drupal::service('asset.css.collection_optimizer')->deleteAll();

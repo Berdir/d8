@@ -132,6 +132,14 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
   /**
    * {@inheritdoc}
    */
+  public function resetTagInvalidations() {
+    $this->connection->truncate('cachetags')->execute();
+    $this->reset();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function reset() {
     $this->tagCache = array();
     $this->invalidatedTags = array();

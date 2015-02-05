@@ -54,6 +54,13 @@ interface CacheTagsChecksumInterface {
   public function isValid($checksum, array $tags);
 
   /**
+   * Clear all stored cache tag invalidations.
+   *
+   * Called after clearing all stored caches.
+   */
+  public function resetTagInvalidations();
+
+  /**
    * Reset statically cached tags.
    *
    * This is only used by tests.
