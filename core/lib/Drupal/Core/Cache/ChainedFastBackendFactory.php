@@ -58,7 +58,14 @@ class ChainedFastBackendFactory implements CacheFactoryInterface {
     }
 
     $this->consistentServiceName = $consistent_service_name;
-    $this->fastServiceName = $fast_service_name;
+
+    // Do not use the fast chained backend when we are in maintenance mode, e.g.
+    // during installation. In those cases, we expect more cache invalidations
+    // and writes, the fast chained cache backend performs badly in such a
+    // scenario.
+    if (!defined('MAINTENANCE_MODE')) {
+      $this->fastServiceName = $fast_service_name;
+    }
   }
 
   /**
