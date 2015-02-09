@@ -1816,11 +1816,6 @@ function install_finished(&$install_state) {
   // installer does not use an HttpKernel, that event is never triggered.
   \Drupal::service('router.builder')->rebuild();
 
-  // Run cron to populate update status tables (if available) so that users
-  // will be warned if they've installed an out of date Drupal version.
-  // Will also trigger indexing of profile-supplied content or feeds.
-  \Drupal::service('cron')->run();
-
   // Save a snapshot of the initially installed configuration.
   $active = \Drupal::service('config.storage');
   $snapshot = \Drupal::service('config.storage.snapshot');
