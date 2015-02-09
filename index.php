@@ -14,6 +14,8 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+unlink('/tmp/classes.txt');
+
 $autoloader = require_once __DIR__ . '/core/vendor/autoload.php';
 
 try {

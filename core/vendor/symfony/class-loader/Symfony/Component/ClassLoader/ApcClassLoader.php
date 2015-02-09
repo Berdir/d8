@@ -110,6 +110,9 @@ class ApcClassLoader
      */
     public function loadClass($class)
     {
+
+        $nesting = isset($GLOBALS['nesting']) ? $GLOBALS['nesting'] : 0;
+        file_put_contents('/tmp/classes.txt', str_repeat('  ', $nesting) . $class . "\n", FILE_APPEND);
         if ($file = $this->findFile($class)) {
             require $file;
 

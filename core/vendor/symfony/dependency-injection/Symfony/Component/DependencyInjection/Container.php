@@ -322,8 +322,12 @@ class Container implements IntrospectableContainerInterface
 
         $this->loading[$id] = true;
 
+        $GLOBALS['nesting'] = count($this->loading);
+        file_put_contents('/tmp/classes.txt', str_repeat('- ', count($this->loading)) . $id . "\n", FILE_APPEND);
+
         try {
             $service = $this->$method();
+
         } catch (\Exception $e) {
             unset($this->loading[$id]);
 
@@ -337,6 +341,8 @@ class Container implements IntrospectableContainerInterface
 
             throw $e;
         }
+
+        $GLOBALS['nesting']--;
 
         unset($this->loading[$id]);
 
