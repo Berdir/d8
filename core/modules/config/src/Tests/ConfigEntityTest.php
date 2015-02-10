@@ -39,6 +39,10 @@ class ConfigEntityTest extends WebTestBase {
    */
   function testCRUD() {
     $default_langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
+
+    $storage = \Drupal::entityManager()->getStorage('config_test');
+    $this->assertFalse($storage->hasData());
+
     // Verify default properties on a newly created empty entity.
     $empty = entity_create('config_test');
     $this->assertTrue($empty->uuid());
@@ -79,6 +83,8 @@ class ConfigEntityTest extends WebTestBase {
     catch (EntityMalformedException $e) {
       $this->pass('EntityMalformedException was thrown.');
     }
+
+    $this->assertTrue($storage->hasData());
 
     // Verify that an entity with an empty ID string is considered empty, too.
     $empty_id = entity_create('config_test', array(
