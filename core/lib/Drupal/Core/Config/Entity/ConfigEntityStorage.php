@@ -287,7 +287,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    * {@inheritdoc}
    */
   public function hasData() {
-    return FALSE;
+    return (bool) $this->configFactory->listAll($this->getPrefix());
   }
 
   /**

@@ -203,7 +203,7 @@ class KeyValueEntityStorage extends EntityStorageBase {
    * {@inheritdoc}
    */
   public function hasData() {
-    return FALSE;
+    return (bool) $this->keyValueStore->getAll();
   }
 
   /**

@@ -23,14 +23,6 @@ use Drupal\Core\Field\FieldStorageDefinitionListenerInterface;
 interface DynamicallyFieldableEntityStorageInterface extends FieldableEntityStorageInterface, FieldStorageDefinitionListenerInterface {
 
   /**
-   * Determines if the storage contains any data.
-   *
-   * @return bool
-   *   TRUE if the storage contains data, FALSE if not.
-   */
-  public function hasData();
-
-  /**
    * Reacts to the creation of a field.
    *
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
