@@ -784,17 +784,19 @@ function simpletest_script_get_test_list() {
   else {
     if ($args['class']) {
       $test_list = array();
+      $groups = simpletest_test_get_all();
+      $all_classes = array();
+      foreach ($groups as $group) {
+        $all_classes = array_merge($all_classes, array_keys($group));
+      }
       foreach ($args['test_names'] as $test_class) {
         list($class_name, ) = explode('::', $test_class, 2);
-        if (class_exists($class_name)) {
+        // Verify that the class is known, it might be excluded due to missing
+        // dependencies.
+        if (in_array($class_name, $all_classes)) {
           $test_list[] = $test_class;
         }
         else {
-          $groups = simpletest_test_get_all();
-          $all_classes = array();
-          foreach ($groups as $group) {
-            $all_classes = array_merge($all_classes, array_keys($group));
-          }
           simpletest_script_print_error('Test class not found: ' . $class_name);
           simpletest_script_print_alternatives($class_name, $all_classes, 6);
           exit(1);
@@ -809,23 +811,28 @@ function simpletest_script_get_test_list() {
           exit;
         }
         $content = file_get_contents($file);
-        // Extract a potential namespace.
-        $namespace = FALSE;
         if (preg_match('@^namespace ([^ ;]+)@m', $content, $matches)) {
           $namespace = $matches[1];
+        }
+        else  {
+          // Test files must have a namespace.
+          continue;
         }
         // Extract all class names.
         // Abstract classes are excluded on purpose.
         preg_match_all('@^class ([^ ]+)@m', $content, $matches);
-        if (!$namespace) {
-          $test_list = array_merge($test_list, $matches[1]);
+        $groups = simpletest_test_get_all();
+        $all_classes = array();
+        foreach ($groups as $group) {
+          $all_classes = array_merge($all_classes, array_keys($group));
         }
-        else {
-          foreach ($matches[1] as $class_name) {
-            $namespace_class = $namespace . '\\' . $class_name;
-            if (is_subclass_of($namespace_class, '\Drupal\simpletest\TestBase') || is_subclass_of($namespace_class, '\PHPUnit_Framework_TestCase')) {
-              $test_list[] = $namespace_class;
-            }
+
+        foreach ($matches[1] as $class_name) {
+          $namespace_class = $namespace . '\\' . $class_name;
+          // Verify that the class is known, it might be excluded due to missing
+          // dependencies.
+          if (in_array($namespace_class, $all_classes)) {
+            $test_list[] = $namespace_class;
           }
         }
       }
