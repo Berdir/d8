@@ -284,6 +284,13 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function hasData() {
+    return FALSE;
+  }
+
+  /**
    * Gets entities from the static cache.
    *
    * @param array $ids
