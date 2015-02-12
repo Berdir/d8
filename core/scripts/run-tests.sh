@@ -950,7 +950,12 @@ function simpletest_script_reporter_write_xml_results() {
       // Create the XML element for this test case:
       $case = $dom_document->createElement('testcase');
       $case->setAttribute('classname', $test_class);
-      list($class, $name) = explode('->', $result->function, 2);
+      if (strpos($result->function, '->') !== NULL) {
+        list($class, $name) = explode('->', $result->function, 2);
+      }
+      else {
+        $name = $result->function;
+      }
       $case->setAttribute('name', $name);
 
       // Passes get no further attention, but failures and exceptions get to add more detail:
