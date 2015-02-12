@@ -950,7 +950,7 @@ function simpletest_script_reporter_write_xml_results() {
       // Create the XML element for this test case:
       $case = $dom_document->createElement('testcase');
       $case->setAttribute('classname', $test_class);
-      if (strpos($result->function, '->') !== NULL) {
+      if (strpos($result->function, '->') !== FALSE) {
         list($class, $name) = explode('->', $result->function, 2);
       }
       else {
