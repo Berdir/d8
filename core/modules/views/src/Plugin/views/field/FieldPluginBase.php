@@ -1330,9 +1330,9 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       // Url::toUriString() call above, because we support twig tokens in
       // rewrite settings of views fields.
       // In that case the original path looks like
-      // user-path:/admin/content/files/usage/{{fid}}, which will be escaped by
+      // user-path:/admin/content/files/usage/{{ fid }}, which will be escaped by
       // the toUriString() call above.
-      $path = str_replace(['%7B','%7D'], ['{','}'], $path);
+      $path = str_replace(['%7B%20', '%7D%20', '%7B', '%7D'], ['{ ', ' }', '{', '}'], $path);
 
       // Use strip tags as there should never be HTML in the path.
       // However, we need to preserve special characters like " that
