@@ -104,6 +104,7 @@ class SimpletestTestForm extends FormBase {
     ];
 
     // Generate the list of tests arranged by group.
+    \Drupal::moduleHandler()->load('simpletest');
     $groups = simpletest_test_get_all();
     foreach ($groups as $group => $tests) {
       $form['tests'][$group] = array(

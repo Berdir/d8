@@ -29,6 +29,7 @@ abstract class FormTestTableSelectFormBase extends FormBase {
    *   A form with a tableselect element and a submit button.
    */
   function tableselectFormBuilder($form, FormStateInterface $form_state, $element_properties) {
+    \Drupal::moduleHandler()->load('form_test');
     list($header, $options) = _form_test_tableselect_get_data();
 
     $form['tableselect'] = $element_properties;

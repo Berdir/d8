@@ -27,6 +27,6 @@ class RegisterAccessCheck implements AccessInterface {
    */
   public function access(AccountInterface $account) {
     $user_settings = \Drupal::config('user.settings');
-    return AccessResult::allowedIf($account->isAnonymous() && $user_settings->get('register') != USER_REGISTER_ADMINISTRATORS_ONLY)->cacheUntilConfigurationChanges($user_settings);
+    return AccessResult::allowedIf($account->isAnonymous() && $user_settings->get('register') != 'admin_only')->cacheUntilConfigurationChanges($user_settings);
   }
 }

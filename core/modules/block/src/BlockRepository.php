@@ -53,6 +53,7 @@ class BlockRepository implements BlockRepositoryInterface {
    *   An array of human-readable region names keyed by machine name.
    */
   protected function getRegionNames() {
+    \Drupal::moduleHandler()->load('system');
     return system_region_list($this->getTheme());
   }
 

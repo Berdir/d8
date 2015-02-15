@@ -107,6 +107,7 @@ function drupal_install_profile_distribution_name() {
   // At all other times, we load the profile via standard methods.
   else {
     $profile = drupal_get_profile();
+    \Drupal::moduleHandler()->load('system');
     $info = system_get_info('module', $profile);
   }
   return isset($info['distribution']['name']) ? $info['distribution']['name'] : 'Drupal';

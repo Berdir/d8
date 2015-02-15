@@ -47,6 +47,21 @@ use Drupal\taxonomy\VocabularyInterface;
 class Vocabulary extends ConfigEntityBundleBase implements VocabularyInterface {
 
   /**
+   * Denotes that no term in the vocabulary has a parent.
+   */
+  const HIERARCHY_DISABLED = 0;
+
+  /**
+   * Denotes that one or more terms in the vocabulary has a single parent.
+   */
+  const HIERARCHY_SINGLE = 1;
+
+  /**
+   * Denotes that one or more terms in the vocabulary have multiple parents.
+   */
+  const HIERARCHY_MULTIPLE = 2;
+
+  /**
    * The taxonomy vocabulary ID.
    *
    * @var string
@@ -71,13 +86,13 @@ class Vocabulary extends ConfigEntityBundleBase implements VocabularyInterface {
    * The type of hierarchy allowed within the vocabulary.
    *
    * Possible values:
-   * - TAXONOMY_HIERARCHY_DISABLED: No parents.
-   * - TAXONOMY_HIERARCHY_SINGLE: Single parent.
-   * - TAXONOMY_HIERARCHY_MULTIPLE: Multiple parents.
+   * - Vocabulary::HIERARCHY_DISABLED: No parents.
+   * - Vocabulary::HIERARCHY_SINGLE: Single parent.
+   * - Vocabulary::HIERARCHY_MULTIPLE: Multiple parents.
    *
    * @var integer
    */
-  protected $hierarchy = TAXONOMY_HIERARCHY_DISABLED;
+  protected $hierarchy = Vocabulary::HIERARCHY_DISABLED;
 
   /**
    * The weight of this vocabulary in relation to other vocabularies.

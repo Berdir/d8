@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\module_test\Controller;
+use Drupal\module_autoload_test\SomeClass;
 
 /**
  * Controller routines for module_test routes.
@@ -13,24 +14,40 @@ namespace Drupal\module_test\Controller;
 class ModuleTestController {
 
   /**
-   * @todo Remove module_test_hook_dynamic_loading_invoke().
+   * Page callback for 'hook dynamic loading' test.
+   *
+   * If the hook is dynamically loaded correctly, the menu callback should
+   * return 'success!'.
    */
   public function hookDynamicLoadingInvoke() {
-    return module_test_hook_dynamic_loading_invoke();
+    $result = \Drupal::moduleHandler()->invoke('module_test', 'test_hook');
+    return $result['module_test'];
   }
 
   /**
-   * @todo Remove module_test_hook_dynamic_loading_invoke_all().
+   * Page callback for 'hook dynamic loading' test.
+   *
+   * If the hook is dynamically loaded correctly, the menu callback should
+   * return 'success!'.
    */
   public function hookDynamicLoadingInvokeAll() {
-    return module_test_hook_dynamic_loading_invoke_all();
+    $result = \Drupal::moduleHandler()->invokeAll('test_hook');
+    return $result['module_test'];
   }
 
   /**
-   * @todo Remove module_test_class_loading().
+   * Page callback for 'class loading' test.
+   *
+   * This module does not have a dependency on module_autoload_test.module. If
+   * that module is enabled, this function should return the string
+   * 'Drupal\\module_autoload_test\\SomeClass::testMethod() was invoked.'. If
+   * that module is not enabled, this function should return nothing.
    */
   public function testClassLoading() {
-    return ['#markup' => module_test_class_loading()];
+    if (class_exists('Drupal\module_autoload_test\SomeClass')) {
+      $obj = new SomeClass();
+      return ['#markup' => $obj->testMethod()];
+    }
   }
 
 }

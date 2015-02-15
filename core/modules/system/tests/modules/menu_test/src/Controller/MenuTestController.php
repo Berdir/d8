@@ -22,7 +22,6 @@ class MenuTestController {
     return ['#markup' => 'This is the menuTestCallback content.'];
   }
 
-
   /**
    * A title callback method for test routes.
    *
@@ -40,10 +39,27 @@ class MenuTestController {
   }
 
   /**
-   * @todo Remove menu_test_theme_page_callback().
+   * Page callback: Tests the theme negotiation functionality.
+   *
+   * @param bool $inherited
+   *   (optional) TRUE when the requested page is intended to inherit
+   *   the theme of its parent.
+   *
+   * @return string
+   *   A string describing the requested custom theme and actual theme being used
+   *   for the current page request.
+   *
+   * @see menu_test.routing.yml
    */
   public function themePage($inherited) {
-    return menu_test_theme_page_callback($inherited);
+    $theme_key = \Drupal::theme()->getActiveTheme()->getName();
+    // Now we check what the theme negotiator service returns.
+    $active_theme = \Drupal::service('theme.negotiator')->determineActiveTheme(\Drupal::routeMatch());
+    $output = "Active theme: $active_theme. Actual theme: $theme_key.";
+    if ($inherited) {
+      $output .= ' Theme negotiation inheritance is being tested.';
+    }
+    return $output;
   }
 
   /**

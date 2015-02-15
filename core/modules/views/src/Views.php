@@ -522,6 +522,20 @@ class Views {
   }
 
   /**
+   * #pre_render callback to set contextual links for views using a Page display.
+   */
+  public static function pageDisplayPreRender(array $element) {
+    // If the main content of this page contains a view, attach its contextual
+    // links to the overall page array. This allows them to be rendered directly
+    // next to the page title.
+    \Drupal::moduleHandler()->load('views');
+    if ($view = views_get_page_view()) {
+      views_add_contextual_links($element, 'page', $view, $view->current_display);
+    }
+    return $element;
+  }
+
+  /**
    * Translates a string to the current language or to a given language.
    *
    * See the t() documentation for details.

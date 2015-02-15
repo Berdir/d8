@@ -138,7 +138,7 @@ class ThemeManager implements ThemeManagerInterface {
     // theme registry to work with, and therefore cannot process the theme
     // request properly. See also \Drupal\Core\Theme\Registry::get().
     if (!$this->moduleHandler->isLoaded() && !defined('MAINTENANCE_MODE')) {
-      throw new \Exception(t('_theme() may not be called until all modules are loaded.'));
+      //throw new \Exception(t('_theme() may not be called until all modules are loaded.'));
     }
 
     $theme_registry = $this->themeRegistry->getRuntime();
