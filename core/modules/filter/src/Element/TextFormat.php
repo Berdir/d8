@@ -119,6 +119,7 @@ class TextFormat extends RenderElement {
     );
 
     // Get a list of formats that the current user has access to.
+    \Drupal::moduleHandler()->load('filter');
     $formats = filter_formats($user);
 
     // Allow the list of formats to be restricted.

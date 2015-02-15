@@ -66,7 +66,7 @@ class ManagedFile extends FormElement {
       $return = $input;
 
       // Uploads take priority over all other values.
-      if ($files = file_managed_file_save_upload($element, $form_state)) {
+      if ($files = static::saveUpload($element, $form_state)) {
         if ($element['#multiple']) {
           $fids = array_merge($fids, array_keys($files));
         }
@@ -121,6 +121,52 @@ class ManagedFile extends FormElement {
 
     $return['fids'] = $fids;
     return $return;
+  }
+
+  /**
+   * Saves any files that have been uploaded into a managed_file element.
+   *
+   * @param $element
+   *   The FAPI element whose values are being saved.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return array|false
+   *   An array of file entities for each file that was saved, keyed by its file
+   *   ID, or FALSE if no files were saved.
+   */
+  public static function saveUpload($element, FormStateInterface $form_state) {
+    $upload_name = implode('_', $element['#parents']);
+    $file_upload = \Drupal::request()->files->get("files[$upload_name]", NULL, TRUE);
+    if (empty($file_upload)) {
+      return FALSE;
+    }
+
+    $destination = isset($element['#upload_location']) ? $element['#upload_location'] : NULL;
+    if (isset($destination) && !file_prepare_directory($destination, FILE_CREATE_DIRECTORY)) {
+      \Drupal::logger('file')->notice('The upload directory %directory for the file field !name could not be created or is not accessible. A newly uploaded file could not be saved in this directory as a consequence, and the upload was canceled.', array('%directory' => $destination, '!name' => $element['#field_name']));
+      $form_state->setErrorByName($upload_name, t('The file could not be uploaded.'));
+      return FALSE;
+    }
+
+    // Save attached files to the database.
+    $files_uploaded = $element['#multiple'] && count(array_filter($file_upload)) > 0;
+    $files_uploaded |= !$element['#multiple'] && !empty($file_upload);
+    if ($files_uploaded) {
+      if (!$files = file_save_upload($upload_name, $element['#upload_validators'], $destination)) {
+        \Drupal::logger('file')->notice('The file upload failed. %upload', array('%upload' => $upload_name));
+        $form_state->setErrorByName($upload_name, t('Files in the !name field were unable to be uploaded.', array('!name' => $element['#title'])));
+        return array();
+      }
+
+      // Value callback expects FIDs to be keys.
+      $files = array_filter($files);
+      $fids = array_map(function($file) { return $file->id(); }, $files);
+
+      return empty($files) ? array() : array_combine($fids, $files);
+    }
+
+    return array();
   }
 
   /**

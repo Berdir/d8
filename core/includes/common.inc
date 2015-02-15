@@ -797,6 +797,7 @@ function drupal_process_attached(array $elements) {
           call_user_func_array('_drupal_add_http_header', $args);
           break;
         default:
+          file_put_contents('/tmp/attached', print_r($options, TRUE), FILE_APPEND);
           throw new \LogicException(sprintf('You are not allowed to use %s in #attached', $callback));
       }
     }
