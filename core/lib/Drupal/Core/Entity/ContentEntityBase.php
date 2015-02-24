@@ -212,6 +212,16 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   /**
    * {@inheritdoc}
    */
+  public function urlInfo($rel = 'canonical', array $options = []) {
+    // Display links by default based on the current language.
+    $options += ['language' => $this->language()];
+    return parent::urlInfo($rel, $options);
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
   public function postCreate(EntityStorageInterface $storage) {
     $this->newRevision = TRUE;
   }
