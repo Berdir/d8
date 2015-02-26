@@ -198,6 +198,29 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function setMultiple(array $items) {
+    $try_again = FALSE;
+    try {
+      // The bin might not yet exist.
+      $this->doSetMultiple($items);
+    }
+    catch (\Exception $e) {
+      // If there was an exception, try to create the bins.
+      if (!$try_again = $this->ensureBinExists()) {
+        // If the exception happened for other reason than the missing bin
+        // table, propagate the exception.
+        throw $e;
+      }
+    }
+    // Now that the bin has been created, try again if necessary.
+    if ($try_again) {
+      $this->doSetMultiple($items);
+    }
+  }
+
+  /**
+   * Actual implementation for setMultiple().
+   */
+  public function doSetMultiple(array $items) {
     $query_parts = array();
     $values = array();
 
