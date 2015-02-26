@@ -177,82 +177,63 @@ class DatabaseBackend implements CacheBackendInterface {
    * Actually set the cache.
    */
   protected function doSet($cid, $data, $expire, $tags) {
-    $fields = array(
-      'created' => round(microtime(TRUE), 3),
-      'expire' => $expire,
-      'tags' => implode(' ', $tags),
-      'checksum' => $this->checksumProvider->getCurrentChecksum($tags),
-    );
+    $serialized = 0;
     if (!is_string($data)) {
-      $fields['data'] = serialize($data);
-      $fields['serialized'] = 1;
-    }
-    else {
-      $fields['data'] = $data;
-      $fields['serialized'] = 0;
+      $data = serialize($data);
+      $serialized = 1;
     }
 
-    $this->connection->merge($this->bin)
-      ->key('cid', $this->normalizeCid($cid))
-      ->fields($fields)
-      ->execute();
+    $this->connection->query("REPLACE {" . $this->bin . "} (cid, created, expire, tags, checksum, data, serialized) VALUES (:cid, :created, :expire, :tags, :checksum, :data, :serialized)", array(
+      ':cid' => $this->normalizeCid($cid),
+      ':created' => round(microtime(TRUE), 3),
+      ':expire' => $expire,
+      ':tags' => implode(' ', $tags),
+      ':checksum' => $this->checksumProvider->getCurrentChecksum($tags),
+      ':data' => $data,
+      ':serialized' => $serialized
+    ));
   }
 
   /**
    * {@inheritdoc}
    */
   public function setMultiple(array $items) {
-    // Use a transaction so that the database can write the changes in a single
-    // commit.
-    $transaction = $this->connection->startTransaction();
+    $query_parts = array();
+    $values = array();
 
-    try {
-      // Delete all items first so we can do one insert. Rather than multiple
-      // merge queries.
-      $this->deleteMultiple(array_keys($items));
+    $index = 0;
+    foreach ($items as $cid => $item) {
+      $item += array(
+        'expire' => CacheBackendInterface::CACHE_PERMANENT,
+        'tags' => array(),
+      );
+      $index++;
 
-      $query = $this->connection
-        ->insert($this->bin)
-        ->fields(array('cid', 'data', 'expire', 'created', 'serialized', 'tags', 'checksum'));
+      Cache::validateTags($item['tags']);
+      $item['tags'] = array_unique($item['tags']);
+      // Sort the cache tags so that they are stored consistently in the DB.
+      sort($item['tags']);
 
-      foreach ($items as $cid => $item) {
-        $item += array(
-          'expire' => CacheBackendInterface::CACHE_PERMANENT,
-          'tags' => array(),
-        );
 
-        Cache::validateTags($item['tags']);
-        $item['tags'] = array_unique($item['tags']);
-        // Sort the cache tags so that they are stored consistently in the DB.
-        sort($item['tags']);
-
-        $fields = array(
-          'cid' => $cid,
-          'expire' => $item['expire'],
-          'created' => round(microtime(TRUE), 3),
-          'tags' => implode(' ', $item['tags']),
-          'checksum' => $this->checksumProvider->getCurrentChecksum($item['tags']),
-        );
-
-        if (!is_string($item['data'])) {
-          $fields['data'] = serialize($item['data']);
-          $fields['serialized'] = 1;
-        }
-        else {
-          $fields['data'] = $item['data'];
-          $fields['serialized'] = 0;
-        }
-
-        $query->values($fields);
+      $serialized = 0;
+      if (!is_string($item['data'])) {
+        $item['data'] = serialize($item['data']);
+        $serialized = 1;
       }
+      $query_parts[] = "(:cid$index, :created$index, :expire$index, :tags$index, :checksum$index, :data$index, :serialized$index)";
+      $values += array(
+        ":cid$index" => $this->normalizeCid($cid),
+        ":created$index" => round(microtime(TRUE), 3),
+        ":expire$index" => $item['expire'],
+        ":tags$index" => implode(' ', $item['tags']),
+        ":checksum$index" => $this->checksumProvider->getCurrentChecksum($item['tags']),
+        ":data$index" => $item['data'],
+        ":serialized$index" => $serialized
+      );
+    }
 
-      $query->execute();
-    }
-    catch (\Exception $e) {
-      $transaction->rollback();
-      // @todo Log something here or just re throw?
-      throw $e;
-    }
+    $query = "REPLACE {" . $this->bin . "} (cid, created, expire, tags, checksum, data, serialized) VALUES " . implode(', ', $query_parts);
+    $this->connection->query($query, $values);
   }
 
   /**
