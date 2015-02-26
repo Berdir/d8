@@ -9,6 +9,7 @@ namespace Drupal\Core\Cache;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\SchemaObjectExistsException;
 
 /**
@@ -177,21 +178,25 @@ class DatabaseBackend implements CacheBackendInterface {
    * Actually set the cache.
    */
   protected function doSet($cid, $data, $expire, $tags) {
-    $serialized = 0;
+    $fields = array(
+      'created' => round(microtime(TRUE), 3),
+      'expire' => $expire,
+      'tags' => implode(' ', $tags),
+      'checksum' => $this->checksumProvider->getCurrentChecksum($tags),
+    );
     if (!is_string($data)) {
-      $data = serialize($data);
-      $serialized = 1;
+      $fields['data'] = serialize($data);
+      $fields['serialized'] = 1;
+    }
+    else {
+      $fields['data'] = $data;
+      $fields['serialized'] = 0;
     }
 
-    $this->connection->query("REPLACE {" . $this->bin . "} (cid, created, expire, tags, checksum, data, serialized) VALUES (:cid, :created, :expire, :tags, :checksum, :data, :serialized)", array(
-      ':cid' => $this->normalizeCid($cid),
-      ':created' => round(microtime(TRUE), 3),
-      ':expire' => $expire,
-      ':tags' => implode(' ', $tags),
-      ':checksum' => $this->checksumProvider->getCurrentChecksum($tags),
-      ':data' => $data,
-      ':serialized' => $serialized
-    ));
+    $this->connection->merge($this->bin)
+      ->key('cid', $this->normalizeCid($cid))
+      ->fields($fields)
+      ->execute();
   }
 
   /**
@@ -202,6 +207,11 @@ class DatabaseBackend implements CacheBackendInterface {
     try {
       // The bin might not yet exist.
       $this->doSetMultiple($items);
+    }
+    catch (IntegrityConstraintViolationException $e) {
+      // Ignore exceptions because a key already exists. In this case we
+      // conflicted with another process that very likely wrote the same data
+      return;
     }
     catch (\Exception $e) {
       // If there was an exception, try to create the bins.
@@ -218,45 +228,60 @@ class DatabaseBackend implements CacheBackendInterface {
   }
 
   /**
-   * Actual implementation for setMultiple().
+   * {@inheritdoc}
    */
   public function doSetMultiple(array $items) {
-    $query_parts = array();
-    $values = array();
+    // Use a transaction so that the database can write the changes in a single
+    // commit.
+    $transaction = $this->connection->startTransaction();
 
-    $index = 0;
-    foreach ($items as $cid => $item) {
-      $item += array(
-        'expire' => CacheBackendInterface::CACHE_PERMANENT,
-        'tags' => array(),
-      );
-      $index++;
+    try {
+      // Delete all items first so we can do one insert. Rather than multiple
+      // merge queries.
+      $this->deleteMultiple(array_keys($items));
 
-      Cache::validateTags($item['tags']);
-      $item['tags'] = array_unique($item['tags']);
-      // Sort the cache tags so that they are stored consistently in the DB.
-      sort($item['tags']);
+      $query = $this->connection
+        ->insert($this->bin)
+        ->fields(array('cid', 'data', 'expire', 'created', 'serialized', 'tags', 'checksum'));
 
+      foreach ($items as $cid => $item) {
+        $item += array(
+          'expire' => CacheBackendInterface::CACHE_PERMANENT,
+          'tags' => array(),
+        );
 
-      $serialized = 0;
-      if (!is_string($item['data'])) {
-        $item['data'] = serialize($item['data']);
-        $serialized = 1;
+        Cache::validateTags($item['tags']);
+        $item['tags'] = array_unique($item['tags']);
+        // Sort the cache tags so that they are stored consistently in the DB.
+        sort($item['tags']);
+
+        $fields = array(
+          'cid' => $cid,
+          'expire' => $item['expire'],
+          'created' => round(microtime(TRUE), 3),
+          'tags' => implode(' ', $item['tags']),
+          'checksum' => $this->checksumProvider->getCurrentChecksum($item['tags']),
+        );
+
+        if (!is_string($item['data'])) {
+          $fields['data'] = serialize($item['data']);
+          $fields['serialized'] = 1;
+        }
+        else {
+          $fields['data'] = $item['data'];
+          $fields['serialized'] = 0;
+        }
+
+        $query->values($fields);
       }
-      $query_parts[] = "(:cid$index, :created$index, :expire$index, :tags$index, :checksum$index, :data$index, :serialized$index)";
-      $values += array(
-        ":cid$index" => $this->normalizeCid($cid),
-        ":created$index" => round(microtime(TRUE), 3),
-        ":expire$index" => $item['expire'],
-        ":tags$index" => implode(' ', $item['tags']),
-        ":checksum$index" => $this->checksumProvider->getCurrentChecksum($item['tags']),
-        ":data$index" => $item['data'],
-        ":serialized$index" => $serialized
-      );
-    }
 
-    $query = "REPLACE {" . $this->bin . "} (cid, created, expire, tags, checksum, data, serialized) VALUES " . implode(', ', $query_parts);
-    $this->connection->query($query, $values);
+      $query->execute();
+    }
+    catch (\Exception $e) {
+      $transaction->rollback();
+      // @todo Log something here or just re throw?
+      throw $e;
+    }
   }
 
   /**

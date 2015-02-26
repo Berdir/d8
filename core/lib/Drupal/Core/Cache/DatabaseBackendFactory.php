@@ -48,7 +48,13 @@ class DatabaseBackendFactory implements CacheFactoryInterface {
    *   The cache backend object for the specified cache bin.
    */
   function get($bin) {
-    return new DatabaseBackend($this->connection, $this->checksumProvider, $bin);
+    // Use the optimized mysql implementation if possible.
+    if ($this->connection->databaseType() == 'mysql') {
+      return new MySqlDatabaseBackend($this->connection, $this->checksumProvider, $bin);
+    }
+    else {
+      return new DatabaseBackend($this->connection, $this->checksumProvider, $bin);
+    }
   }
 
 }
