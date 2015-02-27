@@ -66,6 +66,7 @@ class EntityQueryRelationshipTest extends EntityUnitTestBase  {
     parent::setUp();
 
     $this->installEntitySchema('taxonomy_term');
+    $this->installConfig(array('filter'));
 
     // We want a taxonomy term reference field. It needs a vocabulary, terms,
     // a field storage and a field. First, create the vocabulary.

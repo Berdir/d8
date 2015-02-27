@@ -60,7 +60,7 @@ class EntityQueryTest extends EntityUnitTestBase {
 
     $this->installEntitySchema('entity_test_mulrev');
 
-    $this->installConfig(array('language'));
+    $this->installConfig(array('language', 'filter'));
 
     $figures = Unicode::strtolower($this->randomMachineName());
     $greetings = Unicode::strtolower($this->randomMachineName());

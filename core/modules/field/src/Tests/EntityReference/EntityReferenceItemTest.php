@@ -50,6 +50,7 @@ class EntityReferenceItemTest extends FieldUnitTestBase {
     parent::setUp();
 
     $this->installEntitySchema('taxonomy_term');
+    $this->installConfig(array('filter'));
 
     $this->vocabulary = entity_create('taxonomy_vocabulary', array(
       'name' => $this->randomMachineName(),

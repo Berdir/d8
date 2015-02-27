@@ -58,7 +58,7 @@ abstract class EntityLanguageTestBase extends EntityUnitTestBase {
       }
     }
 
-    $this->installConfig(array('language'));
+    $this->installConfig(array('language', 'filter'));
 
     // Create the test field.
     entity_test_install();

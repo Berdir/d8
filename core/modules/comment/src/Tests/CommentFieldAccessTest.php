@@ -78,7 +78,7 @@ class CommentFieldAccessTest extends EntityUnitTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->installConfig(array('user'));
+    $this->installConfig(array('user', 'filter'));
     $this->installSchema('comment', array('comment_entity_statistics'));
   }
 

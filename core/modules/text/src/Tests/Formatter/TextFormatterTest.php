@@ -44,6 +44,8 @@ class TextFormatterTest extends EntityUnitTestBase {
   protected function setUp() {
     parent::setUp();
 
+    $this->installConfig(array('filter'));
+
     entity_create('filter_format', array(
       'format' => 'my_text_format',
       'name' => 'My text format',

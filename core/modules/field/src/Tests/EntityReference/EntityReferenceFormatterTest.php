@@ -68,7 +68,7 @@ class EntityReferenceFormatterTest extends EntityUnitTestBase {
     parent::setUp();
 
     // Grant the 'view test entity' permission.
-    $this->installConfig(array('user'));
+    $this->installConfig(array('user', 'filter'));
     Role::load(DRUPAL_ANONYMOUS_RID)
       ->grantPermission('view test entity')
       ->save();

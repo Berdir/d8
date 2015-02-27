@@ -29,6 +29,7 @@ class TermValidationTest extends EntityUnitTestBase {
   protected function setUp() {
     parent::setUp();
     $this->installEntitySchema('taxonomy_term');
+    $this->installConfig(array('filter'));
   }
 
   /**

@@ -34,7 +34,7 @@ class BookUninstallTest extends KernelTestBase {
     $this->installEntitySchema('node');
     $this->installSchema('book', array('book'));
     $this->installSchema('node', array('node_access'));
-    $this->installConfig(array('node', 'book', 'field'));
+    $this->installConfig(array('node', 'book', 'field', 'filter'));
     // For uninstall to work.
     $this->installSchema('user', array('users_data'));
   }

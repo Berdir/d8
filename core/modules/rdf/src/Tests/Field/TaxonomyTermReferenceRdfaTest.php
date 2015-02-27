@@ -46,6 +46,7 @@ class TaxonomyTermReferenceRdfaTest extends FieldRdfaTestBase {
     parent::setUp();
 
     $this->installEntitySchema('taxonomy_term');
+    $this->installConfig(array('filter'));
 
     $vocabulary = entity_create('taxonomy_vocabulary', array(
       'name' => $this->randomMachineName(),

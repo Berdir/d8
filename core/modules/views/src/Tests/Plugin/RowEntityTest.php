@@ -40,7 +40,7 @@ class RowEntityTest extends ViewUnitTestBase {
     parent::setUp();
 
     $this->installEntitySchema('taxonomy_term');
-    $this->installConfig(array('taxonomy'));
+    $this->installConfig(array('taxonomy', 'filter'));
     \Drupal::service('router.builder')->rebuild();
   }
 

@@ -82,7 +82,7 @@ abstract class NormalizerTestBase extends KernelTestBase {
       }
       $class = get_parent_class($class);
     }
-    $this->installConfig(array('field', 'language'));
+    $this->installConfig(array('field', 'language', 'filter'));
 
     // Add German as a language.
     ConfigurableLanguage::create(array(
