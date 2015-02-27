@@ -25,10 +25,14 @@ use Drupal\entity_test\Entity\EntityTest;
  *       "delete" = "Drupal\entity_test\EntityTestDeleteForm"
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler",
- *     "views_data" = "Drupal\views\EntityViewsData"
+ *     "views_data" = "Drupal\views\EntityViewsData",
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *   },
  *   base_table = "entity_test_mul",
  *   data_table = "entity_test_mul_property_data",
+ *   admin_permission = "administer entity_test content",
  *   translatable = TRUE,
  *   entity_keys = {
  *     "id" = "id",
@@ -38,7 +42,7 @@ use Drupal\entity_test\Entity\EntityTest;
  *     "langcode" = "langcode",
  *   },
  *   links = {
- *     "canonical" = "/entity_test_mul/manage/{entity_test_mul}",
+ *     "canonical" = "/entity_test_mul/{entity_test_mul}",
  *     "edit-form" = "/entity_test_mul/manage/{entity_test_mul}",
  *     "delete-form" = "/entity_test/delete/entity_test_mul/{entity_test_mul}",
  *   },

@@ -49,7 +49,7 @@ class TermLanguageTest extends TaxonomyTestBase {
     $edit = array(
       'default_language[language_alterable]' => TRUE,
     );
-    $this->drupalPostForm('admin/structure/taxonomy/manage/' . $this->vocabulary->id(), $edit, t('Save'));
+    $this->drupalPostForm($this->vocabulary->urlInfo('edit-form'), $edit, t('Save'));
 
     // Add a term.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
@@ -85,7 +85,7 @@ class TermLanguageTest extends TaxonomyTestBase {
       'default_language[langcode]' => 'bb',
       'default_language[language_alterable]' => TRUE,
     );
-    $this->drupalPostForm('admin/structure/taxonomy/manage/' . $this->vocabulary->id(), $edit, t('Save'));
+    $this->drupalPostForm($this->vocabulary->urlInfo('edit-form'), $edit, t('Save'));
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
     $this->assertOptionSelected('edit-langcode-0-value', 'bb', 'The expected langcode was selected.');
 
@@ -94,7 +94,7 @@ class TermLanguageTest extends TaxonomyTestBase {
       'default_language[langcode]' => 'current_interface',
       'default_language[language_alterable]' => TRUE,
     );
-    $this->drupalPostForm('admin/structure/taxonomy/manage/' . $this->vocabulary->id(), $edit, t('Save'));
+    $this->drupalPostForm($this->vocabulary->urlInfo('edit-form'), $edit, t('Save'));
     $this->drupalGet('aa/admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
     $this->assertOptionSelected('edit-langcode-0-value', 'aa', "The expected langcode, 'aa', was selected.");
     $this->drupalGet('bb/admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
@@ -107,7 +107,7 @@ class TermLanguageTest extends TaxonomyTestBase {
       'default_language[langcode]' => LanguageInterface::LANGCODE_SITE_DEFAULT,
       'default_language[language_alterable]' => TRUE,
     );
-    $this->drupalPostForm('admin/structure/taxonomy/manage/' . $this->vocabulary->id(), $edit, t('Save'));
+    $this->drupalPostForm($this->vocabulary->urlInfo('edit-form'), $edit, t('Save'));
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/add');
     $this->assertOptionSelected('edit-langcode-0-value', 'cc', "The expected langcode, 'cc', was selected.");
   }

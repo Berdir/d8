@@ -31,7 +31,10 @@ use Drupal\shortcut\ShortcutInterface;
  *       "edit" = "Drupal\shortcut\ShortcutForm",
  *       "delete" = "Drupal\shortcut\Form\ShortcutDeleteForm"
  *     },
- *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
+ *     "translation" = "Drupal\content_translation\ContentTranslationHandler",
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *   },
  *   base_table = "shortcut",
  *   data_table = "shortcut_field_data",
@@ -45,8 +48,8 @@ use Drupal\shortcut\ShortcutInterface;
  *   },
  *   links = {
  *     "canonical" = "/admin/config/user-interface/shortcut/link/{shortcut}",
+ *     "edit-form" = "/admin/config/user-interface/shortcut/link/{shortcut}/edit",
  *     "delete-form" = "/admin/config/user-interface/shortcut/link/{shortcut}/delete",
- *     "edit-form" = "/admin/config/user-interface/shortcut/link/{shortcut}",
  *   },
  *   list_cache_tags = { "config:shortcut_set_list" },
  *   bundle_entity_type = "shortcut_set"

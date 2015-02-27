@@ -35,7 +35,7 @@ use Drupal\user\UserInterface;
  *       "edit" = "Drupal\node\NodeForm"
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\node\Entity\NodeRouteProvider",
+ *       "html" = "Drupal\node\Entity\NodeHtmlRouteProvider",
  *     },
  *     "list_builder" = "Drupal\node\NodeListBuilder",
  *     "translation" = "Drupal\node\NodeTranslationHandler"

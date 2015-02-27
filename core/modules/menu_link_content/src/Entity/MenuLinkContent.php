@@ -30,7 +30,10 @@ use Drupal\menu_link_content\MenuLinkContentInterface;
  *     "form" = {
  *       "default" = "Drupal\menu_link_content\Form\MenuLinkContentForm",
  *       "delete" = "Drupal\menu_link_content\Form\MenuLinkContentDeleteForm"
- *     }
+ *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *   },
  *   admin_permission = "administer menu",
  *   base_table = "menu_link_content",
@@ -44,7 +47,7 @@ use Drupal\menu_link_content\MenuLinkContentInterface;
  *     "bundle" = "bundle"
  *   },
  *   links = {
- *     "canonical" = "/admin/structure/menu/item/{menu_link_content}/edit",
+ *     "canonical" = "/admin/structure/menu/item/{menu_link_content}",
  *     "edit-form" = "/admin/structure/menu/item/{menu_link_content}/edit",
  *     "delete-form" = "/admin/structure/menu/item/{menu_link_content}/delete",
  *   }

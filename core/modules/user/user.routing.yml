@@ -99,22 +99,6 @@ user.role_add:
   requirements:
     _permission: 'administer permissions'
 
-entity.user_role.edit_form:
-  path: '/admin/people/roles/manage/{user_role}'
-  defaults:
-    _entity_form: user_role.default
-    _title: 'Edit role'
-  requirements:
-    _entity_access: user_role.update
-
-entity.user_role.delete_form:
-  path: '/admin/people/roles/manage/{user_role}/delete'
-  defaults:
-    _entity_form: user_role.delete
-    _title: 'Delete role'
-  requirements:
-    _entity_access: user_role.delete
-
 user.pass:
   path: '/user/password'
   defaults:

@@ -24,8 +24,11 @@ use Drupal\user\RoleInterface;
  *     "list_builder" = "Drupal\user\RoleListBuilder",
  *     "form" = {
  *       "default" = "Drupal\user\RoleForm",
- *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
- *     }
+ *       "delete" = "Drupal\Core\Entity\EntityDeleteForm",
+ *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *   },
  *   admin_permission = "administer permissions",
  *   config_prefix = "role",

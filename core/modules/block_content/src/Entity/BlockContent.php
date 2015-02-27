@@ -33,7 +33,10 @@ use Drupal\block_content\BlockContentInterface;
  *       "delete" = "Drupal\block_content\Form\BlockContentDeleteForm",
  *       "default" = "Drupal\block_content\BlockContentForm"
  *     },
- *     "translation" = "Drupal\block_content\BlockContentTranslationHandler"
+ *     "translation" = "Drupal\block_content\BlockContentTranslationHandler",
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *     },
  *   },
  *   admin_permission = "administer blocks",
  *   base_table = "block_content",
@@ -42,7 +45,7 @@ use Drupal\block_content\BlockContentInterface;
  *   links = {
  *     "canonical" = "/block/{block_content}",
  *     "delete-form" = "/block/{block_content}/delete",
- *     "edit-form" = "/block/{block_content}",
+ *     "edit-form" = "/block/{block_content}/edit",
  *     "collection" = "/admin/structure/block/block-content",
  *   },
  *   translatable = TRUE,

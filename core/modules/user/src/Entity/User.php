@@ -32,7 +32,7 @@ use Drupal\user\UserInterface;
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\user\UserViewsData",
  *     "route_provider" = {
- *       "html" = "Drupal\user\Entity\UserRouteProvider",
+ *       "html" = "Drupal\user\Entity\UserHtmlRouteProvider",
  *     },
  *     "form" = {
  *       "default" = "Drupal\user\ProfileForm",

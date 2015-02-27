@@ -1,11 +1,3 @@
-entity.entity_test.canonical:
-  path: '/entity_test/{entity_test}'
-  defaults:
-    _entity_view: 'entity_test.full'
-    _title: 'Test full view mode'
-  requirements:
-    _access: 'TRUE'
-
 entity.entity_test.render_options:
   path: '/entity_test_converter/{foo}'
   options:

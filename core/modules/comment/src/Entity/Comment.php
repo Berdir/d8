@@ -33,7 +33,10 @@ use Drupal\user\UserInterface;
  *       "default" = "Drupal\comment\CommentForm",
  *       "delete" = "Drupal\comment\Form\DeleteForm"
  *     },
- *     "translation" = "Drupal\comment\CommentTranslationHandler"
+ *     "translation" = "Drupal\comment\CommentTranslationHandler",
+ *     "route_provider" = {
+ *       "html" = "Drupal\comment\CommentHtmlRouteProvider",
+ *     },
  *   },
  *   base_table = "comment",
  *   data_table = "comment_field_data",

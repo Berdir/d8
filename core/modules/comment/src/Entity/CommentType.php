@@ -24,7 +24,10 @@ use Drupal\comment\CommentTypeInterface;
  *       "edit" = "Drupal\comment\CommentTypeForm",
  *       "delete" = "Drupal\comment\Form\CommentTypeDeleteForm"
  *     },
- *     "list_builder" = "Drupal\comment\CommentTypeListBuilder"
+ *     "list_builder" = "Drupal\comment\CommentTypeListBuilder",
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *   },
  *   admin_permission = "administer comment types",
  *   config_prefix = "type",

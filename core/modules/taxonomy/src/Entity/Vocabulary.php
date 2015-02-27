@@ -24,7 +24,10 @@ use Drupal\taxonomy\VocabularyInterface;
  *       "default" = "Drupal\taxonomy\VocabularyForm",
  *       "reset" = "Drupal\taxonomy\Form\VocabularyResetForm",
  *       "delete" = "Drupal\taxonomy\Form\VocabularyDeleteForm"
- *     }
+ *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *   },
  *   admin_permission = "administer taxonomy",
  *   config_prefix = "vocabulary",
@@ -35,11 +38,12 @@ use Drupal\taxonomy\VocabularyInterface;
  *     "weight" = "weight"
  *   },
  *   links = {
+ *     "canonical" = "/admin/structure/taxonomy/manage/{taxonomy_vocabulary}",
  *     "add-form" = "/admin/structure/taxonomy/manage/{taxonomy_vocabulary}/add",
+ *     "edit-form" = "/admin/structure/taxonomy/manage/{taxonomy_vocabulary}/edit",
  *     "delete-form" = "/admin/structure/taxonomy/manage/{taxonomy_vocabulary}/delete",
  *     "reset-form" = "/admin/structure/taxonomy/manage/{taxonomy_vocabulary}/reset",
  *     "overview-form" = "/admin/structure/taxonomy/manage/{taxonomy_vocabulary}/overview",
- *     "edit-form" = "/admin/structure/taxonomy/manage/{taxonomy_vocabulary}",
  *     "collection" = "/admin/structure/taxonomy",
  *   }
  * )

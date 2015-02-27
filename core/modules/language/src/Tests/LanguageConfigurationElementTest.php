@@ -235,7 +235,7 @@ class LanguageConfigurationElementTest extends WebTestBase {
       'default_language[langcode]' => 'current_interface',
       'default_language[language_alterable]' => TRUE,
     );
-    $this->drupalPostForm('admin/structure/taxonomy/manage/country', $edit, t('Save'));
+    $this->drupalPostForm($vocabulary->urlInfo('edit-form'), $edit, t('Save'));
 
     // Check the language default configuration.
     $configuration = ContentLanguageSettings::loadByEntityTypeBundle('taxonomy_term', 'country');
@@ -246,7 +246,7 @@ class LanguageConfigurationElementTest extends WebTestBase {
     $edit = array(
       'vid' => 'nation'
     );
-    $this->drupalPostForm('admin/structure/taxonomy/manage/country', $edit, t('Save'));
+    $this->drupalPostForm($vocabulary->urlInfo('edit-form'), $edit, t('Save'));
     // Check that we still have the settings for the new vocabulary.
     $configuration = ContentLanguageSettings::loadByEntityTypeBundle('taxonomy_term', 'nation');
     $this->assertEqual($configuration->getDefaultLangcode(), 'current_interface', 'The default language configuration has been kept on the new Country vocabulary.');

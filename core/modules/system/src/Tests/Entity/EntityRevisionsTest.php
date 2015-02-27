@@ -30,6 +30,7 @@ class EntityRevisionsTest extends WebTestBase {
     // Create and login user.
     $this->web_user = $this->drupalCreateUser(array(
       'administer entity_test content',
+      'view test entity',
     ));
     $this->drupalLogin($this->web_user);
   }

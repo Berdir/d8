@@ -47,19 +47,6 @@ class TaxonomyController extends ControllerBase {
   /**
    * Route title callback.
    *
-   * @param \Drupal\taxonomy\VocabularyInterface $taxonomy_vocabulary
-   *   The taxonomy term.
-   *
-   * @return string
-   *   The term label.
-   */
-  public function vocabularyTitle(VocabularyInterface $taxonomy_vocabulary) {
-    return Xss::filter($taxonomy_vocabulary->label());
-  }
-
-  /**
-   * Route title callback.
-   *
    * @param \Drupal\taxonomy\TermInterface $taxonomy_term
    *   The taxonomy term.
    *

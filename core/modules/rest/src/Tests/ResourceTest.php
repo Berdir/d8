@@ -39,6 +39,10 @@ class ResourceTest extends RESTTestBase {
    * Tests that a resource without formats cannot be enabled.
    */
   public function testFormats() {
+    $account = $this->drupalCreateUser(['view test entity']);
+    $account->save();
+    $this->drupalLogin($account);
+
     $settings = array(
       'entity:entity_test' => array(
         'GET' => array(

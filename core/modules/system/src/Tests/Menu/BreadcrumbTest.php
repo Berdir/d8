@@ -64,7 +64,7 @@ class BreadcrumbTest extends MenuTestBase {
     $trail += array(
       'admin/structure/taxonomy' => t('Taxonomy'),
     );
-    $this->assertBreadcrumb('admin/structure/taxonomy/manage/tags', $trail);
+    $this->assertBreadcrumb('admin/structure/taxonomy/manage/tags/edit', $trail);
     $trail += array(
       'admin/structure/taxonomy/manage/tags' => t('Tags'),
     );
@@ -80,7 +80,7 @@ class BreadcrumbTest extends MenuTestBase {
     $trail += array(
       'admin/structure/menu' => t('Menus'),
     );
-    $this->assertBreadcrumb('admin/structure/menu/manage/tools', $trail);
+    $this->assertBreadcrumb('admin/structure/menu/manage/tools/edit', $trail);
 
     $trail += array(
       'admin/structure/menu/manage/tools' => t('Tools'),
@@ -94,7 +94,7 @@ class BreadcrumbTest extends MenuTestBase {
       'admin/structure/types' => t('Content types'),
     );
     $this->assertBreadcrumb('admin/structure/types/add', $trail);
-    $this->assertBreadcrumb("admin/structure/types/manage/$type", $trail);
+    $this->assertBreadcrumb("admin/structure/types/manage/$type/edit", $trail);
     $trail += array(
       "admin/structure/types/manage/$type" => t('Article'),
     );

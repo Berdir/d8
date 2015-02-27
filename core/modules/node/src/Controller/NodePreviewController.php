@@ -63,7 +63,7 @@ class NodePreviewController extends EntityViewController {
    * @return string
    *   The page title.
    */
-  public function title(EntityInterface $node_preview) {
+  public function previewTitle(EntityInterface $node_preview) {
     return String::checkPlain($this->entityManager->getTranslationFromContext($node_preview)->label());
   }
 

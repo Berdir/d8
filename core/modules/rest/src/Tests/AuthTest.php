@@ -91,6 +91,7 @@ class AuthTest extends RESTTestBase {
         CURLOPT_URL => $url->setAbsolute()->toString(),
         CURLOPT_NOBODY => FALSE,
         CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+        CURLOPT_HTTPHEADER => array('Accept: ' . $this->defaultMimeType),
         CURLOPT_USERPWD => $username . ':' . $password,
       )
     );

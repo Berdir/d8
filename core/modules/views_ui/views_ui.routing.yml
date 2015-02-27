@@ -72,32 +72,12 @@ entity.view.duplicate_form:
   requirements:
     _entity_access: view.duplicate
 
-entity.view.delete_form:
-  path: '/admin/structure/views/view/{view}/delete'
-  defaults:
-    _entity_form: 'view.delete'
-    _title: 'Delete view'
-  requirements:
-    _entity_access: view.delete
-
 views_ui.autocomplete:
   path: '/admin/views/ajax/autocomplete/tag'
   defaults:
     _controller: '\Drupal\views_ui\Controller\ViewsUIController::autocompleteTag'
   requirements:
     _permission: 'administer views'
-
-entity.view.edit_form:
-  path: '/admin/structure/views/view/{view}'
-  options:
-    parameters:
-      view:
-        tempstore: TRUE
-        type: entity:view
-  defaults:
-    _controller: '\Drupal\views_ui\Controller\ViewsUIController::edit'
-  requirements:
-    _entity_access: view.update
 
 entity.view.edit_display_form:
   path: '/admin/structure/views/view/{view}/edit/{display_id}'

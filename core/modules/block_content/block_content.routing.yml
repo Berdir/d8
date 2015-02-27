@@ -36,34 +36,6 @@ entity.block_content_type.delete_form:
   options:
     _admin_route: TRUE
 
-entity.block_content.canonical:
-  path: '/block/{block_content}'
-  defaults:
-    _entity_form: 'block_content.edit'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _entity_access: 'block_content.update'
-
-entity.block_content.edit_form:
-  path: '/block/{block_content}'
-  defaults:
-    _entity_form: 'block_content.edit'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _entity_access: 'block_content.update'
-
-entity.block_content.delete_form:
-  path: '/block/{block_content}/delete'
-  defaults:
-    _entity_form: 'block_content.delete'
-    _title: 'Delete'
-  options:
-    _admin_route: TRUE
-  requirements:
-    _entity_access: 'block_content.delete'
-
 block_content.type_add:
   path: '/admin/structure/block/block-content/types/add'
   defaults:

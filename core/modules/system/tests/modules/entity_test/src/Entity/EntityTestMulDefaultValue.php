@@ -37,7 +37,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "langcode" = "langcode"
  *   },
  *   links = {
- *     "canonical" = "/entity_test_mul_default_value/manage/{entity_test_mul_default_value}",
+ *     "canonical" = "/entity_test_mul_default_value/{entity_test_mul_default_value}",
  *     "edit-form" = "/entity_test_mul_default_value/manage/{entity_test_mul_default_value}",
  *     "delete-form" = "/entity_test/delete/entity_test_mul_default_value/{entity_test_mul_default_value}",
  *   },

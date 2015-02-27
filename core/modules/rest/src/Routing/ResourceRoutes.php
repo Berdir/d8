@@ -71,6 +71,7 @@ class ResourceRoutes extends RouteSubscriberBase{
 
     // Iterate over all enabled resource plugins.
     foreach ($enabled_resources as $id => $enabled_methods) {
+      /** @var \Drupal\rest\Plugin\ResourceInterface $plugin */
       $plugin = $this->manager->getInstance(array('id' => $id));
 
       foreach ($plugin->routes() as $name => $route) {

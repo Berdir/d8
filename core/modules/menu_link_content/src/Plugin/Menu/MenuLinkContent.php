@@ -187,7 +187,7 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
    * {@inheritdoc}
    */
   public function getEditRoute() {
-    return $this->getEntity()->urlInfo();
+    return $this->getEntity()->urlInfo('edit-form');
   }
 
   /**

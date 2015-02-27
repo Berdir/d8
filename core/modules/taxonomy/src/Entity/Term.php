@@ -30,7 +30,10 @@ use Drupal\taxonomy\TermInterface;
  *       "default" = "Drupal\taxonomy\TermForm",
  *       "delete" = "Drupal\taxonomy\Form\TermDeleteForm"
  *     },
- *     "translation" = "Drupal\taxonomy\TermTranslationHandler"
+ *     "translation" = "Drupal\taxonomy\TermTranslationHandler",
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *     },
  *   },
  *   base_table = "taxonomy_term_data",
  *   data_table = "taxonomy_term_field_data",

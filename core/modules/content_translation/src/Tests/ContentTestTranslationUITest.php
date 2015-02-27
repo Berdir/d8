@@ -34,7 +34,7 @@ class ContentTestTranslationUITest extends ContentTranslationUITest {
    * Overrides \Drupal\content_translation\Tests\ContentTranslationUITest::getTranslatorPermission().
    */
   protected function getTranslatorPermissions() {
-    return array_merge(parent::getTranslatorPermissions(), array('administer entity_test content'));
+    return array_merge(parent::getTranslatorPermissions(), array('administer entity_test content', 'view test entity'));
   }
 
 }

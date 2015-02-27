@@ -20,16 +20,20 @@ use Drupal\Core\Entity\EntityTypeInterface;
  *     "form" = {
  *       "default" = "Drupal\entity_test\EntityTestForm"
  *     },
- *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
+ *     "translation" = "Drupal\content_translation\ContentTranslationHandler",
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     },
  *   },
  *   base_table = "entity_test_string",
+ *   admin_permission = "administer entity_test content",
  *   entity_keys = {
  *     "id" = "id",
  *     "uuid" = "uuid",
  *     "bundle" = "type"
  *   },
  *   links = {
- *     "canonical" = "/entity_test_string_id/manage/{entity_test_string_id}",
+ *     "canonical" = "/entity_test_string_id/{entity_test_string_id}",
  *     "edit-form" = "/entity_test_string_id/manage/{entity_test_string_id}",
  *   },
  *   field_ui_base_route = "entity.entity_test_string_id.admin_form",

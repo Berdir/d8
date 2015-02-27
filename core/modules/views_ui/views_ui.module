@@ -53,6 +53,7 @@ function views_ui_entity_type_build(array &$entity_types) {
     ->setFormClass('delete', 'Drupal\Core\Entity\EntityDeleteForm')
     ->setFormClass('break_lock', 'Drupal\views_ui\Form\BreakLockForm')
     ->setListBuilderClass('Drupal\views_ui\ViewListBuilder')
+    ->setHandlerClass('route_provider', ['html' => 'Drupal\views_ui\ViewHtmlRouteProvider'])
     ->setLinkTemplate('edit-form', '/admin/structure/views/view/{view}')
     ->setLinkTemplate('edit-display-form', '/admin/structure/views/view/{view}/edit/{display_id}')
     ->setLinkTemplate('preview-form', '/admin/structure/views/view/{view}/preview/{display_id}')

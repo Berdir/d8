@@ -50,17 +50,4 @@ class NodeViewController extends EntityViewController {
     return $build;
   }
 
-  /**
-   * The _title_callback for the page that renders a single node.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $node
-   *   The current node.
-   *
-   * @return string
-   *   The page title.
-   */
-  public function title(EntityInterface $node) {
-    return String::checkPlain($this->entityManager->getTranslationFromContext($node)->label());
-  }
-
 }

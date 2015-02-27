@@ -275,7 +275,7 @@ class ForumTest extends WebTestBase {
 
     // Add forum to the Tools menu.
     $edit = array();
-    $this->drupalPostForm('admin/structure/menu/manage/tools', $edit, t('Save'));
+    $this->drupalPostForm('admin/structure/menu/manage/tools/edit', $edit, t('Save'));
     $this->assertResponse(200);
 
     // Edit forum taxonomy.
@@ -311,7 +311,7 @@ class ForumTest extends WebTestBase {
     $this->root_forum = $this->createForum('forum');
 
     // Test vocabulary form alterations.
-    $this->drupalGet('admin/structure/taxonomy/manage/forums');
+    $this->drupalGet('admin/structure/taxonomy/manage/forums/edit');
     $this->assertFieldByName('op', t('Save'), 'Save button found.');
     $this->assertNoFieldByName('op', t('Delete'), 'Delete button not found.');
 
@@ -332,7 +332,7 @@ class ForumTest extends WebTestBase {
     ));
     $vocabulary->save();
     // Test tags vocabulary form is not affected.
-    $this->drupalGet('admin/structure/taxonomy/manage/tags');
+    $this->drupalGet('admin/structure/taxonomy/manage/tags/edit');
     $this->assertFieldByName('op', t('Save'), 'Save button found.');
     $this->assertLink(t('Delete'));
     // Test tags vocabulary term form is not affected.
@@ -358,7 +358,7 @@ class ForumTest extends WebTestBase {
     );
 
     // Edit the vocabulary.
-    $this->drupalPostForm('admin/structure/taxonomy/manage/' . $original_vocabulary->id(), $edit, t('Save'));
+    $this->drupalPostForm($original_vocabulary->urlInfo('edit-form'), $edit, t('Save'));
     $this->assertResponse(200);
     $this->assertRaw(t('Updated vocabulary %name.', array('%name' => $edit['name'])), 'Vocabulary was edited');
 

@@ -41,6 +41,8 @@ class EntityViewControllerTest extends WebTestBase {
       $this->entities[] = $entity_test;
     }
 
+    $account = $this->drupalCreateUser(['view test entity']);
+    $this->drupalLogin($account);
   }
 
   /**

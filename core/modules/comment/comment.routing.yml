@@ -16,14 +16,6 @@ comment.admin_approval:
   requirements:
     _permission: 'administer comments'
 
-entity.comment.edit_form:
-  path: '/comment/{comment}/edit'
-  defaults:
-    _title: 'Edit'
-    _entity_form: 'comment.default'
-  requirements:
-    _entity_access: 'comment.update'
-
 comment.approve:
   path: '/comment/{comment}/approve'
   defaults:
@@ -33,22 +25,6 @@ comment.approve:
   requirements:
     _entity_access: 'comment.approve'
     _csrf_token: 'TRUE'
-
-entity.comment.canonical:
-  path: '/comment/{comment}'
-  defaults:
-    _title_callback: '\Drupal\comment\Controller\CommentController::commentPermalinkTitle'
-    _controller: '\Drupal\comment\Controller\CommentController::commentPermalink'
-  requirements:
-    _entity_access: 'comment.view'
-
-entity.comment.delete_form:
-  path: '/comment/{comment}/delete'
-  defaults:
-    _title: 'Delete'
-    _entity_form: 'comment.delete'
-  requirements:
-    _entity_access: 'comment.delete'
 
 comment.reply:
   path: '/comment/reply/{entity_type}/{entity}/{field_name}/{pid}'
@@ -88,16 +64,6 @@ entity.comment_type.collection:
   options:
     _admin_route: TRUE
 
-entity.comment_type.delete_form:
-  path: '/admin/structure/comment/manage/{comment_type}/delete'
-  defaults:
-    _entity_form: 'comment_type.delete'
-    _title: 'Delete'
-  requirements:
-    _entity_access: 'comment_type.delete'
-  options:
-    _admin_route: TRUE
-
 entity.comment_type.add_form:
   path: '/admin/structure/comment/types/add'
   defaults:
@@ -105,15 +71,5 @@ entity.comment_type.add_form:
     _title: 'Add comment type'
   requirements:
     _permission: 'administer comment types'
-  options:
-    _admin_route: TRUE
-
-entity.comment_type.edit_form:
-  path: '/admin/structure/comment/manage/{comment_type}'
-  defaults:
-    _entity_form: 'comment_type.edit'
-    _title: 'Edit'
-  requirements:
-    _entity_access: 'comment_type.update'
   options:
     _admin_route: TRUE

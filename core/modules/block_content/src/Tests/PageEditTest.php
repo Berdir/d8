@@ -37,7 +37,7 @@ class PageEditTest extends BlockContentTestBase {
     $this->assertTrue($block, 'Custom block found in database.');
 
     // Load the edit page.
-    $this->drupalGet('block/' . $block->id());
+    $this->drupalGet($block->urlInfo('edit-form'));
     $this->assertFieldByName($title_key, $edit[$title_key], 'Title field displayed.');
     $this->assertFieldByName($body_key, $edit[$body_key], 'Body field displayed.');
 
@@ -49,7 +49,7 @@ class PageEditTest extends BlockContentTestBase {
     $this->drupalPostForm(NULL, $edit, t('Save'));
 
     // Edit the same block, creating a new revision.
-    $this->drupalGet("block/" . $block->id());
+    $this->drupalGet($block->urlInfo('edit-form'));
     $edit = array();
     $edit['info[0][value]'] = $this->randomMachineName(8);
     $edit[$body_key] = $this->randomMachineName(16);
@@ -62,7 +62,7 @@ class PageEditTest extends BlockContentTestBase {
     $this->assertNotIdentical($block->getRevisionId(), $revised_block->getRevisionId(), 'A new revision has been created.');
 
     // Test deleting the block.
-    $this->drupalGet("block/" . $revised_block->id());
+    $this->drupalGet($block->urlInfo('edit-form'));
     $this->clickLink(t('Delete'));
     $this->assertText(format_string('Are you sure you want to delete the custom block !label?', array('!label' => $revised_block->label())));
   }
