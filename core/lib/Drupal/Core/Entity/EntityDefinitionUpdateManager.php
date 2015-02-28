@@ -153,7 +153,7 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
    *     - DEFINITION_DELETED
    */
   protected function getChangeList() {
-    $this->entityManager->clearCachedDefinitions();
+    $this->entityManager->useCaches(FALSE);
     $change_list = array();
 
     foreach ($this->entityManager->getDefinitions() as $entity_type_id => $entity_type) {

@@ -175,6 +175,13 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
   protected $classNameEntityTypeMap = array();
 
   /**
+   * Flag whether persistent caches should be used.
+   *
+   * @var bool
+   */
+  protected $useCaches = TRUE;
+
+  /**
    * Constructs a new Entity plugin manager.
    *
    * @param \Traversable $namespaces
@@ -221,6 +228,16 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     $this->classNameEntityTypeMap = array();
     $this->handlers = array();
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getCachedDefinitions() {
+    if ($this->useCaches) {
+      return parent::getCachedDefinitions();
+    }
+  }
+
 
   /**
    * {@inheritdoc}
@@ -372,7 +389,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     if (!isset($this->baseFieldDefinitions[$entity_type_id])) {
       // Not prepared, try to load from cache.
       $cid = 'entity_base_field_definitions:' . $entity_type_id . ':' . $this->languageManager->getCurrentLanguage()->getId();
-      if ($cache = $this->cacheBackend->get($cid)) {
+      if ($cache = $this->cacheGet($cid)) {
         $this->baseFieldDefinitions[$entity_type_id] = $cache->data;
       }
       else {
@@ -470,7 +487,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
       $base_field_definitions = $this->getBaseFieldDefinitions($entity_type_id);
       // Not prepared, try to load from cache.
       $cid = 'entity_bundle_field_definitions:' . $entity_type_id . ':' . $bundle . ':' . $this->languageManager->getCurrentLanguage()->getId();
-      if ($cache = $this->cacheBackend->get($cid)) {
+      if ($cache = $this->cacheGet($cid)) {
         $bundle_field_definitions = $cache->data;
       }
       else {
@@ -578,7 +595,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
       }
       // Not prepared, try to load from cache.
       $cid = 'entity_field_storage_definitions:' . $entity_type_id . ':' . $this->languageManager->getCurrentLanguage()->getId();
-      if ($cache = $this->cacheBackend->get($cid)) {
+      if ($cache = $this->cacheGet($cid)) {
         $field_storage_definitions = $cache->data;
       }
       else {
@@ -598,7 +615,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     if (!$this->fieldMap) {
       // Not prepared, try to load from cache.
       $cid = 'entity_field_map';
-      if ($cache = $this->cacheBackend->get($cid)) {
+      if ($cache = $this->cacheGet($cid)) {
         $this->fieldMap = $cache->data;
       }
       else {
@@ -717,7 +734,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
   public function getAllBundleInfo() {
     if (empty($this->bundleInfo)) {
       $langcode = $this->languageManager->getCurrentLanguage()->getId();
-      if ($cache = $this->cacheBackend->get("entity_bundle_info:$langcode")) {
+      if ($cache = $this->cacheGet("entity_bundle_info:$langcode")) {
         $this->bundleInfo = $cache->data;
       }
       else {
@@ -758,7 +775,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     // hook_entity_extra_field_info_alter() might contain t() calls, we cache
     // per language.
     $cache_id = 'entity_bundle_extra_fields:' . $entity_type_id . ':' . $bundle . ':' . $this->languageManager->getCurrentLanguage()->getId();
-    $cached = $this->cacheBackend->get($cache_id);
+    $cached = $this->cacheGet($cache_id);
     if ($cached) {
       $this->extraFields[$entity_type_id][$bundle] = $cached->data;
       return $this->extraFields[$entity_type_id][$bundle];
@@ -886,7 +903,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
       $key = 'entity_' . $display_type . '_info';
       $entity_type_id = 'entity_' . $display_type;
       $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_INTERFACE)->getId();
-      if ($cache = $this->cacheBackend->get("$key:$langcode")) {
+      if ($cache = $this->cacheGet("$key:$langcode")) {
         $this->displayModeInfo[$display_type] = $cache->data;
       }
       else {
@@ -1204,6 +1221,37 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
    */
   public function getLastInstalledDefinition($entity_type_id) {
     return $this->installedDefinitions->get($entity_type_id . '.entity_type');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function useCaches($use_caches = FALSE) {
+    $this->useCaches = $use_caches;
+    if (!$use_caches) {
+      $this->definitions = NULL;
+      $this->handlers = [];
+      $this->fieldDefinitions = [];
+      $this->baseFieldDefinitions = [];
+      $this->fieldStorageDefinitions = [];
+    }
+  }
+
+  /**
+   * Fetches from the cache backend, respecting the use caches flag.
+   *
+   * @param string $cid
+   *   The cache ID.
+   *
+   * @return false|object
+   *   FALSE on a cache miss or if caches are disabled, the cache object
+   *   otherwise.
+   */
+  protected function cacheGet($cid) {
+    if ($this->useCaches) {
+      return $this->cacheBackend->get($cid);
+    }
+    return FALSE;
   }
 
   /**

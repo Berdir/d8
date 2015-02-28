@@ -513,4 +513,17 @@ interface EntityManagerInterface extends PluginManagerInterface, EntityTypeListe
    */
   public function getEntityTypeFromClass($class_name);
 
+  /**
+   * Disable the use of caches.
+   *
+   * Can be used to ensure that uncached entity and field definitions are
+   * returned, without invalidating all cached information.
+   *
+   * This will also remove all local/static caches.
+   *
+   * @param bool $use_caches
+   *   FALSE to not use any caches.
+   */
+  public function useCaches($use_caches = FALSE);
+
 }
