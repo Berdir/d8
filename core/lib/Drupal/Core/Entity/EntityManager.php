@@ -238,6 +238,17 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function setCachedDefinitions($definitions) {
+    if ($this->useCaches) {
+      parent::setCachedDefinitions($definitions);
+    }
+    else {
+      $this->definitions = $definitions;
+    }
+  }
 
   /**
    * {@inheritdoc}
