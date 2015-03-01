@@ -7,13 +7,14 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionListenerInterface;
 
 /**
  * Provides an interface for entity type managers.
  */
-interface EntityManagerInterface extends PluginManagerInterface, EntityTypeListenerInterface, EntityBundleListenerInterface, FieldStorageDefinitionListenerInterface {
+interface EntityManagerInterface extends PluginManagerInterface, EntityTypeListenerInterface, EntityBundleListenerInterface, FieldStorageDefinitionListenerInterface, CachedDiscoveryInterface {
 
   /**
    * Builds a list of entity type labels suitable for a Form API options list.
@@ -512,18 +513,5 @@ interface EntityManagerInterface extends PluginManagerInterface, EntityTypeListe
    * @see \Drupal\Core\Entity\Entity::loadMultiple()
    */
   public function getEntityTypeFromClass($class_name);
-
-  /**
-   * Disable the use of caches.
-   *
-   * Can be used to ensure that uncached entity and field definitions are
-   * returned, without invalidating all cached information.
-   *
-   * This will also remove all local/static caches.
-   *
-   * @param bool $use_caches
-   *   FALSE to not use any caches.
-   */
-  public function useCaches($use_caches = FALSE);
 
 }

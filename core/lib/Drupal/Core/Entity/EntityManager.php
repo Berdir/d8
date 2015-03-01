@@ -175,13 +175,6 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
   protected $classNameEntityTypeMap = array();
 
   /**
-   * Flag whether persistent caches should be used.
-   *
-   * @var bool
-   */
-  protected $useCaches = TRUE;
-
-  /**
    * Constructs a new Entity plugin manager.
    *
    * @param \Traversable $namespaces
@@ -227,27 +220,6 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     $this->clearCachedFieldDefinitions();
     $this->classNameEntityTypeMap = array();
     $this->handlers = array();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getCachedDefinitions() {
-    if ($this->useCaches) {
-      return parent::getCachedDefinitions();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setCachedDefinitions($definitions) {
-    if ($this->useCaches) {
-      parent::setCachedDefinitions($definitions);
-    }
-    else {
-      $this->definitions = $definitions;
-    }
   }
 
   /**
@@ -406,7 +378,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
       else {
         // Rebuild the definitions and put it into the cache.
         $this->baseFieldDefinitions[$entity_type_id] = $this->buildBaseFieldDefinitions($entity_type_id);
-        $this->cacheBackend->set($cid, $this->baseFieldDefinitions[$entity_type_id], Cache::PERMANENT, array('entity_types', 'entity_field_info'));
+        $this->cacheSet($cid, $this->baseFieldDefinitions[$entity_type_id], Cache::PERMANENT, array('entity_types', 'entity_field_info'));
        }
      }
     return $this->baseFieldDefinitions[$entity_type_id];
@@ -504,7 +476,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
       else {
         // Rebuild the definitions and put it into the cache.
         $bundle_field_definitions = $this->buildBundleFieldDefinitions($entity_type_id, $bundle, $base_field_definitions);
-        $this->cacheBackend->set($cid, $bundle_field_definitions, Cache::PERMANENT, array('entity_types', 'entity_field_info'));
+        $this->cacheSet($cid, $bundle_field_definitions, Cache::PERMANENT, array('entity_types', 'entity_field_info'));
       }
       // Field definitions consist of the bundle specific overrides and the
       // base fields, merge them together. Use array_replace() to replace base
@@ -612,7 +584,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
       else {
         // Rebuild the definitions and put it into the cache.
         $field_storage_definitions = $this->buildFieldStorageDefinitions($entity_type_id);
-        $this->cacheBackend->set($cid, $field_storage_definitions, Cache::PERMANENT, array('entity_types', 'entity_field_info'));
+        $this->cacheSet($cid, $field_storage_definitions, Cache::PERMANENT, array('entity_types', 'entity_field_info'));
       }
       $this->fieldStorageDefinitions[$entity_type_id] += $field_storage_definitions;
     }
@@ -642,7 +614,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
           }
         }
 
-        $this->cacheBackend->set($cid, $this->fieldMap, Cache::PERMANENT, array('entity_types', 'entity_field_info'));
+        $this->cacheSet($cid, $this->fieldMap, Cache::PERMANENT, array('entity_types', 'entity_field_info'));
       }
     }
     return $this->fieldMap;
@@ -766,7 +738,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
           }
         }
         $this->moduleHandler->alter('entity_bundle_info', $this->bundleInfo);
-        $this->cacheBackend->set("entity_bundle_info:$langcode", $this->bundleInfo, Cache::PERMANENT, array('entity_types', 'entity_bundles'));
+        $this->cacheSet("entity_bundle_info:$langcode", $this->bundleInfo, Cache::PERMANENT, array('entity_types', 'entity_bundles'));
       }
     }
 
@@ -802,7 +774,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
 
     // Store in the 'static' and persistent caches.
     $this->extraFields[$entity_type_id][$bundle] = $info;
-    $this->cacheBackend->set($cache_id, $info, Cache::PERMANENT, array(
+    $this->cacheSet($cache_id, $info, Cache::PERMANENT, array(
       'entity_field_info',
     ));
 
@@ -924,7 +896,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
           $this->displayModeInfo[$display_type][$display_mode_entity_type][$display_mode_name] = $display_mode->toArray();
         }
         $this->moduleHandler->alter($key, $this->displayModeInfo[$display_type]);
-        $this->cacheBackend->set("$key:$langcode", $this->displayModeInfo[$display_type], CacheBackendInterface::CACHE_PERMANENT, array('entity_types', 'entity_field_info'));
+        $this->cacheSet("$key:$langcode", $this->displayModeInfo[$display_type], CacheBackendInterface::CACHE_PERMANENT, array('entity_types', 'entity_field_info'));
       }
     }
 
@@ -1238,31 +1210,13 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
    * {@inheritdoc}
    */
   public function useCaches($use_caches = FALSE) {
-    $this->useCaches = $use_caches;
+    parent::useCaches($use_caches);
     if (!$use_caches) {
-      $this->definitions = NULL;
       $this->handlers = [];
       $this->fieldDefinitions = [];
       $this->baseFieldDefinitions = [];
       $this->fieldStorageDefinitions = [];
     }
-  }
-
-  /**
-   * Fetches from the cache backend, respecting the use caches flag.
-   *
-   * @param string $cid
-   *   The cache ID.
-   *
-   * @return false|object
-   *   FALSE on a cache miss or if caches are disabled, the cache object
-   *   otherwise.
-   */
-  protected function cacheGet($cid) {
-    if ($this->useCaches) {
-      return $this->cacheBackend->get($cid);
-    }
-    return FALSE;
   }
 
   /**
