@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\basic_auth\PageCache\DisallowBasicAuthRoutes.
+ * Contains \Drupal\basic_auth\PageCache\DisallowBasicAuthRequests.
  */
 
 namespace Drupal\basic_auth\PageCache;
@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  * account. Otherwise this can result in access bypass security issues when an
  * authenticated user response gets into the page cache.
  */
-class DisallowBasicAuthRoutes implements RequestPolicyInterface {
+class DisallowBasicAuthRequests implements RequestPolicyInterface {
 
   /**
    * {@inheritdoc}
