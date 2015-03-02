@@ -24,8 +24,8 @@ interface CachedDiscoveryInterface extends DiscoveryInterface {
   /**
    * Disable the use of caches.
    *
-   * Can be used to ensure that uncached plugin definitions are
-   * returned, without invalidating all cached information.
+   * Can be used to ensure that uncached plugin definitions are returned,
+   * without invalidating all cached information.
    *
    * This will also remove all local/static caches.
    *

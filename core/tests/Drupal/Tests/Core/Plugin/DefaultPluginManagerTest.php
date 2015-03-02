@@ -186,7 +186,7 @@ class DefaultPluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * Tests the plugin manager with no disabled cache.
+   * Tests the plugin manager with caching disabled.
    */
   public function testDefaultPluginManagerNoCache() {
     $plugin_manager = new TestPluginManager($this->namespaces, $this->expectedDefinitions, NULL, NULL, '\Drupal\plugin_test\Plugin\plugin_test\fruit\FruitInterface');
