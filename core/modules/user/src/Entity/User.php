@@ -8,7 +8,6 @@
 namespace Drupal\user\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -86,24 +85,6 @@ class User extends ContentEntityBase implements UserInterface {
     foreach ($this->get('roles') as $index => $item) {
       if (in_array($item->target_id, array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID))) {
         $this->get('roles')->offsetUnset($index);
-      }
-    }
-
-    // Update the user password if it has changed.
-    if ($this->isNew() || ($this->pass->value && $this->pass->value != $this->original->pass->value)) {
-      // Allow alternate password hashing schemes.
-      $this->pass->value = \Drupal::service('password')->hash(trim($this->pass->value));
-      // Abort if the hashing failed and returned FALSE.
-      if (!$this->pass->value) {
-        throw new EntityMalformedException('The entity does not have a password.');
-      }
-    }
-
-    if (!$this->isNew()) {
-      // If the password is empty, that means it was not changed, so use the
-      // original password.
-      if (empty($this->pass->value)) {
-        $this->pass->value = $this->original->pass->value;
       }
     }
 
@@ -461,6 +442,20 @@ class User extends ContentEntityBase implements UserInterface {
   /**
    * {@inheritdoc}
    */
+  public function setExistingPassword($password) {
+    $this->get('pass')->existing = $password;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkExistingPassword(UserInterface $account_unchanged) {
+    return !empty($this->get('pass')->existing) && \Drupal::service('password')->check(trim($this->get('pass')->existing), $account_unchanged);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['uid'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('User ID'))
@@ -514,14 +509,16 @@ class User extends ContentEntityBase implements UserInterface {
 
     $fields['pass'] = BaseFieldDefinition::create('password')
       ->setLabel(t('Password'))
-      ->setDescription(t('The password of this user (hashed).'));
+      ->setDescription(t('The password of this user (hashed).'))
+      ->addConstraint('ProtectedUserFieldConstraint');
 
     $fields['mail'] = BaseFieldDefinition::create('email')
       ->setLabel(t('Email'))
       ->setDescription(t('The email of this user.'))
       ->setDefaultValue('')
       ->addConstraint('UserMailUnique')
-      ->addConstraint('UserMailRequired');
+      ->addConstraint('UserMailRequired')
+      ->addConstraint('ProtectedUserFieldConstraint');
 
     // @todo Convert to a text field in https://drupal.org/node/1548204.
     $fields['signature'] = BaseFieldDefinition::create('string')

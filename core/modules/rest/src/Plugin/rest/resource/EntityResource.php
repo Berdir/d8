@@ -145,11 +145,8 @@ class EntityResource extends ResourceBase {
       if ($field_name == $langcode_key && $field->isEmpty()) {
         continue;
       }
-      if ($field->isEmpty() && !$original_entity->get($field_name)->access('delete')) {
-        throw new AccessDeniedHttpException(String::format('Access denied on deleting field @field.', array('@field' => $field_name)));
-      }
       $original_entity->set($field_name, $field->getValue());
-      if (!$original_entity->get($field_name)->access('update')) {
+      if (!$original_entity->get($field_name)->access('edit')) {
         throw new AccessDeniedHttpException(String::format('Access denied on updating field @field.', array('@field' => $field_name)));
       }
     }

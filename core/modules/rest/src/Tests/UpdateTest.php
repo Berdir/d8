@@ -160,4 +160,71 @@ class UpdateTest extends RESTTestBase {
     $this->assertResponse(405);
   }
 
+  /**
+   * Tests several valid and invalid update requests for 'user' entity type.
+   */
+  public function testUpdateUser() {
+    $serializer = $this->container->get('serializer');
+    $entity_type = 'user';
+    // Enables the REST service for 'user' entity type.
+    $this->enableService('entity:' . $entity_type, 'PATCH');
+    $permissions = $this->entityPermissions($entity_type, 'update');
+    $permissions[] = 'restful patch entity:' . $entity_type;
+    $account = $this->drupalCreateUser($permissions);
+    $account->set('mail', 'old-email@example.com');
+    $this->drupalLogin($account);
+
+    // Create an entity and save it to the database.
+    $account->save();
+    $account->set('changed', NULL);
+
+    // Try to send invalid data to trigger the entity validation constraints.
+    // Send a UUID that is too long.
+    $account->set('mail', 'new-email@example.com');
+    $context = ['account' => $account];
+
+    // Try and send the new email without the password.
+    $normalized = $serializer->normalize($account, $this->defaultFormat, $context);
+    $serialized = $serializer->serialize($normalized, $this->defaultFormat, $context);
+    $response = $this->httpRequest($account->urlInfo(), 'PATCH', $serialized, $this->defaultMimeType);
+    $this->assertResponse(422);
+    $error = Json::decode($response);
+    $this->assertEqual($error['error'], "Unprocessable Entity: validation failed.\nmail: Your current password is missing or incorrect; it's required to change the <em class=\"placeholder\">Email</em>.\n");
+
+    // Try and send the new email with a password.
+    $normalized['pass'][0]['existing'] = 'wrong';
+    $serialized = $serializer->serialize($normalized, $this->defaultFormat, $context);
+    $response = $this->httpRequest($account->urlInfo(), 'PATCH', $serialized, $this->defaultMimeType);
+    $this->assertResponse(422);
+    $error = Json::decode($response);
+    $this->assertEqual($error['error'], "Unprocessable Entity: validation failed.\nmail: Your current password is missing or incorrect; it's required to change the <em class=\"placeholder\">Email</em>.\n");
+
+    // Try again with the password.
+    $normalized['pass'][0]['existing'] = $account->pass_raw;
+    $serialized = $serializer->serialize($normalized, $this->defaultFormat, $context);
+    $this->httpRequest($account->urlInfo(), 'PATCH', $serialized, $this->defaultMimeType);
+    $this->assertResponse(204);
+
+    // Try to change the password without providing the current password.
+    $new_password = $this->randomString();
+    $normalized = $serializer->normalize($account, $this->defaultFormat, $context);
+    $normalized['pass'][0]['value'] = $new_password;
+    $serialized = $serializer->serialize($normalized, $this->defaultFormat, $context);
+    $response = $this->httpRequest($account->urlInfo(), 'PATCH', $serialized, $this->defaultMimeType);
+    $this->assertResponse(422);
+    $error = Json::decode($response);
+    $this->assertEqual($error['error'], "Unprocessable Entity: validation failed.\npass: Your current password is missing or incorrect; it's required to change the <em class=\"placeholder\">Password</em>.\n");
+
+    // Try again with the password.
+    $normalized['pass'][0]['existing'] = $account->pass_raw;
+    $serialized = $serializer->serialize($normalized, $this->defaultFormat, $context);
+    $this->httpRequest($account->urlInfo(), 'PATCH', $serialized, $this->defaultMimeType);
+    $this->assertResponse(204);
+
+    // Verify that we can log in with the new password.
+    $account->pass_raw = $new_password;
+    $this->drupalLogin($account);
+
+  }
+
 }
