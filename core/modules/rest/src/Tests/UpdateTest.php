@@ -113,6 +113,9 @@ class UpdateTest extends RESTTestBase {
     $this->assertEqual($entity->field_test_text->value, 'no edit access value', 'Text field was not updated.');
 
     // Try to update the field with a text format this user has no access to.
+    // First change the original field value so we're allowed to edit it again.
+    $entity->field_test_text->value = 'test';
+    $entity->save();
     $patch_entity->set('field_test_text', array(
       'value' => 'test',
       'format' => 'full_html',
@@ -123,7 +126,7 @@ class UpdateTest extends RESTTestBase {
 
     // Re-load the entity from the database.
     $entity = entity_load($entity_type, $entity->id(), TRUE);
-    $this->assertEqual($entity->field_test_text->value, 'no edit access value', 'Text field was not updated.');
+    $this->assertEqual($entity->field_test_text->format, 'plain_text', 'Text field was not updated.');
 
     // Restore the valid test value.
     $entity->field_test_text->value = $this->randomString();

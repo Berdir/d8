@@ -146,13 +146,10 @@ class EntityResource extends ResourceBase {
         continue;
       }
 
-      if ($field->isEmpty() && !$original_entity->get($field_name)->access('edit')) {
+      if (!$original_entity->get($field_name)->access('edit')) {
         throw new AccessDeniedHttpException(String::format('Access denied on updating field @field.', array('@field' => $field_name)));
       }
       $original_entity->set($field_name, $field->getValue());
-      if (!$field->isEmpty() && !$original_entity->get($field_name)->access('edit')) {
-        throw new AccessDeniedHttpException(String::format('Access denied on updating field @field.', array('@field' => $field_name)));
-      }
     }
 
     // Validate the received data before saving.
