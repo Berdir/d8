@@ -89,7 +89,7 @@ class UpdateTest extends RESTTestBase {
 
     // Enable access protection for the text field.
     // @see entity_test_entity_field_access()
-    $entity->field_test_text->value = 'no delete access value';
+    $entity->field_test_text->value = 'no edit access value';
     $entity->field_test_text->format = 'plain_text';
     $entity->save();
 
@@ -99,7 +99,7 @@ class UpdateTest extends RESTTestBase {
 
     // Re-load the entity from the database.
     $entity = entity_load($entity_type, $entity->id(), TRUE);
-    $this->assertEqual($entity->field_test_text->value, 'no delete access value', 'Text field was not deleted.');
+    $this->assertEqual($entity->field_test_text->value, 'no edit access value', 'Text field was not deleted.');
 
     // Try to update an access protected field.
     $normalized = $serializer->normalize($patch_entity, $this->defaultFormat, $context);
@@ -110,7 +110,7 @@ class UpdateTest extends RESTTestBase {
 
     // Re-load the entity from the database.
     $entity = entity_load($entity_type, $entity->id(), TRUE);
-    $this->assertEqual($entity->field_test_text->value, 'no delete access value', 'Text field was not updated.');
+    $this->assertEqual($entity->field_test_text->value, 'no edit access value', 'Text field was not updated.');
 
     // Try to update the field with a text format this user has no access to.
     $patch_entity->set('field_test_text', array(
@@ -123,7 +123,7 @@ class UpdateTest extends RESTTestBase {
 
     // Re-load the entity from the database.
     $entity = entity_load($entity_type, $entity->id(), TRUE);
-    $this->assertEqual($entity->field_test_text->value, 'no delete access value', 'Text field was not updated.');
+    $this->assertEqual($entity->field_test_text->value, 'no edit access value', 'Text field was not updated.');
 
     // Restore the valid test value.
     $entity->field_test_text->value = $this->randomString();
