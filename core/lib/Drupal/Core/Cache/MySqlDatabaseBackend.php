@@ -57,7 +57,6 @@ class MySqlDatabaseBackend extends DatabaseBackend {
       // Sort the cache tags so that they are stored consistently in the DB.
       sort($item['tags']);
 
-
       $serialized = 0;
       if (!is_string($item['data'])) {
         $item['data'] = serialize($item['data']);

@@ -210,7 +210,7 @@ class DatabaseBackend implements CacheBackendInterface {
     }
     catch (IntegrityConstraintViolationException $e) {
       // Ignore exceptions because a key already exists. In this case we
-      // conflicted with another process that very likely wrote the same data
+      // conflicted with another process that very likely wrote the same data.
       return;
     }
     catch (\Exception $e) {
