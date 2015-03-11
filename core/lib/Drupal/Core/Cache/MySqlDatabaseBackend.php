@@ -20,21 +20,12 @@ class MySqlDatabaseBackend extends DatabaseBackend {
    * {@inheritdoc}
    */
   protected function doSet($cid, $data, $expire, $tags) {
-    $serialized = 0;
-    if (!is_string($data)) {
-      $data = serialize($data);
-      $serialized = 1;
-    }
-
-    $this->connection->query("REPLACE {" . $this->bin . "} (cid, created, expire, tags, checksum, data, serialized) VALUES (:cid, :created, :expire, :tags, :checksum, :data, :serialized)", array(
-      ':cid' => $this->normalizeCid($cid),
-      ':created' => round(microtime(TRUE), 3),
-      ':expire' => $expire,
-      ':tags' => implode(' ', $tags),
-      ':checksum' => $this->checksumProvider->getCurrentChecksum($tags),
-      ':data' => $data,
-      ':serialized' => $serialized
-    ));
+    $this->doSetMultiple([$cid => [
+        'data' => $data,
+        'expire' => $expire,
+        'tags' => $tags,
+      ],
+    ]);
   }
 
   /**
@@ -74,7 +65,7 @@ class MySqlDatabaseBackend extends DatabaseBackend {
       );
     }
 
-    $query = "REPLACE {" . $this->bin . "} (cid, created, expire, tags, checksum, data, serialized) VALUES " . implode(', ', $query_parts);
+    $query = "REPLACE {" . $this->connection->escapeTable($this->bin) . "} (cid, created, expire, tags, checksum, data, serialized) VALUES " . implode(', ', $query_parts);
     $this->connection->query($query, $values);
   }
 
