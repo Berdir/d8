@@ -67,11 +67,10 @@ class AuthenticationManager implements AuthenticationProviderInterface, Authenti
   /**
    * Constructs an authentication manager.
    *
-   * @todo: Revisit service construction. Especially write a custom compiler
-   * pass which is capable of collecting, sorting and injecting all providers
-   * (including global/vs non global), filters and challengers on compile time.
-   *
-   * @see https://www.drupal.org/node/2432585
+   * @todo Revisit service construction. Especially write a custom compiler pass
+   *   which is capable of collecting, sorting and injecting all providers
+   *   (including global/vs non global), filters and challengers on compile
+   *   time in https://www.drupal.org/node/2432585.
    */
   public function __construct($global_providers = ['cookie' => TRUE]) {
     $this->globalProviders = $global_providers;
@@ -247,8 +246,8 @@ class AuthenticationManager implements AuthenticationProviderInterface, Authenti
   /**
    * Returns the sorted array of authentication providers.
    *
-   * @todo: Replace with a list of providers sorted during compile time.
-   * @see https://www.drupal.org/node/2432585
+   * @todo Replace with a list of providers sorted during compile time in
+   *   https://www.drupal.org/node/2432585.
    *
    * @return \Drupal\Core\Authentication\AuthenticationProviderInterface[]
    *   An array of authentication provider objects.
