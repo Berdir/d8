@@ -119,6 +119,8 @@ class ConfigImportAllTest extends ModuleTestBase {
       $this->assertModuleTablesDoNotExist($module);
     }
 
+    $this->resetAll();
+
     // Import the configuration thereby re-installing all the modules.
     $this->drupalPostForm('admin/config/development/configuration', array(), t('Import all'));
     // Modules have been installed that have services.
