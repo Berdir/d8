@@ -132,7 +132,7 @@ services:
     tags:
       - { name: service_collector, tag: page_cache_request_policy, call: addPolicy}
   page_cache_response_policy:
-    class: Drupal\Core\PageCache\ChainResponsePolicy
+    class: Drupal\Core\PageCache\DefaultResponsePolicy
     tags:
       - { name: service_collector, tag: page_cache_response_policy, call: addPolicy}
     lazy: true
