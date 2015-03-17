@@ -7,6 +7,7 @@
 
 namespace Drupal\file\Entity;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -216,6 +217,56 @@ class File extends ContentEntityBase implements FileInterface {
       // corresponding file entity will be deleted.
       file_unmanaged_delete($entity->getFileUri());
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    // Assume that files are only embedded in other entities and don't have
+    // their own cache tags.
+    return [];
+  }
+
+  /**
+   * Invalidates an entity's cache tags upon save.
+   *
+   * @param bool $update
+   *   TRUE if the entity has been updated, or FALSE if it has been inserted.
+   */
+  protected function invalidateTagsOnSave($update) {
+    // An entity was created or updated: invalidate its list cache tags. (An
+    // updated entity may start to appear in a listing because it now meets that
+    // listing's filtering requirements. A newly created entity may start to
+    // appear in listings because it did not exist before.)
+    $tags = $this->getEntityType()->getListCacheTags();
+    if ($update) {
+      // Files don't have their own cache tags, instead, we invalidate cache
+      // tags of entities that use that file.
+      foreach (\Drupal::service('file.usage')->listUsage($this) as $module => $module_references) {
+        foreach ($module_references as $type => $ids) {
+          if ($this->entityManager()->hasDefinition($type)) {
+            $tags = Cache::mergeTags($tags, Cache::buildTags($type, $ids));
+          }
+        }
+      }
+    }
+    Cache::invalidateTags($tags);
+  }
+
+  /**
+   * Invalidates an entity's cache tags upon delete.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition.
+   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   *   An array of entities.
+   */
+  protected static function invalidateTagsOnDelete(EntityTypeInterface $entity_type, array $entities) {
+    $tags = $entity_type->getListCacheTags();
+    // We only invalidate cache tags of entities using the file. If a file is
+    // deleted, we assume that it is no longer used.
+    Cache::invalidateTags($tags);
   }
 
   /**
