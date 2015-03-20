@@ -4,7 +4,6 @@ namespace Drupal\Tests\Core\Config;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Config\CachedStorage;
-use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\NullBackend;
 
 /**
