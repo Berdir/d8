@@ -147,7 +147,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   /**
    * Overrides Entity::__construct().
    */
-  public function __construct(array $values, $entity_type, $bundle = FALSE, $translations = array()) {
+  public function __construct(array $values, $entity_type, $bundle = FALSE) {
     $this->entityTypeId = $entity_type;
     $this->entityKeys['bundle'] = $bundle ? $bundle : $this->entityTypeId;
     $this->langcodeKey = $this->getEntityType()->getKey('langcode');
@@ -162,17 +162,19 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
       }
     }
 
+    $translations = array_keys($values);
+
     $this->values = $values;
     foreach ($this->getEntityType()->getKeys() as $key => $field_name) {
-      if (isset($this->values[$field_name])) {
-        if (is_array($this->values[$field_name]) && isset($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT])) {
-          if (is_array($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT])) {
-            if (isset($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT][0]['value'])) {
-              $this->entityKeys[$key] = $this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT][0]['value'];
+      if (isset($this->values[LanguageInterface::LANGCODE_DEFAULT][$field_name])) {
+        if (is_array($this->values[LanguageInterface::LANGCODE_DEFAULT][$field_name]) && isset($this->values[LanguageInterface::LANGCODE_DEFAULT][$field_name])) {
+          if (is_array($this->values[LanguageInterface::LANGCODE_DEFAULT][$field_name])) {
+            if (isset($this->values[LanguageInterface::LANGCODE_DEFAULT][$field_name][0]['value'])) {
+              $this->entityKeys[$key] = $this->values[LanguageInterface::LANGCODE_DEFAULT][$field_name][0]['value'];
             }
           }
           else {
-            $this->entityKeys[$key] = $this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT];
+            $this->entityKeys[$key] = $this->values[LanguageInterface::LANGCODE_DEFAULT][$field_name];
           }
         }
       }
@@ -303,7 +305,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     // Get the values of instantiated field objects, only serialize the values.
     foreach ($this->fields as $name => $fields) {
       foreach ($fields as $langcode => $field) {
-        $this->values[$name][$langcode] = $field->getValue();
+        $this->values[$langcode][$name] = $field->getValue();
       }
     }
     $this->fields = array();
@@ -381,8 +383,8 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
       }
       else {
         $value = NULL;
-        if (isset($this->values[$name][$langcode])) {
-          $value = $this->values[$name][$langcode];
+        if (isset($this->values[$langcode][$name])) {
+          $value = $this->values[$langcode][$name];
         }
         $field = \Drupal::service('plugin.manager.field.field_type')->createFieldItemList($this, $name, $value);
         if ($default) {
@@ -585,7 +587,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
       case $this->defaultLangcodeKey:
         // @todo Use a standard method to make the default_langcode field
         //   read-only. See https://www.drupal.org/node/2443991.
-        if (isset($this->values[$this->defaultLangcodeKey])) {
+        if (isset($this->values[LanguageInterface::LANGCODE_DEFAULT][$this->defaultLangcodeKey])) {
           $this->get($this->defaultLangcodeKey)->setValue($this->isDefaultTranslation(), FALSE);
           $message = String::format('The default translation flag cannot be changed (@langcode).', array('@langcode' => $this->activeLangcode));
           throw new \LogicException($message);
@@ -733,7 +735,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
 
     foreach ($values as $name => $value) {
       if (isset($definitions[$name]) && $definitions[$name]->isTranslatable()) {
-        $translation->values[$name][$langcode] = $value;
+        $translation->values[$langcode][$name] = $value;
       }
     }
 
@@ -747,8 +749,8 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     if (isset($this->translations[$langcode]) && $langcode != LanguageInterface::LANGCODE_DEFAULT && $langcode != $this->defaultLangcode) {
       foreach ($this->getFieldDefinitions() as $name => $definition) {
         if ($definition->isTranslatable()) {
-          unset($this->values[$name][$langcode]);
-          unset($this->fields[$name][$langcode]);
+          unset($this->values[$langcode][$name]);
+          unset($this->fields[$langcode][$name]);
         }
       }
       $this->translations[$langcode]['status'] = static::TRANSLATION_REMOVED;
@@ -794,7 +796,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
       if (!$definition->isComputed() && !empty($this->fields[$name])) {
         foreach ($this->fields[$name] as $langcode => $item) {
           $item->filterEmptyItems();
-          $this->values[$name][$langcode] = $item->getValue();
+          $this->values[$langcode][$name] = $item->getValue();
         }
       }
     }
@@ -822,10 +824,10 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     }
     // Else directly read/write plain values. That way, non-field entity
     // properties can always be accessed directly.
-    if (!isset($this->values[$name])) {
-      $this->values[$name] = NULL;
+    if (!isset($this->values[LanguageInterface::LANGCODE_DEFAULT][$name])) {
+      $this->values[LanguageInterface::LANGCODE_DEFAULT][$name] = NULL;
     }
-    return $this->values[$name];
+    return $this->values[LanguageInterface::LANGCODE_DEFAULT][$name];
   }
 
   /**
@@ -860,7 +862,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     }
     // Directly write non-field values.
     else {
-      $this->values[$name] = $value;
+      $this->values[LanguageInterface::LANGCODE_DEFAULT][$name] = $value;
     }
   }
 
@@ -874,7 +876,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     }
     // For non-field properties, check the internal values.
     else {
-      return isset($this->values[$name]);
+      return isset($this->values[LanguageInterface::LANGCODE_DEFAULT][$name]);
     }
   }
 
@@ -888,7 +890,7 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     }
     // For non-field properties, unset the internal value.
     else {
-      unset($this->values[$name]);
+      unset($this->values[LanguageInterface::LANGCODE_DEFAULT][$name]);
     }
   }
 

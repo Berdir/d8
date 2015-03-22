@@ -624,28 +624,25 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         // that store several properties).
         if ($field_name = strstr($name, '__', TRUE)) {
           $property_name = substr($name, strpos($name, '__') + 2);
-          $values[$id][$field_name][LanguageInterface::LANGCODE_DEFAULT][$property_name] = $value;
+          $values[$id][LanguageInterface::LANGCODE_DEFAULT][$field_name][$property_name] = $value;
         }
         else {
           // Handle columns named directly after the field (e.g if the field
           // type only stores one property).
-          $values[$id][$name][LanguageInterface::LANGCODE_DEFAULT] = $value;
+          $values[$id][LanguageInterface::LANGCODE_DEFAULT][$name] = $value;
         }
       }
     }
 
-    // Initialize translations array.
-    $translations = array_fill_keys(array_keys($values), array());
-
     // Load values from shared and dedicated tables.
-    $this->loadFromSharedTables($values, $translations);
+    $this->loadFromSharedTables($values);
     $this->loadFromDedicatedTables($values, $load_from_revision);
 
     $entities = array();
     foreach ($values as $id => $entity_values) {
-      $bundle = $this->bundleKey ? $entity_values[$this->bundleKey][LanguageInterface::LANGCODE_DEFAULT] : FALSE;
+      $bundle = $this->bundleKey ? $entity_values[LanguageInterface::LANGCODE_DEFAULT][$this->bundleKey] : FALSE;
       // Turn the record into an entity class.
-      $entities[$id] = new $this->entityClass($entity_values, $this->entityTypeId, $bundle, array_keys($translations[$id]));
+      $entities[$id] = new $this->entityClass($entity_values, $this->entityTypeId, $bundle);
     }
 
     return $entities;
@@ -659,7 +656,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @param array &$translations
    *   List of translations, keyed on the entity ID.
    */
-  protected function loadFromSharedTables(array &$values, array &$translations) {
+  protected function loadFromSharedTables(array &$values) {
     if ($this->dataTable) {
       // If a revision table is available, we need all the properties of the
       // latest revision. Otherwise we fall back to the data table.
@@ -689,7 +686,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         // Get the revision IDs.
         $revision_ids = array();
         foreach ($values as $entity_values) {
-          $revision_ids[] = $entity_values[$this->revisionKey][LanguageInterface::LANGCODE_DEFAULT];
+          $revision_ids[] = $entity_values[LanguageInterface::LANGCODE_DEFAULT][$this->revisionKey];
         }
         $query->condition('revision.' . $this->revisionKey, $revision_ids, 'IN');
       }
@@ -705,17 +702,15 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         // LanguageInterface::LANGCODE_DEFAULT as key.
         $langcode = empty($row[$this->defaultLangcodeKey]) ? $row[$this->langcodeKey] : LanguageInterface::LANGCODE_DEFAULT;
 
-        $translations[$id][$langcode] = TRUE;
-
         foreach ($fields as $field_name) {
           $columns = $table_mapping->getColumnNames($field_name);
           // Do not key single-column fields by property name.
           if (count($columns) == 1) {
-            $values[$id][$field_name][$langcode] = $row[reset($columns)];
+            $values[$id][$langcode][$field_name] = $row[reset($columns)];
           }
           else {
             foreach ($columns as $property_name => $column_name) {
-              $values[$id][$field_name][$langcode][$property_name] = $row[$column_name];
+              $values[$id][$langcode][$field_name][$property_name] = $row[$column_name];
             }
           }
         }
@@ -1224,10 +1219,10 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $ids = array();
     $default_langcodes = array();
     foreach ($values as $key => $entity_values) {
-      $bundles[$this->bundleKey ? $entity_values[$this->bundleKey][LanguageInterface::LANGCODE_DEFAULT] : $this->entityTypeId] = TRUE;
-      $ids[] = !$load_from_revision ? $key : $entity_values[$this->revisionKey][LanguageInterface::LANGCODE_DEFAULT];
-      if ($this->langcodeKey && isset($entity_values[$this->langcodeKey][LanguageInterface::LANGCODE_DEFAULT])) {
-        $default_langcodes[$key] = $entity_values[$this->langcodeKey][LanguageInterface::LANGCODE_DEFAULT];
+      $bundles[$this->bundleKey ? $entity_values[LanguageInterface::LANGCODE_DEFAULT][$this->bundleKey] : $this->entityTypeId] = TRUE;
+      $ids[] = !$load_from_revision ? $key : $entity_values[LanguageInterface::LANGCODE_DEFAULT][$this->revisionKey];
+      if ($this->langcodeKey && isset($entity_values[LanguageInterface::LANGCODE_DEFAULT][$this->langcodeKey])) {
+        $default_langcodes[$key] = $entity_values[LanguageInterface::LANGCODE_DEFAULT][$this->langcodeKey];
       }
     }
 
@@ -1271,14 +1266,14 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
           $langcode = $row->langcode;
         }
 
-        if (!isset($values[$row->entity_id][$field_name][$langcode])) {
-          $values[$row->entity_id][$field_name][$langcode] = array();
+        if (!isset($values[$row->entity_id][$langcode][$field_name])) {
+          $values[$row->entity_id][$langcode][$field_name] = array();
         }
 
         // Ensure that records for non-translatable fields having invalid
         // languages are skipped.
         if ($langcode == LanguageInterface::LANGCODE_DEFAULT || $definitions[$bundle][$field_name]->isTranslatable()) {
-          if ($storage_definition->getCardinality() == FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED || count($values[$row->entity_id][$field_name][$langcode]) < $storage_definition->getCardinality()) {
+          if ($storage_definition->getCardinality() == FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED || count($values[$row->entity_id][$langcode][$field_name]) < $storage_definition->getCardinality()) {
             $item = array();
             // For each column declared by the field, populate the item from the
             // prefixed database column.
@@ -1289,7 +1284,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
             }
 
             // Add the item to the field values for the entity.
-            $values[$row->entity_id][$field_name][$langcode][] = $item;
+            $values[$row->entity_id][$langcode][$field_name][] = $item;
           }
         }
       }
