@@ -999,7 +999,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   protected function processDataTable(ContentEntityTypeInterface $entity_type, array &$schema) {
     // Marking the respective fields as NOT NULL makes the indexes more
     // performant.
-    $schema['fields']['default_langcode']['not null'] = TRUE;
+    $schema['fields'][$entity_type->getKey('default_langcode')]['not null'] = TRUE;
   }
 
   /**
@@ -1016,7 +1016,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   protected function processRevisionDataTable(ContentEntityTypeInterface $entity_type, array &$schema) {
     // Marking the respective fields as NOT NULL makes the indexes more
     // performant.
-    $schema['fields']['default_langcode']['not null'] = TRUE;
+    $schema['fields'][$entity_type->getKey('default_langcode')]['not null'] = TRUE;
   }
 
   /**
