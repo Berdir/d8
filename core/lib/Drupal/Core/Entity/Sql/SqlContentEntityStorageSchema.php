@@ -882,7 +882,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
     $schema = array(
       'description' => "The data table for $entity_type_id entities.",
       'primary key' => array($id_key, $entity_type->getKey('langcode')),
-      'indexes' => array(),
+      'indexes' => array(
+        $entity_type_id . '__id__langcode' => array($id_key, $entity_type->getKey('default_langcode'), $entity_type->getKey('langcode')),
+      ),
       'foreign keys' => array(
         $entity_type_id => array(
           'table' => $this->storage->getBaseTable(),
@@ -918,7 +920,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
     $schema = array(
       'description' => "The revision data table for $entity_type_id entities.",
       'primary key' => array($revision_key, $entity_type->getKey('langcode')),
-      'indexes' => array(),
+      'indexes' => array(
+        $entity_type_id . '__id__langcode' => array($id_key, $entity_type->getKey('default_langcode'), $entity_type->getKey('langcode')),
+      ),
       'foreign keys' => array(
         $entity_type_id => array(
           'table' => $this->storage->getBaseTable(),
@@ -993,6 +997,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *   A partial schema array for the base table.
    */
   protected function processDataTable(ContentEntityTypeInterface $entity_type, array &$schema) {
+    // Marking the respective fields as NOT NULL makes the indexes more
+    // performant.
+    $schema['fields']['default_langcode']['not null'] = TRUE;
   }
 
   /**
@@ -1007,6 +1014,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *   A partial schema array for the base table.
    */
   protected function processRevisionDataTable(ContentEntityTypeInterface $entity_type, array &$schema) {
+    // Marking the respective fields as NOT NULL makes the indexes more
+    // performant.
+    $schema['fields']['default_langcode']['not null'] = TRUE;
   }
 
   /**
