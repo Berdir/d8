@@ -446,7 +446,7 @@ class User extends ContentEntityBase implements UserInterface {
       $entity_type = $entity_manager->getDefinition('user');
       $class = $entity_type->getClass();
 
-      static::$anonymousUser = new $class([LanguageInterface::LANGCODE_DEFAULT => ['uid' => 0]], $entity_type->id());
+      static::$anonymousUser = new $class(['uid' => [LanguageInterface::LANGCODE_DEFAULT => 0]], $entity_type->id());
     }
     return static::$anonymousUser;
   }
