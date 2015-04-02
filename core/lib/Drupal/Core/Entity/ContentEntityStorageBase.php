@@ -206,4 +206,67 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Dyn
     }
   }
 
+
+  /**
+   * Checks whether the field values changed compared to the original entity.
+   *
+   * @todo It would probably be better to have a compare() or an equals()
+   * method at both of the TypedDataInterface and FieldItemListInterface
+   * methods.
+   *
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   Field definition of field to compare for changes.
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   *   Entity to check for field changes.
+   * @param \Drupal\Core\Entity\ContentEntityInterface $original
+   *   Original entity to compare against.
+   *
+   * @return bool
+   *   True if the field value changed from the original entity.
+   */
+  protected function hasFieldValueChanged(FieldDefinitionInterface $field_definition, ContentEntityInterface $entity, ContentEntityInterface $original) {
+
+    $field_name = $field_definition->getName();
+    $default_langcode = $entity->getUntranslated()->language()->getId();
+    $translation_langcodes = array_keys($entity->getTranslationLanguages());
+    $langcodes = $field_definition->isTranslatable() ? $translation_langcodes : array($default_langcode);
+    $columns = $field_definition->getFieldStorageDefinition()->getColumns();
+
+    foreach ($langcodes as $langcode) {
+      $items = $entity->getTranslation($langcode)->get($field_name);
+      $items->filterEmptyItems();
+      $originalItems = $original->getTranslation($langcode)->get($field_name);
+      $originalItems->filterEmptyItems();
+
+      $count1 = count($items);
+      $count2 = count($originalItems);
+      if ($count1 === 0 && $count2 === 0) {
+        // Both are empty we can safely assume that it did not change.
+        return FALSE;
+      }
+      if ($count1 !== $count2) {
+        // One of them is empty but not the other one so the value changed.
+        return TRUE;
+      }
+      // We have to clean things up a bit before comparing because order of
+      // properties sadly may vary.
+      $callback = function (&$value) use ($columns) {
+        if (is_array($value)) {
+          $value = array_intersect_key($value, $columns);
+          ksort($value);
+        }
+      };
+      $value1 = $items->getValue();
+      $value2 = $originalItems->getValue();
+      array_walk($value1, $callback);
+      array_walk($value2, $callback);
+
+      if ($value1 !== $value2) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
 }
