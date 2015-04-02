@@ -242,7 +242,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Dyn
       $count2 = count($originalItems);
       if ($count1 === 0 && $count2 === 0) {
         // Both are empty we can safely assume that it did not change.
-        return FALSE;
+        continue;
       }
       if ($count1 !== $count2) {
         // One of them is empty but not the other one so the value changed.
