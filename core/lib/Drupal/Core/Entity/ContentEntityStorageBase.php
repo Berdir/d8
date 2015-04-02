@@ -233,6 +233,11 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Dyn
     $columns = $field_definition->getFieldStorageDefinition()->getColumns();
 
     foreach ($langcodes as $langcode) {
+      // If the original entity doesn't have this translation, we need to save.
+      if (!$original->hasTranslation($langcode)) {
+        return TRUE;
+      }
+
       $items = $entity->getTranslation($langcode)->get($field_name);
       $items->filterEmptyItems();
       $originalItems = $original->getTranslation($langcode)->get($field_name);
