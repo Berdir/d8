@@ -126,6 +126,10 @@ class User extends ContentEntityBase implements UserInterface {
         _user_mail_notify($op, $this);
       }
     }
+
+    // Ensure that the existing password is unset to minify risks of it
+    // getting serialized and stored somewhere.
+    $this->setExistingPassword(NULL);
   }
 
   /**

@@ -8,6 +8,7 @@
 namespace Drupal\user\Tests;
 
 use Drupal\simpletest\WebTestBase;
+use Drupal\user\Entity\User;
 
 /**
  * Tests account saving for arbitrary new uid.
@@ -48,4 +49,17 @@ class UserSaveTest extends WebTestBase {
     $user_by_name = user_load_by_name($test_name);
     $this->assertTrue($user_by_name, 'Loading user by name.');
   }
+
+  /**
+   * Ensures that an existing password is unset after the user was saved.
+   */
+  function testExistingPasswordRemoval() {
+    $user = User::create(['name' => $this->randomMachineName()]);
+    $user->save();
+    $user->setExistingPassword('existing password');
+    $this->assertNotNull($user->pass->existing);
+    $user->save();
+    $this->assertNull($user->pass->existing);
+  }
+
 }
