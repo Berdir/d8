@@ -127,9 +127,19 @@ class TwigEnvironment extends \Twig_Environment {
           $this->updateCompiledTemplate($cache_filename, $name);
         }
 
-        if (!$this->storage()->load($cache_filename)) {
+        // Load the file, double-check that the class now exists to prevent rare
+        // race conditions in the storage.
+        if (!$this->storage()->load($cache_filename) || !class_exists($cls)) {
           $this->updateCompiledTemplate($cache_filename, $name);
           $this->storage()->load($cache_filename);
+        }
+
+        if (!class_exists($cls, FALSE)) {
+          // In some rare race conditions with concurrent requests, we might
+          // have failed load load the class. In that case, execute the code
+          // directly to make the class available.
+          $compiled_source = $this->compileSource($this->loader->getSource($name), $name);
+          eval('?' . '>' . $compiled_source);
         }
       }
     }

@@ -8,6 +8,7 @@
 namespace Drupal\system\Tests\Theme;
 
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\PhpStorage\PhpStorageFactory;
 use Drupal\Core\Site\Settings;
 use Drupal\simpletest\KernelTestBase;
 
@@ -43,6 +44,19 @@ class TwigEnvironmentTest extends KernelTestBase {
       '#context' => array('unsafe_content' => $unsafe_string),
     );
     $this->assertEqual(drupal_render($element), 'test-with-context ' . SafeMarkup::checkPlain($unsafe_string));
+
+    // Simulate an invalid, existing file in the storage.
+    $name = 'maintenance-page.html.twig';
+    $cache_file = $environment->getCacheFilename($name);
+    $storage = PhpStorageFactory::get('twig');
+    $storage->save($cache_file, '<?php');
+
+    $element = array();
+    $element['test'] = array(
+      '#type' => 'inline_template',
+      '#template' => $name,
+    );
+    $this->assertEqual(drupal_render($element), $name);
 
     // Enable twig_auto_reload and twig_debug.
     $settings = Settings::getAll();

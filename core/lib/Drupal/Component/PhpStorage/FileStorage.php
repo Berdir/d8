@@ -56,11 +56,11 @@ class FileStorage implements PhpStorageInterface {
     $directory = dirname($path);
     if ($this->ensureDirectory($directory)) {
       $htaccess_path =  $directory . '/.htaccess';
-      if (!file_exists($htaccess_path) && file_put_contents($htaccess_path, static::htaccessLines())) {
+      if (!file_exists($htaccess_path) && file_put_contents($htaccess_path, static::htaccessLines(), LOCK_EX)) {
         @chmod($htaccess_path, 0444);
       }
     }
-    return (bool) file_put_contents($path, $code);
+    return (bool) file_put_contents($path, $code, LOCK_EX);
   }
 
   /**
@@ -133,7 +133,7 @@ EOF
   protected function ensureDirectory($directory, $mode = 0777) {
     if ($this->createDirectory($directory, $mode)) {
       $htaccess_path =  $directory . '/.htaccess';
-      if (!file_exists($htaccess_path) && file_put_contents($htaccess_path, static::htaccessLines())) {
+      if (!file_exists($htaccess_path) && file_put_contents($htaccess_path, static::htaccessLines(), LOCK_EX)) {
         @chmod($htaccess_path, 0444);
       }
     }
@@ -168,7 +168,7 @@ EOF
     if (is_dir($parent = dirname($directory))) {
       // If the parent directory exists, then the backwards recursion must end,
       // regardless of whether the subdirectory could be created.
-      if ($status = mkdir($directory)) {
+      if ($status = @mkdir($directory)) {
         // Only try to chmod() if the subdirectory could be created.
         $status = chmod($directory, $mode);
       }
