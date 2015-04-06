@@ -883,7 +883,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       'description' => "The data table for $entity_type_id entities.",
       'primary key' => array($id_key, $entity_type->getKey('langcode')),
       'indexes' => array(
-        $entity_type_id . '__id__langcode' => array($id_key, $entity_type->getKey('default_langcode'), $entity_type->getKey('langcode')),
+        $entity_type_id . '__id__default__langcode' => array($id_key, $entity_type->getKey('default_langcode'), $entity_type->getKey('langcode')),
       ),
       'foreign keys' => array(
         $entity_type_id => array(
@@ -921,7 +921,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       'description' => "The revision data table for $entity_type_id entities.",
       'primary key' => array($revision_key, $entity_type->getKey('langcode')),
       'indexes' => array(
-        $entity_type_id . '__id__langcode' => array($id_key, $entity_type->getKey('default_langcode'), $entity_type->getKey('langcode')),
+        $entity_type_id . '__id__default__langcode' => array($id_key, $entity_type->getKey('default_langcode'), $entity_type->getKey('langcode')),
       ),
       'foreign keys' => array(
         $entity_type_id => array(

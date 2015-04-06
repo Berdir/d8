@@ -548,7 +548,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
         'primary key' => array('id', 'langcode'),
         'unique keys' => array(),
         'indexes' => array(
-          'entity_test__id__langcode' => array(
+          'entity_test__id__default__langcode' => array(
             0 => 'id',
             1 => 'default_langcode',
             2 => 'langcode',
@@ -715,7 +715,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
         'primary key' => array('id', 'langcode'),
         'unique keys' => array(),
         'indexes' => array(
-          'entity_test__id__langcode' => array(
+          'entity_test__id__default__langcode' => array(
             0 => 'id',
             1 => 'default_langcode',
             2 => 'langcode',
@@ -753,7 +753,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
         'primary key' => array('revision_id', 'langcode'),
         'unique keys' => array(),
         'indexes' => array(
-          'entity_test__id__langcode' => array(
+          'entity_test__id__default__langcode' => array(
             0 => 'id',
             1 => 'default_langcode',
             2 => 'langcode',
