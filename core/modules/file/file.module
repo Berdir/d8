@@ -591,9 +591,8 @@ function file_file_download($uri) {
     return NULL;
   }
 
-
   // Check file access.
-  $result = $file->access('download');
+  $result = $file->access('download', NULL, TRUE);
 
   if ($result->isForbidden()) {
     // If access is explicitly forbidden, forbid access to the file.
