@@ -31,7 +31,9 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
             /** @var \Drupal\Core\Entity\EntityInterface $referencing_entity */
             foreach ($referencing_entities as $referencing_entity) {
               $entity_and_field_access = $referencing_entity->access('view', $account, TRUE)->andIf($referencing_entity->$field_name->access('view', $account, TRUE));
-              if ($entity_and_field_access->isAllowed()) {
+              // Return the result if access is either explicitly allowed
+              // or forbidden.
+              if (!$entity_and_field_access->isNeutral()) {
                 return $entity_and_field_access;
               }
             }

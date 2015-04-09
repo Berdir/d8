@@ -588,28 +588,27 @@ function file_file_download($uri) {
     }
   }
   if (!isset($file)) {
-    return;
+    return NULL;
   }
 
-  // Find out which (if any) fields of this type contain the file.
-  $references = file_get_file_references($file, NULL, EntityStorageInterface::FIELD_LOAD_CURRENT, NULL);
 
-  // Stop processing if there are no references in order to avoid returning
-  // headers for files controlled by other modules. Make an exception for
-  // temporary files where the host entity has not yet been saved (for example,
-  // an image preview on a node/add form) in which case, allow download by the
-  // file's owner.
-  if (empty($references) && ($file->isPermanent() || $file->getOwnerId() != \Drupal::currentUser()->id())) {
-    return;
-  }
+  // Check file access.
+  $result = $file->access('download');
 
-  if (!$file->access('download')) {
+  if ($result->isForbidden()) {
+    // If access is explicitly forbidden, forbid access to the file.
     return -1;
   }
+  elseif ($result->isNeutral()) {
+    // If the access result is neutral, allow other hooks to grant access and
+    // return nothing.
+    return NULL;
+  }
+  else {
+    // Access is granted.
+    return file_get_content_headers($file);
+  }
 
-  // Access is granted.
-  $headers = file_get_content_headers($file);
-  return $headers;
 }
 
 /**
