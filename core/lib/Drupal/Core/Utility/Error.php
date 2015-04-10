@@ -33,13 +33,15 @@ class Error {
   /**
    * Decodes an exception and retrieves the correct caller.
    *
-   * @param \Exception $exception
-   *   The exception object that was thrown.
+   * @param $exception
+   *   The exception object that was thrown. We skip the type hint for
+   *   backward compatibility, as this could either be an \Exception
+   *   object in PHP 5 or a \BaseException object in PHP 7.
    *
    * @return array
    *   An error in the format expected by _drupal_log_error().
    */
-  public static function decodeException(\Exception $exception) {
+  public static function decodeException($exception) {
     $message = $exception->getMessage();
 
     $backtrace = $exception->getTrace();
@@ -82,13 +84,15 @@ class Error {
   /**
    * Renders an exception error message without further exceptions.
    *
-   * @param \Exception $exception
-   *   The exception object that was thrown.
+   * @param $exception
+   *   The exception object that was thrown. We skip the type hint for
+   *   backwards compatibility, as this could either be an \Exception
+   *   object in PHP 5 or a \BaseException object in PHP 7.
    *
    * @return string
    *   An error message.
    */
-  public static function renderExceptionSafe(\Exception $exception) {
+  public static function renderExceptionSafe($exception) {
     $decode = static::decodeException($exception);
     $backtrace = $decode['backtrace'];
     unset($decode['backtrace']);
