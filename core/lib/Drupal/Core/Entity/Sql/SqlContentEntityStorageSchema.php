@@ -260,8 +260,12 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       return;
     }
 
+    $index_only_changes = $entity_type->isRevisionable() == $original->isRevisionable() &&
+      $entity_type->isTranslatable() == $original->isTranslatable() &&
+      !$this->hasSharedTableNameChanges($entity_type, $original);
+
     // If a migration is required, we can't proceed.
-    if ($this->requiresEntityDataMigration($entity_type, $original)) {
+    if (!$index_only_changes && $this->requiresEntityDataMigration($entity_type, $original)) {
       throw new EntityStorageException(SafeMarkup::format('The SQL storage cannot change the schema for an existing entity type with data.'));
     }
 
