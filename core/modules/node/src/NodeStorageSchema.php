@@ -63,16 +63,7 @@ class NodeStorageSchema extends SqlContentEntityStorageSchema {
 
         case 'changed':
         case 'created':
-        case 'langcode':
           // @todo Revisit index definitions: https://drupal.org/node/2015277.
-          $this->addSharedTableFieldIndex($storage_definition, $schema, TRUE);
-          break;
-      }
-    }
-
-    if ($table_name == 'node_field_revision') {
-      switch ($field_name) {
-        case 'langcode':
           $this->addSharedTableFieldIndex($storage_definition, $schema, TRUE);
           break;
       }
