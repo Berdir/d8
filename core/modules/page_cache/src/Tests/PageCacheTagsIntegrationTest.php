@@ -25,11 +25,6 @@ class PageCacheTagsIntegrationTest extends WebTestBase {
 
   protected $profile = 'standard';
 
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['page_cache'];
-
   protected $dumpHeaders = TRUE;
 
   /**

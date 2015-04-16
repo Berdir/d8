@@ -8,16 +8,11 @@
 namespace Drupal\page_cache\Tests;
 
 use Drupal\Component\Datetime\DateTimePlus;
-use Drupal\Core\Form\FormState;
-use Drupal\Core\PageCache\ChainRequestPolicy;
-use Drupal\Core\PageCache\RequestPolicy\NoSessionOpen;
-use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Url;
 use Drupal\simpletest\WebTestBase;
 use Drupal\Core\Cache\Cache;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Enables the page cache and tests it with various HTTP requests.
@@ -33,7 +28,7 @@ class PageCacheTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('test_page_test', 'system_test', 'page_cache');
+  public static $modules = array('test_page_test', 'system_test');
 
   /**
    * {@inheritdoc}
@@ -53,7 +48,11 @@ class PageCacheTest extends WebTestBase {
    * Since tag based invalidation works, we know that our tag properly
    * persisted.
    */
-  public function testPageCacheTags() {
+  function testPageCacheTags() {
+    $config = $this->config('system.performance');
+    $config->set('cache.page.max_age', 300);
+    $config->save();
+
     $path = 'system-test/cache_tags_page';
     $tags = array('system_test_cache_tags_page');
     $this->drupalGet($path);
@@ -62,7 +61,7 @@ class PageCacheTest extends WebTestBase {
     // Verify a cache hit, but also the presence of the correct cache tags.
     $this->drupalGet($path);
     $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT');
-    $cid_parts = array(\Drupal::url('system_test.cache_tags_page',array(), array('absolute' => TRUE)), 'html');
+    $cid_parts = array(\Drupal::url('system_test.cache_tags_page', array(), array('absolute' => TRUE)), 'html');
     $cid = implode(':', $cid_parts);
     $cache_entry = \Drupal::cache('render')->get($cid);
     sort($cache_entry->tags);
@@ -81,21 +80,23 @@ class PageCacheTest extends WebTestBase {
   /**
    * Tests support for different cache items with different Accept headers.
    */
-  public function testAcceptHeaderRequests() {
-    $url_generator = \Drupal::urlGenerator();
-    $url_generator->setContext(new RequestContext());
-    $accept_header_cache_uri = $url_generator->getPathFromRoute('system_test.page_cache_accept_header');
+  function testAcceptHeaderRequests() {
+    $config = $this->config('system.performance');
+    $config->set('cache.page.max_age', 300);
+    $config->save();
+
+    $accept_header_cache_url = Url::fromRoute('system_test.page_cache_accept_header');
     $json_accept_header = array('Accept: application/json');
 
-    $this->drupalGet($accept_header_cache_uri);
+    $this->drupalGet($accept_header_cache_url);
     $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'MISS', 'HTML page was not yet cached.');
-    $this->drupalGet($accept_header_cache_uri);
+    $this->drupalGet($accept_header_cache_url);
     $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT', 'HTML page was cached.');
     $this->assertRaw('<p>oh hai this is html.</p>', 'The correct HTML response was returned.');
 
-    $this->drupalGet($accept_header_cache_uri, array(), $json_accept_header);
+    $this->drupalGet($accept_header_cache_url, array(), $json_accept_header);
     $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'MISS', 'Json response was not yet cached.');
-    $this->drupalGet($accept_header_cache_uri, array(), $json_accept_header);
+    $this->drupalGet($accept_header_cache_url, array(), $json_accept_header);
     $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT', 'Json response was cached.');
     $this->assertRaw('{"content":"oh hai this is json"}', 'The correct Json response was returned.');
 
@@ -147,7 +148,11 @@ class PageCacheTest extends WebTestBase {
   /**
    * Tests support of requests with If-Modified-Since and If-None-Match headers.
    */
-  public function testConditionalRequests() {
+  function testConditionalRequests() {
+    $config = $this->config('system.performance');
+    $config->set('cache.page.max_age', 300);
+    $config->save();
+
     // Fill the cache.
     $this->drupalGet('');
     // Verify the page is not printed twice when the cache is cold.
@@ -187,10 +192,16 @@ class PageCacheTest extends WebTestBase {
   /**
    * Tests cache headers.
    */
-  public function testPageCache() {
+  function testPageCache() {
+    $config = $this->config('system.performance');
+    $config->set('cache.page.max_age', 300);
+    $config->set('response.gzip', 1);
+    $config->save();
+
     // Fill the cache.
     $this->drupalGet('system-test/set-header', array('query' => array('name' => 'Foo', 'value' => 'bar')));
     $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'MISS', 'Page was not cached.');
+    $this->assertEqual(strtolower($this->drupalGetHeader('Vary')), 'cookie,accept-encoding', 'Vary header was sent.');
     // Symfony's Response logic determines a specific order for the subvalues
     // of the Cache-Control header, even if they are explicitly passed in to
     // the response header bag in a different order.
@@ -201,6 +212,7 @@ class PageCacheTest extends WebTestBase {
     // Check cache.
     $this->drupalGet('system-test/set-header', array('query' => array('name' => 'Foo', 'value' => 'bar')));
     $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT', 'Page was cached.');
+    $this->assertEqual(strtolower($this->drupalGetHeader('Vary')), 'cookie,accept-encoding', 'Vary: Cookie header was sent.');
     $this->assertEqual($this->drupalGetHeader('Cache-Control'), 'max-age=300, public', 'Cache-Control header was sent.');
     $this->assertEqual($this->drupalGetHeader('Expires'), 'Sun, 19 Nov 1978 05:00:00 GMT', 'Expires header was sent.');
     $this->assertEqual($this->drupalGetHeader('Foo'), 'bar', 'Custom header was sent.');
@@ -209,12 +221,14 @@ class PageCacheTest extends WebTestBase {
     $this->drupalGet('system-test/set-header', array('query' => array('name' => 'Expires', 'value' => 'Fri, 19 Nov 2008 05:00:00 GMT')));
     $this->assertEqual($this->drupalGetHeader('Expires'), 'Fri, 19 Nov 2008 05:00:00 GMT', 'Default header was replaced.');
     $this->drupalGet('system-test/set-header', array('query' => array('name' => 'Vary', 'value' => 'User-Agent')));
+    $this->assertEqual(strtolower($this->drupalGetHeader('Vary')), 'user-agent,accept-encoding', 'Default header was replaced.');
 
     // Check that authenticated users bypass the cache.
     $user = $this->drupalCreateUser();
     $this->drupalLogin($user);
     $this->drupalGet('system-test/set-header', array('query' => array('name' => 'Foo', 'value' => 'bar')));
     $this->assertFalse($this->drupalGetHeader('X-Drupal-Cache'), 'Caching was bypassed.');
+    $this->assertTrue(strpos(strtolower($this->drupalGetHeader('Vary')), 'cookie') === FALSE, 'Vary: Cookie header was not sent.');
     $this->assertEqual($this->drupalGetHeader('Cache-Control'), 'must-revalidate, no-cache, post-check=0, pre-check=0, private', 'Cache-Control header was sent.');
     $this->assertEqual($this->drupalGetHeader('Expires'), 'Sun, 19 Nov 1978 05:00:00 GMT', 'Expires header was sent.');
     $this->assertEqual($this->drupalGetHeader('Foo'), 'bar', 'Custom header was sent.');
@@ -292,6 +306,10 @@ class PageCacheTest extends WebTestBase {
    * Tests the omit_vary_cookie setting.
    */
   public function testPageCacheWithoutVaryCookie() {
+    $config = $this->config('system.performance');
+    $config->set('cache.page.max_age', 300);
+    $config->save();
+
     $settings['settings']['omit_vary_cookie'] = (object) array(
       'value' => TRUE,
       'required' => TRUE,
@@ -302,11 +320,13 @@ class PageCacheTest extends WebTestBase {
     $this->drupalGet('');
     $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'MISS', 'Page was not cached.');
     $this->assertTrue(strpos($this->drupalGetHeader('Vary'), 'Cookie') === FALSE, 'Vary: Cookie header was not sent.');
+    $this->assertEqual($this->drupalGetHeader('Cache-Control'), 'max-age=300, public', 'Cache-Control header was sent.');
 
     // Check cache.
     $this->drupalGet('');
     $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT', 'Page was cached.');
     $this->assertTrue(strpos($this->drupalGetHeader('Vary'), 'Cookie') === FALSE, 'Vary: Cookie header was not sent.');
+    $this->assertEqual($this->drupalGetHeader('Cache-Control'), 'max-age=300, public', 'Cache-Control header was sent.');
   }
 
   /**
@@ -316,7 +336,7 @@ class PageCacheTest extends WebTestBase {
     // Install the module that provides the test form.
     $this->container->get('module_installer')
       ->install(['page_cache_form_test']);
-    $this->resetAll();
+    \Drupal::service('router.builder')->rebuild();
 
     $this->drupalGet('page_cache_form_test_immutability');
 

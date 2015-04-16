@@ -39,23 +39,9 @@ class SiteMaintenanceTest extends WebTestBase {
   }
 
   /**
-   * Verify site maintenance mode functionality with page cache disabled.
-   */
-  function testSiteMaintenanceWithoutPageCache() {
-    $this->doTestSiteMaintenance();
-  }
-
-  /**
-   * Verify site maintenance mode functionality with page cache enabled.
-   */
-  function testSiteMaintenanceWithPageCache() {
-    $this->doTestSiteMaintenance();
-  }
-
-  /**
    * Verify site maintenance mode functionality.
    */
-  protected function doTestSiteMaintenance() {
+  protected function TestSiteMaintenance() {
     // Turn on maintenance mode.
     $edit = array(
       'maintenance_mode' => 1,
