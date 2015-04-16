@@ -41,7 +41,7 @@ class SiteMaintenanceTest extends WebTestBase {
   /**
    * Verify site maintenance mode functionality.
    */
-  protected function TestSiteMaintenance() {
+  protected function testSiteMaintenance() {
     // Turn on maintenance mode.
     $edit = array(
       'maintenance_mode' => 1,
