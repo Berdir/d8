@@ -354,6 +354,13 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
   /**
    * {@inheritdoc}
    */
+  public function deleteCache($form_build_id) {
+    $this->formCache->deleteCache($form_build_id);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm($form_arg, FormStateInterface &$form_state) {
     $build_info = $form_state->getBuildInfo();
     if (empty($build_info['args'])) {
@@ -490,8 +497,10 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
       if (!$form_state->isRebuilding() && !FormState::hasAnyErrors()) {
         if ($submit_response = $this->formSubmitter->doSubmitForm($form, $form_state)) {
+          $this->formCache->deleteCache($form_state->getValue('form_build_id'));
           return $submit_response;
         }
+        $this->formCache->deleteCache($form_state->getValue('form_build_id'));
       }
 
       // Don't rebuild or cache form submissions invoked via self::submitForm().
