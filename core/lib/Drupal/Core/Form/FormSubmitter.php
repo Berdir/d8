@@ -55,6 +55,10 @@ class FormSubmitter implements FormSubmitterInterface {
     // Execute form submit handlers.
     $this->executeSubmitHandlers($form, $form_state);
 
+    \Drupal::keyValueExpirable('form')->delete($form_state->getValue('form_build_id'));
+    \Drupal::keyValueExpirable('form_state')->delete($form_state->getValue('form_build_id'));
+
+
     // If batches were set in the submit handlers, we process them now,
     // possibly ending execution. We make sure we do not react to the batch
     // that is already being processed (if a batch operation performs a
