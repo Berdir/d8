@@ -656,7 +656,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
 
         // Add per-bundle field definitions based on the stored field bundle
         // map.
-        $entity_field_bundle_map = \Drupal::state()->get('entity_field_bundle_map');
+        $entity_field_bundle_map = \Drupal::state()->get('entity_field_bundle_map', []);
         foreach ($entity_field_bundle_map as $entity_type_id => $field_bundle_map) {
           foreach ($field_bundle_map as $field_name => $field_bundles_type) {
             if (!isset($this->fieldMap[$entity_type_id][$field_name])) {
@@ -704,6 +704,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     $entity_field_bundle_map[$field_definition->getTargetEntityTypeId()][$field_definition->getName()]['bundles'][] = $field_definition->getTargetBundle();
     \Drupal::state()->set('entity_field_bundle_map', $entity_field_bundle_map);
     $this->cacheBackend->delete('entity_field_map');
+    $this->fieldMap = [];
   }
 
   /**
