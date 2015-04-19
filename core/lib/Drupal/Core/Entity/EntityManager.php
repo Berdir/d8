@@ -18,6 +18,7 @@ use Drupal\Core\Entity\Exception\AmbiguousEntityClassException;
 use Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionEvent;
 use Drupal\Core\Field\FieldStorageDefinitionEvents;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -640,19 +641,34 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
         $this->fieldMap = $cache->data;
       }
       else {
-        // Rebuild the definitions and put it into the cache.
+        // First, add all base fields, they are not explicitly tracked as they
+        // are available on all bundles.
         foreach ($this->getDefinitions() as $entity_type_id => $entity_type) {
           if ($entity_type->isSubclassOf('\Drupal\Core\Entity\FieldableEntityInterface')) {
-            foreach ($this->getBundleInfo($entity_type_id) as $bundle => $bundle_info) {
-              foreach ($this->getFieldDefinitions($entity_type_id, $bundle) as $field_name => $field_definition) {
-                $this->fieldMap[$entity_type_id][$field_name]['type'] = $field_definition->getType();
-                $this->fieldMap[$entity_type_id][$field_name]['bundles'][] = $bundle;
-              }
+            $bundles = array_keys($this->getBundleInfo($entity_type_id));
+            $base_fields = $this->getBaseFieldDefinitions($entity_type_id);
+            foreach ($base_fields as $field_name => $base_field_definition) {
+              $this->fieldMap[$entity_type_id][$field_name]['type'] = $base_field_definition->getType();
+              $this->fieldMap[$entity_type_id][$field_name]['bundles'] = $bundles;
             }
           }
         }
 
-        $this->cacheSet($cid, $this->fieldMap, Cache::PERMANENT, array('entity_types', 'entity_field_info'));
+        // Add per-bundle field definitions based on the stored field bundle
+        // map.
+        $entity_field_bundle_map = \Drupal::state()->get('entity_field_bundle_map');
+        foreach ($entity_field_bundle_map as $entity_type_id => $field_bundle_map) {
+          foreach ($field_bundle_map as $field_name => $field_bundles_type) {
+            if (!isset($this->fieldMap[$entity_type_id][$field_name])) {
+              $this->fieldMap[$entity_type_id][$field_name] = $field_bundles_type;
+            }
+            else {
+              $this->fieldMap[$entity_type_id][$field_name]['bundles'] = array_merge($this->fieldMap[$entity_type_id][$field_name]['bundles'], $field_bundles_type['bundles']);
+            }
+          }
+        }
+
+        $this->cacheSet($cid, $this->fieldMap, Cache::PERMANENT, array('entity_types'));
       }
     }
     return $this->fieldMap;
@@ -675,6 +691,19 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
       $this->fieldMapByFieldType[$field_type] = $filtered_map;
     }
     return $this->fieldMapByFieldType[$field_type];
+  }
+
+  public function onFieldDefinitionCreate(FieldDefinitionInterface $field_definition) {
+    $entity_field_bundle_map = \Drupal::state()->get('entity_field_bundle_map');
+    if (!isset($entity_field_bundle_map[$field_definition->getTargetEntityTypeId()][$field_definition->getName()])) {
+      $entity_field_bundle_map[$field_definition->getTargetEntityTypeId()][$field_definition->getName()] = [
+        'type' => $field_definition->getType(),
+        'bundles' => [],
+      ];
+    }
+    $entity_field_bundle_map[$field_definition->getTargetEntityTypeId()][$field_definition->getName()]['bundles'][] = $field_definition->getTargetBundle();
+    \Drupal::state()->set('entity_field_bundle_map', $entity_field_bundle_map);
+    $this->cacheBackend->delete('entity_field_map');
   }
 
   /**

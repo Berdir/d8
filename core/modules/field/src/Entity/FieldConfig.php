@@ -169,6 +169,15 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
   /**
    * {@inheritdoc}
    */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    if (!$update) {
+      $this->entityManager()->onFieldDefinitionCreate($this);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function calculateDependencies() {
     parent::calculateDependencies();
     // Mark the field_storage_config as a a dependency.
