@@ -693,7 +693,11 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     return $this->fieldMapByFieldType[$field_type];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function onFieldDefinitionCreate(FieldDefinitionInterface $field_definition) {
+    $this->getStorage($field_definition->getTargetEntityTypeId())->onFieldDefinitionCreate($field_definition);
     $entity_field_bundle_map = \Drupal::state()->get('entity_field_bundle_map');
     if (!isset($entity_field_bundle_map[$field_definition->getTargetEntityTypeId()][$field_definition->getName()])) {
       $entity_field_bundle_map[$field_definition->getTargetEntityTypeId()][$field_definition->getName()] = [
@@ -702,6 +706,29 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
       ];
     }
     $entity_field_bundle_map[$field_definition->getTargetEntityTypeId()][$field_definition->getName()]['bundles'][] = $field_definition->getTargetBundle();
+    \Drupal::state()->set('entity_field_bundle_map', $entity_field_bundle_map);
+    $this->cacheBackend->delete('entity_field_map');
+    $this->fieldMap = [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onFieldDefinitionUpdate(FieldDefinitionInterface $field_definition, FieldDefinitionInterface $original) {
+    $this->getStorage($field_definition->getTargetEntityTypeId())->onFieldDefinitionUpdate($field_definition, $original);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onFieldDefinitionDelete(FieldDefinitionInterface $field_definition) {
+    $this->getStorage($field_definition->getTargetEntityTypeId())->onFieldDefinitionDelete($field_definition);
+    $entity_field_bundle_map = \Drupal::state()->get('entity_field_bundle_map');
+    $key = array_search($field_definition->getTargetBundle(), $entity_field_bundle_map[$field_definition->getTargetEntityTypeId()][$field_definition->getName()]['bundles']);
+    unset($entity_field_bundle_map[$field_definition->getTargetEntityTypeId()][$field_definition->getName()]['bundles'][$key]);
+    if (empty($entity_field_bundle_map[$field_definition->getTargetEntityTypeId()][$field_definition->getName()]['bundles'])) {
+      unset($entity_field_bundle_map[$field_definition->getTargetEntityTypeId()][$field_definition->getName()]['bundles']);
+    }
     \Drupal::state()->set('entity_field_bundle_map', $entity_field_bundle_map);
     $this->cacheBackend->delete('entity_field_map');
     $this->fieldMap = [];
