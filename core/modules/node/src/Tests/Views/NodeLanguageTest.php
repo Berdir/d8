@@ -7,6 +7,7 @@
 
 namespace Drupal\node\Tests\Views;
 
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\views\Plugin\views\PluginBase;
@@ -65,6 +66,9 @@ class NodeLanguageTest extends NodeTestBase {
     // "English", or "Spanish", as there is a language field in the view
     // that prints out those words.
     $this->nodeTitles = array(
+      LanguageInterface::LANGCODE_NOT_SPECIFIED => array(
+        'First node und',
+      ),
       'es' => array(
         'Primero nodo es',
         'Segundo nodo es',
