@@ -92,6 +92,12 @@ function content_translation_language_types_info_alter(array &$language_types) {
  * assumed. Every translation handler must implement
  * \Drupal\content_translation\ContentTranslationHandlerInterface.
  *
+ * By default, entity types that do not have a canonical link template can not
+ * be enabled for translation. Entity types can skip this check by setting the
+ * "content_translation_ui_skip" key to true. No UI will be provided than, such
+ * entity types are expected to implement their own UI. For example, entity
+ * types that are embedded into others for editing.
+ *
  * To implement its business logic the content translation UI relies on various
  * metadata items describing the translation state. The default implementation
  * is provided by \Drupal\content_translation\ContentTranslationMetadataWrapper,
