@@ -7,9 +7,11 @@
 
 namespace Drupal\block;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Plugin\Context\ContextHandlerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 
 /**
  * Provides a repository for Block config entities.
@@ -31,6 +33,13 @@ class BlockRepository implements BlockRepositoryInterface {
   protected $themeManager;
 
   /**
+   * The cache backend.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $cacheBackend;
+
+  /**
    * Constructs a new BlockRepository.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -39,11 +48,13 @@ class BlockRepository implements BlockRepositoryInterface {
    *   The theme manager.
    * @param \Drupal\Core\Plugin\Context\ContextHandlerInterface $context_handler
    *   The plugin context handler.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    */
-  public function __construct(EntityManagerInterface $entity_manager, ThemeManagerInterface $theme_manager, ContextHandlerInterface $context_handler) {
+  public function __construct(EntityManagerInterface $entity_manager, ThemeManagerInterface $theme_manager, ContextHandlerInterface $context_handler, CacheBackendInterface $cache_backend) {
     $this->blockStorage = $entity_manager->getStorage('block');
     $this->themeManager = $theme_manager;
     $this->contextHandler = $context_handler;
+    $this->cacheBackend = $cache_backend;
   }
 
   /**
@@ -74,7 +85,18 @@ class BlockRepository implements BlockRepositoryInterface {
     $empty = array_fill_keys(array_keys($this->getRegionNames()), array());
 
     $full = array();
-    foreach ($this->blockStorage->loadByProperties(array('theme' => $this->getTheme())) as $block_id => $block) {
+    $theme = $this->getTheme();
+    $cid = 'block_list:' . $theme;
+    if ($cached = $this->cacheBackend->get($cid)) {
+      $blocks = $cached->data;
+    }
+    else {
+      $blocks = $this->blockStorage->loadByProperties(['theme' => $theme]);
+      // Add the block config entity list cache tag, so that this is invalidated
+      // when blocks change.
+      $this->cacheBackend->set($cid, $blocks, Cache::PERMANENT, ['config:block_list']);
+    }
+    foreach ($blocks as $block_id => $block) {
       /** @var \Drupal\block\BlockInterface $block */
       // Set the contexts on the block before checking access.
       if ($block->setContexts($contexts)->access('view')) {

@@ -7,6 +7,8 @@
 
 namespace Drupal\block\Tests;
 
+use Drupal\block\Entity\Block;
+
 /**
  * Tests branding block display.
  *
@@ -54,9 +56,11 @@ class BlockSystemBrandingTest extends BlockTestBase {
     $this->assertCacheTag('config:system.site');
 
     // Turn just the logo off.
-    $this->config('block.block.site-branding')
-      ->set('settings.use_site_logo', 0)
-      ->save();
+    /** @var \Drupal\block\BlockInterface $block */
+    $block = Block::load('site-branding');
+    $block->getPlugin()->setConfigurationValue('use_site_logo', FALSE);
+    $block->save();
+
     $this->drupalGet('');
     $site_logo_element = $this->xpath($site_logo_xpath);
     $site_name_element = $this->xpath($site_name_xpath);
@@ -68,10 +72,11 @@ class BlockSystemBrandingTest extends BlockTestBase {
     $this->assertCacheTag('config:system.site');
 
     // Turn just the site name off.
-    $this->config('block.block.site-branding')
-      ->set('settings.use_site_logo', 1)
-      ->set('settings.use_site_name', 0)
-      ->save();
+    $block->getPlugin()
+      ->setConfigurationValue('use_site_logo', TRUE)
+      ->setConfigurationValue('use_site_name', FALSE);
+    $block->save();
+
     $this->drupalGet('');
     $site_logo_element = $this->xpath($site_logo_xpath);
     $site_name_element = $this->xpath($site_name_xpath);
@@ -83,10 +88,11 @@ class BlockSystemBrandingTest extends BlockTestBase {
     $this->assertCacheTag('config:system.site');
 
     // Turn just the site slogan off.
-    $this->config('block.block.site-branding')
-      ->set('settings.use_site_name', 1)
-      ->set('settings.use_site_slogan', 0)
-      ->save();
+    $block->getPlugin()
+      ->setConfigurationValue('use_site_name', TRUE)
+      ->setConfigurationValue('use_site_slogan', FALSE);
+    $block->save();
+
     $this->drupalGet('');
     $site_logo_element = $this->xpath($site_logo_xpath);
     $site_name_element = $this->xpath($site_name_xpath);
@@ -98,10 +104,11 @@ class BlockSystemBrandingTest extends BlockTestBase {
     $this->assertCacheTag('config:system.site');
 
     // Turn the site name and the site slogan off.
-    $this->config('block.block.site-branding')
-      ->set('settings.use_site_name', 0)
-      ->set('settings.use_site_slogan', 0)
-      ->save();
+    $block->getPlugin()
+      ->setConfigurationValue('use_site_name', FALSE)
+      ->setConfigurationValue('use_site_slogan', FALSE);
+    $block->save();
+
     $this->drupalGet('');
     $site_logo_element = $this->xpath($site_logo_xpath);
     $site_name_element = $this->xpath($site_name_xpath);

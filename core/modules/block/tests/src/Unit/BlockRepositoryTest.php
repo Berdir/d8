@@ -8,6 +8,8 @@
 namespace Drupal\Tests\block\Unit;
 
 use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Plugin\Context\Context;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Tests\UnitTestCase;
 
@@ -38,6 +40,13 @@ class BlockRepositoryTest extends UnitTestCase {
   protected $contextHandler;
 
   /**
+   * The cache backend.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit_Framework_MockObject_MockObject
+   */
+  protected $cacheBackend;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -61,9 +70,10 @@ class BlockRepositoryTest extends UnitTestCase {
     $entity_manager->expects($this->any())
       ->method('getStorage')
       ->willReturn($this->blockStorage);
+    $this->cacheBackend = $this->getMock('Drupal\Core\Cache\CacheBackendInterface');
 
     $this->blockRepository = $this->getMockBuilder('Drupal\block\BlockRepository')
-      ->setConstructorArgs([$entity_manager, $theme_manager, $this->contextHandler])
+      ->setConstructorArgs([$entity_manager, $theme_manager, $this->contextHandler, $this->cacheBackend])
       ->setMethods(['getRegionNames'])
       ->getMock();
     $this->blockRepository->expects($this->once())
@@ -102,13 +112,8 @@ class BlockRepositoryTest extends UnitTestCase {
       ->method('loadByProperties')
       ->with(['theme' => $this->theme])
       ->willReturn($blocks);
-    $result = [];
-    foreach ($this->blockRepository->getVisibleBlocksPerRegion([]) as $region => $resulting_blocks) {
-      $result[$region] = [];
-      foreach ($resulting_blocks as $plugin_id => $block) {
-        $result[$region][] = $plugin_id;
-      }
-    }
+
+    $result = $this->getAllVisibleBlocks([]);
     $this->assertSame($result, $expected_blocks);
   }
 
@@ -147,6 +152,45 @@ class BlockRepositoryTest extends UnitTestCase {
    * @covers ::getVisibleBlocksPerRegion
    */
   public function testGetVisibleBlocksPerRegionWithContext() {
+    $contexts = [];
+    $contexts[] = new Context(new ContextDefinition('entity:user', 'Current user'));
+
+    $block = $this->getMock('Drupal\block\BlockInterface');
+    $block->expects($this->once())
+      ->method('setContexts')
+      ->with($contexts)
+      ->willReturnSelf();
+    $block->expects($this->once())
+      ->method('access')
+      ->willReturn(TRUE);
+    $block->expects($this->once())
+      ->method('getRegion')
+      ->willReturn('top');
+    $blocks['block_id'] = $block;
+
+    $this->blockStorage->expects($this->once())
+      ->method('loadByProperties')
+      ->with(['theme' => $this->theme])
+      ->willReturn($blocks);
+
+    $result = $this->getAllVisibleBlocks($contexts);
+    $expected = [
+      'top' => [
+        'block_id',
+      ],
+      'center' => [],
+      'bottom' => [],
+    ];
+    $this->assertSame($expected, $result);
+  }
+
+  /**
+   * @covers ::getVisibleBlocksPerRegion
+   */
+  public function testGetVisibleBlocksPerRegionFromCache() {
+    $this->blockStorage->expects($this->never())
+      ->method('loadByProperties');
+
     $block = $this->getMock('Drupal\block\BlockInterface');
     $block->expects($this->once())
       ->method('setContexts')
@@ -159,18 +203,12 @@ class BlockRepositoryTest extends UnitTestCase {
       ->willReturn('top');
     $blocks['block_id'] = $block;
 
-    $contexts = [];
-    $this->blockStorage->expects($this->once())
-      ->method('loadByProperties')
-      ->with(['theme' => $this->theme])
-      ->willReturn($blocks);
-    $result = [];
-    foreach ($this->blockRepository->getVisibleBlocksPerRegion($contexts) as $region => $resulting_blocks) {
-      $result[$region] = [];
-      foreach ($resulting_blocks as $plugin_id => $block) {
-        $result[$region][] = $plugin_id;
-      }
-    }
+    $this->cacheBackend->expects($this->once())
+      ->method('get')
+      ->with('block_list:' . $this->theme)
+      ->willReturn((object) ['data' => $blocks]);
+
+    $result = $this->getAllVisibleBlocks([]);
     $expected = [
       'top' => [
         'block_id',
@@ -179,6 +217,20 @@ class BlockRepositoryTest extends UnitTestCase {
       'bottom' => [],
     ];
     $this->assertSame($expected, $result);
+  }
+
+  /**
+   * Calls getVisibleBlocksPerRegion() for a set of contexts.
+   */
+  protected function getAllVisibleBlocks(array $contexts) {
+    $result = [];
+    foreach ($this->blockRepository->getVisibleBlocksPerRegion($contexts) as $region => $resulting_blocks) {
+      $result[$region] = [];
+      foreach ($resulting_blocks as $plugin_id => $block) {
+        $result[$region][] = $plugin_id;
+      }
+    }
+    return $result;
   }
 
 }

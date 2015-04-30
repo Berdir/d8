@@ -78,6 +78,8 @@ interface BlockPluginInterface extends ConfigurablePluginInterface, PluginFormIn
    * @param mixed $value
    *   The value to set for the provided key.
    *
+   * @return $this
+   *
    * @todo This doesn't belong here. Move this into a new base class in
    *   http://drupal.org/node/1764380.
    * @todo This does not set a value in \Drupal::config(), so the name is confusing.

@@ -108,6 +108,7 @@ abstract class BlockBase extends ContextAwarePluginBase implements BlockPluginIn
    */
   public function setConfigurationValue($key, $value) {
     $this->configuration[$key] = $value;
+    return $this;
   }
 
   /**
