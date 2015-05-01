@@ -256,7 +256,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
 
     // Retrieve the desired properties and set them in config.
     $config->setData($this->mapToStorageRecord($entity));
-    $config->save();
+    $config->save($entity->hasTrustedData());
 
     return $is_new ? SAVED_NEW : SAVED_UPDATED;
   }

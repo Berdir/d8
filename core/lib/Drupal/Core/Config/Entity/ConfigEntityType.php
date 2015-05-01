@@ -15,7 +15,7 @@ use Drupal\Component\Utility\SafeMarkup;
 /**
  * Provides an implementation of a configuration entity type and its metadata.
  */
-class ConfigEntityType extends EntityType {
+class ConfigEntityType extends EntityType implements ConfigEntityTypeInterface {
 
   /**
    * Length limit of the configuration entity prefix.
@@ -62,6 +62,20 @@ class ConfigEntityType extends EntityType {
   protected $static_cache = FALSE;
 
   /**
+   * The list of configuration entity properties to export from the annotation.
+   *
+   * @var array
+   */
+  protected $config_export = [];
+
+  /**
+   * A static cache of the configuration entity properties to export.
+   *
+   * @var array
+   */
+  protected $static_config_export = [];
+
+  /**
    * {@inheritdoc}
    *
    * @throws \Drupal\Core\Config\Entity\Exception\ConfigEntityStorageClassException
@@ -85,6 +99,7 @@ class ConfigEntityType extends EntityType {
     $this->handlers += array(
       'storage' => 'Drupal\Core\Config\Entity\ConfigEntityStorage',
     );
+
   }
 
   /**
@@ -171,6 +186,37 @@ class ConfigEntityType extends EntityType {
     if (!is_a($class, 'Drupal\Core\Config\Entity\ConfigEntityStorage', TRUE)) {
       throw new ConfigEntityStorageClassException(SafeMarkup::format('@class is not \Drupal\Core\Config\Entity\ConfigEntityStorage or it does not extend it', ['@class' => $class]));
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPropertiesToExport() {
+    if (!empty($this->config_export)) {
+      if (empty($this->static_config_export)) {
+        // Always add default properties to be exported.
+        $defaults = [
+          'uuid' => 'uuid',
+          'langcode' => 'langcode',
+          'status' => 'status',
+          'dependencies' => 'dependencies',
+          'third_party_settings' => 'third_party_settings'
+        ];
+        $properties_for_annotation = $this->config_export;
+        $properties_to_merge = [];
+        foreach ($properties_for_annotation as $property => $name) {
+          if (is_numeric($property)) {
+            $properties_to_merge[$name] = $name;
+          }
+          else {
+            $properties_to_merge[$property] = $name;
+          }
+        }
+        $this->static_config_export = array_unique(array_merge($defaults, $properties_to_merge));
+      }
+      return $this->static_config_export;
+    }
+    return FALSE;
   }
 
 }

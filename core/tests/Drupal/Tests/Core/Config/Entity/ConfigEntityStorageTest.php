@@ -22,7 +22,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
   /**
    * The entity type.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface|\PHPUnit_Framework_MockObject_MockObject
+   * @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface|\PHPUnit_Framework_MockObject_MockObject
    */
   protected $entityType;
 
@@ -111,7 +111,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
   protected function setUp() {
     parent::setUp();
 
-    $this->entityType = $this->getMock('Drupal\Core\Entity\EntityTypeInterface');
+    $this->entityType = $this->getMock('Drupal\Core\Config\Entity\ConfigEntityTypeInterface');
     $this->entityTypeId = 'test_entity_type';
     $this->entityType->expects($this->any())
       ->method('getKey')
