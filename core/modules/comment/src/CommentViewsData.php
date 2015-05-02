@@ -7,6 +7,7 @@
 
 namespace Drupal\comment;
 
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\views\EntityViewsData;
 
 /**
@@ -159,7 +160,7 @@ class CommentViewsData extends EntityViewsData {
 
     // Provide a relationship for each entity type except comment.
     foreach ($entities_types as $type => $entity_type) {
-      if ($type == 'comment' || !$entity_type->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface') || !$entity_type->getBaseTable()) {
+      if ($type == 'comment' || !$entity_type instanceof ContentEntityTypeInterface || !$entity_type->getBaseTable()) {
         continue;
       }
       if ($fields = \Drupal::service('comment.manager')->getFields($type)) {
@@ -211,7 +212,7 @@ class CommentViewsData extends EntityViewsData {
 
     // Provide a relationship for each entity type except comment.
     foreach ($entities_types as $type => $entity_type) {
-      if ($type == 'comment' || !$entity_type->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface') || !$entity_type->getBaseTable()) {
+      if ($type == 'comment' || !$entity_type instanceof ContentEntityTypeInterface || !$entity_type->getBaseTable()) {
         continue;
       }
       // This relationship does not use the 'field id' column, if the entity has

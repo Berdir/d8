@@ -10,6 +10,7 @@ namespace Drupal\Core\Entity\Plugin\EntityReferenceSelection;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -142,7 +143,7 @@ class SelectionBase extends PluginBase implements SelectionInterface, ContainerF
       );
     }
 
-    if ($entity_type->isSubclassOf('\Drupal\Core\Entity\FieldableEntityInterface')) {
+    if ($entity_type instanceof ContentEntityTypeInterface) {
       $fields = array();
       foreach (array_keys($bundles) as $bundle) {
         $bundle_fields = array_filter($this->entityManager->getFieldDefinitions($entity_type_id, $bundle), function ($field_definition) {

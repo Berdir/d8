@@ -9,6 +9,7 @@ namespace Drupal\rest\LinkManager;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
 
 class TypeLinkManager implements TypeLinkManagerInterface {
@@ -96,7 +97,7 @@ class TypeLinkManager implements TypeLinkManagerInterface {
     foreach (entity_get_bundles() as $entity_type_id => $bundles) {
       // Only content entities are supported currently.
       // @todo Consider supporting config entities.
-      if ($entity_types[$entity_type_id]->isSubclassOf('\Drupal\Core\Config\Entity\ConfigEntityInterface')) {
+      if (!($entity_types[$entity_type_id] instanceof ContentEntityTypeInterface)) {
         continue;
       }
       foreach ($bundles as $bundle => $bundle_info) {

@@ -14,6 +14,7 @@ use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\Entity\CommentType;
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Component\Utility\SafeMarkup;
@@ -311,7 +312,7 @@ function comment_form_field_storage_config_edit_form_alter(&$form, FormStateInte
  */
 function comment_entity_storage_load($entities, $entity_type) {
   // Comments can only be attached to content entities, so skip others.
-  if (!\Drupal::entityManager()->getDefinition($entity_type)->isSubclassOf('Drupal\Core\Entity\FieldableEntityInterface')) {
+  if (!\Drupal::entityManager()->getDefinition($entity_type) instanceof ContentEntityTypeInterface) {
     return;
   }
   if (!\Drupal::service('comment.manager')->getFields($entity_type)) {

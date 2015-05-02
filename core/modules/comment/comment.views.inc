@@ -4,6 +4,7 @@
  * @file
  * Provide views data for comment.module.
  */
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 
 /**
  * Implements hook_views_data_alter().
@@ -22,7 +23,7 @@ function comment_views_data_alter(&$data) {
 
   // Provide a integration for each entity type except comment.
   foreach (\Drupal::entityManager()->getDefinitions() as $entity_type_id => $entity_type) {
-    if ($entity_type_id == 'comment' || !$entity_type->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface') || !$entity_type->getBaseTable()) {
+    if ($entity_type_id == 'comment' || !$entity_type instanceof ContentEntityTypeInterface || !$entity_type->getBaseTable()) {
       continue;
     }
     $fields = \Drupal::service('comment.manager')->getFields($entity_type_id);

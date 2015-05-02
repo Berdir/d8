@@ -6,6 +6,7 @@
  */
 
 use Drupal\config_translation\Plugin\Derivative\ConfigTranslationLocalTasks;
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\field\FieldConfigInterface;
@@ -77,7 +78,7 @@ function config_translation_themes_uninstalled() {
 function config_translation_entity_type_alter(array &$entity_types) {
   /** @var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
   foreach ($entity_types as $entity_type_id => $entity_type) {
-    if ($entity_type->isSubclassOf('Drupal\Core\Config\Entity\ConfigEntityInterface')) {
+    if ($entity_type instanceof ConfigEntityTypeInterface) {
       if ($entity_type_id == 'block') {
         $class = 'Drupal\config_translation\Controller\ConfigTranslationBlockListBuilder';
       }
@@ -129,7 +130,7 @@ function config_translation_config_translation_info(&$info) {
     // Determine base path for entities automatically if provided via the
     // configuration entity.
     if (
-      !$entity_type->isSubclassOf('Drupal\Core\Config\Entity\ConfigEntityInterface') ||
+      !$entity_type instanceof ConfigEntityTypeInterface ||
       !$entity_type->hasLinkTemplate('edit-form')
     ) {
       // Do not record this entity mapper if the entity type does not
@@ -158,7 +159,7 @@ function config_translation_config_translation_info(&$info) {
 function config_translation_entity_operation(EntityInterface $entity) {
   $operations = array();
   $entity_type = $entity->getEntityType();
-  if ($entity_type->isSubclassOf('Drupal\Core\Config\Entity\ConfigEntityInterface') &&
+  if ($entity_type instanceof ConfigEntityTypeInterface &&
     $entity->hasLinkTemplate('config-translation-overview') &&
     \Drupal::currentUser()->hasPermission('translate configuration')) {
 

@@ -8,6 +8,7 @@
 namespace Drupal\config\Form;
 
 use Drupal\Component\Serialization\Yaml;
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
@@ -123,7 +124,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
 
     $entity_types = array();
     foreach ($this->entityManager->getDefinitions() as $entity_type => $definition) {
-      if ($definition->isSubclassOf('Drupal\Core\Config\Entity\ConfigEntityInterface')) {
+      if ($definition instanceof ConfigEntityTypeInterface) {
         $entity_types[$entity_type] = $definition->getLabel();
       }
     }

@@ -128,7 +128,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
       throw new \InvalidArgumentException('Missing required properties for an EntityDisplay entity.');
     }
 
-    if (!$this->entityManager()->getDefinition($values['targetEntityType'])->isSubclassOf('\Drupal\Core\Entity\FieldableEntityInterface')) {
+    if (!$this->entityManager()->getDefinition($values['targetEntityType']) instanceof ContentEntityTypeInterface) {
       throw new \InvalidArgumentException('EntityDisplay entities can only handle fieldable entity types.');
     }
 

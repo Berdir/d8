@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Field;
 
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\FieldableEntityStorageInterface;
 use Drupal\Core\Extension\ModuleUninstallValidatorInterface;
@@ -48,7 +49,7 @@ class FieldModuleUninstallValidator implements ModuleUninstallValidatorInterface
         // We skip entity types defined by the module as there must be no
         // content to be able to uninstall them anyway.
         // See \Drupal\Core\Entity\ContentUninstallValidator.
-        if ($entity_type->getProvider() != $module_name && $entity_type->isSubclassOf('\Drupal\Core\Entity\FieldableEntityInterface')) {
+        if ($entity_type->getProvider() != $module_name && $entity_type instanceof ContentEntityTypeInterface) {
           foreach ($this->entityManager->getFieldStorageDefinitions($entity_type_id) as $storage_definition) {
             if ($storage_definition->getProvider() == $module_name) {
               $storage = $this->entityManager->getStorage($entity_type_id);

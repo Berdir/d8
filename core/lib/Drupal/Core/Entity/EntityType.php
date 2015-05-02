@@ -270,7 +270,7 @@ class EntityType implements EntityTypeInterface {
 
     // Automatically add the EntityChanged constraint if the entity type tracks
     // the changed time.
-    if ($this->isSubclassOf('Drupal\Core\Entity\EntityChangedInterface') ) {
+    if (is_subclass_of($this->getClass(), 'Drupal\Core\Entity\EntityChangedInterface')) {
       $this->addConstraint('EntityChanged');
     }
 

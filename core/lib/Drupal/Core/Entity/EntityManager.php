@@ -406,7 +406,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     $keys = array_filter($entity_type->getKeys());
 
     // Fail with an exception for non-fieldable entity types.
-    if (!$entity_type->isSubclassOf('\Drupal\Core\Entity\FieldableEntityInterface')) {
+    if (!($entity_type instanceof ContentEntityTypeInterface)) {
       throw new \LogicException(SafeMarkup::format('Getting the base fields is not supported for entity type @type.', array('@type' => $entity_type->getLabel())));
     }
 
@@ -644,7 +644,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
       else {
         // Rebuild the definitions and put it into the cache.
         foreach ($this->getDefinitions() as $entity_type_id => $entity_type) {
-          if ($entity_type->isSubclassOf('\Drupal\Core\Entity\FieldableEntityInterface')) {
+          if ($entity_type instanceof ContentEntityTypeInterface) {
             foreach ($this->getBundleInfo($entity_type_id) as $bundle => $bundle_info) {
               foreach ($this->getFieldDefinitions($entity_type_id, $bundle) as $field_name => $field_definition) {
                 $this->fieldMap[$entity_type_id][$field_name]['type'] = $field_definition->getType();
@@ -1087,7 +1087,7 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     $this->eventDispatcher->dispatch(EntityTypeEvents::CREATE, new EntityTypeEvent($entity_type));
 
     $this->setLastInstalledDefinition($entity_type);
-    if ($entity_type->isSubclassOf('\Drupal\Core\Entity\FieldableEntityInterface')) {
+    if ($entity_type instanceof ContentEntityTypeInterface) {
       $this->setLastInstalledFieldStorageDefinitions($entity_type_id, $this->getFieldStorageDefinitions($entity_type_id));
     }
   }
