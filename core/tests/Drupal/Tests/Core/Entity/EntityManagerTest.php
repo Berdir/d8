@@ -1262,7 +1262,7 @@ class EntityManagerTest extends UnitTestCase {
     $key_value_store = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
     $this->keyValueFactory->expects($this->once())
       ->method('get')
-      ->with('entity.definitions.field_map')
+      ->with('entity.definitions.bundle_field_map')
       ->willReturn($key_value_store);
     $key_value_store->expects($this->once())
       ->method('getAll')
@@ -1404,7 +1404,7 @@ class EntityManagerTest extends UnitTestCase {
     $key_value_store = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
     $this->keyValueFactory->expects($this->once())
       ->method('get')
-      ->with('entity.definitions.field_map')
+      ->with('entity.definitions.bundle_field_map')
       ->willReturn($key_value_store);
     $key_value_store->expects($this->once())
       ->method('getAll')
@@ -1483,7 +1483,7 @@ class EntityManagerTest extends UnitTestCase {
     $key_value_store = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
     $this->keyValueFactory->expects($this->exactly(2))
       ->method('get')
-      ->with('entity.definitions.field_map')
+      ->with('entity.definitions.bundle_field_map')
       ->willReturn($key_value_store);
     $key_value_store->expects($this->once())
       ->method('get')
@@ -1536,7 +1536,7 @@ class EntityManagerTest extends UnitTestCase {
     $key_value_store = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
     $this->keyValueFactory->expects($this->exactly(2))
       ->method('get')
-      ->with('entity.definitions.field_map')
+      ->with('entity.definitions.bundle_field_map')
       ->willReturn($key_value_store);
     $key_value_store->expects($this->once())
       ->method('get')
@@ -1623,7 +1623,7 @@ class EntityManagerTest extends UnitTestCase {
     $key_value_store = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
     $this->keyValueFactory->expects($this->exactly(2))
       ->method('get')
-      ->with('entity.definitions.field_map')
+      ->with('entity.definitions.bundle_field_map')
       ->willReturn($key_value_store);
     $key_value_store->expects($this->once())
       ->method('get')
@@ -1686,7 +1686,7 @@ class EntityManagerTest extends UnitTestCase {
     $key_value_store = $this->getMock('Drupal\Core\KeyValueStore\KeyValueStoreInterface');
     $this->keyValueFactory->expects($this->exactly(2))
       ->method('get')
-      ->with('entity.definitions.field_map')
+      ->with('entity.definitions.bundle_field_map')
       ->willReturn($key_value_store);
     $key_value_store->expects($this->once())
       ->method('get')
