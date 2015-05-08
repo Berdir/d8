@@ -175,12 +175,13 @@ abstract class SqlBase extends SourcePluginBase {
       //    But, include all rows if the high water mark is not set.
       if (isset($high_water_property['name']) && ($high_water = $this->migration->getHighWater()) !== '') {
         if (isset($high_water_property['alias'])) {
-          $high_water = $high_water_property['alias'] . '.' . $high_water_property['name'];
+          $high_water_field = $high_water_property['alias'] . '.' . $high_water_property['name'];
         }
         else {
-          $high_water = $high_water_property['name'];
+          $high_water_field = $high_water_property['name'];
         }
-        $conditions->condition($high_water, $high_water, '>');
+        $conditions->condition($high_water_field, $high_water, '>');
+        $this->query->orderBy($high_water_field);
         $condition_added = TRUE;
       }
       if ($condition_added) {

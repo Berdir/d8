@@ -19,6 +19,8 @@ migrate.migration.*:
     load:
       type: migrate.load.[plugin]
       label: 'Source'
+    highWaterProperty:
+      type: mapping
     source:
       type: migrate.source.[plugin]
       label: 'Source'
