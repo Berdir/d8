@@ -733,16 +733,20 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
 
     // If the field map is initialized, update it as well, so that calls to it
     // do not have to rebuild it again.
-    if ($this->fieldMap) {
-      if (!isset($this->fieldMap[$entity_type_id][$field_name])) {
+    $cid = 'entity_field_map';
+    if ($cache = $this->cacheGet($cid)) {
+      $field_map = $cache->data;
+      if (!isset($field_map[$entity_type_id][$field_name])) {
         // This field did not exist yet, initialize it with the type and empty
         // bundle list.
-        $this->fieldMap[$entity_type_id][$field_name] = [
+        $field_map[$entity_type_id][$field_name] = [
           'type' => $field_definition->getType(),
           'bundles' => [],
         ];
       }
-      $this->fieldMap[$entity_type_id][$field_name]['bundles'][$bundle] = $bundle;
+      $field_map[$entity_type_id][$field_name]['bundles'][$bundle] = $bundle;
+      $this->fieldMap = $field_map;
+      $this->cacheSet($cid, $this->fieldMap, Cache::PERMANENT, array('entity_types'));
     }
 
     // Delete caches.
@@ -784,11 +788,15 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
 
     // If the field map is initialized, update it as well, so that calls to it
     // do not have to rebuild it again.
-    if ($this->fieldMap) {
-      unset($this->fieldMap[$entity_type_id][$field_name]['bundles'][$bundle]);
-      if (empty($this->fieldMap[$entity_type_id][$field_name]['bundles'])) {
-        unset($this->fieldMap[$entity_type_id][$field_name]);
+    $cid = 'entity_field_map';
+    if ($cache = $this->cacheGet($cid)) {
+      $field_map = $cache->data;
+      unset($field_map[$entity_type_id][$field_name]['bundles'][$bundle]);
+      if (empty($field_map[$entity_type_id][$field_name]['bundles'])) {
+        unset($field_map[$entity_type_id][$field_name]);
       }
+      $this->fieldMap = $field_map;
+      $this->cacheSet($cid, $this->fieldMap, Cache::PERMANENT, array('entity_types'));
     }
 
     // Delete caches.
