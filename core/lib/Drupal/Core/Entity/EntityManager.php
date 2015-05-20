@@ -224,6 +224,8 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     $this->clearCachedFieldDefinitions();
     $this->classNameEntityTypeMap = array();
     $this->handlers = array();
+    $this->fieldMap = array();
+    $this->fieldMapByFieldType = array();
   }
 
   /**
@@ -729,9 +731,6 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     $bundle_field_map[$field_name]['bundles'][$bundle] = $bundle;
     $this->keyValueFactory->get('entity.definitions.bundle_field_map')->set($entity_type_id, $bundle_field_map);
 
-    // Delete the cache entry.
-    $this->cacheBackend->delete('entity_field_map');
-
     // If the field map is initialized, update it as well, so that calls to it
     // do not have to rebuild it again.
     if ($this->fieldMap) {
@@ -745,6 +744,10 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
       }
       $this->fieldMap[$entity_type_id][$field_name]['bundles'][$bundle] = $bundle;
     }
+
+    // Delete caches.
+    $this->clearCachedFieldDefinitions();
+    $this->fieldMapByFieldType = [];
   }
 
   /**
@@ -753,6 +756,10 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
   public function onFieldDefinitionUpdate(FieldDefinitionInterface $field_definition, FieldDefinitionInterface $original) {
     // Notify the storage about the updated field.
     $this->getStorage($field_definition->getTargetEntityTypeId())->onFieldDefinitionUpdate($field_definition, $original);
+
+    // Delete caches.
+    $this->clearCachedFieldDefinitions();
+    $this->fieldMapByFieldType = [];
   }
 
   /**
@@ -775,9 +782,6 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     }
     $this->keyValueFactory->get('entity.definitions.bundle_field_map')->set($entity_type_id, $bundle_field_map);
 
-    // Delete the cache entry.
-    $this->cacheBackend->delete('entity_field_map');
-
     // If the field map is initialized, update it as well, so that calls to it
     // do not have to rebuild it again.
     if ($this->fieldMap) {
@@ -786,6 +790,10 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
         unset($this->fieldMap[$entity_type_id][$field_name]);
       }
     }
+
+    // Delete caches.
+    $this->clearCachedFieldDefinitions();
+    $this->fieldMapByFieldType = [];
   }
 
   /**
@@ -832,8 +840,6 @@ class EntityManager extends DefaultPluginManager implements EntityManagerInterfa
     $this->baseFieldDefinitions = array();
     $this->fieldDefinitions = array();
     $this->fieldStorageDefinitions = array();
-    $this->fieldMap = array();
-    $this->fieldMapByFieldType = array();
     $this->displayModeInfo = array();
     $this->extraFields = array();
     Cache::invalidateTags(array('entity_field_info'));

@@ -196,7 +196,7 @@ class BaseFieldOverride extends FieldConfigBase {
       $previous_definition = $this->original;
     }
     // Notify the entity storage.
-    $this->entityManager()->getStorage($this->getTargetEntityTypeId())->onFieldDefinitionUpdate($this, $previous_definition);
+    $this->entityManager()->onFieldDefinitionUpdate($this, $previous_definition);
   }
 
   /**
@@ -204,8 +204,6 @@ class BaseFieldOverride extends FieldConfigBase {
    */
   public static function postDelete(EntityStorageInterface $storage, array $field_overrides) {
     $entity_manager = \Drupal::entityManager();
-    // Clear the cache upfront, to refresh the results of getBundles().
-    $entity_manager->clearCachedFieldDefinitions();
     /** @var \Drupal\Core\Field\Entity\BaseFieldOverride $field_override */
     foreach ($field_overrides as $field_override) {
       // Inform the system that the field definition is being updated back to
@@ -213,7 +211,7 @@ class BaseFieldOverride extends FieldConfigBase {
       // @todo This assumes that there isn't a non-config-based override that
       //   we're returning to, but that might not be the case:
       //   https://www.drupal.org/node/2321071.
-      $entity_manager->getStorage($field_override->getTargetEntityTypeId())->onFieldDefinitionUpdate($field_override->getBaseFieldDefinition(), $field_override);
+      $entity_manager->onFieldDefinitionUpdate($field_override->getBaseFieldDefinition(), $field_override);
     }
   }
 

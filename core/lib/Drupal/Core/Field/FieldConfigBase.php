@@ -288,20 +288,6 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * {@inheritdoc}
    */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
-    // Clear the cache.
-    $this->entityManager()->clearCachedFieldDefinitions();
-
-    // Invalidate the render cache for all affected entities.
-    $entity_type = $this->getFieldStorageDefinition()->getTargetEntityTypeId();
-    if ($this->entityManager()->hasHandler($entity_type, 'view_builder')) {
-      $this->entityManager()->getViewBuilder($entity_type)->resetCache();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getLabel() {
     return $this->label();
   }
