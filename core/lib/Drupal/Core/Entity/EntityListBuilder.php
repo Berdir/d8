@@ -137,18 +137,21 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
    */
   protected function getDefaultOperations(EntityInterface $entity) {
     $operations = array();
-    if ($entity->access('update') && $entity->hasLinkTemplate('edit-form')) {
+    if ($entity->hasLinkTemplate('edit-form')) {
       $operations['edit'] = array(
         'title' => $this->t('Edit'),
         'weight' => 10,
         'url' => $entity->urlInfo('edit-form'),
+        'access' => $entity->access('update', NULL, TRUE),
       );
     }
-    if ($entity->access('delete') && $entity->hasLinkTemplate('delete-form')) {
+
+    if ($entity->hasLinkTemplate('delete-form')) {
       $operations['delete'] = array(
         'title' => $this->t('Delete'),
         'weight' => 100,
         'url' => $entity->urlInfo('delete-form'),
+        'access' => $entity->access('delete', NULL, TRUE),
       );
     }
 

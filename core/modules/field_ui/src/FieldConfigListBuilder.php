@@ -164,18 +164,22 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
     /** @var \Drupal\field\FieldConfigInterface $entity */
     $operations = parent::getDefaultOperations($entity);
 
-    if ($entity->access('update') && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-edit-form")) {
+    if ($entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-edit-form")) {
+      $access = $entity->access('update', NULL, TRUE);
       $operations['edit'] = array(
         'title' => $this->t('Edit'),
         'weight' => 10,
         'url' => $entity->urlInfo("{$entity->getTargetEntityTypeId()}-field-edit-form"),
+        'access' => $access,
       );
     }
     if ($entity->access('delete') && $entity->hasLinkTemplate("{$entity->getTargetEntityTypeId()}-field-delete-form")) {
+      $access = $entity->access('delete', NULL, TRUE);
       $operations['delete'] = array(
         'title' => $this->t('Delete'),
         'weight' => 100,
         'url' => $entity->urlInfo("{$entity->getTargetEntityTypeId()}-field-delete-form"),
+        'access' => $access,
       );
     }
 

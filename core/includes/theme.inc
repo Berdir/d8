@@ -14,11 +14,13 @@ use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\StorageException;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionNameLengthException;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\ThemeSettings;
 use Drupal\Component\Utility\NestedArray;
@@ -603,6 +605,7 @@ function template_preprocess_links(&$variables) {
       $link += array(
         'ajax' => NULL,
         'url' => NULL,
+        'access' => NULL,
       );
 
       $li_attributes = array();
@@ -613,6 +616,8 @@ function template_preprocess_links(&$variables) {
         '#options' => array_diff_key($link, array_combine($keys, $keys)),
         '#url' => $link['url'],
         '#ajax' => $link['ajax'],
+        '#cache' => isset($link['access']) ? BubbleableMetadata::createFromObject($link['access']) : [],
+        '#access' => $link['access'] instanceof AccessResultInterface ? $link['access']->isAllowed() : $link['access'] === TRUE,
       );
 
       // Handle links and ensure that the active class is added on the LIs, but

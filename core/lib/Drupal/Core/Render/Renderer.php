@@ -10,6 +10,7 @@ namespace Drupal\Core\Render;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerResolverInterface;
@@ -138,7 +139,7 @@ class Renderer implements RendererInterface {
     }
 
     // Early-return nothing if user does not have access.
-    if (empty($elements) || (isset($elements['#access']) && !$elements['#access'])) {
+    if (empty($elements) || (($elements['#access'] instanceof AccessResultInterface && !$elements['#access']->isAllowed()) || !$elements['#access'])) {
       return '';
     }
 

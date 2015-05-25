@@ -8,6 +8,7 @@
 namespace Drupal\Core\Render;
 
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Access\AccessResultInterface;
 
 /**
  * Provides helper methods for Drupal render elements.
@@ -137,7 +138,7 @@ class Element {
       $child = $elements[$key];
 
       // Skip un-accessible children.
-      if (isset($child['#access']) && !$child['#access']) {
+      if (isset($child['#access']) && (($child['#access'] instanceof AccessResultInterface && !$child['#access']->isAllowed()) || !$child['#access'])) {
         continue;
       }
 

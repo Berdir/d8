@@ -55,6 +55,7 @@ class MenuListBuilder extends ConfigEntityListBuilder {
         'title' => t('Add link'),
         'weight' => 20,
         'url' => $entity->urlInfo('add-link-form'),
+        'access' => $operations['edit'],
       );
     }
     if (isset($operations['delete'])) {

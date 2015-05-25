@@ -12,6 +12,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -787,7 +788,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       }
 
       // Deny access to child elements if parent is denied.
-      if (isset($element['#access']) && !$element['#access']) {
+      if (isset($element['#access']) && (($element['#access'] instanceof AccessResultInterface && !$element['#access']->isAllowed()) || !$element['#access'])) {
         $element[$key]['#access'] = FALSE;
       }
 
