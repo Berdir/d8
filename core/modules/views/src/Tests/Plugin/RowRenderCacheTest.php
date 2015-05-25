@@ -7,6 +7,7 @@
 
 namespace Drupal\views\Tests\Plugin;
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -36,7 +37,7 @@ class RowRenderCacheTest extends ViewUnitTestBase {
    *
    * @var array
    */
-  public static $testViews = array('test_row_render_cache');
+  public static $testViews = array('test_row_render_cache_title', 'test_row_render_cache_edit', 'test_row_render_cache_delete', 'test_row_render_cache_operations');
 
   /**
    * An editor user account.
@@ -118,15 +119,17 @@ class RowRenderCacheTest extends ViewUnitTestBase {
    */
   protected function doTestRenderedOutput(AccountInterface $account, $check_cache = FALSE) {
     $this->setCurrentUser($account);
-    $view = Views::getView('test_row_render_cache');
-    $view->setDisplay();
-    $view->preview();
+
+    /** @var \Drupal\views\ViewExecutable[] $views */
+    $views = [];
+    foreach (['title', 'edit', 'delete', 'operations'] as $view_suffix) {
+      $views[$view_suffix] = Views::getView('test_row_render_cache_' . $view_suffix);
+      $views[$view_suffix]->setDisplay();
+      $views[$view_suffix]->preview();
+    }
 
     /** @var \Drupal\Core\Render\RenderCacheInterface $render_cache */
     $render_cache = $this->container->get('render_cache');
-
-    /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache_plugin */
-    $cache_plugin = $view->display_handler->getPlugin('cache');
 
     // Retrieve nodes and sort them in alphabetical order to match view results.
     $nodes = Node::loadMultiple();
@@ -141,34 +144,39 @@ class RowRenderCacheTest extends ViewUnitTestBase {
 
       $counter = $index + 1;
       $expected = "$nid: $counter (just in case: $nid)";
-      $counter_output = $view->style_plugin->getField($index, 'counter');
+      $counter_output = $views['title']->style_plugin->getField($index, 'counter');
       $this->assertEqual($counter_output, $expected);
 
       $node_url = $node->url();
       $expected = "<a href=\"$node_url\"><span class=\"da-title\">{$node->label()}</span> <span class=\"counter\">$counter_output</span></a>";
-      $output = $view->style_plugin->getField($index, 'title');
+      $output = $views['title']->style_plugin->getField($index, 'title');
       $this->assertEqual($output, $expected);
 
       $expected = $access ? "<a href=\"$node_url/edit?destination=/\" hreflang=\"en\">edit</a>" : "";
-      $output = $view->style_plugin->getField($index, 'edit_node');
+      $output = $views['edit']->style_plugin->getField($index, 'edit_node');
       $this->assertEqual($output, $expected);
 
       $expected = $access ? "<a href=\"$node_url/delete?destination=/\" hreflang=\"en\">delete</a>" : "";
-      $output = $view->style_plugin->getField($index, 'delete_node');
+      $output = $views['delete']->style_plugin->getField($index, 'delete_node');
       $this->assertEqual($output, $expected);
 
       $expected = $access ? "  <div class=\"dropbutton-wrapper\"><div class=\"dropbutton-widget\"><ul class=\"dropbutton\">" .
           "<li class=\"edit\"><a href=\"$node_url/edit?destination=/\" hreflang=\"en\">Edit</a></li>" .
           "<li class=\"delete\"><a href=\"$node_url/delete?destination=/\" hreflang=\"en\">Delete</a></li>" .
           "</ul></div></div>" : "";
-      $output = $view->style_plugin->getField($index, 'operations');
+      $output = $views['operations']->style_plugin->getField($index, 'operations');
       $this->assertEqual($output, $expected);
 
       if ($check_cache) {
-        $keys = $cache_plugin->getRowCacheKeys($view->result[$index]);
-        $user_context = !$account->hasPermission('edit any test content') ? 'user' : 'user.permissions';
-        $element = $render_cache->get(['#cache' => ['keys' => $keys, 'contexts' => ['languages:language_interface', 'theme', $user_context]]]);
-        $this->assertTrue($element);
+        foreach ($views as $view_suffix => $view) {
+          /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache_plugin */
+          $cache_plugin = $view->display_handler->getPlugin('cache');
+          $keys = $cache_plugin->getRowCacheKeys($view->result[$index]);
+          $user_context = !$account->hasPermission('edit any test content') ? 'user' : 'user.permissions';
+          $element = $render_cache->get(['#cache' => ['keys' => $keys, 'contexts' => ['languages:language_interface', 'theme', $user_context]]]);
+          $this->assertTrue($element, SafeMarkup::format('@name views row is cached with @keys and @context', ['@name' => $view_suffix, '@keys' => implode(', ', $keys), '@context' => $user_context[0]]));
+        }
+
       }
 
       $index++;

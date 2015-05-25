@@ -369,6 +369,7 @@ class Renderer implements RendererInterface {
       if ($pre_bubbling_elements['#cache']['keys'] !== $elements['#cache']['keys']) {
         throw new \LogicException('Cache keys may not be changed after initial setup. Use the contexts property instead to bubble additional metadata.');
       }
+      //debug($elements['#cache']);
       $this->renderCache->set($elements, $pre_bubbling_elements);
     }
 
