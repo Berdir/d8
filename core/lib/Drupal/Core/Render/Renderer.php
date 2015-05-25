@@ -139,7 +139,10 @@ class Renderer implements RendererInterface {
     }
 
     // Early-return nothing if user does not have access.
-    if (empty($elements) || (($elements['#access'] instanceof AccessResultInterface && !$elements['#access']->isAllowed()) || !$elements['#access'])) {
+    if (empty($elements)) {
+      return '';
+    }
+    if (isset($elements['#access']) && (($elements['#access'] instanceof AccessResultInterface && !$elements['#access']->isAllowed()) || !$elements['#access'])) {
       return '';
     }
 

@@ -616,7 +616,7 @@ function template_preprocess_links(&$variables) {
         '#options' => array_diff_key($link, array_combine($keys, $keys)),
         '#url' => $link['url'],
         '#ajax' => $link['ajax'],
-        '#cache' => isset($link['access']) ? BubbleableMetadata::createFromObject($link['access']) : [],
+        '#cache' => isset($link['cache']) ? BubbleableMetadata::createFromObject($link['cache']) : [],
         '#access' => $link['access'] instanceof AccessResultInterface ? $link['access']->isAllowed() : $link['access'] === TRUE,
       );
 
