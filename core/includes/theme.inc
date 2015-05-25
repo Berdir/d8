@@ -605,7 +605,7 @@ function template_preprocess_links(&$variables) {
       $link += array(
         'ajax' => NULL,
         'url' => NULL,
-        'access' => NULL,
+        'access' => TRUE,
       );
 
       $li_attributes = array();
