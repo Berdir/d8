@@ -18,6 +18,7 @@ use Drupal\system\MenuInterface;
  *   id = "menu",
  *   label = @Translation("Menu"),
  *   handlers = {
+ *     "storage" = "Drupal\system\MenuStorage",
  *     "access" = "Drupal\system\MenuAccessControlHandler"
  *   },
  *   admin_permission = "administer menu",
@@ -75,6 +76,17 @@ class Menu extends ConfigEntityBase implements MenuInterface {
    */
   public function isLocked() {
     return (bool) $this->locked;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Override the default cache tags to use the cache tags that are not coupled
+   * to Menu config entities (i.e. this class), to not force other parts of the
+   * menu system to couple themselves to Menu config entities.
+   */
+  public function getCacheTags() {
+    return ['menu:' . $this->id()];
   }
 
 }

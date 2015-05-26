@@ -179,7 +179,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
     // menu block must also be re-rendered for that user, because maybe a menu
     // link that is accessible for that user has been added.
     $cache_tags = parent::getCacheTags();
-    $cache_tags[] = 'config:system.menu.' . $this->getDerivativeId();
+    $cache_tags[] = 'menu:' . $this->getDerivativeId();
     return $cache_tags;
   }
 

@@ -74,7 +74,7 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
    */
   protected function resolveCacheMiss($menu_name) {
     $this->storage[$menu_name] = $this->doGetActiveTrailIds($menu_name);
-    $this->tags[] = 'config:system.menu.' . $menu_name;
+    $this->tags[] = 'menu:' . $menu_name;
     $this->persist($menu_name);
 
     return $this->storage[$menu_name];

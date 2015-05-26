@@ -191,7 +191,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     $this->resetDefinitions();
     $affected_menus = $this->getMenuNames() + $before_menus;
     // Invalidate any cache tagged with any menu name.
-    $cache_tags = Cache::buildTags('config:system.menu', $affected_menus, '.');
+    $cache_tags = Cache::buildTags('menu', $affected_menus, ':');
     $this->cacheTagsInvalidator->invalidateTags($cache_tags);
     $this->resetDefinitions();
     // Every item in the cache bin should have one of the menu cache tags but it
@@ -252,7 +252,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   public function save(array $link) {
     $affected_menus = $this->doSave($link);
     $this->resetDefinitions();
-    $cache_tags = Cache::buildTags('config:system.menu', $affected_menus, '.');
+    $cache_tags = Cache::buildTags('menu', $affected_menus, ':');
     $this->cacheTagsInvalidator->invalidateTags($cache_tags);
     return $affected_menus;
   }
@@ -405,7 +405,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       $this->updateParentalStatus($item);
       // Many children may have moved.
       $this->resetDefinitions();
-      $this->cacheTagsInvalidator->invalidateTags(['config:system.menu.' . $item['menu_name']]);
+      $this->cacheTagsInvalidator->invalidateTags(['menu:' . $item['menu_name']]);
     }
   }
 
@@ -834,7 +834,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       $data['tree'] = $this->doBuildTreeData($links, $parameters->activeTrail, $parameters->minDepth);
       $data['definitions'] = array();
       $data['route_names'] = $this->collectRoutesAndDefinitions($data['tree'], $data['definitions']);
-      $this->menuCacheBackend->set($tree_cid, $data, Cache::PERMANENT, ['config:system.menu.' . $menu_name]);
+      $this->menuCacheBackend->set($tree_cid, $data, Cache::PERMANENT, ['menu:' . $menu_name]);
       // The definitions were already added to $this->definitions in
       // $this->doBuildTreeData()
       unset($data['definitions']);

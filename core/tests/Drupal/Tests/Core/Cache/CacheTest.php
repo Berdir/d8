@@ -140,7 +140,7 @@ class CacheTest extends UnitTestCase {
       ['node', ['a' => NULL], ['node:']],
       ['node', ['a' => TRUE], ['node:1']],
       // Test the $glue parameter.
-      ['config:system.menu', ['menu_name'], ['config:system.menu.menu_name'], '.'],
+      ['menu', ['menu_name'], ['menu:menu_name'], ':'],
     ];
   }
 
