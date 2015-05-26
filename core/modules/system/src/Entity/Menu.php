@@ -80,12 +80,11 @@ class Menu extends ConfigEntityBase implements MenuInterface {
 
   /**
    * {@inheritdoc}
-   *
-   * Override the default cache tags to use the cache tags that are not coupled
-   * to Menu config entities (i.e. this class), to not force other parts of the
-   * menu system to couple themselves to Menu config entities.
    */
   public function getCacheTags() {
+    // Override the default cache tags to use the cache tags that are not
+    // coupled to Menu config entities (i.e. this class), to not force other
+    // parts of the menu system to couple themselves to Menu config entities.
     return ['menu:' . $this->id()];
   }
 

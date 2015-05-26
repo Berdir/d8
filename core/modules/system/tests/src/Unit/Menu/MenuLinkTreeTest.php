@@ -126,7 +126,7 @@ class MenuLinkTreeTest extends UnitTestCase {
       '#cache' => [
         'contexts' => [],
         'tags' => [
-          'config:system.menu.mock',
+          'menu:mock',
         ],
         'max-age' => Cache::PERMANENT,
       ],

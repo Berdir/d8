@@ -18,13 +18,12 @@ class MenuStorage extends ConfigEntityStorage {
 
   /**
    * {@inheritdoc}
-   *
-   * The menu API doesn't require one to use Menu config entities. Hence the
-   * Menu config entity should not use config-specific cache tags, but generic
-   * ones instead. That's what this code guarantees.
    */
   public function save(EntityInterface $entity) {
     parent::save($entity);
+    // The menu API doesn't require one to use Menu config entities. Hence the
+    // Menu config entity should not use config-specific cache tags, but generic
+    // ones instead. That's what this code guarantees.
     Cache::invalidateTags($entity->getCacheTags());
   }
 
