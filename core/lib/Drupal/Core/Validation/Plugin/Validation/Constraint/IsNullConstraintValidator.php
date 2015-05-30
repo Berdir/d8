@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Validation\Plugin\Validation\Constraint\NullConstraintValidator.
+ * Contains \Drupal\Core\Validation\Plugin\Validation\Constraint\IsNullConstraintValidator.
  */
 
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\IsNullValidator;
  *
  * Overrides the symfony validator to handle empty Typed Data structures.
  */
-class NullConstraintValidator extends IsNullValidator {
+class IsNullConstraintValidator extends IsNullValidator {
 
   use TypedDataAwareValidatorTrait;
 

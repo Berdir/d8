@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Validation\Plugin\Validation\Constraint\NullConstraint.
+ * Contains \Drupal\Core\Validation\Plugin\Validation\Constraint\IsNullConstraint.
  */
 
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
@@ -20,4 +20,4 @@ use Symfony\Component\Validator\Constraints\IsNull;
  *   type = false
  * )
  */
-class NullConstraint extends IsNull { }
+class IsNullConstraint extends IsNull { }
