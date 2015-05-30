@@ -169,6 +169,19 @@ class YamlFileLoader
             $definition->setAbstract($service['abstract']);
         }
 
+        if (isset($service['factory'])) {
+            if (is_string($service['factory'])) {
+                if (strpos($service['factory'], ':') !== false && strpos($service['factory'], '::') === false) {
+                    $parts = explode(':', $service['factory']);
+                    $definition->setFactory(array($this->resolveServices('@'.$parts[0]), $parts[1]));
+              } else {
+                    $definition->setFactory($service['factory']);
+            }
+          } else {
+              $definition->setFactory(array($this->resolveServices($service['factory'][0]), $service['factory'][1]));
+          }
+        }
+
         if (isset($service['factory_class'])) {
             $definition->setFactoryClass($service['factory_class']);
         }
