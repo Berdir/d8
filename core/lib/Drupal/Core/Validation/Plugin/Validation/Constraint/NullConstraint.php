@@ -7,7 +7,7 @@
 
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
-use Symfony\Component\Validator\Constraints\Null;
+use Symfony\Component\Validator\Constraints\IsNull;
 
 /**
  * Null constraint.
@@ -20,4 +20,4 @@ use Symfony\Component\Validator\Constraints\Null;
  *   type = false
  * )
  */
-class NullConstraint extends Null { }
+class NullConstraint extends IsNull { }

@@ -11,14 +11,14 @@ use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\ListInterface;
 use Drupal\Core\TypedData\Validation\TypedDataAwareValidatorTrait;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\NullValidator;
+use Symfony\Component\Validator\Constraints\IsNullValidator;
 
 /**
  * Null constraint validator.
  *
  * Overrides the symfony validator to handle empty Typed Data structures.
  */
-class NullConstraintValidator extends NullValidator {
+class NullConstraintValidator extends IsNullValidator {
 
   use TypedDataAwareValidatorTrait;
 
