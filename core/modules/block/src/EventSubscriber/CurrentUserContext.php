@@ -56,6 +56,7 @@ class CurrentUserContext extends BlockContextSubscriberBase {
 
     $context = new Context(new ContextDefinition('entity:user', $this->t('Current user')));
     $context->setContextValue($current_user);
+    $context->getCacheableMetadata()->addCacheContexts(['user']);
     $event->setContext('user.current_user', $context);
   }
 

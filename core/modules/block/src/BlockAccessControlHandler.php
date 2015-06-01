@@ -105,13 +105,8 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
       else {
         $access = AccessResult::forbidden();
       }
-      // This should not be hardcoded to an uncacheable access check result, but
-      // in order to fix that, we need condition plugins to return cache contexts,
-      // otherwise it will be impossible to determine by which cache contexts the
-      // result should be varied.
-      // @todo Change this to use $access->cacheUntilEntityChanges($entity) once
-      //   https://www.drupal.org/node/2375695 is resolved.
-      return $access->setCacheMaxAge(0);
+      // Ensure that access is evaluated again when the block changes.
+      return $access->cacheUntilEntityChanges($entity);
     }
   }
 

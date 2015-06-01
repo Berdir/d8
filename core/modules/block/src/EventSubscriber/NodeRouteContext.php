@@ -43,6 +43,8 @@ class NodeRouteContext extends BlockContextSubscriberBase {
       $context = new Context(new ContextDefinition($route_contexts['node']['type']));
       if ($node = $this->routeMatch->getParameter('node')) {
         $context->setContextValue($node);
+        $cache = $context->getCacheableMetadata();
+        $cache->addCacheContexts(['route']);
       }
       $event->setContext('node.node', $context);
     }
@@ -50,6 +52,8 @@ class NodeRouteContext extends BlockContextSubscriberBase {
       $node_type = $this->routeMatch->getParameter('node_type');
       $context = new Context(new ContextDefinition('entity:node'));
       $context->setContextValue(Node::create(array('type' => $node_type->id())));
+      $cache = $context->getCacheableMetadata();
+      $cache->addCacheContexts(['route']);
       $event->setContext('node.node', $context);
     }
   }
