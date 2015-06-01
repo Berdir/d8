@@ -142,7 +142,10 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
           // might be checking incorrectly for a non-empty block.
           CacheableMetadata::createFromRenderArray($build)
             ->merge(CacheableMetadata::createFromObject($access))
+            ->merge(CacheableMetadata::createFromObject($block))
             ->applyTo($build);
+
+          debug($block->getCacheContexts());
 
           continue;
         }

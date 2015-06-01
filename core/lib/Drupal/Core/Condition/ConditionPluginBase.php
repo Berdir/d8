@@ -7,6 +7,8 @@
 
 namespace Drupal\Core\Condition;
 
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Executable\ExecutablePluginBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContextAwarePluginAssignmentTrait;
@@ -105,6 +107,48 @@ abstract class ConditionPluginBase extends ExecutablePluginBase implements Condi
    */
   public function calculateDependencies() {
     return array();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    $cache_contexts = [];
+    foreach ($this->getContexts() as $context) {
+      /** @var $context \Drupal\Core\Cache\CacheableDependencyInterface */
+      if ($context instanceof CacheableDependencyInterface) {
+        $cache_contexts = Cache::mergeContexts($context->get);
+      }
+    }
+    return $cache_contexts;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    $tags = [];
+    foreach ($this->getContexts() as $context) {
+      /** @var $context \Drupal\Core\Cache\CacheableDependencyInterface */
+      if ($context instanceof CacheableDependencyInterface) {
+        $tags = Cache::mergeTags($tags, $context->getCacheTags());
+      }
+    }
+    return $tags;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge() {
+    $max_age = (int)$this->configuration['cache']['max_age'];
+    foreach ($this->getContexts() as $context) {
+      /** @var $context \Drupal\Core\Cache\CacheableDependencyInterface */
+      if ($context instanceof CacheableDependencyInterface) {
+        $max_age = Cache::mergeMaxAges($max_age, $context->getCacheMaxAge());
+      }
+    }
+    return $max_age;
   }
 
 }
