@@ -137,9 +137,12 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
         $access = $block->access('view', NULL, TRUE);
 
         if (!$access->isAllowed()) {
-          $build[$region][$key] = [];
-          CacheableMetadata::createFromObject($access)
-            ->applyTo($build[$region][$key]);
+          // Add the cache metadata from the access result directly to the
+          // build array, to avoid issues with empty checks and alters that
+          // might be checking incorrectly for a non-empty block.
+          CacheableMetadata::createFromRenderArray($build)
+            ->merge(CacheableMetadata::createFromObject($access))
+            ->applyTo($build);
 
           continue;
         }
