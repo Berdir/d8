@@ -89,10 +89,7 @@ class BlockRepositoryTest extends UnitTestCase {
       $block->expects($this->once())
         ->method('setContexts')
         ->willReturnSelf();
-      $block->expects($this->once())
-        ->method('access')
-        ->will($this->returnValue($block_config[0]));
-      $block->expects($block_config[0] ? $this->atLeastOnce() : $this->never())
+      $block->expects($this->atLeastOnce())
         ->method('getRegion')
         ->willReturn($block_config[1]);
       $blocks[$block_id] = $block;
@@ -116,10 +113,6 @@ class BlockRepositoryTest extends UnitTestCase {
     $blocks_config = array(
       'block1' => array(
         TRUE, 'top', 0
-      ),
-      // Test a block without access.
-      'block2' => array(
-        FALSE, 'bottom', 0
       ),
       // Test two blocks in the same region with specific weight.
       'block3' => array(
@@ -151,9 +144,6 @@ class BlockRepositoryTest extends UnitTestCase {
     $block->expects($this->once())
       ->method('setContexts')
       ->willReturnSelf();
-    $block->expects($this->once())
-      ->method('access')
-      ->willReturn(TRUE);
     $block->expects($this->once())
       ->method('getRegion')
       ->willReturn('top');

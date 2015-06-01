@@ -12,6 +12,7 @@ use Drupal\block\Event\BlockContextEvent;
 use Drupal\block\Event\BlockEvents;
 use Drupal\Core\Block\MainContentBlockPluginInterface;
 use Drupal\Core\Block\MessagesBlockPluginInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Display\PageVariantInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
@@ -133,6 +134,15 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
     foreach ($this->blockRepository->getVisibleBlocksPerRegion($contexts) as $region => $blocks) {
       /** @var $blocks \Drupal\block\BlockInterface[] */
       foreach ($blocks as $key => $block) {
+        $access = $block->access('view', NULL, TRUE);
+
+        if (!$access->isAllowed()) {
+          $build[$region][$key] = [];
+          CacheableMetadata::createFromObject($access)
+            ->applyTo($build[$region][$key]);
+
+          continue;
+        }
         $block_plugin = $block->getPlugin();
         if ($block_plugin instanceof MainContentBlockPluginInterface) {
           $block_plugin->setMainContent($this->mainContent);
@@ -142,6 +152,10 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
           $messages_block_displayed = TRUE;
         }
         $build[$region][$key] = $this->blockViewBuilder->view($block);
+
+        CacheableMetadata::createFromRenderArray($build[$region][$key])
+          ->merge(CacheableMetadata::createFromObject($access))
+          ->applyTo($build[$region][$key]);
 
         // The main content block cannot be cached: it is a placeholder for the
         // render array returned by the controller. It should be rendered as-is,
