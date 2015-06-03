@@ -57,8 +57,7 @@ class Context implements ContextInterface {
       $default_value = $definition->getDefaultValue();
 
       if (!isset($default_value) && $definition->isRequired()) {
-        $type = $definition->getDataType();
-        throw new ContextException(sprintf("The %s context is required and not present.", $type));
+        return NULL;
       }
       // Keep the default value here so that subsequent calls don't have to look
       // it up again.

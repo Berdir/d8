@@ -23,7 +23,7 @@ class ContextTest extends UnitTestCase {
     return [
       ['context_value', 'context_value', FALSE, 'data_type'],
       [NULL, NULL, FALSE, 'data_type'],
-      ['will throw exception', NULL, TRUE, 'data_type'],
+      [NULL, NULL, TRUE, 'data_type'],
     ];
   }
 
@@ -62,25 +62,10 @@ class ContextTest extends UnitTestCase {
         ->method('isRequired')
         ->willReturn($is_required);
 
-      // Set expectation for getDataType().
-      $mock_definition->expects($this->exactly(
-            $is_required ? 1 : 0
-        ))
-        ->method('getDataType')
-        ->willReturn($data_type);
-
       // Set expectation for getContextDefinition().
       $mock_context->expects($this->once())
         ->method('getContextDefinition')
         ->willReturn($mock_definition);
-
-      // Set expectation for exception.
-      if ($is_required) {
-        $this->setExpectedException(
-          'Drupal\Component\Plugin\Exception\ContextException',
-          sprintf("The %s context is required and not present.", $data_type)
-        );
-      }
 
       // Exercise getContextValue().
       $this->assertEquals($context_value, $mock_context->getContextValue());

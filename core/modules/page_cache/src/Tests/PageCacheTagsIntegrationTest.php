@@ -71,13 +71,11 @@ class PageCacheTagsIntegrationTest extends WebTestBase {
 
     $cache_contexts = [
       'languages:' . LanguageInterface::TYPE_INTERFACE,
-      'route.menu_active_trails:account',
-      'route.menu_active_trails:footer',
-      'route.menu_active_trails:main',
-      'route.menu_active_trails:tools',
+      'route',
       'theme',
       'timezone',
       'user.permissions',
+      'user.roles:anonymous',
       // The cache contexts associated with the (in)accessible menu links are
       // bubbled.
       'user.roles:authenticated',
@@ -93,6 +91,9 @@ class PageCacheTagsIntegrationTest extends WebTestBase {
       'config:block.block.bartik_tools',
       'config:block.block.bartik_login',
       'config:block.block.bartik_footer',
+      'config:block.block.bartik_help',
+      'config:block.block.bartik_search',
+      'config:block.block.' . $block->id(),
       'config:block.block.bartik_powered',
       'config:block.block.bartik_main_menu',
       'config:block.block.bartik_account_menu',
@@ -123,6 +124,8 @@ class PageCacheTagsIntegrationTest extends WebTestBase {
       'config:block.block.bartik_content',
       'config:block.block.bartik_tools',
       'config:block.block.bartik_login',
+      'config:block.block.bartik_help',
+      'config:block.block.bartik_search',
       'config:block.block.' . $block->id(),
       'config:block.block.bartik_footer',
       'config:block.block.bartik_powered',

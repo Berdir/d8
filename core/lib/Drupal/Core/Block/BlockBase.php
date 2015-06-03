@@ -10,6 +10,7 @@ namespace Drupal\Core\Block;
 use Drupal\block\BlockInterface;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContextAwarePluginBase;
 use Drupal\Component\Utility\Unicode;
@@ -303,21 +304,42 @@ abstract class BlockBase extends ContextAwarePluginBase implements BlockPluginIn
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    return [];
+    $cache_contexts = [];
+    foreach ($this->getContexts() as $context) {
+      /** @var $context \Drupal\Core\Cache\CacheableDependencyInterface */
+      if ($context instanceof CacheableDependencyInterface) {
+        $cache_contexts = Cache::mergeContexts($cache_contexts, $context->getCacheContexts());
+      }
+    }
+    return $cache_contexts;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheTags() {
-    return [];
+    $tags = [];
+    foreach ($this->getContexts() as $context) {
+      /** @var $context \Drupal\Core\Cache\CacheableDependencyInterface */
+      if ($context instanceof CacheableDependencyInterface) {
+        $tags = Cache::mergeTags($tags, $context->getCacheTags());
+      }
+    }
+    return $tags;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheMaxAge() {
-    return (int)$this->configuration['cache']['max_age'];
+    $max_age = (int)$this->configuration['cache']['max_age'];
+    foreach ($this->getContexts() as $context) {
+      /** @var $context \Drupal\Core\Cache\CacheableDependencyInterface */
+      if ($context instanceof CacheableDependencyInterface) {
+        $max_age = Cache::mergeMaxAges($max_age, $context->getCacheMaxAge());
+      }
+    }
+    return $max_age;
   }
 
 }
