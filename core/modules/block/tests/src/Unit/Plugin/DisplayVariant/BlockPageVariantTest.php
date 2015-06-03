@@ -7,6 +7,7 @@
 
 namespace Drupal\Tests\block\Unit\Plugin\DisplayVariant;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -55,6 +56,18 @@ class BlockPageVariantTest extends UnitTestCase {
    *   A mocked display variant plugin.
    */
   public function setUpDisplayVariant($configuration = array(), $definition = array()) {
+
+    $container = new ContainerBuilder();
+    $cache_context_manager = $this->getMockBuilder('Drupal\Core\Cache\CacheContextsManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('cache_contexts_manager', $cache_context_manager);
+    $cache_context_manager->expects($this->any())
+      ->method('validateTokens')
+      ->with([])
+      ->willReturn([]);
+    \Drupal::setContainer($container);
+
     $this->blockRepository = $this->getMock('Drupal\block\BlockRepositoryInterface');
     $this->blockViewBuilder = $this->getMock('Drupal\Core\Entity\EntityViewBuilderInterface');
     $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
@@ -99,18 +112,48 @@ class BlockPageVariantTest extends UnitTestCase {
           ],
         ],
         'top' => [
-          'block1' => [],
+          'block1' => [
+            '#cache' => [
+              'contexts' => [],
+              'tags' => [],
+              'max-age' => -1,
+            ],
+          ],
           '#sorted' => TRUE,
         ],
         // The main content was rendered via a block.
         'center' => [
-          'block4' => [],
-          'block5' => [],
+          'block4' => [
+            '#cache' => [
+              'contexts' => [],
+              'tags' => [],
+              'max-age' => -1,
+            ],
+          ],
+          'block5' => [
+            '#cache' => [
+              'contexts' => [],
+              'tags' => [],
+              'max-age' => -1,
+            ],
+          ],
           '#sorted' => TRUE,
         ],
         'bottom' => [
-          'block2' => [],
-          'block3' => [],
+          'block2' => [
+            '#cache' => [
+              'contexts' => [],
+              'tags' => [],
+              'max-age' => -1,
+            ],
+          ],
+          'block3' => [
+            '#cache' => [
+              'contexts' => [],
+              'tags' => [],
+              'max-age' => -1,
+            ],
+          ],
           '#sorted' => TRUE,
         ],
       ],
@@ -124,16 +167,40 @@ class BlockPageVariantTest extends UnitTestCase {
           ],
         ],
         'top' => [
-          'block1' => [],
+          'block1' => [
+            '#cache' => [
+              'contexts' => [],
+              'tags' => [],
+              'max-age' => -1,
+            ],
+          ],
           '#sorted' => TRUE,
         ],
         'center' => [
-          'block4' => [],
+          'block4' => [
+            '#cache' => [
+              'contexts' => [],
+              'tags' => [],
+              'max-age' => -1,
+            ],
+          ],
           '#sorted' => TRUE,
         ],
         'bottom' => [
-          'block2' => [],
-          'block3' => [],
+          'block2' => [
+            '#cache' => [
+              'contexts' => [],
+              'tags' => [],
+              'max-age' => -1,
+            ],
+          ],
+          'block3' => [
+            '#cache' => [
+              'contexts' => [],
+              'tags' => [],
+              'max-age' => -1,
+            ],
+          ],
           '#sorted' => TRUE,
         ],
         // The messages are rendered via the fallback in case there is no block
@@ -155,12 +222,30 @@ class BlockPageVariantTest extends UnitTestCase {
           ],
         ],
         'top' => [
-          'block1' => [],
+          'block1' => [
+            '#cache' => [
+              'contexts' => [],
+              'tags' => [],
+              'max-age' => -1,
+            ],
+          ],
           '#sorted' => TRUE,
         ],
         'bottom' => [
-          'block2' => [],
-          'block3' => [],
+          'block2' => [
+            '#cache' => [
+              'contexts' => [],
+              'tags' => [],
+              'max-age' => -1,
+            ],
+          ],
+          'block3' => [
+            '#cache' => [
+              'contexts' => [],
+              'tags' => [],
+              'max-age' => -1,
+            ],
+          ],
           '#sorted' => TRUE,
         ],
         // The main content & messages are rendered via the fallback in case
@@ -192,11 +277,31 @@ class BlockPageVariantTest extends UnitTestCase {
     $block_plugin = $this->getMock('Drupal\Core\Block\BlockPluginInterface');
     $main_content_block_plugin = $this->getMock('Drupal\Core\Block\MainContentBlockPluginInterface');
     $messages_block_plugin = $this->getMock('Drupal\Core\Block\MessagesBlockPluginInterface');
+    $access_result = $this->getMockBuilder('\Drupal\Core\Access\AccessResultAllowed')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $access_result->expects($this->atLeastOnce())
+      ->method('isAllowed')
+      ->willReturn(TRUE);
+    $access_result->expects($this->atLeastOnce())
+      ->method('getCacheContexts')
+      ->willReturn([]);
+    $access_result->expects($this->atLeastOnce())
+      ->method('getCacheTags')
+      ->willReturn([]);
+    $access_result->expects($this->atLeastOnce())
+      ->method('getCacheMaxAge')
+      ->willReturn(-1);
+
     foreach ($blocks_config as $block_id => $block_config) {
       $block = $this->getMock('Drupal\block\BlockInterface');
       $block->expects($this->atLeastOnce())
         ->method('getPlugin')
         ->willReturn($block_config[1] ? $main_content_block_plugin : ($block_config[2] ? $messages_block_plugin : $block_plugin));
+      $block->expects($this->atLeastOnce())
+        ->method('access')
+        ->willReturn($access_result);
       $blocks[$block_config[0]][$block_id] = $block;
     }
 

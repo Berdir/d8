@@ -77,9 +77,8 @@ class BlockRepository implements BlockRepositoryInterface {
     foreach ($this->blockStorage->loadByProperties(array('theme' => $this->getTheme())) as $block_id => $block) {
       /** @var \Drupal\block\BlockInterface $block */
       // Set the contexts on the block before checking access.
-      if ($block->setContexts($contexts)->access('view')) {
-        $full[$block->getRegion()][$block_id] = $block;
-      }
+      $block->setContexts($contexts);
+      $full[$block->getRegion()][$block_id] = $block;
     }
 
     // Merge it with the actual values to maintain the region ordering.

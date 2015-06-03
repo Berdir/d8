@@ -77,8 +77,8 @@ trait AssertPageCacheContextsAndTagsTrait {
     sort($cache_entry->tags);
     $this->assertEqual($cache_entry->tags, $expected_tags);
     if ($cache_entry->tags !== $expected_tags) {
-      debug('Missing cache tags: ' . implode(',', array_diff($cache_entry->tags, $expected_tags)));
-      debug('Unwanted cache tags: ' . implode(',', array_diff($expected_tags, $cache_entry->tags)));
+      debug('Unwanted cache tags: ' . implode(',', array_diff($cache_entry->tags, $expected_tags)));
+      debug('Missing cache tags: ' . implode(',', array_diff($expected_tags, $cache_entry->tags)));
     }
   }
 
@@ -92,8 +92,8 @@ trait AssertPageCacheContextsAndTagsTrait {
     $actual_tags = $this->getCacheHeaderValues('X-Drupal-Cache-Tags');
     $this->assertIdentical($actual_tags, $expected_tags);
     if ($actual_tags !== $expected_tags) {
-      debug('Missing cache tags: ' . implode(',', array_diff($actual_tags, $expected_tags)));
-      debug('Unwanted cache tags: ' . implode(',', array_diff($expected_tags, $actual_tags)));
+      debug('Unwanted cache tags: ' . implode(',', array_diff($actual_tags, $expected_tags)));
+      debug('Missing cache tags: ' . implode(',', array_diff($expected_tags, $actual_tags)));
     }
   }
 
@@ -114,8 +114,8 @@ trait AssertPageCacheContextsAndTagsTrait {
     sort($actual_contexts);
     $return = $this->assertIdentical($actual_contexts, $expected_contexts, $message);
     if (!$return) {
-      debug('Missing cache contexts: ' . implode(',', array_diff($actual_contexts, $expected_contexts)));
-      debug('Unwanted cache contexts: ' . implode(',', array_diff($expected_contexts, $actual_contexts)));
+      debug('Unwanted cache contexts: ' . implode(',', array_diff($actual_contexts, $expected_contexts)));
+      debug('Missing cache contexts: ' . implode(',', array_diff($expected_contexts, $actual_contexts)));
     }
     return $return;
   }

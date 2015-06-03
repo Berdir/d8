@@ -8,8 +8,8 @@
 namespace Drupal\Core\Plugin\Context;
 
 use Drupal\Component\Plugin\Context\Context as ComponentContext;
-use Drupal\Component\Plugin\Exception\ContextException;
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedDataTrait;
 
@@ -35,6 +35,21 @@ class Context extends ComponentContext implements ContextInterface {
   protected $contextDefinition;
 
   /**
+   * The cacheability metadata.
+   *
+   * @var \Drupal\Core\Cache\CacheableMetadata
+   */
+  protected $cacheabilityMetadata;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(ContextDefinitionInterface $context_definition) {
+    parent::__construct($context_definition);
+    $this->cacheabilityMetadata = new CacheableMetadata();
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getContextValue() {
@@ -48,8 +63,7 @@ class Context extends ComponentContext implements ContextInterface {
         $this->setContextValue($default_value);
       }
       elseif ($definition->isRequired()) {
-        $type = $definition->getDataType();
-        throw new ContextException(SafeMarkup::format("The @type context is required and not present.", array('@type' => $type)));
+        return NULL;
       }
       return $default_value;
     }
@@ -60,6 +74,11 @@ class Context extends ComponentContext implements ContextInterface {
    * {@inheritdoc}
    */
   public function setContextValue($value) {
+    // Add the value as a cacheable dependency only if implements to interface
+    // to prevent it from disabling caching with a max-age 0.
+    if ($value instanceof CacheableDependencyInterface) {
+      $this->addCacheableDependency($value);
+    }
     if ($value instanceof TypedDataInterface) {
       return $this->setContextData($value);
     }
@@ -111,6 +130,35 @@ class Context extends ComponentContext implements ContextInterface {
    */
   public function validate() {
     return $this->getContextData()->validate();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addCacheableDependency($dependency) {
+    $this->cacheabilityMetadata = $this->cacheabilityMetadata->merge(CacheableMetadata::createFromObject($dependency));
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    return $this->cacheabilityMetadata->getCacheContexts();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    return $this->cacheabilityMetadata->getCacheTags();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge() {
+    return $this->cacheabilityMetadata->getCacheMaxAge();
   }
 
 }
