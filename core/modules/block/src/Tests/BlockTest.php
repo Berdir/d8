@@ -8,6 +8,7 @@
 namespace Drupal\block\Tests;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\Cache;
 use Drupal\simpletest\WebTestBase;
 use Drupal\block\Entity\Block;
 use Drupal\user\RoleInterface;
@@ -428,12 +429,17 @@ class BlockTest extends BlockTestBase {
    * Tests the block access.
    */
   public function testBlockAccess() {
-    $this->drupalPlaceBlock('test_access', ['region' => 'help']);
+    $block = $this->drupalPlaceBlock('test_access', ['region' => 'help']);
 
     $this->drupalGet('<front>');
     $this->assertNoText('Hello test world');
 
     \Drupal::state()->set('test_block_access', TRUE);
+    // This is a test-only scenario and there is no context for state-dependant
+    // values. Therefore we manually invalidate the block cache tag to
+    // invalidate the cached access result.
+    Cache::invalidateTags($block->getCacheTags());
+
     $this->drupalGet('<front>');
     $this->assertText('Hello test world');
   }

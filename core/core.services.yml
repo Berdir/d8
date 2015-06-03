@@ -882,15 +882,13 @@ services:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
       - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    factory: cache_factory:get
     arguments: [smart_cache_contexts]
   cache.smart_cache_html:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
       - { name: cache.bin }
-    factory_method: get
-    factory_service: cache_factory
+    factory: cache_factory:get
     arguments: [smart_cache_html]
   smart_cache_request_policy:
     class: Drupal\Core\SmartCache\DefaultRequestPolicy
