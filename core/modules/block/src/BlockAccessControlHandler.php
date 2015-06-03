@@ -119,7 +119,6 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
 
       $this->mergeCacheabilityFromConditions($conditions, $access);
 
-
       // Ensure that access is evaluated again when the block changes.
       return $access->cacheUntilEntityChanges($entity);
     }

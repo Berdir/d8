@@ -82,12 +82,6 @@ class BlockViewBuilder extends EntityViewBuilder {
         '#block' => $entity,
       );
       $build[$entity_id]['#configuration']['label'] = SafeMarkup::checkPlain($configuration['label']);
-      /** @var $context \Drupal\Core\Plugin\Context\ContextInterface */
-      foreach ($entity->getVisibilityConditions()->getConditionContexts() as $context) {
-        CacheableMetadata::createFromRenderArray($build[$entity_id])
-          ->merge($context->getCacheableMetadata())
-          ->applyTo($build[$entity_id]);
-      }
 
       // Don't run in ::buildBlock() to ensure cache keys can be altered. If an
       // alter hook wants to modify the block contents, it can append another
