@@ -255,13 +255,26 @@ class ContextHandlerTest extends UnitTestCase {
       ->method('setContextValue')
       ->with('hit', array('foo'));
 
+    // Make sure that the cacheability metadata is passed to the plugin context.
+    $plugin_context = $this->getMock('Drupal\Core\Plugin\Context\ContextInterface');
+    $plugin_context->expects($this->once())
+      ->method('addCacheableDependency')
+      ->with($context_hit);
+    $plugin->expects($this->once())
+      ->method('getContext')
+      ->with('hit')
+      ->willReturn($plugin_context);
+
     $this->contextHandler->applyContextMapping($plugin, $contexts);
   }
 
   /**
    * @covers ::applyContextMapping
+   *
+   * @expectedException \Drupal\Component\Plugin\Exception\ContextException
+   * @expectedExceptionMessage Required contexts without a value: hit.
    */
-  public function testApplyContextMappingConfigurable() {
+  public function testApplyContextMappingMissingRequired() {
     $context = $this->getMock('Drupal\Core\Plugin\Context\ContextInterface');
     $context->expects($this->never())
       ->method('getContextValue');
@@ -271,6 +284,9 @@ class ContextHandlerTest extends UnitTestCase {
     );
 
     $context_definition = $this->getMock('Drupal\Core\Plugin\Context\ContextDefinitionInterface');
+    $context_definition->expects($this->atLeastOnce())
+      ->method('isRequired')
+      ->willReturn(TRUE);
 
     $plugin = $this->getMock('Drupal\Tests\Core\Plugin\TestConfigurableContextAwarePluginInterface');
     $plugin->expects($this->once())
@@ -281,6 +297,122 @@ class ContextHandlerTest extends UnitTestCase {
       ->will($this->returnValue(array('hit' => $context_definition)));
     $plugin->expects($this->never())
       ->method('setContextValue');
+
+    $this->contextHandler->applyContextMapping($plugin, $contexts);
+  }
+
+  /**
+   * @covers ::applyContextMapping
+   */
+  public function testApplyContextMappingMissingNotRequired() {
+    $context = $this->getMock('Drupal\Core\Plugin\Context\ContextInterface');
+    $context->expects($this->never())
+      ->method('getContextValue');
+
+    $contexts = array(
+      'name' => $context,
+    );
+
+    $context_definition = $this->getMock('Drupal\Core\Plugin\Context\ContextDefinitionInterface');
+    $context_definition->expects($this->atLeastOnce())
+      ->method('isRequired')
+      ->willReturn(FALSE);
+
+    $plugin = $this->getMock('Drupal\Tests\Core\Plugin\TestConfigurableContextAwarePluginInterface');
+    $plugin->expects($this->once())
+      ->method('getContextMapping')
+      ->willReturn([]);
+    $plugin->expects($this->once())
+      ->method('getContextDefinitions')
+      ->will($this->returnValue(array('hit' => $context_definition)));
+    $plugin->expects($this->never())
+      ->method('setContextValue');
+
+    $this->contextHandler->applyContextMapping($plugin, $contexts);
+  }
+
+  /**
+   * @covers ::applyContextMapping
+   *
+   * @expectedException \Drupal\Component\Plugin\Exception\ContextException
+   * @expectedExceptionMessage Required contexts without a value: hit.
+   */
+  public function testApplyContextMappingNoValueRequired() {
+    $context = $this->getMock('Drupal\Core\Plugin\Context\ContextInterface');
+    $context->expects($this->atLeastOnce())
+      ->method('getContextValue')
+      ->willReturn(NULL);
+
+    $contexts = array(
+      'hit' => $context,
+    );
+
+    $context_definition = $this->getMock('Drupal\Core\Plugin\Context\ContextDefinitionInterface');
+    $context_definition->expects($this->atLeastOnce())
+      ->method('isRequired')
+      ->willReturn(TRUE);
+
+    $plugin = $this->getMock('Drupal\Tests\Core\Plugin\TestConfigurableContextAwarePluginInterface');
+    $plugin->expects($this->once())
+      ->method('getContextMapping')
+      ->willReturn([]);
+    $plugin->expects($this->once())
+      ->method('getContextDefinitions')
+      ->will($this->returnValue(array('hit' => $context_definition)));
+    $plugin->expects($this->never())
+      ->method('setContextValue');
+
+    // Make sure that the cacheability metadata is passed to the plugin context.
+    $plugin_context = $this->getMock('Drupal\Core\Plugin\Context\ContextInterface');
+    $plugin_context->expects($this->once())
+      ->method('addCacheableDependency')
+      ->with($context);
+    $plugin->expects($this->once())
+      ->method('getContext')
+      ->with('hit')
+      ->willReturn($plugin_context);
+
+    $this->contextHandler->applyContextMapping($plugin, $contexts);
+  }
+
+
+  /**
+   * @covers ::applyContextMapping
+   */
+  public function testApplyContextMappingNoValueNonRequired() {
+    $context = $this->getMock('Drupal\Core\Plugin\Context\ContextInterface');
+    $context->expects($this->atLeastOnce())
+      ->method('getContextValue')
+      ->willReturn(NULL);
+
+    $contexts = array(
+      'hit' => $context,
+    );
+
+    $context_definition = $this->getMock('Drupal\Core\Plugin\Context\ContextDefinitionInterface');
+    $context_definition->expects($this->atLeastOnce())
+      ->method('isRequired')
+      ->willReturn(FALSE);
+
+    $plugin = $this->getMock('Drupal\Tests\Core\Plugin\TestConfigurableContextAwarePluginInterface');
+    $plugin->expects($this->once())
+      ->method('getContextMapping')
+      ->willReturn([]);
+    $plugin->expects($this->once())
+      ->method('getContextDefinitions')
+      ->will($this->returnValue(array('hit' => $context_definition)));
+    $plugin->expects($this->never())
+      ->method('setContextValue');
+
+    // Make sure that the cacheability metadata is passed to the plugin context.
+    $plugin_context = $this->getMock('Drupal\Core\Plugin\Context\ContextInterface');
+    $plugin_context->expects($this->once())
+      ->method('addCacheableDependency')
+      ->with($context);
+    $plugin->expects($this->once())
+      ->method('getContext')
+      ->with('hit')
+      ->willReturn($plugin_context);
 
     $this->contextHandler->applyContextMapping($plugin, $contexts);
   }
@@ -310,6 +442,16 @@ class ContextHandlerTest extends UnitTestCase {
     $plugin->expects($this->once())
       ->method('setContextValue')
       ->with('hit', array('foo'));
+
+    // Make sure that the cacheability metadata is passed to the plugin context.
+    $plugin_context = $this->getMock('Drupal\Core\Plugin\Context\ContextInterface');
+    $plugin_context->expects($this->once())
+      ->method('addCacheableDependency')
+      ->with($context);
+    $plugin->expects($this->once())
+      ->method('getContext')
+      ->with('hit')
+      ->willReturn($plugin_context);
 
     $this->contextHandler->applyContextMapping($plugin, $contexts, ['hit' => 'name']);
   }

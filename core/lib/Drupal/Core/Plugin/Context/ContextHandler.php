@@ -96,7 +96,9 @@ class ContextHandler implements ContextHandlerInterface {
           continue;
         }
 
-        $plugin->setContextValue($plugin_context_id, $contexts[$context_id]->getContextValue());
+        if ($contexts[$context_id]->getContextValue()) {
+          $plugin->setContextValue($plugin_context_id, $contexts[$context_id]->getContextValue());
+        }
       }
       elseif ($plugin_context_definition->isRequired()) {
         $missing_value[] = $plugin_context_id;
