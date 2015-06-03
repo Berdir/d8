@@ -123,8 +123,11 @@ function tracker_page($account = NULL) {
 
       $rows[] = $row;
 
-      // Add node to cache tags.
+      // Add node and node owner to cache tags.
       $cache_tags = Cache::mergeTags($cache_tags, $node->getCacheTags());
+      if ($node->getOwner()) {
+        $cache_tags = Cache::mergeTags($cache_tags, $node->getOwner()->getCacheTags());
+      }
     }
   }
 

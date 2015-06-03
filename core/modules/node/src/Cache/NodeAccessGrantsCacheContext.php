@@ -75,6 +75,7 @@ class NodeAccessGrantsCacheContext extends UserCacheContext implements Calculate
     foreach ($grants as $realm => $gids) {
       $grants_context_parts[] = $realm . ':' . implode(',', $gids);
     }
+    debug($operation . '.' . implode(';', $grants_context_parts));
     return $operation . '.' . implode(';', $grants_context_parts);
   }
 
