@@ -567,6 +567,11 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       $form['#method'] = 'get';
     }
 
+    // Mark every non-GET form as uncacheable.
+    if (!$form_state->isMethodType('get')) {
+      $form['#cache']['max-age'] = 0;
+    }
+
     // Generate a new #build_id for this form, if none has been set already.
     // The form_build_id is used as key to cache a particular build of the form.
     // For multi-step forms, this allows the user to go back to an earlier

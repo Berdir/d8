@@ -99,6 +99,12 @@ class HtmlRenderer implements MainContentRendererInterface {
    * The entire HTML: takes a #type 'page' and wraps it in a #type 'html'.
    */
   public function renderResponse(array $main_content, Request $request, RouteMatchInterface $route_match) {
+    // If the _controller result already is #type => html, we can skip
+    // immediately to the final rendering (only html.html.twig).
+    if (isset($main_content['#type']) && $main_content['#type'] === 'html') {
+      return $this->finish($main_content);
+    }
+
     list($page, $title) = $this->prepare($main_content, $request, $route_match);
 
     if (!isset($page['#type']) || $page['#type'] !== 'page') {
@@ -119,6 +125,19 @@ class HtmlRenderer implements MainContentRendererInterface {
     // page.html.twig, hence add them here, just before rendering html.html.twig.
     $this->buildPageTopAndBottom($html);
 
+    return $this->finish($html);
+  }
+
+  /**
+   * Receives the render array for the html.twig.twig template and renders it.
+   *
+   * @param array $html
+   *   The #type => html render array that represents the entire page.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The response.
+   */
+  protected function finish(array $html) {
     // The three parts of rendered markup in html.html.twig (page_top, page and
     // page_bottom) must be rendered with drupal_render_root(), so that their
     // #post_render_cache callbacks are executed (which may attach additional

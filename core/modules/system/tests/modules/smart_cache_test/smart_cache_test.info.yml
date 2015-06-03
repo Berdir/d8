@@ -1,0 +1,6 @@
+name: 'Test SmartCache'
+type: module
+description: 'Provides test routes/responses for SmartCache.'
+package: Testing
+version: VERSION
+core: 8.x

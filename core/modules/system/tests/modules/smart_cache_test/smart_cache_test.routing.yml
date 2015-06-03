@@ -1,0 +1,45 @@
+smart_cache_test.response:
+  path: '/smart-cache-test/response'
+  defaults:
+    _controller: '\Drupal\smart_cache_test\SmartCacheTestController::response'
+  requirements:
+    _access: 'TRUE'
+
+smart_cache_test.response.admin:
+  path: '/smart-cache-test/response/admin'
+  defaults:
+    _controller: '\Drupal\smart_cache_test\SmartCacheTestController::response'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _admin_route: TRUE
+
+smart_cache_test.html:
+  path: '/smart-cache-test/html'
+  defaults:
+    _controller: '\Drupal\smart_cache_test\SmartCacheTestController::html'
+  requirements:
+    _access: 'TRUE'
+
+smart_cache_test.html.admin:
+  path: '/smart-cache-test/html/admin'
+  defaults:
+    _controller: '\Drupal\smart_cache_test\SmartCacheTestController::html'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _admin_route: TRUE
+
+smart_cache_test.html.with_cache_contexts:
+  path: '/smart-cache-test/html/with-cache-contexts'
+  defaults:
+    _controller: '\Drupal\smart_cache_test\SmartCacheTestController::htmlWithCacheContexts'
+  requirements:
+    _access: 'TRUE'
+
+smart_cache_test.html.uncacheable:
+  path: '/smart-cache-test/html/uncacheable'
+  defaults:
+    _controller: '\Drupal\smart_cache_test\SmartCacheTestController::htmlUncacheable'
+  requirements:
+    _access: 'TRUE'
