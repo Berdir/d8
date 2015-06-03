@@ -206,17 +206,26 @@ services:
     class: Drupal\Core\PageCache\ResponsePolicy\KillSwitch
     tags:
       - { name: page_cache_response_policy }
+      - { name: smart_cache_response_policy }
   page_cache_no_cache_routes:
     class: Drupal\Core\PageCache\ResponsePolicy\DenyNoCacheRoutes
     arguments: ['@current_route_match']
     public: false
     tags:
       - { name: page_cache_response_policy }
+      - { name: smart_cache_response_policy }
   page_cache_no_server_error:
     class: Drupal\Core\PageCache\ResponsePolicy\NoServerError
     public: false
     tags:
       - { name: page_cache_response_policy }
+      - { name: smart_cache_response_policy }
+  smart_cache_no_admin_routes:
+    class: Drupal\Core\PageCache\ResponsePolicy\NoAdminRoutes
+    arguments: ['@current_route_match']
+    public: false
+    tags:
+      - { name: smart_cache_response_policy }
   config.manager:
     class: Drupal\Core\Config\ConfigManager
     arguments: ['@entity.manager', '@config.factory', '@config.typed', '@string_translation', '@config.storage', '@event_dispatcher']
@@ -848,8 +857,8 @@ services:
     tags:
       - { name: event_subscriber }
   main_content_renderer.html:
-    class: Drupal\Core\Render\MainContent\HtmlRenderer
-    arguments: ['@title_resolver', '@plugin.manager.display_variant', '@event_dispatcher', '@module_handler', '@renderer', '@render_cache']
+    class: Drupal\Core\Render\MainContent\SmartCacheHtmlRenderer
+    arguments: ['@title_resolver', '@plugin.manager.display_variant', '@event_dispatcher', '@module_handler', '@renderer', '@render_cache', '@cache_contexts_manager', '@smart_cache_request_policy', '@smart_cache_response_policy', '@current_route_match', '@cache.smart_cache_contexts', '@cache.smart_cache_html', '@request_stack']
     tags:
       - { name: render.main_content_renderer, format: html }
   main_content_renderer.ajax:
@@ -868,6 +877,37 @@ services:
     arguments: ['@title_resolver']
     tags:
       - { name: render.main_content_renderer, format: drupal_modal }
+
+  cache.smart_cache_contexts:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory_method: get
+    factory_service: cache_factory
+    arguments: [smart_cache_contexts]
+  cache.smart_cache_html:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory_method: get
+    factory_service: cache_factory
+    arguments: [smart_cache_html]
+  smart_cache_request_policy:
+    class: Drupal\Core\SmartCache\DefaultRequestPolicy
+    tags:
+      - { name: service_collector, tag: smart_cache_request_policy, call: addPolicy}
+    lazy: true
+  smart_cache_response_policy:
+    class: Drupal\Core\PageCache\ChainResponsePolicy
+    tags:
+      - { name: service_collector, tag: smart_cache_response_policy, call: addPolicy}
+    lazy: true
+  smart_cache_subscriber:
+    class: Drupal\Core\EventSubscriber\SmartCacheSubscriber
+    arguments: ['@current_route_match', '@cache_contexts_manager', '@cache.smart_cache_contexts', '@cache.smart_cache_html']
+    tags:
+      - { name: event_subscriber }
+
   controller.form:
     class: Drupal\Core\Controller\HtmlFormController
     arguments: ['@controller_resolver', '@form_builder', '@class_resolver']

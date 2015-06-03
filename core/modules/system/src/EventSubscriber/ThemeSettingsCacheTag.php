@@ -53,8 +53,8 @@ class ThemeSettingsCacheTag implements EventSubscriberInterface {
    *   The Event to process.
    */
   public function onSave(ConfigCrudEvent $event) {
-    // Global theme settings.
-    if ($event->getConfig()->getName() === 'system.theme.global') {
+    // Theme configuration and global theme settings.
+    if (in_array($event->getConfig()->getName(), ['system.theme', 'system.theme.global'])) {
       $this->cacheTagsInvalidator->invalidateTags(['rendered']);
     }
 
