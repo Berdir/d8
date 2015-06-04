@@ -79,7 +79,7 @@ class ContentTranslationController extends ControllerBase {
     $manager = $this->manager;
     $entity_type = $entity->getEntityType();
 
-    $cacheability = CacheableMetadata::createFromRenderArray([]);
+    $cacheability = new CacheableMetadata();
 
     $languages = $this->languageManager()->getLanguages();
     $original = $entity->getUntranslated()->language()->getId();
