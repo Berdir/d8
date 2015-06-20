@@ -75,6 +75,13 @@ class Node extends ContentEntityBase implements NodeInterface {
   use EntityChangedTrait;
 
   /**
+   * Whether the node is being previewed or not.
+   *
+   * @var true|null
+   */
+  public $in_preview = NULL;
+
+  /**
    * {@inheritdoc}
    */
   public function preSave(EntityStorageInterface $storage) {
