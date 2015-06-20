@@ -537,12 +537,12 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     // Get the language code if the property exists.
     // Try to read the value directly from the list of entity keys which got
     // initialized in __construct(). This avoids creating a field item object.
-    if (isset($this->entityKeys['langcode'])) {
-      $this->defaultLangcode = $this->entityKeys['langcode'];
+    if (isset($this->translatableEntityKeys['langcode'][$this->activeLangcode])) {
+      $this->defaultLangcode = $this->translatableEntityKeys['langcode'][$this->activeLangcode];
     }
     elseif ($this->hasField($this->langcodeKey) && ($item = $this->get($this->langcodeKey)) && isset($item->language)) {
       $this->defaultLangcode = $item->language->getId();
-      $this->entityKeys['langcode'] = $this->defaultLangcode;
+      $this->translatableEntityKeys['langcode'][$this->activeLangcode] = $this->defaultLangcode;
     }
 
     if (empty($this->defaultLangcode)) {
