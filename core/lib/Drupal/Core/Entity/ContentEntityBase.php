@@ -138,18 +138,25 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
   protected $isDefaultRevision = TRUE;
 
   /**
-   * Holds entity keys like the ID, bundle and revision ID, keyed by langcode.
+   * Holds untranslatable entity keys like the ID, bundle and revision ID, keyed by langcode.
    *
    * @var array
    */
   protected $entityKeys = array();
 
   /**
+   * Holds translatable entity keys like the ID, bundle and revision ID .
+   *
+   * @var array
+   */
+  protected $translatableEntityKeys = array();
+
+  /**
    * Overrides Entity::__construct().
    */
   public function __construct(array $values, $entity_type, $bundle = FALSE, $translations = array()) {
     $this->entityTypeId = $entity_type;
-    $this->entityKeys['bundle'][LanguageInterface::LANGCODE_DEFAULT] = $bundle ? $bundle : $this->entityTypeId;
+    $this->entityKeys['bundle'] = $bundle ? $bundle : $this->entityTypeId;
     $this->langcodeKey = $this->getEntityType()->getKey('langcode');
     $this->defaultLangcodeKey = $this->getEntityType()->getKey('default_langcode');
 
@@ -165,19 +172,34 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     $this->values = $values;
     foreach ($this->getEntityType()->getKeys() as $key => $field_name) {
       if (isset($this->values[$field_name])) {
-        if (is_array($this->values[$field_name]) && isset($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT])) {
-          // We save translatable entity keys such as the publishing status and
-          // the owner of an entity into an array keyed by langcode as a
-          // performance optimization, so we don't have to go through TypedData
-          // when we need these values.
-          foreach ($this->values[$field_name] as $langcode => $field_value) {
-            if (is_array($this->values[$field_name][$langcode])) {
-              if (isset($this->values[$field_name][$langcode][0]['value'])) {
-                $this->entityKeys[$key][$langcode] = $this->values[$field_name][$langcode][0]['value'];
+        if (is_array($this->values[$field_name])) {
+          // Store untranslatable fields without a langcode key.
+          if (!$this->getFieldDefinition($field_name)->isTranslatable()) {
+            if (isset($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT])) {
+              if (is_array($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT])) {
+                if (isset($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT][0]['value'])) {
+                  $this->entityKeys[$key] = $this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT][0]['value'];
+                }
+              }
+              else {
+                $this->entityKeys[$key] = $this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT];
               }
             }
-            else {
-              $this->entityKeys[$key][$langcode] = $this->values[$field_name][$langcode];
+          }
+          else {
+            // We save translatable entity keys such as the publishing status and
+            // the owner of an entity into an array keyed by langcode as a
+            // performance optimization, so we don't have to go through TypedData
+            // when we need these values.
+            foreach ($this->values[$field_name] as $langcode => $field_value) {
+              if (is_array($this->values[$field_name][$langcode])) {
+                if (isset($this->values[$field_name][$langcode][0]['value'])) {
+                  $this->translatableEntityKeys[$key][$langcode] = $this->values[$field_name][$langcode][0]['value'];
+                }
+              }
+              else {
+                $this->translatableEntityKeys[$key][$langcode] = $this->values[$field_name][$langcode];
+              }
             }
           }
         }
@@ -515,12 +537,12 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     // Get the language code if the property exists.
     // Try to read the value directly from the list of entity keys which got
     // initialized in __construct(). This avoids creating a field item object.
-    if (isset($this->entityKeys['langcode'][LanguageInterface::LANGCODE_DEFAULT])) {
-      $this->defaultLangcode = $this->entityKeys['langcode'][LanguageInterface::LANGCODE_DEFAULT];
+    if (isset($this->entityKeys['langcode'])) {
+      $this->defaultLangcode = $this->entityKeys['langcode'];
     }
     elseif ($this->hasField($this->langcodeKey) && ($item = $this->get($this->langcodeKey)) && isset($item->language)) {
       $this->defaultLangcode = $item->language->getId();
-      $this->entityKeys['langcode'][LanguageInterface::LANGCODE_DEFAULT] = $this->defaultLangcode;
+      $this->entityKeys['langcode'] = $this->defaultLangcode;
     }
 
     if (empty($this->defaultLangcode)) {
@@ -562,11 +584,11 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     // lead to recursions.
     if ($key = array_search($name, $this->getEntityType()->getKeys())) {
       if ($key != 'bundle') {
-        if (isset($this->entityKeys[$key][LanguageInterface::LANGCODE_DEFAULT])) {
-          unset($this->entityKeys[$key][LanguageInterface::LANGCODE_DEFAULT]);
+        if (isset($this->entityKeys[$key])) {
+          unset($this->entityKeys[$key]);
         }
-        if (isset($this->entityKeys[$key][$this->activeLangcode])) {
-          unset($this->entityKeys[$key][$this->activeLangcode]);
+        elseif (isset($this->translatableEntityKeys[$key][$this->activeLangcode])) {
+          unset($this->translatableEntityKeys[$key][$this->activeLangcode]);
         }
       }
     }
@@ -1000,28 +1022,34 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
    *   The value of the entity key, NULL if not defined.
    */
   protected function getEntityKey($key) {
-    if (!isset($this->entityKeys[$key][$this->activeLangcode])) {
-      if ($key == 'bundle') {
-        $this->entityKeys[$key][$this->activeLangcode] = $this->entityKeys[$key][LanguageInterface::LANGCODE_DEFAULT];
-      }
-      elseif ($this->getEntityType()->hasKey($key)) {
-        $field_name = $this->getEntityType()->getKey($key);
-        $definition = $this->getFieldDefinition($field_name);
-        if (!$definition->isTranslatable() && isset($this->entityKeys[$key][LanguageInterface::LANGCODE_DEFAULT])) {
-          $value = $this->entityKeys[$key][LanguageInterface::LANGCODE_DEFAULT];
-        }
-        else {
-          $property = $definition->getFieldStorageDefinition()->getMainPropertyName();
-          $value = $this->get($field_name)->$property;
-        }
-        $this->entityKeys[$key][$this->activeLangcode] = $value;
+    // If the value is known already, return it.
+    if (isset($this->entityKeys[$key])) {
+      return $this->entityKeys[$key];
+    }
+    if (isset($this->translatableEntityKeys[$key][$this->activeLangcode])) {
+      return $this->translatableEntityKeys[$key][$this->activeLangcode];
+    }
+
+    // Otherwise fetch the value by creating a field object.
+    $value = NULL;
+    if ($this->getEntityType()->hasKey($key)) {
+      $field_name = $this->getEntityType()->getKey($key);
+      $definition = $this->getFieldDefinition($field_name);
+      $property = $definition->getFieldStorageDefinition()->getMainPropertyName();
+      $value = $this->get($field_name)->$property;
+
+      // Put it in the right array, depending on whether it is translatable.
+      if ($definition->isTranslatable()) {
+        $this->translatableEntityKeys[$key][$this->activeLangcode] = $value;
       }
       else {
-        $this->entityKeys[$key][LanguageInterface::LANGCODE_DEFAULT] = NULL;
-        $this->entityKeys[$key][$this->activeLangcode] = NULL;
+        $this->entityKeys[$key] = $value;
       }
     }
-    return $this->entityKeys[$key][$this->activeLangcode];
+    else {
+      $this->entityKeys[$key] = $value;
+    }
+    return $value;
   }
 
   /**
