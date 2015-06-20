@@ -52,15 +52,15 @@ class ThemeInitialization implements ThemeInitializationInterface {
    *   The app root.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_default
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to use to load modules.
    */
-  public function __construct($root, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache_default, ModuleHandlerInterface $module_handler) {
+  public function __construct($root, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache, ModuleHandlerInterface $module_handler) {
     $this->root = $root;
     $this->themeHandler = $theme_handler;
-    $this->cache = $cache_default;
+    $this->cache = $cache;
     $this->moduleHandler = $module_handler;
   }
 
