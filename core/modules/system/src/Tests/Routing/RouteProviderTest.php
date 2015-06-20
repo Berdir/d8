@@ -16,7 +16,6 @@ use Drupal\Core\Routing\MatcherDumper;
 use Drupal\Core\Routing\RouteProvider;
 use Drupal\Core\State\State;
 use Drupal\Tests\Core\Routing\RoutingFixtures;
-use Drupal\url_alter_test\PathProcessor;
 use Drupal\simpletest\KernelTestBase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;

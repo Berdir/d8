@@ -51,6 +51,9 @@ class PathSubscriber implements EventSubscriberInterface {
    * Sets the cache key on the alias manager cache decorator.
    *
    * KernelEvents::CONTROLLER is used in order to be executed after routing.
+   *
+   * @param \Symfony\Component\HttpKernel\Event\FilterControllerEvent $event
+   *   The Event to process.
    */
   public function onKernelController(FilterControllerEvent $event) {
     // Set the cache key on the alias manager cache decorator.
