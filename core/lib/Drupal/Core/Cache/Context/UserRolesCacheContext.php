@@ -23,6 +23,9 @@ class UserRolesCacheContext extends UserCacheContext implements CalculatedCacheC
    * {@inheritdoc}
    */
   public function getContext($role = NULL) {
+    if ($this->user->id() == 1) {
+      return 'is-super-user';
+    }
     if ($role === NULL) {
       return 'r.' . implode(',', $this->user->getRoles());
     }

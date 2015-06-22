@@ -76,14 +76,16 @@ class PermissionsHashGeneratorTest extends UnitTestCase {
 
     new Settings(array('hash_salt' => 'test'));
 
-    // The mocked super user account.
+    // The mocked super user account, with the same roles as Account 2.
     $this->account1 = $this->getMockBuilder('Drupal\user\Entity\User')
       ->disableOriginalConstructor()
-      ->setMethods(array('id'))
+      ->setMethods(array('getRoles', 'id'))
       ->getMock();
     $this->account1->expects($this->any())
       ->method('id')
       ->willReturn(1);
+    $this->account1->expects($this->never())
+      ->method('getRoles');
 
     // Account 2: 'administrator' and 'authenticated' roles.
     $roles_1 = array('administrator', 'authenticated');
@@ -145,12 +147,14 @@ class PermissionsHashGeneratorTest extends UnitTestCase {
    */
   public function testGenerate() {
     // Ensure that the super user (user 1) always gets the same hash.
-    $this->assertSame('is-super-user', $this->permissionsHash->generate($this->account1));
+    $super_user_hash = $this->permissionsHash->generate($this->account1);
 
     // Ensure that two user accounts with the same roles generate the same hash.
     $hash_2 = $this->permissionsHash->generate($this->account2);
     $hash_3 = $this->permissionsHash->generate($this->account3);
     $this->assertSame($hash_2, $hash_3, 'Different users with the same roles generate the same permissions hash.');
+
+    $this->assertNotSame($hash_2, $super_user_hash, 'User 1 has a different hash despite having the same roles');
 
     // Compare with hash for user account 1 with an additional role.
     $updated_hash_2 = $this->permissionsHash->generate($this->account2Updated);

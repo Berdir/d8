@@ -40,6 +40,23 @@ class RenderCacheTest extends KernelTestBase {
    * Tests that user 1 has a different permission context with the same roles.
    */
   public function testUser1PermissionContext() {
+    $this->doTestUser1WithContexts(['user.permissions']);
+  }
+
+  /**
+   * Tests that user 1 has a different roles context with the same roles.
+   */
+  public function testUser1RolesContext() {
+    $this->doTestUser1WithContexts(['user.roles']);
+  }
+
+  /**
+   * Ensures that user 1 has a unique render cache for the given context.
+   *
+   * @param string[] $contexts
+   *   List of cache contexts to use.
+   */
+  protected function doTestUser1WithContexts($contexts) {
     // Test that user 1 does not share the cache with other users who have the
     // same roles, even when using a role-based cache context.
     $user1 = $this->createUser();
@@ -52,12 +69,12 @@ class RenderCacheTest extends KernelTestBase {
     // Impersonate user 1 and render content that only user 1 should have
     // permission to see.
     \Drupal::service('account_switcher')->switchTo($user1);
-    $test_element = array(
-      '#cache' => array(
-        'keys' => array('test'),
-        'contexts' => array('user.permissions'),
-      ),
-    );
+    $test_element = [
+      '#cache' => [
+        'keys' => ['test'],
+        'contexts' => $contexts,
+      ],
+    ];
     $element = $test_element;
     $element['#markup'] = 'content for user 1';
     $output = \Drupal::service('renderer')->render($element);

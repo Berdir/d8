@@ -51,10 +51,10 @@ class PermissionsHashGenerator implements PermissionsHashGeneratorInterface {
    * Cached by role, invalidated whenever permissions change.
    */
   public function generate(AccountInterface $account) {
-    // User 1 is the super user, and can always access all permissions. No hash
-    // necessary in this case.
+    // User 1 is the super user, and can always access all permissions. Use a
+    // different, unique identifier for the hash.
     if ($account->id() == 1) {
-      return 'is-super-user';
+      return $this->hash('is-super-user');
     }
 
     $sorted_roles = $account->getRoles();
@@ -95,7 +95,20 @@ class PermissionsHashGenerator implements PermissionsHashGeneratorInterface {
       // effectively be no-ops, allowing for hash collisions.)
       $permissions_by_role[$role] = $permissions;
     }
-    return hash('sha256', $this->privateKey->get() . Settings::getHashSalt() . serialize($permissions_by_role));
+    return $this->hash(serialize($permissions_by_role));
+  }
+
+  /**
+   * Hashes the given string.
+   *
+   * @param string $identifier
+   *   The string to be hashed.
+   *
+   * @return string
+   *   The hash.
+   */
+  protected function hash($identifier) {
+    return hash('sha256', $this->privateKey->get() . Settings::getHashSalt() . $identifier);
   }
 
 }
