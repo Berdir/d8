@@ -120,6 +120,7 @@ interface CacheBackendInterface {
    *     ),
    *   );
    *   @endcode
+   *   Backend implementations must keep the order of items.
    */
   public function setMultiple(array $items);
 

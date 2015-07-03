@@ -48,6 +48,9 @@ class PhpStorageFactory {
       );
     }
     $class = isset($configuration['class']) ? $configuration['class'] : 'Drupal\Component\PhpStorage\MTimeProtectedFileStorage';
+    if ($name == 'service_container') {
+      $class = 'Drupal\Core\PhpStorage\CacheStorage';
+    }
     if (!isset($configuration['bin'])) {
       $configuration['bin'] = $name;
     }
