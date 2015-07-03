@@ -711,11 +711,72 @@ function _drupal_exception_handler_additional($exception, $exception2) {
   // Another uncaught exception was thrown while handling the first one.
   // If we are displaying errors, then do so with no possibility of a further
   // uncaught exception being thrown.
-  if (error_displayable()) {
-    print '<h1>Additional uncaught exception thrown while handling exception.</h1>';
-    print '<h2>Original</h2><p>' . Error::renderExceptionSafe($exception) . '</p>';
-    print '<h2>Additional</h2><p>' . Error::renderExceptionSafe($exception2) . '</p><hr />';
+  if (error_displayable() && class_exists('\\Drupal\\Core\\Utility\\Error', FALSE) && class_exists('\\Drupal\\Component\\Utility\\SafeMarkup', FALSE)) {
+    try {
+      print '<h1>Additional uncaught exception thrown while handling exception.</h1>';
+      print '<h2>Original</h2><p>' . Error::renderExceptionSafe($exception) . '</p>';
+      print '<h2>Additional</h2><p>' . Error::renderExceptionSafe($exception2) . '</p><hr />';
+    }
+    // PHP 7 introduces BaseExceptions.
+    catch (BaseException $exception3) {
+      _drupal_panic($exception, $exception2, $exception3);
+    }
+    // In order to be compatibile with PHP 5 we also catch regular Exceptions.
+    catch (Exception $exception3) {
+      _drupal_panic($exception, $exception2, $exception3);
+    }
   }
+  else {
+    _drupal_panic($exception, $exception2);
+  }
+}
+
+/**
+ * Panic and Die.
+ *
+ * If exceptions are thrown during the drupal additional exception handling
+ * then something is horribly wrong - we stop relying on any Drupal
+ * functionality from here on out and compose what amounts to a kernel panic.
+ *
+ * @param \Exception|\BaseException $exception
+ *   The first exception object that was thrown.
+ * @param \Exception|\BaseException $exception
+ *   The second exception object that was thrown.
+ * @param \Exception|\BaseException $exception
+ *   (optional) The third exception object that was thrown, if one exists.
+ */
+function _drupal_panic($exception, $exception2 = NULL, $exception3 = NULL) {
+  if (!headers_sent()) {
+    header("HTTP/1.0 503 Service Unavailable");
+  }
+  // Clear all buffers and stop buffering - note PHPUnit does NOT like this
+  // because it kills PHPUnit's own output buffer.
+  while (ob_get_level()) {
+    ob_end_clean();
+  }
+
+  //Log the error both to the PHP engine log and to the system log.
+  $exceptions = array_filter([$exception, $exception2, $exception3]);
+  $error_string = implode("\n\n", array_map(function(\Exception $e) {
+    return $e->getMessage();
+  }, $exceptions));
+
+  $error_string = addslashes($error_string);
+  openlog('Drupal 8', LOG_PERROR, LOG_USER);
+  syslog(LOG_ERR, $error_string);
+  closelog();
+  error_log($error_string);
+
+  //Inform the user.
+  print '<!DOCTYPE html><html><body><h1>System Error</h1>
+    <p>Drupal has encountered an unresolvable system error. If you have just
+    changed code (for example deployed a new module or moved an existing one)
+    read <a href="https://www.drupal.org/documentation/rebuild">
+    https://www.drupal.org/documentation/rebuild</a>. A record of what went
+    wrong has been written to the server system log and php error log.</p>
+    </body></html>';
+
+  exit();
 }
 
 /**

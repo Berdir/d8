@@ -9,6 +9,7 @@ use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Utility\Error;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Maps PHP error constants to watchdog severity levels.
@@ -185,6 +186,8 @@ function _drupal_log_error($error, $fatal = FALSE) {
   else {
     // Display the message if the current error reporting level allows this type
     // of message to be displayed, and unconditionally in update.php.
+    $message = '';
+    $class = NULL;
     if (error_displayable($error)) {
       $class = 'error';
 
@@ -219,20 +222,14 @@ function _drupal_log_error($error, $fatal = FALSE) {
         // Generate a backtrace containing only scalar argument values.
         $message .= '<pre class="backtrace">' . Error::formatBacktrace($backtrace) . '</pre>';
       }
-      if (\Drupal::hasService('session')) {
-        // Message display is dependent on sessions being available.
-        drupal_set_message(SafeMarkup::set($message), $class, TRUE);
-      }
-      else {
-        print $message;
-      }
     }
 
     if ($fatal) {
       // We fallback to a maintenance page at this point, because the page generation
       // itself can generate errors.
       // Should not translate the string to avoid errors producing more errors.
-      $message = 'The website encountered an unexpected error. Please try again later.';
+      $message = 'The website encountered an unexpected error. Please try again later.' . $message;
+
       if ($is_installer) {
         // install_display_output() prints the output and ends script execution.
         $output = array(
@@ -243,12 +240,21 @@ function _drupal_log_error($error, $fatal = FALSE) {
         exit;
       }
 
-      $bare_html_page_renderer = \Drupal::service('bare_html_page_renderer');
-      $response = $bare_html_page_renderer->renderBarePage(['#markup' => $message], 'Error', 'maintenance_page');
+      $response = new Response($message);
       $response->setStatusCode(500, '500 Service unavailable (with message)');
-      // An exception must halt script execution.
+
       $response->send();
+      // An exception must halt script execution.
       exit;
+    }
+    else {
+      if (\Drupal::hasService('session')) {
+        // Message display is dependent on sessions being available.
+        drupal_set_message(SafeMarkup::set($message), $class, TRUE);
+      }
+      else {
+        print $message;
+      }
     }
   }
 }

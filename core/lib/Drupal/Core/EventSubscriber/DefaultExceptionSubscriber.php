@@ -87,6 +87,7 @@ class DefaultExceptionSubscriber implements EventSubscriberInterface {
 
     // Display the message if the current error reporting level allows this type
     // of message to be displayed, and unconditionally in update.php.
+    $message = '';
     if (error_displayable($error)) {
       $class = 'error';
 
@@ -125,11 +126,11 @@ class DefaultExceptionSubscriber implements EventSubscriberInterface {
         // sure the backtrace is escaped as it can contain user submitted data.
         $message .= '<pre class="backtrace">' . SafeMarkup::escape(Error::formatBacktrace($backtrace)) . '</pre>';
       }
-      drupal_set_message(SafeMarkup::set($message), $class, TRUE);
     }
 
     $content = $this->t('The website encountered an unexpected error. Please try again later.');
-    $response = $this->bareHtmlPageRenderer->renderBarePage(['#markup' => $content], $this->t('Error'), 'maintenance_page');
+    $content .= $message ? '</br></br>' . $message : '';
+    $response = new Response($content, 500);
 
     if ($exception instanceof HttpExceptionInterface) {
       $response->setStatusCode($exception->getStatusCode());
