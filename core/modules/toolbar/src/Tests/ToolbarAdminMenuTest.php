@@ -341,28 +341,6 @@ class ToolbarAdminMenuTest extends WebTestBase {
 
     $this->drupalGetJSON('toolbar/subtrees/' . $subtrees_hash);
     $this->assertResponse('200');
-
-    // Test that the subtrees hash changes with a different language code and
-    // that JSON is returned when a language code is specified.
-    // Create a new language with the langcode 'xx'.
-    $langcode = 'xx';
-    // The English name for the language. This will be translated.
-    $name = $this->randomMachineName(16);
-    $edit = array(
-      'predefined_langcode' => 'custom',
-      'langcode' => $langcode,
-      'label' => $name,
-      'direction' => LanguageInterface::DIRECTION_LTR,
-    );
-    $this->drupalPostForm('admin/config/regional/language/add', $edit, t('Add custom language'));
-
-    // Get a page with the new language langcode in the URL.
-    $this->drupalGet('xx/test-page');
-    // Request a new page to refresh the drupalSettings object.
-    $subtrees_hash = $this->getSubtreesHash();
-
-    $this->drupalGetJSON('toolbar/subtrees/' . $subtrees_hash . '/' . $langcode);
-    $this->assertResponse('200');
   }
 
   /**
