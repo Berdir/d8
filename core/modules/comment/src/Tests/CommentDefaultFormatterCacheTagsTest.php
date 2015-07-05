@@ -70,7 +70,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityUnitTestBase {
       ->getViewBuilder('entity_test')
       ->view($commented_entity);
     $renderer->renderRoot($build);
-    $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($build['#cache']->getKeys())->getCacheableMetadata()->getCacheTags();
+    $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($build['#cache']['contexts'])->getCacheableMetadata()->getCacheTags();
     $expected_cache_tags = Cache::mergeTags($cache_context_tags, [
       'entity_test_view',
       'entity_test:'  . $commented_entity->id(),
@@ -113,7 +113,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityUnitTestBase {
       ->getViewBuilder('entity_test')
       ->view($commented_entity);
     $renderer->renderRoot($build);
-    $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($build['#cache']->getKeys())->getCacheableMetadata()->getCacheTags();
+    $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($build['#cache']['contexts'])->getCacheableMetadata()->getCacheTags();
     $expected_cache_tags = Cache::mergeTags($cache_context_tags, [
       'entity_test_view',
       'entity_test:' . $commented_entity->id(),
