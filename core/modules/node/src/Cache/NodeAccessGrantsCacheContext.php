@@ -7,6 +7,7 @@
 
 namespace Drupal\node\Cache;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
 use Drupal\Core\Cache\Context\UserCacheContext;
 
@@ -80,6 +81,13 @@ class NodeAccessGrantsCacheContext extends UserCacheContext implements Calculate
       $grants_context_parts[] = $realm . ':' . implode(',', $gids);
     }
     return $operation . '.' . implode(';', $grants_context_parts);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata($operation = NULL) {
+    return new CacheableMetadata();
   }
 
 }

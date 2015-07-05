@@ -33,4 +33,11 @@ class MenuActiveTrailsCacheContext extends ContainerAware implements CalculatedC
     return 'menu_trail.' . $menu_name . '|' . implode('|', $active_trail);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata($menu_name = NULL) {
+    return NULL;
+  }
+
 }

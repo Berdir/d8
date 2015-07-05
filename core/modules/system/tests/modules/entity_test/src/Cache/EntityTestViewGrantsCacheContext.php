@@ -34,4 +34,11 @@ class EntityTestViewGrantsCacheContext implements CacheContextInterface {
     return '299792458';
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata() {
+    return NULL;
+  }
+
 }

@@ -40,4 +40,11 @@ class UserCacheContext implements CacheContextInterface {
     return "u." . $this->user->id();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata() {
+    return NULL;
+  }
+
 }

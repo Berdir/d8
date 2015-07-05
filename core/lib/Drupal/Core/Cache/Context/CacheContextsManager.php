@@ -8,6 +8,7 @@
 namespace Drupal\Core\Cache\Context;
 
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -99,23 +100,38 @@ class CacheContextsManager {
    * @param string[] $context_tokens
    *   An array of cache context tokens.
    *
-   * @return string[]
-   *   The array of corresponding cache keys.
+   * @return \Drupal\Core\Cache\Context\CacheContextKeys
    *
    * @throws \InvalidArgumentException
    */
   public function convertTokensToKeys(array $context_tokens) {
-    $context_tokens = $this->optimizeTokens($context_tokens);
-    sort($context_tokens);
+    $cacheable_metadata = new CacheableMetadata();
+    $optimized_tokens = $this->optimizeTokens($context_tokens);
+    // Iterate through cache contexts that has been optimized away and get their
+    // cacheable metadata.
+    foreach (static::parseTokens(array_diff($context_tokens, $optimized_tokens)) as $context_token) {
+      list($context_id, $parameter) = $context_token;
+      if (!in_array($context_id, $this->contexts)) {
+        throw new \InvalidArgumentException(SafeMarkup::format('"@context" is not a valid cache context ID.', ['@context' => $context_id]));
+      }
+      $context = $this->getService($context_id);
+      // To make it possible to return NULL instead of CacheableMetadata.
+      if ($metadata = $context->getCacheableMetadata($parameter)) {
+        $cacheable_metadata = $cacheable_metadata->merge($metadata);
+      }
+    }
+
+    sort($optimized_tokens);
     $keys = [];
-    foreach (static::parseTokens($context_tokens) as $context) {
+    foreach (static::parseTokens($optimized_tokens) as $context) {
       list($context_id, $parameter) = $context;
       if (!in_array($context_id, $this->contexts)) {
         throw new \InvalidArgumentException(SafeMarkup::format('"@context" is not a valid cache context ID.', ['@context' => $context_id]));
       }
       $keys[] = $this->getService($context_id)->getContext($parameter);
     }
-    return $keys;
+
+    return new CacheContextKeys($keys, $cacheable_metadata);
   }
 
   /**
@@ -128,6 +144,9 @@ class CacheContextsManager {
    * Hence a minimal representative subset is the most compact representation
    * possible of a set of cache context tokens, that still captures the entire
    * universe of variations.
+   *
+   * If cache context is being optimized away, it is able to set cacheable
+   * metadata for itself which will be bubbled up.
    *
    * E.g. when caching per user ('user'), also caching per role ('user.roles')
    * is meaningless because "per role" is implied by "per user".

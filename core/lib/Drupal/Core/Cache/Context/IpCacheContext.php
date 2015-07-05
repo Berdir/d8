@@ -28,4 +28,11 @@ class IpCacheContext extends RequestStackCacheContextBase {
     return $this->requestStack->getCurrentRequest()->getClientIp();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata() {
+    return NULL;
+  }
+
 }

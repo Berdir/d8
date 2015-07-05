@@ -30,4 +30,11 @@ class ViewsTestCacheContext implements CacheContextInterface {
     return \Drupal::state()->get('views_test_cache_context', 'George');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata() {
+    return NULL;
+  }
+
 }

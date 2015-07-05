@@ -74,4 +74,11 @@ class LanguagesCacheContext implements CalculatedCacheContextInterface  {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata($type = NULL) {
+    return NULL;
+  }
+
 }

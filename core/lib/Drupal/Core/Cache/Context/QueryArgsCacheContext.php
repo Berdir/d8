@@ -35,4 +35,11 @@ class QueryArgsCacheContext extends RequestStackCacheContextBase implements Calc
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata($query_arg = NULL) {
+    return NULL;
+  }
+
 }

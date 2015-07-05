@@ -38,4 +38,11 @@ class PagersCacheContext extends RequestStackCacheContextBase implements Calcula
     return 'pager.' . $pager_id . '.' . pager_find_page($pager_id);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata($pager_id = NULL) {
+    return NULL;
+  }
+
 }

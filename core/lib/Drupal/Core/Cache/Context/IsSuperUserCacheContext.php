@@ -28,4 +28,11 @@ class IsSuperUserCacheContext extends UserCacheContext {
     return ((int) $this->user->id()) === 1 ? '1' : '0';
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata() {
+    return NULL;
+  }
+
 }

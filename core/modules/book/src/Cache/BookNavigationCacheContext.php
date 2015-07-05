@@ -70,4 +70,11 @@ class BookNavigationCacheContext extends ContainerAware implements CacheContextI
     return 'book.' . implode('|', $active_trail);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata() {
+    return NULL;
+  }
+
 }

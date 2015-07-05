@@ -31,4 +31,11 @@ abstract class RequestStackCacheContextBase implements CacheContextInterface {
     $this->requestStack = $request_stack;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata() {
+    return NULL;
+  }
+
 }

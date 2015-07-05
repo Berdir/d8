@@ -95,7 +95,7 @@ class CacheContextsManagerTest extends UnitTestCase {
       'baz.cnenzrgreO',
       'bar',
     ];
-    $this->assertEquals($expected, $new_keys);
+    $this->assertEquals($expected, $new_keys->getKeys());
   }
 
   /**
@@ -234,6 +234,13 @@ class FooCacheContext implements CacheContextInterface {
     return 'bar';
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata() {
+    return NULL;
+  }
+
 }
 
 /**
@@ -256,6 +263,13 @@ class BazCacheContext implements CalculatedCacheContextInterface {
       throw new \Exception();
     }
     return 'baz.' . str_rot13($parameter);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata($parameter = NULL) {
+    return NULL;
   }
 
 }

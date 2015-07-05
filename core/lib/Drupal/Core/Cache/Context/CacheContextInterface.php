@@ -31,4 +31,15 @@ interface CacheContextInterface {
    */
   public function getContext();
 
+  /**
+   * Gets the cacheable metadata for the context based on the parameter value.
+   *
+   * If the cache context is being optimized away, cacheable metadata provided
+   * by this method will be bubbled up.
+   *
+   * @return \Drupal\Core\Cache\CacheableMetadata|NULL
+   *   A cacheable metadata object or NULL.
+   */
+  public function getCacheableMetadata();
+
 }

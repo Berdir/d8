@@ -32,4 +32,11 @@ class TimeZoneCacheContext implements CacheContextInterface {
     return date_default_timezone_get();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata() {
+    return NULL;
+  }
+
 }
