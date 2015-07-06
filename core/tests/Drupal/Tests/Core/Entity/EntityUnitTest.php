@@ -8,6 +8,7 @@
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException;
@@ -486,4 +487,59 @@ class EntityUnitTest extends UnitTestCase {
   public function testReferencedEntities() {
     $this->assertSame(array(), $this->entity->referencedEntities());
   }
+
+  /**
+   * @covers ::getCacheTags
+   * @covers ::getCacheTagsForInvalidation
+   * @covers ::addCacheTags
+   */
+  public function testCacheTags() {
+    // Ensure that both methods return the same by default.
+    $this->assertEquals([$this->entityTypeId . ':' . 1], $this->entity->getCacheTags());
+    $this->assertEquals([$this->entityTypeId . ':' . 1], $this->entity->getCacheTagsForInvalidation());
+
+    // Add an additional cache tag and make sure only getCacheTags() returns
+    // tha.
+    $this->entity->addCacheTags(['additional_cache_tag']);
+
+    $this->assertEquals(['additional_cache_tag', $this->entityTypeId . ':' . 1], $this->entity->getCacheTags());
+    $this->assertEquals([$this->entityTypeId . ':' . 1], $this->entity->getCacheTagsForInvalidation());
+  }
+
+  /**
+   * @covers ::getCacheContexts
+   * @covers ::addCacheContexts
+   */
+  public function testCacheContexts() {
+    $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container = new ContainerBuilder();
+    $container->set('cache_contexts_manager', $cache_contexts_manager);
+    \Drupal::setContainer($container);
+
+    // There are no cache contexts by defaut.
+    $this->assertEquals([], $this->entity->getCacheContexts());
+
+    // Add an additional cache context.
+    $this->entity->addCacheContexts(['user']);
+    $this->assertEquals(['user'], $this->entity->getCacheContexts());
+  }
+
+
+  /**
+   * @covers ::getCacheMaxAge
+   * @covers ::setCacheMaxAgeIfLower
+   */
+  public function testCacheMaxAge() {
+    // Cache max age is permanent by default.
+    $this->assertEquals(Cache::PERMANENT, $this->entity->getCacheMaxAge());
+
+    // Set two cache max ages, the lower value is the one that needs to be
+    // returned.
+    $this->entity->setCacheMaxAgeIfLower(600);
+    $this->entity->setCacheMaxAgeIfLower(1800);
+    $this->assertEquals(600, $this->entity->getCacheMaxAge());
+  }
+
 }
