@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Cache\Context;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
@@ -37,7 +38,8 @@ class MenuActiveTrailsCacheContext extends ContainerAware implements CalculatedC
    * {@inheritdoc}
    */
   public function getCacheableMetadata($menu_name = NULL) {
-    return NULL;
+    $cacheable_metadata = new CacheableMetadata();
+    return $cacheable_metadata->setCacheTags(["config:system.menu.$menu_name"]);
   }
 
 }

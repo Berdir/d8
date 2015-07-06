@@ -87,7 +87,7 @@ class NodeAccessGrantsCacheContext extends UserCacheContext implements Calculate
    * {@inheritdoc}
    */
   public function getCacheableMetadata($operation = NULL) {
-    return new CacheableMetadata();
+    return NULL;
   }
 
 }
