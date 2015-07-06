@@ -1336,4 +1336,32 @@ class ViewUI implements ViewEntityInterface {
     return $this->storage->hasTrustedData();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function addCacheContexts(array $cache_contexts) {
+    return $this->storage->addCacheContexts($cache_contexts);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCacheMaxAgeIfLower($max_age) {
+    return $this->storage->setCacheMaxAgeIfLower($max_age);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTagsForInvalidation() {
+    return $this->storage->getCacheTagsForInvalidation();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function addCacheTags(array $cache_tags) {
+    return $this->storage->addCacheTags($cache_tags);
+  }
+
 }

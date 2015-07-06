@@ -9,13 +9,14 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\MutableCacheableDependencyInterface;
 
 /**
  * Defines a common interface for all entity objects.
  *
  * @ingroup entity_api
  */
-interface EntityInterface extends AccessibleInterface, CacheableDependencyInterface {
+interface EntityInterface extends AccessibleInterface, CacheableDependencyInterface, MutableCacheableDependencyInterface {
 
   /**
    * Gets the entity UUID (Universally Unique Identifier).
@@ -347,6 +348,20 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    *   support renames.
    */
   public function getOriginalId();
+
+  /**
+   * Returns the cache tags that should be used when invalidating caches.
+   *
+   * This will not return additional cache tags added through addCacheTags().
+   * Invalidating caches that are depending on this entity must use this method.
+   *
+   * @return string[]
+   *   Set of cache tags.
+   *
+   * @see \Drupal\Core\Cache\MutableCacheableDependencyInterface::addCacheTags()
+   * @see \Drupal\Core\Cache\CacheableDependencyInterface::getCacheTags()
+   */
+  public function getCacheTagsForInvalidation();
 
   /**
    * Sets the original ID.
