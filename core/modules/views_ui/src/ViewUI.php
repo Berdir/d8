@@ -1353,8 +1353,8 @@ class ViewUI implements ViewEntityInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCacheTagsForInvalidation() {
-    return $this->storage->getCacheTagsForInvalidation();
+  public function getCacheTagsToInvalidate() {
+    return $this->storage->getCacheTagsToInvalidate();
   }
 
   /**

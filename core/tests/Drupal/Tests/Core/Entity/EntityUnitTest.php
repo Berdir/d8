@@ -490,20 +490,20 @@ class EntityUnitTest extends UnitTestCase {
 
   /**
    * @covers ::getCacheTags
-   * @covers ::getCacheTagsForInvalidation
+   * @covers ::getCacheTagsToInvalidate
    * @covers ::addCacheTags
    */
   public function testCacheTags() {
     // Ensure that both methods return the same by default.
     $this->assertEquals([$this->entityTypeId . ':' . 1], $this->entity->getCacheTags());
-    $this->assertEquals([$this->entityTypeId . ':' . 1], $this->entity->getCacheTagsForInvalidation());
+    $this->assertEquals([$this->entityTypeId . ':' . 1], $this->entity->getCacheTagsToInvalidate());
 
     // Add an additional cache tag and make sure only getCacheTags() returns
     // tha.
     $this->entity->addCacheTags(['additional_cache_tag']);
 
     $this->assertEquals(['additional_cache_tag', $this->entityTypeId . ':' . 1], $this->entity->getCacheTags());
-    $this->assertEquals([$this->entityTypeId . ':' . 1], $this->entity->getCacheTagsForInvalidation());
+    $this->assertEquals([$this->entityTypeId . ':' . 1], $this->entity->getCacheTagsToInvalidate());
   }
 
   /**

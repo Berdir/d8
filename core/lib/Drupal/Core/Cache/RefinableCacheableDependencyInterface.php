@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\Core\Cache\MutableCacheableDependencyInterface.
+ * Contains \Drupal\Core\Cache\RefinableCacheableDependencyInterface.
  */
 
 namespace Drupal\Core\Cache;
@@ -14,7 +14,7 @@ namespace Drupal\Core\Cache;
  * based on the current content language then a cache context for that must be
  * added.
  */
-interface MutableCacheableDependencyInterface extends CacheableDependencyInterface {
+interface RefinableCacheableDependencyInterface extends CacheableDependencyInterface {
 
   /**
    * Adds cache contexts.

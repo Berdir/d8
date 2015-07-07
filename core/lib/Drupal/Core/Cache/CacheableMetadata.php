@@ -11,7 +11,7 @@ namespace Drupal\Core\Cache;
  *
  * @ingroup cache
  *
- * @todo Use MutableCacheableDependencyInterface and the corresponding trait in
+ * @todo Use RefinableCacheableDependencyInterface and the corresponding trait in
  *   https://www.drupal.org/node/2526326.
  */
 class CacheableMetadata implements CacheableDependencyInterface {

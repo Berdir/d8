@@ -246,7 +246,7 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
     // so we must invalidate the associated block's cache tag (which includes
     // the theme cache tag).
     if (!$update) {
-      Cache::invalidateTags($this->getCacheTagsForInvalidation());
+      Cache::invalidateTags($this->getCacheTagsToInvalidate());
     }
   }
 

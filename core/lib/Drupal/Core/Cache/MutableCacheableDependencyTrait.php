@@ -8,7 +8,7 @@
 namespace Drupal\Core\Cache;
 
 /**
- * Trait for \Drupal\Core\Cache\MutableCacheableDependencyInterface.
+ * Trait for \Drupal\Core\Cache\RefinableCacheableDependencyInterface.
  */
 trait MutableCacheableDependencyTrait {
 
