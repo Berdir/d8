@@ -7,19 +7,18 @@
 
 namespace Drupal\block\Plugin\DisplayVariant;
 
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\block\BlockRepositoryInterface;
-use Drupal\block\Event\BlockContextEvent;
-use Drupal\block\Event\BlockEvents;
 use Drupal\Core\Block\MainContentBlockPluginInterface;
 use Drupal\Core\Block\MessagesBlockPluginInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Display\PageVariantInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Display\VariantBase;
+use Drupal\Core\Plugin\ContextAwarePluginInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides a page display variant that decorates the main content with blocks.
@@ -61,6 +60,13 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
   protected $blockListCacheTags;
 
   /**
+   * The theme manager.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected $themeManager;
+
+  /**
    * The render array representing the main page content.
    *
    * @var array
@@ -80,17 +86,17 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
    *   The block repository.
    * @param \Drupal\Core\Entity\EntityViewBuilderInterface $block_view_builder
    *   The block view builder.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
-   *   The event dispatcher.
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   *   The theme manager.
    * @param string[] $block_list_cache_tags
    *   The Block entity type list cache tags.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, BlockRepositoryInterface $block_repository, EntityViewBuilderInterface $block_view_builder, EventDispatcherInterface $dispatcher, array $block_list_cache_tags) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, BlockRepositoryInterface $block_repository, EntityViewBuilderInterface $block_view_builder, ThemeManagerInterface $theme_manager, array $block_list_cache_tags) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->blockRepository = $block_repository;
     $this->blockViewBuilder = $block_view_builder;
-    $this->dispatcher = $dispatcher;
     $this->blockListCacheTags = $block_list_cache_tags;
+    $this->themeManager = $theme_manager;
   }
 
   /**
@@ -103,7 +109,7 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
       $plugin_definition,
       $container->get('block.repository'),
       $container->get('entity.manager')->getViewBuilder('block'),
-      $container->get('event_dispatcher'),
+      $container->get('theme.manager'),
       $container->get('entity.manager')->getDefinition('block')->getListCacheTags()
     );
   }
@@ -129,10 +135,9 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
         'tags' => $this->blockListCacheTags,
       ],
     ];
-    $contexts = $this->getActiveBlockContexts();
     // Load all region content assigned via blocks.
     $cacheable_metadata_list = [];
-    foreach ($this->blockRepository->getVisibleBlocksPerRegion($contexts, $cacheable_metadata_list) as $region => $blocks) {
+    foreach ($this->blockRepository->getVisibleBlocksPerRegion($cacheable_metadata_list) as $region => $blocks) {
       /** @var $blocks \Drupal\block\BlockInterface[] */
       foreach ($blocks as $key => $block) {
         $block_plugin = $block->getPlugin();
@@ -186,16 +191,6 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
     $merged_cacheable_metadata->applyTo($build);
 
     return $build;
-  }
-
-  /**
-   * Returns an array of context objects to set on the blocks.
-   *
-   * @return \Drupal\Component\Plugin\Context\ContextInterface[]
-   *   An array of contexts to set on the blocks.
-   */
-  protected function getActiveBlockContexts() {
-    return $this->dispatcher->dispatch(BlockEvents::ACTIVE_CONTEXT, new BlockContextEvent())->getContexts();
   }
 
 }
