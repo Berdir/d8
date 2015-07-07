@@ -659,7 +659,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
   protected function createCacheId(array $keys, array $contexts) {
     $cid_parts = $keys;
 
-    $contexts = \Drupal::service('cache_contexts_manager')->convertokensToKeys($contexts);
+    $contexts = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($contexts);
     $cid_parts = array_merge($cid_parts, $contexts->getKeys());
 
     return implode(':', $cid_parts);
