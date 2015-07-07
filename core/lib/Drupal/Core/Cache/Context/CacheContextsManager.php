@@ -100,14 +100,16 @@ class CacheContextsManager {
    * @param string[] $context_tokens
    *   An array of cache context tokens.
    *
-   * @return \Drupal\Core\Cache\Context\CacheContextKeys
+   * @return \Drupal\Core\Cache\Context\ContextCacheKeys
+   *   The ContextCacheKeys object containing the converted cache keys and
+   *   cacheability metadata.
    *
    * @throws \InvalidArgumentException
    */
   public function convertTokensToKeys(array $context_tokens) {
     $cacheable_metadata = new CacheableMetadata();
     $optimized_tokens = $this->optimizeTokens($context_tokens);
-    // Iterate through cache contexts that has been optimized away and get their
+    // Iterate over cache contexts that have been optimized away and get their
     // cacheable metadata.
     foreach (static::parseTokens(array_diff($context_tokens, $optimized_tokens)) as $context_token) {
       list($context_id, $parameter) = $context_token;
@@ -128,7 +130,7 @@ class CacheContextsManager {
       $keys[] = $this->getService($context_id)->getContext($parameter);
     }
 
-    return new CacheContextKeys($keys, $cacheable_metadata);
+    return new ContextCacheKeys($keys, $cacheable_metadata);
   }
 
   /**
@@ -142,7 +144,7 @@ class CacheContextsManager {
    * possible of a set of cache context tokens, that still captures the entire
    * universe of variations.
    *
-   * If cache context is being optimized away, it is able to set cacheable
+   * If a cache context is being optimized away, it is able to set cacheable
    * metadata for itself which will be bubbled up.
    *
    * E.g. when caching per user ('user'), also caching per role ('user.roles')
@@ -166,6 +168,14 @@ class CacheContextsManager {
   public function optimizeTokens(array $context_tokens) {
     $optimized_content_tokens = [];
     foreach ($context_tokens as $context_token) {
+
+      // Extract the parameter if available.
+      $parameter = NULL;
+      $context_id = $context_token;
+      if (strpos($context_token, ':') !== FALSE) {
+        list($context_id, $parameter) = explode(':', $context_token);
+      }
+
       // Context tokens without:
       // - a period means they don't have a parent
       // - a colon means they're not a specific value of a cache context
@@ -174,14 +184,13 @@ class CacheContextsManager {
         $optimized_content_tokens[] = $context_token;
       }
       // Check cacheability. If the context defines a max-age of 0, then it
-      // can not be optimized away.
-      elseif ($this->getService($context_token)->getCacheableMetadata()->getCacheMaxAge() == 0) {
+      // can not be optimized away. Pass the parameter along if we have one.
+      elseif ($this->getService($context_id)->getCacheableMetadata($parameter)->getCacheMaxAge() === 0) {
         $optimized_content_tokens[] = $context_token;
       }
       // The context token has a period or a colon. Iterate over all ancestor
       // cache contexts. If one exists, omit the context token.
       else {
-
         $ancestor_found = FALSE;
         // Treat a colon like a period, that allows us to consider 'a' the
         // ancestor of 'a:foo', without any additional code for the colon.

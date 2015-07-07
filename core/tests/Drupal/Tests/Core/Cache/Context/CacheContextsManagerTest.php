@@ -33,10 +33,11 @@ class CacheContextsManagerTest extends UnitTestCase {
     $container->expects($this->any())
       ->method('get')
       ->will($this->returnValueMap([
-        ['a', Container::EXCEPTION_ON_INVALID_REFERENCE, new FooCacheContext()],
-        ['a.b', Container::EXCEPTION_ON_INVALID_REFERENCE, new FooCacheContext()],
-        ['a.b.c', Container::EXCEPTION_ON_INVALID_REFERENCE, new BazCacheContext()],
-        ['x', Container::EXCEPTION_ON_INVALID_REFERENCE, new BazCacheContext()],
+        ['cache_context.a', Container::EXCEPTION_ON_INVALID_REFERENCE, new FooCacheContext()],
+        ['cache_context.a.b', Container::EXCEPTION_ON_INVALID_REFERENCE, new FooCacheContext()],
+        ['cache_context.a.b.c', Container::EXCEPTION_ON_INVALID_REFERENCE, new BazCacheContext()],
+        ['cache_context.x', Container::EXCEPTION_ON_INVALID_REFERENCE, new BazCacheContext()],
+        ['cache_context.a.b.no-optimize', Container::EXCEPTION_ON_INVALID_REFERENCE, new NoOptimizeCacheContext()],
       ]));
     $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
 
@@ -75,6 +76,9 @@ class CacheContextsManagerTest extends UnitTestCase {
       [['a', 'a.b.c:foo'], ['a']],
       [['a.b.c:foo', 'a'], ['a']],
       [['a.b.c:foo', 'a.b.c'], ['a.b.c']],
+
+      // max-age 0 is treated as non-optimizable.
+      [['a.b.no-optimize', 'a.b', 'a'], ['a.b.no-optimize', 'a']],
     ];
   }
 
@@ -271,6 +275,35 @@ class BazCacheContext implements CalculatedCacheContextInterface {
    */
   public function getCacheableMetadata($parameter = NULL) {
     return new CacheableMetadata();
+  }
+
+}
+
+/**
+ * Non-optimizable context class.
+ */
+class NoOptimizeCacheContext implements CacheContextInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getLabel() {
+    return 'Foo';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getContext() {
+    return 'bar';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata() {
+    $cacheable_metadata = new CacheableMetadata();
+    return $cacheable_metadata->setCacheMaxAge(0);
   }
 
 }

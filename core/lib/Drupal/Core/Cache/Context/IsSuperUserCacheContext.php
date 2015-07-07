@@ -7,8 +7,6 @@
 
 namespace Drupal\Core\Cache\Context;
 
-use Drupal\Core\Cache\CacheableMetadata;
-
 /**
  * Defines the IsSuperUserCacheContext service, for "super user or not" caching.
  *

@@ -7,8 +7,6 @@
 
 namespace Drupal\Core\Cache\Context;
 
-use Drupal\Core\Cache\CacheableMetadata;
-
 /**
  * Defines the CookiesCacheContext service, for "per cookie" caching.
  *

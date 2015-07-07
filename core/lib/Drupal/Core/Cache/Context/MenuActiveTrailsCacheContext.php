@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 /**
  * Defines the MenuActiveTrailsCacheContext service.
  *
- * This class is container-aware to avoid initializing the 'menu.active_trail'
+ * This class is container-aware to avoid initializing the 'menu.active_trails'
  * service (and its dependencies) when it is not necessary.
  */
 class MenuActiveTrailsCacheContext extends ContainerAware implements CalculatedCacheContextInterface {
@@ -30,7 +30,7 @@ class MenuActiveTrailsCacheContext extends ContainerAware implements CalculatedC
    */
   public function getContext($menu_name = NULL) {
     if (!$menu_name) {
-      throw new \InvalidArgumentException('No menu name provided for menu.active_trail cache context.');
+      throw new \InvalidArgumentException('No menu name provided for menu.active_trails cache context.');
     }
 
     $active_trail = $this->container->get('menu.active_trail')
@@ -43,7 +43,7 @@ class MenuActiveTrailsCacheContext extends ContainerAware implements CalculatedC
    */
   public function getCacheableMetadata($menu_name = NULL) {
     if (!$menu_name) {
-      throw new \InvalidArgumentException('No menu name provided for menu.active_trail cache context.');
+      throw new \InvalidArgumentException('No menu name provided for menu.active_trails cache context.');
     }
     $cacheable_metadata = new CacheableMetadata();
     return $cacheable_metadata->setCacheTags(["config:system.menu.$menu_name"]);

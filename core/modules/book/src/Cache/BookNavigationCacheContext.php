@@ -7,6 +7,7 @@
 
 namespace Drupal\book\Cache;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextInterface;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -74,7 +75,8 @@ class BookNavigationCacheContext extends ContainerAware implements CacheContextI
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
-    return NULL;
+    $cacheable_metadata = new CacheableMetadata();
+    return $cacheable_metadata->setCacheMaxAge(0);
   }
 
 }

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Core\Cache\Context\CacheContextKeys.
+ * Contains \Drupal\Core\Cache\Context\ContextCacheKeys.
  */
 
 namespace Drupal\Core\Cache\Context;
@@ -12,7 +12,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 /**
  * A value object to store generated cache keys with its cacheable metadata.
  */
-class CacheContextKeys {
+class ContextCacheKeys {
 
   /**
    * The generated cache keys.

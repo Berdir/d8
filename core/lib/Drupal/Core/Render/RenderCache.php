@@ -289,7 +289,7 @@ class RenderCache implements RenderCacheInterface {
    *
    * Creates the cache ID string based on #cache['keys'] + #cache['contexts'].
    *
-   * @param array $elements
+   * @param array &$elements
    *   A renderable array.
    *
    * @return string
@@ -304,10 +304,10 @@ class RenderCache implements RenderCacheInterface {
     if (isset($elements['#cache']['keys'])) {
       $cid_parts = $elements['#cache']['keys'];
       if (!empty($elements['#cache']['contexts'])) {
-        $contexts = $this->cacheContextsManager->convertTokensToKeys($elements['#cache']['contexts']);
-        $cid_parts = array_merge($cid_parts, $contexts->getKeys());
+        $context_cache_keys = $this->cacheContextsManager->convertTokensToKeys($elements['#cache']['contexts']);
+        $cid_parts = array_merge($cid_parts, $context_cache_keys->getKeys());
         CacheableMetadata::createFromRenderArray($elements)
-          ->merge($contexts->getCacheableMetadata())
+          ->merge($context_cache_keys->getCacheableMetadata())
           ->applyTo($elements);
       }
       return implode(':', $cid_parts);
