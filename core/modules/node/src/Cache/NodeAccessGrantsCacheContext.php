@@ -87,7 +87,15 @@ class NodeAccessGrantsCacheContext extends UserCacheContext implements Calculate
    * {@inheritdoc}
    */
   public function getCacheableMetadata($operation = NULL) {
-    return NULL;
+    $cacheable_metadata = new CacheableMetadata();
+
+    if (!\Drupal::moduleHandler()->getImplementations('node_grants')) {
+      return $cacheable_metadata;
+    }
+
+    // If the site is using node grants, this cache context can not be
+    // optimized.
+    return $cacheable_metadata->setCacheMaxAge(0);
   }
 
 }

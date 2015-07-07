@@ -52,7 +52,7 @@ class RouteCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
-    return NULL;
+    return new CacheableMetadata();
   }
 
 }

@@ -53,6 +53,15 @@ class CommentRssTest extends CommentTestBase {
     $this->postComment($this->node, $this->randomMachineName(), $this->randomMachineName());
     $this->drupalGet('rss.xml');
 
+    $cache_contexts = [
+      'languages:language_interface',
+      'theme',
+      'user.node_grants:view',
+      'user.permissions',
+      'timezone',
+    ];
+    $this->assertCacheContexts($cache_contexts);
+
     $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($cache_contexts)->getCacheableMetadata()->getCacheTags();
     $this->assertCacheTags(Cache::mergeTags($cache_context_tags, [
       'config:views.view.frontpage',
@@ -60,14 +69,6 @@ class CommentRssTest extends CommentTestBase {
       'node_view',
       'user:3',
     ]));
-
-    $this->assertCacheContexts([
-      'languages:language_interface',
-      'theme',
-      'user.node_grants:view',
-      'user.permissions',
-      'timezone',
-    ]);
 
     $raw = '<comments>' . $this->node->url('canonical', array('fragment' => 'comments', 'absolute' => TRUE)) . '</comments>';
     $this->assertRaw($raw, 'Comments as part of RSS feed.');

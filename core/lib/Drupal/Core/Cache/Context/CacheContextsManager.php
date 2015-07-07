@@ -115,10 +115,7 @@ class CacheContextsManager {
         throw new \InvalidArgumentException(SafeMarkup::format('"@context" is not a valid cache context ID.', ['@context' => $context_id]));
       }
       $context = $this->getService($context_id);
-      // To make it possible to return NULL instead of CacheableMetadata.
-      if ($metadata = $context->getCacheableMetadata($parameter)) {
-        $cacheable_metadata = $cacheable_metadata->merge($metadata);
-      }
+      $cacheable_metadata = $cacheable_metadata->merge($context->getCacheableMetadata($parameter));
     }
 
     sort($optimized_tokens);
@@ -176,9 +173,15 @@ class CacheContextsManager {
       if (strpos($context_token, '.') === FALSE && strpos($context_token, ':') === FALSE) {
         $optimized_content_tokens[] = $context_token;
       }
+      // Check cacheability. If the context defines a max-age of 0, then it
+      // can not be optimized away.
+      elseif ($this->getService($context_token)->getCacheableMetadata()->getCacheMaxAge() == 0) {
+        $optimized_content_tokens[] = $context_token;
+      }
       // The context token has a period or a colon. Iterate over all ancestor
       // cache contexts. If one exists, omit the context token.
       else {
+
         $ancestor_found = FALSE;
         // Treat a colon like a period, that allows us to consider 'a' the
         // ancestor of 'a:foo', without any additional code for the colon.

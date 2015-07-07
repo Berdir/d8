@@ -7,6 +7,7 @@
 
 namespace Drupal\entity_test\Cache;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextInterface;
 
 /**
@@ -38,7 +39,7 @@ class EntityTestViewGrantsCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
-    return NULL;
+    return new CacheableMetadata();
   }
 
 }

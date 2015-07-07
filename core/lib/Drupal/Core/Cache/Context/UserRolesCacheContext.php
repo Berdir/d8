@@ -45,11 +45,4 @@ class UserRolesCacheContext extends UserCacheContext implements CalculatedCacheC
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheableMetadata($role = NULL) {
-    return NULL;
-  }
-
 }

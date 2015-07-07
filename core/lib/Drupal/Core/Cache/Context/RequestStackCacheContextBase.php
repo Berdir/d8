@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Cache\Context;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -35,7 +36,7 @@ abstract class RequestStackCacheContextBase implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
-    return NULL;
+    return new CacheableMetadata();
   }
 
 }

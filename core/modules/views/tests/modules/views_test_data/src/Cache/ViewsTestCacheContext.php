@@ -7,6 +7,7 @@
 
 namespace Drupal\views_test_data\Cache;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextInterface;
 
 /**
@@ -34,7 +35,7 @@ class ViewsTestCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
-    return NULL;
+    return new CacheableMetadata();
   }
 
 }

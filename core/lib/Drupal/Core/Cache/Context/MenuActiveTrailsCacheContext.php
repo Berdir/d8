@@ -29,6 +29,10 @@ class MenuActiveTrailsCacheContext extends ContainerAware implements CalculatedC
    * {@inheritdoc}
    */
   public function getContext($menu_name = NULL) {
+    if (!$menu_name) {
+      throw new \InvalidArgumentException('No menu name provided for menu.active_trail cache context.');
+    }
+
     $active_trail = $this->container->get('menu.active_trail')
       ->getActiveTrailIds($menu_name);
     return 'menu_trail.' . $menu_name . '|' . implode('|', $active_trail);
@@ -38,6 +42,9 @@ class MenuActiveTrailsCacheContext extends ContainerAware implements CalculatedC
    * {@inheritdoc}
    */
   public function getCacheableMetadata($menu_name = NULL) {
+    if (!$menu_name) {
+      throw new \InvalidArgumentException('No menu name provided for menu.active_trail cache context.');
+    }
     $cacheable_metadata = new CacheableMetadata();
     return $cacheable_metadata->setCacheTags(["config:system.menu.$menu_name"]);
   }

@@ -7,6 +7,8 @@
 
 namespace Drupal\Core\Cache\Context;
 
+use Drupal\Core\Cache\CacheableMetadata;
+
 /**
  * Defines the TimeZoneCacheContext service, for "per time zone" caching.
  *
@@ -36,7 +38,7 @@ class TimeZoneCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
-    return NULL;
+    return new CacheableMetadata();
   }
 
 }

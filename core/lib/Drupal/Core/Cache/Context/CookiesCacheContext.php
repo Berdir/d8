@@ -37,11 +37,4 @@ class CookiesCacheContext extends RequestStackCacheContextBase implements Calcul
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheableMetadata() {
-    return NULL;
-  }
-
 }

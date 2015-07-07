@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Cache\Context;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
 /**
@@ -51,7 +52,7 @@ class ThemeCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
-    return NULL;
+    return new CacheableMetadata();
   }
 
 }

@@ -35,11 +35,4 @@ class HeadersCacheContext extends RequestStackCacheContextBase implements Calcul
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheableMetadata($header = NULL) {
-    return NULL;
-  }
-
 }

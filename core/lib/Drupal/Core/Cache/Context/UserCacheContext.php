@@ -7,6 +7,7 @@
 
 namespace Drupal\Core\Cache\Context;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -44,7 +45,7 @@ class UserCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
-    return NULL;
+    return new CacheableMetadata();
   }
 
 }

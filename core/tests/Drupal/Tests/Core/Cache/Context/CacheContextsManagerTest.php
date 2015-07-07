@@ -7,6 +7,7 @@
 
 namespace Drupal\Tests\Core\Cache\Context;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\CacheContextInterface;
 use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
@@ -238,7 +239,7 @@ class FooCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
-    return NULL;
+    return new CacheableMetadata();
   }
 
 }
@@ -269,7 +270,7 @@ class BazCacheContext implements CalculatedCacheContextInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata($parameter = NULL) {
-    return NULL;
+    return new CacheableMetadata();
   }
 
 }
