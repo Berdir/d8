@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * @file
+ * Contains \Drupal\Core\Cache\Context\UserCacheContextBase.
+ */
+
+namespace Drupal\Core\Cache\Context;
+
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Base class for user based cache contexts.
+ */
+abstract class UserCacheContextBase implements CacheContextInterface {
+
+  /**
+   * The account object.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $user;
+
+  /**
+   * Constructs a new UserCacheContext service.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $user
+   *   The current user.
+   */
+  public function __construct(AccountInterface $user) {
+    $this->user = $user;
+  }
+
+}

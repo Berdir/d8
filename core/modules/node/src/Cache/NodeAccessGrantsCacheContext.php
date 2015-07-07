@@ -9,7 +9,7 @@ namespace Drupal\node\Cache;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
-use Drupal\Core\Cache\Context\UserCacheContext;
+use Drupal\Core\Cache\Context\UserCacheContextBase;
 
 /**
  * Defines the node access view cache context service.
@@ -23,7 +23,7 @@ use Drupal\Core\Cache\Context\UserCacheContext;
  * @see node_query_node_access_alter()
  * @ingroup node_access
  */
-class NodeAccessGrantsCacheContext extends UserCacheContext implements CalculatedCacheContextInterface {
+class NodeAccessGrantsCacheContext extends UserCacheContextBase implements CalculatedCacheContextInterface {
 
   /**
    * {@inheritdoc}

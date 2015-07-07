@@ -107,15 +107,13 @@ class CacheContextsManager {
    * @throws \InvalidArgumentException
    */
   public function convertTokensToKeys(array $context_tokens) {
+    $this->validateTokens($context_tokens);
     $cacheable_metadata = new CacheableMetadata();
     $optimized_tokens = $this->optimizeTokens($context_tokens);
     // Iterate over cache contexts that have been optimized away and get their
     // cacheable metadata.
     foreach (static::parseTokens(array_diff($context_tokens, $optimized_tokens)) as $context_token) {
       list($context_id, $parameter) = $context_token;
-      if (!in_array($context_id, $this->contexts)) {
-        throw new \InvalidArgumentException(SafeMarkup::format('"@context" is not a valid cache context ID.', ['@context' => $context_id]));
-      }
       $context = $this->getService($context_id);
       $cacheable_metadata = $cacheable_metadata->merge($context->getCacheableMetadata($parameter));
     }
@@ -124,9 +122,6 @@ class CacheContextsManager {
     $keys = [];
     foreach (static::parseTokens($optimized_tokens) as $context) {
       list($context_id, $parameter) = $context;
-      if (!in_array($context_id, $this->contexts)) {
-        throw new \InvalidArgumentException(SafeMarkup::format('"@context" is not a valid cache context ID.', ['@context' => $context_id]));
-      }
       $keys[] = $this->getService($context_id)->getContext($parameter);
     }
 

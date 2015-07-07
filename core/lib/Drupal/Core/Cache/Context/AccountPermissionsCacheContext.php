@@ -16,12 +16,12 @@ use Drupal\Core\Session\PermissionsHashGeneratorInterface;
  *
  * Cache context ID: 'user.permissions'.
  */
-class AccountPermissionsCacheContext extends UserCacheContext {
+class AccountPermissionsCacheContext extends UserCacheContextBase implements CacheContextInterface {
 
   /**
    * The permissions hash generator.
    *
-   * @var \Drupal\user\PermissionsHashInterface
+   * @var \Drupal\Core\Session\PermissionsHashGeneratorInterface
    */
   protected $permissionsHashGenerator;
 
@@ -30,7 +30,7 @@ class AccountPermissionsCacheContext extends UserCacheContext {
    *
    * @param \Drupal\Core\Session\AccountInterface $user
    *   The current user.
-   * @param \Drupal\user\PermissionsHashInterface $permissions_hash_generator
+   * @param \Drupal\Core\Session\PermissionsHashGeneratorInterface
    *   The permissions hash generator.
    */
   public function __construct(AccountInterface $user, PermissionsHashGeneratorInterface $permissions_hash_generator) {
