@@ -40,13 +40,6 @@ class BlockPageVariantTest extends UnitTestCase {
   protected $contextHandler;
 
   /**
-   * The mocked theme manager.
-   *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface||\PHPUnit_Framework_MockObject_MockObject
-   */
-  protected $themeManager;
-
-  /**
    * Sets up a display variant plugin for testing.
    *
    * @param array $configuration
@@ -73,13 +66,8 @@ class BlockPageVariantTest extends UnitTestCase {
     $this->blockRepository = $this->getMock('Drupal\block\BlockRepositoryInterface');
     $this->blockViewBuilder = $this->getMock('Drupal\Core\Entity\EntityViewBuilderInterface');
 
-    $this->themeManager = $this->getMock('Drupal\Core\Theme\ThemeManagerInterface');
-    $this->themeManager->expects($this->any())
-      ->method('getActiveTheme')
-      ->willReturn((new ActiveTheme(['name' => 'active_theme'])));
-
     return $this->getMockBuilder('Drupal\block\Plugin\DisplayVariant\BlockPageVariant')
-      ->setConstructorArgs(array($configuration, 'test', $definition, $this->blockRepository, $this->blockViewBuilder, $this->themeManager, ['config:block_list']))
+      ->setConstructorArgs(array($configuration, 'test', $definition, $this->blockRepository, $this->blockViewBuilder, ['config:block_list']))
       ->setMethods(array('getRegionNames'))
       ->getMock();
   }

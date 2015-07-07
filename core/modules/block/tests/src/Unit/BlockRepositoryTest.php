@@ -153,7 +153,6 @@ class BlockRepositoryTest extends UnitTestCase {
       ->willReturn('top');
     $blocks['block_id'] = $block;
 
-    $contexts = [];
     $this->blockStorage->expects($this->once())
       ->method('loadByProperties')
       ->with(['theme' => $this->theme])

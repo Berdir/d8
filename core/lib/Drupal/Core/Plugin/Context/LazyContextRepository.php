@@ -55,7 +55,8 @@ class LazyContextRepository implements ContextRepositoryInterface {
   public function getRuntimeContexts(array $context_ids) {
     $contexts = [];
 
-    // Create a map of context providers (service IDs) to unqualified context IDs.
+    // Create a map of context providers (service IDs) to unqualified context
+    // IDs.
     $context_ids_by_service = [];
     foreach ($context_ids as $id) {
       if (isset($this->contexts[$id])) {
@@ -75,7 +76,7 @@ class LazyContextRepository implements ContextRepositoryInterface {
     }
 
     // Iterate over all missing context providers (services), gather the
-    // run-time contexts and assign them as requested.
+    // runtime contexts and assign them as requested.
     foreach ($context_ids_by_service as $service_id => $unqualified_context_ids) {
       $contexts_by_service = $this->container->get($service_id)->getRuntimeContexts($unqualified_context_ids);
 

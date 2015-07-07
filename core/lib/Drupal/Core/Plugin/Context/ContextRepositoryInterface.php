@@ -8,16 +8,16 @@
 namespace Drupal\Core\Plugin\Context;
 
 /**
- * Provides a list of all contexts and as a list of contexts at runtime.
+ * Offers a global context repository.
  *
- * Therefore it provides a ist of all available contexts, which is mostly useful
- * for configuration on forms, as well as a method to determine the congrete
- * contexts with each value, given a list of context IDs.
+ * It provides a ist of all available contexts, which is mostly useful
+ * for configuration on forms, as well as a method to get the concrete
+ * contexts with their values, given a list of fully qualified context IDs.
  */
 interface ContextRepositoryInterface {
 
   /**
-   * Gets run-time context values for the given context IDs.
+   * Gets runtime context values for the given context IDs.
    *
    * @param string[] $context_ids
    *   Fully qualified context IDs. These must be in the

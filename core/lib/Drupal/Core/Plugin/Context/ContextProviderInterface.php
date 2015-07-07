@@ -19,7 +19,7 @@ namespace Drupal\Core\Plugin\Context;
 interface ContextProviderInterface {
 
   /**
-   * Determines the available run-time contexts.
+   * Provides the runtime contexts.
    *
    * For context-aware plugins to function correctly, all of the contexts that
    * they require must be populated with values. So this method must set a value
@@ -35,17 +35,19 @@ interface ContextProviderInterface {
    *   return ['node' => $context];
    * @endcode
    *
-   * @param array $unqualified_context_ids
+   * @param string[] $unqualified_context_ids
    *   The requested context IDs. The context provider must only return contexts
    *   for those IDs.
    *
    * @return \Drupal\Core\Plugin\Context\ContextInterface[]
    *   The determined contexts, keyed by the unqualified context_id.
+   *
+   * @see static::getAvailableContexts()
    */
   public function getRuntimeContexts(array $unqualified_context_ids);
 
   /**
-   * Determines the available configuration-time contexts.
+   * Provides the available contexts.
    *
    * When a context aware plugin is being configured, the configuration UI must
    * know which named contexts are potentially available, but does not care
@@ -67,7 +69,7 @@ interface ContextProviderInterface {
    * @return \Drupal\Core\Plugin\Context\ContextInterface[]
    *   All available contexts keyed by the unqualified context ID.
    *
-   * @see static::getActiveContext()
+   * @see static::getRuntimeContext()
    */
   public function getAvailableContexts();
 

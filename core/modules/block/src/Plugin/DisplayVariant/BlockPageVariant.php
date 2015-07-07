@@ -7,7 +7,6 @@
 
 namespace Drupal\block\Plugin\DisplayVariant;
 
-use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\block\BlockRepositoryInterface;
 use Drupal\Core\Block\MainContentBlockPluginInterface;
 use Drupal\Core\Block\MessagesBlockPluginInterface;
@@ -16,7 +15,6 @@ use Drupal\Core\Display\PageVariantInterface;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Display\VariantBase;
-use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -60,13 +58,6 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
   protected $blockListCacheTags;
 
   /**
-   * The theme manager.
-   *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
-   */
-  protected $themeManager;
-
-  /**
    * The render array representing the main page content.
    *
    * @var array
@@ -86,17 +77,14 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
    *   The block repository.
    * @param \Drupal\Core\Entity\EntityViewBuilderInterface $block_view_builder
    *   The block view builder.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
-   *   The theme manager.
    * @param string[] $block_list_cache_tags
    *   The Block entity type list cache tags.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, BlockRepositoryInterface $block_repository, EntityViewBuilderInterface $block_view_builder, ThemeManagerInterface $theme_manager, array $block_list_cache_tags) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, BlockRepositoryInterface $block_repository, EntityViewBuilderInterface $block_view_builder, array $block_list_cache_tags) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->blockRepository = $block_repository;
     $this->blockViewBuilder = $block_view_builder;
     $this->blockListCacheTags = $block_list_cache_tags;
-    $this->themeManager = $theme_manager;
   }
 
   /**
@@ -109,7 +97,6 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
       $plugin_definition,
       $container->get('block.repository'),
       $container->get('entity.manager')->getViewBuilder('block'),
-      $container->get('theme.manager'),
       $container->get('entity.manager')->getDefinition('block')->getListCacheTags()
     );
   }
