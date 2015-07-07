@@ -82,7 +82,7 @@ class BookNavigationCacheContext extends ContainerAware implements CacheContextI
       // If the node is part of a book that we can use the cache tag for that
       // book. If not, then we can't be optimized away.
       if (!empty($node->book['bid'])) {
-        $cacheable_metadata->addCacheTags('bid:' . $node->book['bid']);
+        $cacheable_metadata->addCacheTags(['bid:' . $node->book['bid']]);
       }
       else {
         $cacheable_metadata->setCacheMaxAge(0);
