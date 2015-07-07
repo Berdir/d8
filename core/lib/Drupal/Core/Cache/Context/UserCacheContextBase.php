@@ -10,7 +10,7 @@ namespace Drupal\Core\Cache\Context;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Base class for user based cache contexts.
+ * Base class for user-based cache contexts.
  */
 abstract class UserCacheContextBase implements CacheContextInterface {
 
@@ -22,7 +22,7 @@ abstract class UserCacheContextBase implements CacheContextInterface {
   protected $user;
 
   /**
-   * Constructs a new UserCacheContext service.
+   * Constructs a new UserCacheContextBase class.
    *
    * @param \Drupal\Core\Session\AccountInterface $user
    *   The current user.

@@ -307,7 +307,7 @@ class RenderCache implements RenderCacheInterface {
         $context_cache_keys = $this->cacheContextsManager->convertTokensToKeys($elements['#cache']['contexts']);
         $cid_parts = array_merge($cid_parts, $context_cache_keys->getKeys());
         CacheableMetadata::createFromRenderArray($elements)
-          ->merge($context_cache_keys->getCacheableMetadata())
+          ->merge($context_cache_keys)
           ->applyTo($elements);
       }
       return implode(':', $cid_parts);

@@ -30,7 +30,7 @@ class AccountPermissionsCacheContext extends UserCacheContextBase implements Cac
    *
    * @param \Drupal\Core\Session\AccountInterface $user
    *   The current user.
-   * @param \Drupal\Core\Session\PermissionsHashGeneratorInterface
+   * @param \Drupal\Core\Session\PermissionsHashGeneratorInterface $permissions_hash_generator
    *   The permissions hash generator.
    */
   public function __construct(AccountInterface $user, PermissionsHashGeneratorInterface $permissions_hash_generator) {

@@ -12,7 +12,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 /**
  * A value object to store generated cache keys with its cacheable metadata.
  */
-class ContextCacheKeys {
+class ContextCacheKeys extends CacheableMetadata {
 
   /**
    * The generated cache keys.
@@ -29,16 +29,13 @@ class ContextCacheKeys {
   protected $cacheableMetadata;
 
   /**
-   * Constructs cache context keys value object.
+   * Constructs a ContextCacheKeys object.
    *
    * @param string[] $keys
    *   The cache context keys.
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheable_metadata
-   *   The cacheable metadata associated for the optimized cache contexts.
    */
-  public function __construct(array $keys, CacheableMetadata $cacheable_metadata) {
+  public function __construct(array $keys) {
     $this->keys = $keys;
-    $this->cacheableMetadata = $cacheable_metadata;
   }
 
   /**
@@ -49,16 +46,6 @@ class ContextCacheKeys {
    */
   public function getKeys() {
     return $this->keys;
-  }
-
-  /**
-   * Gets the cacheability metadata associated for the optimized cache contexts.
-   *
-   * @return \Drupal\Core\Cache\CacheableMetadata
-   *   The cache metadata object.
-   */
-  public function getCacheableMetadata() {
-    return $this->cacheableMetadata;
   }
 
 }

@@ -106,7 +106,7 @@ class CacheContextsManagerTest extends UnitTestCase {
   /**
    * @covers ::convertTokensToKeys
    *
-   * @expectedException \InvalidArgumentException
+   * @expectedException \LogicException
    * @expectedExceptionMessage "non-cache-context" is not a valid cache context ID.
    */
   public function testInvalidContext() {

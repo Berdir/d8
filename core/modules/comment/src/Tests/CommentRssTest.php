@@ -62,7 +62,7 @@ class CommentRssTest extends CommentTestBase {
     ];
     $this->assertCacheContexts($cache_contexts);
 
-    $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($cache_contexts)->getCacheableMetadata()->getCacheTags();
+    $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($cache_contexts)->getCacheTags();
     $this->assertCacheTags(Cache::mergeTags($cache_context_tags, [
       'config:views.view.frontpage',
       'node:1', 'node_list',

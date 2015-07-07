@@ -33,7 +33,7 @@ class IsSuperUserCacheContext extends UserCacheContextBase implements CacheConte
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata($menu_name = NULL) {
+  public function getCacheableMetadata() {
     return new CacheableMetadata();
   }
 

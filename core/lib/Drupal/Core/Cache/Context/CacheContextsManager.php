@@ -125,7 +125,10 @@ class CacheContextsManager {
       $keys[] = $this->getService($context_id)->getContext($parameter);
     }
 
-    return new ContextCacheKeys($keys, $cacheable_metadata);
+    $context_cache_keys = new ContextCacheKeys($keys);
+    return $context_cache_keys
+      ->addCacheTags($cacheable_metadata->getCacheTags())
+      ->setCacheMaxAge($cacheable_metadata->getCacheMaxAge());
   }
 
   /**

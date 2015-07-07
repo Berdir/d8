@@ -349,7 +349,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
         ->getCacheTags();
     }
 
-    $context_metadata = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($entity_cache_contexts)->getCacheableMetadata();
+    $context_metadata = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($entity_cache_contexts);
     $cache_context_tags = $context_metadata->getCacheTags();
 
     // Generate the cache tags for the (non) referencing entities.
@@ -395,7 +395,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
     if (count($access_cache_contexts)) {
       $cache_contexts = Cache::mergeContexts($entity_cache_contexts, $this->getAdditionalCacheContextsForEntity($this->referencingEntity), $access_cache_contexts);
       $redirected_cid = $this->createCacheId($cache_keys, $cache_contexts);
-      $context_metadata = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($cache_contexts)->getCacheableMetadata();
+      $context_metadata = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($cache_contexts);
       $referencing_entity_cache_tags = Cache::mergeTags($referencing_entity_cache_tags, $context_metadata->getCacheTags());
     }
     $this->verifyRenderCache($cid, $referencing_entity_cache_tags, $redirected_cid);
@@ -659,7 +659,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
   protected function createCacheId(array $keys, array $contexts) {
     $cid_parts = $keys;
 
-    $contexts = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($contexts);
+    $contexts = \Drupal::service('cache_contexts_manager')->convertokensToKeys($contexts);
     $cid_parts = array_merge($cid_parts, $contexts->getKeys());
 
     return implode(':', $cid_parts);

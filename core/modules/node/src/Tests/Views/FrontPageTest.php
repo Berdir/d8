@@ -251,7 +251,7 @@ class FrontPageTest extends ViewTestBase {
       'url.query_args.pagers:0',
     ];
 
-    $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($cache_contexts)->getCacheableMetadata()->getCacheTags();
+    $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($cache_contexts)->getCacheTags();
 
     // Test before there are any nodes.
     $empty_node_listing_cache_tags = [
@@ -309,7 +309,7 @@ class FrontPageTest extends ViewTestBase {
       'node:14',
       'node:15',
     ];
-    $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($cache_contexts)->getCacheableMetadata()->getCacheTags();
+    $cache_context_tags = \Drupal::service('cache_contexts_manager')->convertTokensToKeys($cache_contexts)->getCacheTags();
     $first_page_output_cache_tags = Cache::mergeTags(
       $first_page_result_cache_tags,
       $cache_context_tags,
