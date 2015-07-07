@@ -41,15 +41,15 @@ class CurrentLanguageContext implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRunTimeContexts(array $context_slot_names) {
+  public function getRuntimeContexts(array $unqualified_context_ids) {
     // Add a context for each language type.
     $language_types = $this->languageManager->getLanguageTypes();
     $info = $this->languageManager->getDefinedLanguageTypesInfo();
 
-    if ($context_slot_names) {
-      foreach ($context_slot_names as $context_slot_name) {
-        if (array_search(str_replace('language.', '', $context_slot_name), $language_types) === FALSE) {
-          unset($language_types[str_replace('language.', '', $context_slot_name)]);
+    if ($unqualified_context_ids) {
+      foreach ($unqualified_context_ids as $unqualified_context_id) {
+        if (array_search($unqualified_context_id, $language_types) === FALSE) {
+          unset($language_types[$unqualified_context_id]);
         }
       }
     }
@@ -64,7 +64,7 @@ class CurrentLanguageContext implements ContextProviderInterface {
         $cacheability->setCacheContexts(['languages:' . $type_key]);
         $context->addCacheableDependency($cacheability);
 
-        $result['language.' . $type_key] = $context;
+        $result[$type_key] = $context;
       }
     }
 
@@ -74,8 +74,8 @@ class CurrentLanguageContext implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getConfigurationTimeContexts() {
-    return $this->getRunTimeContexts([]);
+  public function getAvailableContexts() {
+    return $this->getRuntimeContexts([]);
   }
 
 }

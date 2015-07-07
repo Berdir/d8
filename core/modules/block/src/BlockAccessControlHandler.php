@@ -104,7 +104,7 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
       foreach ($entity->getVisibilityConditions() as $condition_id => $condition) {
         if ($condition instanceof ContextAwarePluginInterface) {
           try {
-            $contexts = $this->contextRepository->getRunTimeContexts(array_values($condition->getContextMapping()));
+            $contexts = $this->contextRepository->getRuntimeContexts(array_values($condition->getContextMapping()));
             $this->contextHandler->applyContextMapping($condition, $contexts);
           }
           catch (ContextException $e) {

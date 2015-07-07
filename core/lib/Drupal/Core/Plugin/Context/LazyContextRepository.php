@@ -52,36 +52,36 @@ class LazyContextRepository implements ContextRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRunTimeContexts(array $context_ids) {
+  public function getRuntimeContexts(array $context_ids) {
     $contexts = [];
 
-    // Create a map of context providers (service IDs) to context slot names.
+    // Create a map of context providers (service IDs) to unqualified context IDs.
     $context_ids_by_service = [];
     foreach ($context_ids as $id) {
       if (isset($this->contexts[$id])) {
         $contexts[$id] = $this->contexts[$id];
         continue;
       }
-      // The IDs have been passed in @{service_id}:{context_slot_name} format.
+      // The IDs have been passed in @{service_id}:{unqualified_context_id} format.
       if ($id[0] === '@' && strpos($id, ':') !== FALSE) {
-        list($service_id, $context_slot_name) = explode(':', $id, 2);
+        list($service_id, $unqualified_context_id) = explode(':', $id, 2);
         // Remove the leading '@'.
         $service_id = substr($service_id, 1);
       }
       else {
-        throw new \InvalidArgumentException('You must provide the context IDs in the @{service_id}:{context_slot_name} format.');
+        throw new \InvalidArgumentException('You must provide the context IDs in the @{service_id}:{unqualified_context_id} format.');
       }
-      $context_ids_by_service[$service_id][] = $context_slot_name;
+      $context_ids_by_service[$service_id][] = $unqualified_context_id;
     }
 
     // Iterate over all missing context providers (services), gather the
-    // run-time contexts and assign them to the slots as requested.
-    foreach ($context_ids_by_service as $service_id => $context_slot_names) {
-      $contexts_by_service = $this->container->get($service_id)->getRunTimeContexts($context_slot_names);
+    // run-time contexts and assign them as requested.
+    foreach ($context_ids_by_service as $service_id => $unqualified_context_ids) {
+      $contexts_by_service = $this->container->get($service_id)->getRuntimeContexts($unqualified_context_ids);
 
-      $wanted_contexts = array_intersect_key($contexts_by_service, array_flip($context_slot_names));
-      foreach ($wanted_contexts as $context_slot_name => $context) {
-        $context_id = '@' . $service_id . ':' . $context_slot_name;
+      $wanted_contexts = array_intersect_key($contexts_by_service, array_flip($unqualified_context_ids));
+      foreach ($wanted_contexts as $unqualified_context_id => $context) {
+        $context_id = '@' . $service_id . ':' . $unqualified_context_id;
         $this->contexts[$context_id] = $contexts[$context_id] = $context;
       }
     }
@@ -92,12 +92,12 @@ class LazyContextRepository implements ContextRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function getConfigurationTimeContexts() {
+  public function getAvailableContexts() {
     $contexts = [];
     foreach ($this->contextProviderServiceIDs as $service_id) {
-      $contexts_by_service = $this->container->get($service_id)->getConfigurationTimeContexts();
-      foreach ($contexts_by_service as $context_slot_name => $context) {
-        $context_id = '@' . $service_id . ':' . $context_slot_name;
+      $contexts_by_service = $this->container->get($service_id)->getAvailableContexts();
+      foreach ($contexts_by_service as $unqualified_context_id => $context) {
+        $context_id = '@' . $service_id . ':' . $unqualified_context_id;
         $contexts[$context_id] = $context;
       }
     }

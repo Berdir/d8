@@ -39,7 +39,7 @@ class NodeRouteContext implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRunTimeContexts(array $context_slot_names) {
+  public function getRuntimeContexts(array $unqualified_context_ids) {
     $result = [];
     $context = new Context(new ContextDefinition('entity:node', NULL, FALSE));
     if (($route_object = $this->routeMatch->getRouteObject()) && ($route_contexts = $route_object->getOption('parameters')) && isset($route_contexts['node'])) {
@@ -54,7 +54,7 @@ class NodeRouteContext implements ContextProviderInterface {
     $cacheability = new CacheableMetadata();
     $cacheability->setCacheContexts(['route']);
     $context->addCacheableDependency($cacheability);
-    $result['node.node'] = $context;
+    $result['node'] = $context;
 
     return $result;
   }
@@ -62,9 +62,9 @@ class NodeRouteContext implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getConfigurationTimeContexts() {
+  public function getAvailableContexts() {
     $context = new Context(new ContextDefinition('entity:node'));
-    return ['node.node' => $context];
+    return ['node' => $context];
   }
 
 }

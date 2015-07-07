@@ -52,7 +52,7 @@ class CurrentUserContext implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRunTimeContexts(array $context_slot_names) {
+  public function getRuntimeContexts(array $unqualified_context_ids) {
     $current_user = $this->userStorage->load($this->account->id());
 
     $context = new Context(new ContextDefinition('entity:user', $this->t('Current user')));
@@ -62,7 +62,7 @@ class CurrentUserContext implements ContextProviderInterface {
     $context->addCacheableDependency($cacheability);
 
     $result = [
-      'user.current_user' => $context,
+      'current_user' => $context,
     ];
 
     return $result;
@@ -71,8 +71,8 @@ class CurrentUserContext implements ContextProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function getConfigurationTimeContexts() {
-    return $this->getRunTimeContexts([]);
+  public function getAvailableContexts() {
+    return $this->getRuntimeContexts([]);
   }
 
 }

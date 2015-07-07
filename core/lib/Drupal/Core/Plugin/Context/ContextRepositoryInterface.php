@@ -20,13 +20,14 @@ interface ContextRepositoryInterface {
    * Gets run-time context values for the given context IDs.
    *
    * @param string[] $context_ids
-   *   Context provider IDs to get contexts for. These must be in the
-   *   {context_slot_name}@{service_id} format.
+   *   Fully qualified context IDs. These must be in the
+   *   @service_id:unqualified_context_id format, for example
+   *   node.node_route_context:node.
    *
    * @return \Drupal\Core\Plugin\Context\ContextInterface[]
    *   The determined contexts.
    */
-  public function getRunTimeContexts(array $context_ids);
+  public function getRuntimeContexts(array $context_ids);
 
   /**
    * Gets all available contexts for the purposes of configuration.
@@ -34,6 +35,6 @@ interface ContextRepositoryInterface {
    * @return \Drupal\Core\Plugin\Context\ContextInterface[]
    *   All available contexts.
    */
-  public function getConfigurationTimeContexts();
+  public function getAvailableContexts();
 
 }

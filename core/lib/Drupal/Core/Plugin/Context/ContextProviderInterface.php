@@ -9,6 +9,12 @@ namespace Drupal\Core\Plugin\Context;
 
 /**
  * Defines an interface for providing plugin contexts.
+ *
+ * Implementations only need to deal with unqualified context IDs so they only
+ * need to be unique in the context of a given service provider.
+ *
+ * The fully qualified context ID then includes the service ID:
+ * @service_id:unqualified_context_id.
  */
 interface ContextProviderInterface {
 
@@ -18,6 +24,7 @@ interface ContextProviderInterface {
    * For context-aware plugins to function correctly, all of the contexts that
    * they require must be populated with values. So this method must set a value
    * for each context that it adds. For example:
+   *
    * @code
    *   // Determine a specific node to pass as context to a block.
    *   $node = ...
@@ -25,16 +32,17 @@ interface ContextProviderInterface {
    *   // Set that specific node as the value of the 'node' context.
    *   $context = new Context(new ContextDefinition('entity:node'));
    *   $context->setContextValue($node);
-   *   return ['node.node' => $context];
+   *   return ['node' => $context];
    * @endcode
    *
-   * @param array $context_slot_names
-   *   The needed context IDs. The context provider can decide to optimize it.
+   * @param array $unqualified_context_ids
+   *   The requested context IDs. The context provider must only return contexts
+   *   for those IDs.
    *
    * @return \Drupal\Core\Plugin\Context\ContextInterface[]
-   *   The determined contexts.
+   *   The determined contexts, keyed by the unqualified context_id.
    */
-  public function getRunTimeContexts(array $context_slot_names);
+  public function getRuntimeContexts(array $unqualified_context_ids);
 
   /**
    * Determines the available configuration-time contexts.
@@ -47,20 +55,20 @@ interface ContextProviderInterface {
    * For example:
    * @code
    *   // During configuration, there is no specific node to pass as context.
-   *   // However, inform the system that a context named 'node.node' is
+   *   // However, inform the system that a context named 'node' is
    *   // available, and provide its definition, so that context aware plugins
    *   // can be configured to use it. When the plugin, for example a block,
    *   // needs to evaluate the context, the value of this context will be
-   *   // supplied by getRunTimeContexts().
+   *   // supplied by getRuntimeContexts().
    *   $context = new Context(new ContextDefinition('entity:node'));
-   *   return ['node.node' => $context];
+   *   return ['node' => $context];
    * @endcode
    *
    * @return \Drupal\Core\Plugin\Context\ContextInterface[]
-   *   All available contexts.
+   *   All available contexts keyed by the unqualified context ID.
    *
    * @see static::getActiveContext()
    */
-  public function getConfigurationTimeContexts();
+  public function getAvailableContexts();
 
 }
