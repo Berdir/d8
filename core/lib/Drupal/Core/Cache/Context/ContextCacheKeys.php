@@ -10,7 +10,7 @@ namespace Drupal\Core\Cache\Context;
 use Drupal\Core\Cache\CacheableMetadata;
 
 /**
- * A value object to store generated cache keys with its cacheable metadata.
+ * A value object to store generated cache keys with its cacheability metadata.
  */
 class ContextCacheKeys extends CacheableMetadata {
 
@@ -20,13 +20,6 @@ class ContextCacheKeys extends CacheableMetadata {
    * @var string[]
    */
   protected $keys;
-
-  /**
-   * The cacheable metadata associated for the optimized cache contexts.
-   *
-   * @var \Drupal\Core\Cache\CacheableMetadata
-   */
-  protected $cacheableMetadata;
 
   /**
    * Constructs a ContextCacheKeys object.

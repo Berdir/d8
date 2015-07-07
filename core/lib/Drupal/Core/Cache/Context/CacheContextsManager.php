@@ -111,7 +111,7 @@ class CacheContextsManager {
     $cacheable_metadata = new CacheableMetadata();
     $optimized_tokens = $this->optimizeTokens($context_tokens);
     // Iterate over cache contexts that have been optimized away and get their
-    // cacheable metadata.
+    // cacheability metadata.
     foreach (static::parseTokens(array_diff($context_tokens, $optimized_tokens)) as $context_token) {
       list($context_id, $parameter) = $context_token;
       $context = $this->getService($context_id);
@@ -125,10 +125,9 @@ class CacheContextsManager {
       $keys[] = $this->getService($context_id)->getContext($parameter);
     }
 
+    // Create the returned object and merge in the cacheability metadata.
     $context_cache_keys = new ContextCacheKeys($keys);
-    return $context_cache_keys
-      ->addCacheTags($cacheable_metadata->getCacheTags())
-      ->setCacheMaxAge($cacheable_metadata->getCacheMaxAge());
+    return $context_cache_keys->merge($cacheable_metadata);
   }
 
   /**

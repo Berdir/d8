@@ -69,8 +69,8 @@ class CacheContextOptimizationTest extends KernelTestBase {
     // Even though the cache contexts have been optimized to only include 'user'
     // cache context, the element should have been changed because
     // 'user.permissions' cache context defined a cache tags for permission
-    // changes, which should have bubbled up for the element when it was optimized
-    // away.
+    // changes, which should have bubbled up for the element when it was
+    // optimized away.
     Role::load($role)
       ->revokePermission('administer permissions')
       ->save();

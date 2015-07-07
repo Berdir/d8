@@ -32,7 +32,7 @@ interface CacheContextInterface {
   public function getContext();
 
   /**
-   * Gets the cacheable metadata for the context.
+   * Gets the cacheability metadata for the context.
    *
    * If the cache context is being optimized away, cache tags and max-age
    * provided by this method will be bubbled up into the cache item.

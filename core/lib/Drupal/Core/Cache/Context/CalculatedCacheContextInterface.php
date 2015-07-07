@@ -38,7 +38,7 @@ interface CalculatedCacheContextInterface {
   public function getContext($parameter = NULL);
 
   /**
-   * Gets the cacheable metadata for the context based on the parameter value.
+   * Gets the cacheability metadata for the context based on the parameter value.
    *
    * If the cache context is being optimized away, cache tags and max-age
    * provided by this method will be bubbled up into the cache item.

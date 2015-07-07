@@ -75,8 +75,20 @@ class BookNavigationCacheContext extends ContainerAware implements CacheContextI
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
+    // The book active trail depends on the node and data attached to it.
+    // That information is however not stored as part of the node.
     $cacheable_metadata = new CacheableMetadata();
-    return $cacheable_metadata->setCacheMaxAge(0);
+    if ($node = $this->requestStack->getCurrentRequest()->get('node')) {
+      // If the node is part of a book that we can use the cache tag for that
+      // book. If not, then we can't be optimized away.
+      if (!empty($node->book['bid'])) {
+        $cacheable_metadata->addCacheTags('bid:' . $node->book['bid']);
+      }
+      else {
+        $cacheable_metadata->setCacheMaxAge(0);
+      }
+    }
+    return $cacheable_metadata;
   }
 
 }
