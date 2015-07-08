@@ -7,18 +7,16 @@
 
 namespace Drupal\aggregator\EventSubscriber;
 
-use Drupal\block\Event\BlockContextEvent;
-use Drupal\block\EventSubscriber\BlockContextSubscriberBase;
-use Drupal\Component\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\Plugin\Context\ContextProviderInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
 /**
  * Provides aggregator feeds as context.
  */
-class AggregatorFeedContext extends BlockContextSubscriberBase {
+class AggregatorFeedContext implements ContextProviderInterface {
 
   /**
    * The entity storage for feeds.
@@ -26,13 +24,6 @@ class AggregatorFeedContext extends BlockContextSubscriberBase {
    * @var \Drupal\aggregator\FeedStorageInterface
    */
   protected $feedStorage;
-
-  /**
-   * The block storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $blockStorage;
 
   /**
    * The theme manager.
@@ -51,41 +42,37 @@ class AggregatorFeedContext extends BlockContextSubscriberBase {
    */
   public function __construct(EntityManagerInterface $entity_manager, ThemeManagerInterface $theme_manager) {
     $this->feedStorage = $entity_manager->getStorage('aggregator_feed');
-    $this->blockStorage = $entity_manager->getStorage('block');
     $this->themeManager = $theme_manager;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function onBlockActiveContext(BlockContextEvent $event) {
-    foreach ($this->blockStorage->loadByProperties(['plugin' => 'aggregator_feed_block', 'theme' => $this->themeManager->getActiveTheme()->getName()]) as $block_id => $block) {
-      /** @var $block \Drupal\block\Entity\Block */
-      $block_plugin = $block->getPlugin();
-      if ($block_plugin instanceof ContextAwarePluginInterface) {
-        $contexts = $block_plugin->getContextMapping();
-        // The context mapping is stored as aggregator.feed:uuid, so we're just
-        // extracting the UUID so that we can load the specific feed object.
-        list(, $uuid) = explode(':', $contexts['feed'], 2);
-        $feeds = $this->feedStorage->loadByProperties(['uuid' => $uuid]);
-        $feed = reset($feeds);
-        $context = new Context(new ContextDefinition('entity:aggregator_feed'));
-        $context->setContextValue($feed);
-        $event->setContext('aggregator.feed:' . $feed->uuid(), $context);
-      }
+  public function getRuntimeContexts(array $unqualified_context_ids) {
+    $ids = $this->feedStorage->getQuery()
+      ->condition('uuid', $unqualified_context_ids, 'IN')
+      ->execute();
+    $contexts = [];
+    foreach ($this->feedStorage->loadMultiple($ids) as $feed) {
+      $context = new Context(new ContextDefinition('entity:aggregator_feed'));
+      $context->setContextValue($feed);
+      $contexts[$feed->uuid()] = $context;
     }
+    return $contexts;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function onBlockAdministrativeContext(BlockContextEvent $event) {
+  public function getAvailableContexts() {
     $feeds = $this->feedStorage->loadMultiple();
+    $contexts = [];
     foreach ($feeds as $feed) {
       $context = new Context(new ContextDefinition('entity:aggregator_feed', $feed->label()));
       $context->setContextValue($feed);
-      $event->setContext('aggregator.feed:' . $feed->uuid(), $context);
+      $contexts[$feed->uuid()] = $context;
     }
+    return $contexts;
   }
 
 }

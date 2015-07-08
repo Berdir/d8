@@ -51,7 +51,7 @@ block.settings.aggregator_feed_block:
         # This will be stored in the format of 'aggregator.feed:$uuid'.
         feed:
           type: string
-          label: 'Feed
+          label: 'Feed'
 
 field.formatter.settings.aggregator_title:
   type: mapping
