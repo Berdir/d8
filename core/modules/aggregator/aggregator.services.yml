@@ -14,3 +14,8 @@ services:
   logger.channel.aggregator:
     parent: logger.channel_base
     arguments: ['aggregator']
+  aggregator.feed_context:
+    class: Drupal\aggregator\EventSubscriber\AggregatorFeedContext
+    arguments: ['@entity.manager', '@theme.manager']
+    tags:
+      - { name: context_provider }

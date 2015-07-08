@@ -10,8 +10,3 @@ services:
   block.repository:
     class: Drupal\block\BlockRepository
     arguments: ['@entity.manager', '@theme.manager', '@context.handler', '@context.repository']
-  block.aggregator_feed_context:
-    class: Drupal\aggregator\EventSubscriber\AggregatorFeedContext
-    arguments: ['@entity.manager', '@theme.manager']
-    tags:
-      - { name: context_provider }
