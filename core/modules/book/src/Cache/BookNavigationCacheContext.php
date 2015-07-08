@@ -79,8 +79,8 @@ class BookNavigationCacheContext extends ContainerAware implements CacheContextI
     // That information is however not stored as part of the node.
     $cacheable_metadata = new CacheableMetadata();
     if ($node = $this->requestStack->getCurrentRequest()->get('node')) {
-      // If the node is part of a book that we can use the cache tag for that
-      // book. If not, then we can't be optimized away.
+      // If the node is part of a book then we can use the cache tag for that
+      // book. If not, then it can't be optimized away.
       if (!empty($node->book['bid'])) {
         $cacheable_metadata->addCacheTags(['bid:' . $node->book['bid']]);
       }

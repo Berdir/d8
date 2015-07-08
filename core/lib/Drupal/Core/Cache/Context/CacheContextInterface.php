@@ -34,11 +34,14 @@ interface CacheContextInterface {
   /**
    * Gets the cacheability metadata for the context.
    *
-   * If the cache context is being optimized away, cache tags and max-age
-   * provided by this method will be bubbled up into the cache item.
+   * There are three valid cases for the returned CacheableMetadata object:
+   * - An empty object means this can be optimized away safely.
+   * - A max-age of 0 means that this context can never be optimized away. It
+   *   will never bubble up and cache tags will not be used.
+   * - Any non-zero max-age and cache tags will bubble up into the cache item
+   *   if this is optimized away to allow for invalidation if the context
+   *   value changes.
    *
-   * If a max-age of 0 is returned then it means that this context can not
-   * be optimized away.
    *
    * @return \Drupal\Core\Cache\CacheableMetadata
    *   A cacheable metadata object.

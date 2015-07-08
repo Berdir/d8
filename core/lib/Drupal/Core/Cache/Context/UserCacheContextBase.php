@@ -11,8 +11,12 @@ use Drupal\Core\Session\AccountInterface;
 
 /**
  * Base class for user-based cache contexts.
+ *
+ * Subclasses need to implement either
+ * \Drupal\Core\Cache\Context\CacheContextInterface or
+ * \Drupal\Core\Cache\Context\CalculatedCacheContextInterface themself.
  */
-abstract class UserCacheContextBase implements CacheContextInterface {
+abstract class UserCacheContextBase {
 
   /**
    * The account object.

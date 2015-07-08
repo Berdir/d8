@@ -7,7 +7,6 @@
 
 namespace Drupal\Core\Cache\Context;
 
-use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -104,7 +103,8 @@ class CacheContextsManager {
    *   The ContextCacheKeys object containing the converted cache keys and
    *   cacheability metadata.
    *
-   * @throws \InvalidArgumentException
+   * @throws \LogicException
+   *   Thrown if any of the context tokens or parameters are not valid.
    */
   public function convertTokensToKeys(array $context_tokens) {
     $this->validateTokens($context_tokens);

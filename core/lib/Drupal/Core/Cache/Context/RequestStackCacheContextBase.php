@@ -11,6 +11,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Defines a base class for cache contexts depending only on the request stack.
+ *
+ * Subclasses need to implement either
+ * \Drupal\Core\Cache\Context\CacheContextInterface or
+ * \Drupal\Core\Cache\Context\CalculatedCacheContextInterface themself.
  */
 abstract class RequestStackCacheContextBase {
 
