@@ -30,10 +30,10 @@ class DeleteFeedTest extends AggregatorTestBase {
 
     // Place a block for both feeds.
     $block = $this->drupalPlaceBlock('aggregator_feed_block');
-    $block->getPlugin()->setConfigurationValue('feed', $feed1->id());
+    $block->getPlugin()->setContextMapping(['feed' => 'aggregator.feed:' . $feed1->uuid()]);
     $block->save();
     $block2 = $this->drupalPlaceBlock('aggregator_feed_block');
-    $block2->getPlugin()->setConfigurationValue('feed', $feed2->id());
+    $block2->getPlugin()->setContextMapping(['feed' => 'aggregator.feed:' . $feed2->uuid()]);
     $block2->save();
 
     // Delete feed.

@@ -113,7 +113,7 @@ class ContextDefinition extends Plugin {
     // used in the classes they pass to.
     foreach (['label', 'description'] as $key) {
       // @todo Remove this workaround in https://www.drupal.org/node/2362727.
-      if (isset($values[$key]) && $values[$key] instanceof TranslationWrapper) {
+      if (isset($values[$key]) && $values[$key] instanceof Translation && $values[$key]->get() instanceof TranslationWrapper) {
         $values[$key] = (string) $values[$key]->get();
       }
       else {

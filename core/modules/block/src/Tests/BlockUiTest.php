@@ -171,8 +171,26 @@ class BlockUiTest extends WebTestBase {
 
     $this->drupalGet('admin/structure/block');
     $elements = $this->xpath('//details[@id="edit-category-block-test"]//ul[contains(@class, :ul_class)]/li[contains(@class, :li_class)]/a[contains(@href, :href) and text()=:text]', $arguments);
-    $this->assertTrue(empty($elements), 'The context-aware test block does not appear.');
+    $this->assertTrue(!empty($elements), 'The context-aware test block appears.');
     $definition = \Drupal::service('plugin.manager.block')->getDefinition('test_context_aware');
+    $this->assertTrue(!empty($definition), 'The context-aware test block exists.');
+  }
+
+  /**
+   * Tests the behavior of unsatisfied context-aware blocks.
+   */
+  public function testContextAwareUnsatisfiedBlocks() {
+    $arguments = array(
+      ':ul_class' => 'block-list',
+      ':li_class' => 'test-context-aware-unsatisfied',
+      ':href' => 'admin/structure/block/add/test_context_aware_unsatisfied/classy',
+      ':text' => 'Test context-aware block',
+    );
+
+    $this->drupalGet('admin/structure/block');
+    $elements = $this->xpath('//details[@id="edit-category-block-test"]//ul[contains(@class, :ul_class)]/li[contains(@class, :li_class)]/a[contains(@href, :href) and text()=:text]', $arguments);
+    $this->assertTrue(empty($elements), 'The context-aware test block does not appear.');
+    $definition = \Drupal::service('plugin.manager.block')->getDefinition('test_context_aware_unsatisfied');
     $this->assertTrue(!empty($definition), 'The context-aware test block exists.');
   }
 

@@ -99,6 +99,7 @@ class BlockInterfaceTest extends KernelTestBase {
           '#options' => $period,
         ),
       ),
+      'context_mapping' => array(),
       'display_message' => array(
         '#type' => 'textfield',
         '#title' => t('Display message'),

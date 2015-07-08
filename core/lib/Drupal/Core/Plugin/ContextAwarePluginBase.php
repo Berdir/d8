@@ -64,6 +64,10 @@ abstract class ContextAwarePluginBase extends ComponentContextAwarePluginBase im
    * {@inheritdoc}
    */
   public function setContextMapping(array $context_mapping) {
+    // The ContextAwarePluginAssignmentTrait adds a visual element to the
+    // context mapping when only one context is available. We should unset this
+    // before saving the context mapping.
+    unset($context_mapping['context_slot_title']);
     if ($this instanceof ConfigurablePluginInterface) {
       $configuration = $this->getConfiguration();
       $configuration['context_mapping'] = $context_mapping;

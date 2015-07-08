@@ -10,6 +10,8 @@ namespace Drupal\block;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Plugin\Context\ContextHandlerInterface;
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
+use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
 /**
@@ -32,6 +34,20 @@ class BlockRepository implements BlockRepositoryInterface {
   protected $themeManager;
 
   /**
+   * The context repository.
+   *
+   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
+   */
+  protected $contextRepository;
+
+  /**
+   * The context handler.
+   *
+   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface
+   */
+  protected $contextHandler;
+
+  /**
    * Constructs a new BlockRepository.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
@@ -40,11 +56,14 @@ class BlockRepository implements BlockRepositoryInterface {
    *   The theme manager.
    * @param \Drupal\Core\Plugin\Context\ContextHandlerInterface $context_handler
    *   The plugin context handler.
+   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
+   *   The context repository
    */
-  public function __construct(EntityManagerInterface $entity_manager, ThemeManagerInterface $theme_manager, ContextHandlerInterface $context_handler) {
+  public function __construct(EntityManagerInterface $entity_manager, ThemeManagerInterface $theme_manager, ContextHandlerInterface $context_handler, ContextRepositoryInterface $context_repository) {
     $this->blockStorage = $entity_manager->getStorage('block');
     $this->themeManager = $theme_manager;
     $this->contextHandler = $context_handler;
+    $this->contextRepository = $context_repository;
   }
 
   /**
@@ -58,6 +77,13 @@ class BlockRepository implements BlockRepositoryInterface {
     $full = array();
     foreach ($this->blockStorage->loadByProperties(array('theme' => $active_theme->getName())) as $block_id => $block) {
       /** @var \Drupal\block\BlockInterface $block */
+
+      $block_plugin = $block->getPlugin();
+      if ($block_plugin instanceof ContextAwarePluginInterface) {
+        $contexts = $this->contextRepository->getRuntimeContexts(array_values($block_plugin->getContextMapping()));
+        $this->contextHandler->applyContextMapping($block_plugin, $contexts);
+      }
+
       $access = $block->access('view', NULL, TRUE);
       $region = $block->getRegion();
       if (!isset($cacheable_metadata[$region])) {

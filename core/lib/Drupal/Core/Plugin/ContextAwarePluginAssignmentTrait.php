@@ -51,16 +51,26 @@ trait ContextAwarePluginAssignmentTrait {
           '#type' => 'value',
           '#value' => $context_id,
         ];
+        $element['context_slot_title'] = [
+          '#type' => 'item',
+          '#title' => $definition->getLabel() ?: $context_slot,
+          '#markup' => $options[$context_id],
+        ];
       }
 
       if (count($options) > 1) {
+        // The context display element is only useful when a single context is
+        // available, we have multiple and require user interaction.
+        unset($element['context_slot_title']);
+
         $assignments = $plugin->getContextMapping();
         $element[$context_slot] = [
-          '#title' => $this->t('Select a @context value:', ['@context' => $context_slot]),
+          '#title' => $definition->getLabel() ?: $context_slot,
           '#type' => 'select',
           '#options' => $options,
           '#required' => $definition->isRequired(),
           '#default_value' => !empty($assignments[$context_slot]) ? $assignments[$context_slot] : '',
+          '#description' => $definition->getDescription(),
         ];
       }
     }

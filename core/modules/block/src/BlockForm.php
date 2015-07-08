@@ -332,7 +332,12 @@ class BlockForm extends EntityForm {
     $settings = (new FormState())->setValues($form_state->getValue('settings'));
 
     // Call the plugin submit handler.
-    $entity->getPlugin()->submitConfigurationForm($form, $settings);
+    $block = $entity->getPlugin();
+    $block->submitConfigurationForm($form, $settings);
+    if ($block instanceof ContextAwarePluginInterface && $block->getContextDefinitions()) {
+      $context_mapping = $settings->getValue('context_mapping', []);
+      $block->setContextMapping($context_mapping);
+    }
     // Update the original form values.
     $form_state->setValue('settings', $settings->getValues());
 
@@ -343,7 +348,7 @@ class BlockForm extends EntityForm {
       $condition_values = (new FormState())
         ->setValues($values);
       $condition->submitConfigurationForm($form, $condition_values);
-      if ($condition instanceof ContextAwarePluginInterface) {
+      if ($condition instanceof ContextAwarePluginInterface && $condition->getContextDefinitions()) {
         $context_mapping = isset($values['context_mapping']) ? $values['context_mapping'] : [];
         $condition->setContextMapping($context_mapping);
       }

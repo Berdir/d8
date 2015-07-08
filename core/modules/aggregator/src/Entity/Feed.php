@@ -115,9 +115,13 @@ class Feed extends ContentEntityBase implements FeedInterface {
     parent::postDelete($storage, $entities);
     if (\Drupal::moduleHandler()->moduleExists('block')) {
       // Make sure there are no active blocks for these feeds.
+      $context_ids = [];
+      foreach ($entities as $key => $entity) {
+        $context_ids[$key] = 'aggregator.feed:' . $entity->uuid();
+      }
       $ids = \Drupal::entityQuery('block')
         ->condition('plugin', 'aggregator_feed_block')
-        ->condition('settings.feed', array_keys($entities))
+        ->condition('settings.context_mapping.feed', $context_ids)
         ->execute();
       if ($ids) {
         $block_storage = \Drupal::entityManager()->getStorage('block');

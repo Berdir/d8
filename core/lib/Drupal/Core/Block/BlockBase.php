@@ -12,6 +12,7 @@ use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContextAwarePluginAssignmentTrait;
 use Drupal\Core\Plugin\ContextAwarePluginBase;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\NestedArray;
@@ -30,6 +31,8 @@ use Drupal\Component\Transliteration\TransliterationInterface;
  * @ingroup block_api
  */
 abstract class BlockBase extends ContextAwarePluginBase implements BlockPluginInterface {
+
+  use ContextAwarePluginAssignmentTrait;
 
   /**
    * The transliteration service.
@@ -199,6 +202,9 @@ abstract class BlockBase extends ContextAwarePluginBase implements BlockPluginIn
       '#options' => $period,
     );
 
+    // Add context form elements.
+    $contexts = $form_state->getTemporaryValue('gathered_contexts') ?: [];
+    $form['context_mapping'] = $this->addContextAssignmentElement($this, $contexts);
     // Add plugin-specific settings for this block type.
     $form += $this->blockForm($form, $form_state);
     return $form;

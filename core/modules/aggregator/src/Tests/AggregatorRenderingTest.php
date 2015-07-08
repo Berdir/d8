@@ -44,7 +44,7 @@ class AggregatorRenderingTest extends AggregatorTestBase {
     $block = $this->drupalPlaceBlock("aggregator_feed_block", array('label' => 'feed-' . $feed->label()));
 
     // Configure the feed that should be displayed.
-    $block->getPlugin()->setConfigurationValue('feed', $feed->id());
+    $block->getPlugin()->setContextMapping(['feed' => 'aggregator.feed:' . $feed->uuid()]);
     $block->getPlugin()->setConfigurationValue('block_count', 2);
     $block->save();
 

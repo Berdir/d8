@@ -44,9 +44,14 @@ block.settings.aggregator_feed_block:
     block_count:
       type: integer
       label: 'Block count'
-    feed:
-      type: string
-      label: 'Feed'
+    context_mapping:
+      type: mapping
+      label: 'Context assignments'
+      mapping:
+        # This will be stored in the format of 'aggregator.feed:$uuid'.
+        feed:
+          type: string
+          label: 'Feed
 
 field.formatter.settings.aggregator_title:
   type: mapping

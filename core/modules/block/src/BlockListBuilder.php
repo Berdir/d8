@@ -18,6 +18,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -66,6 +67,13 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
   protected $formBuilder;
 
   /**
+   * The context repository.
+   *
+   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
+   */
+  protected $contextRepository;
+
+  /**
    * {@inheritdoc}
    */
   protected $limit = FALSE;
@@ -83,13 +91,16 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
    *   The theme manager.
    * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
    *   The form builder.
+   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
+   *   The context repository
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, BlockManagerInterface $block_manager, ThemeManagerInterface $theme_manager, FormBuilderInterface $form_builder) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, BlockManagerInterface $block_manager, ThemeManagerInterface $theme_manager, FormBuilderInterface $form_builder, ContextRepositoryInterface $context_repository) {
     parent::__construct($entity_type, $storage);
 
     $this->blockManager = $block_manager;
     $this->themeManager = $theme_manager;
     $this->formBuilder = $form_builder;
+    $this->contextRepository = $context_repository;
   }
 
   /**
@@ -101,7 +112,8 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
       $container->get('entity.manager')->getStorage($entity_type->id()),
       $container->get('plugin.manager.block'),
       $container->get('theme.manager'),
-      $container->get('form_builder')
+      $container->get('form_builder'),
+      $container->get('context.repository')
     );
   }
 
@@ -345,7 +357,8 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
     $form['list']['#attributes']['class'][] = 'entity-meta';
 
     // Only add blocks which work without any available context.
-    $definitions = $this->blockManager->getDefinitionsForContexts();
+    $contexts = $this->contextRepository->getAvailableContexts();
+    $definitions = $this->blockManager->getDefinitionsForContexts($contexts);
     $sorted_definitions = $this->blockManager->getSortedDefinitions($definitions);
     foreach ($sorted_definitions as $plugin_id => $plugin_definition) {
       $category = SafeMarkup::checkPlain($plugin_definition['category']);
