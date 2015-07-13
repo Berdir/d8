@@ -352,28 +352,33 @@ abstract class AccessResult implements AccessResultInterface, CacheableDependenc
    *
    * @return $this
    */
-  public function addCacheableDependency(CacheableDependencyInterface $other_object) {
-    // This is called many times per request, so avoid merging unless absolutely
-    // necessary.
-    if (empty($this->contexts)) {
-      $this->contexts = $other_object->getCacheContexts();
-    }
-    elseif ($contexts = $other_object->getCacheContexts()) {
-      $this->contexts = Cache::mergeContexts($this->contexts, $contexts);
-    }
+  public function addCacheableDependency($other_object) {
+    if ($other_object instanceof CacheableDependencyInterface) {
+      // This is called many times per request, so avoid merging unless absolutely
+      // necessary.
+      if (empty($this->contexts)) {
+        $this->contexts = $other_object->getCacheContexts();
+      }
+      elseif ($contexts = $other_object->getCacheContexts()) {
+        $this->contexts = Cache::mergeContexts($this->contexts, $contexts);
+      }
 
-    if (empty($this->tags)) {
-      $this->tags = $other_object->getCacheTags();
-    }
-    elseif ($tags = $other_object->getCacheTags()) {
-      $this->tags = Cache::mergeTags($this->tags, $tags);
-    }
+      if (empty($this->tags)) {
+        $this->tags = $other_object->getCacheTags();
+      }
+      elseif ($tags = $other_object->getCacheTags()) {
+        $this->tags = Cache::mergeTags($this->tags, $tags);
+      }
 
-    if ($this->maxAge === Cache::PERMANENT) {
-      $this->maxAge = $other_object->getCacheMaxAge();
+      if ($this->maxAge === Cache::PERMANENT) {
+        $this->maxAge = $other_object->getCacheMaxAge();
+      }
+      elseif (($max_age = $other_object->getCacheMaxAge()) && $max_age !== Cache::PERMANENT) {
+        $this->maxAge = Cache::mergeMaxAges($this->maxAge, $max_age);
+      }
     }
-    elseif (($max_age = $other_object->getCacheMaxAge()) && $max_age !== Cache::PERMANENT) {
-      $this->maxAge = Cache::mergeMaxAges($this->maxAge, $max_age);
+    else {
+      $this->maxAge = 0;
     }
     return $this;
   }

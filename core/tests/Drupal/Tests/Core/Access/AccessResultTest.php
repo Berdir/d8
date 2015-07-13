@@ -388,12 +388,12 @@ class AccessResultTest extends UnitTestCase {
    * @covers ::cacheUntilConfigurationChanges
    */
   public function testCacheTags() {
-    $verify = function (AccessResult $access, array $tags) {
+    $verify = function (AccessResult $access, array $tags, array $contexts = [], $max_age = Cache::PERMANENT) {
       $this->assertFalse($access->isAllowed());
       $this->assertFalse($access->isForbidden());
       $this->assertTrue($access->isNeutral());
-      $this->assertSame(Cache::PERMANENT, $access->getCacheMaxAge());
-      $this->assertSame([], $access->getCacheContexts());
+      $this->assertSame($max_age, $access->getCacheMaxAge());
+      $this->assertSame($contexts, $access->getCacheContexts());
       $this->assertSame($tags, $access->getCacheTags());
     };
 
@@ -420,29 +420,26 @@ class AccessResultTest extends UnitTestCase {
       ->addCacheTags(['bar:baz']);
     $verify($access, ['bar:baz', 'bar:qux', 'foo:bar', 'foo:baz']);
 
-    // ::cacheUntilEntityChanges() convenience method.
+    // ::addCacheableDependency() convenience method.
     $node = $this->getMock('\Drupal\node\NodeInterface');
     $node->expects($this->any())
       ->method('getCacheTags')
       ->will($this->returnValue(array('node:20011988')));
+    $node->expects($this->any())
+      ->method('getCacheMaxAge')
+      ->willReturn(600);
+    $node->expects($this->any())
+      ->method('getCacheContexts')
+      ->willReturn(['user']);
     $tags = array('node:20011988');
     $a = AccessResult::neutral()->addCacheTags($tags);
     $verify($a, $tags);
-    $b = AccessResult::neutral()->cacheUntilEntityChanges($node);
-    $verify($b, $tags);
-    $this->assertEquals($a, $b);
+    $b = AccessResult::neutral()->addCacheableDependency($node);
+    $verify($b, $tags, ['user'], 600);
 
-    // ::cacheUntilConfigurationChanges() convenience method.
-    $configuration = $this->getMock('\Drupal\Core\Config\ConfigBase');
-    $configuration->expects($this->any())
-      ->method('getCacheTags')
-      ->will($this->returnValue(array('config:foo.bar.baz')));
-    $tags = array('config:foo.bar.baz');
-    $a = AccessResult::neutral()->addCacheTags($tags);
-    $verify($a, $tags);
-    $b = AccessResult::neutral()->cacheUntilConfigurationChanges($configuration);
-    $verify($b, $tags);
-    $this->assertEquals($a, $b);
+    $non_cacheable_dependency = new \stdClass();
+    $non_cacheable = AccessResult::neutral()->addCacheableDependency($non_cacheable_dependency);
+    $verify($non_cacheable, [], [], 0);
   }
 
   /**
