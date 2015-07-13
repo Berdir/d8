@@ -7,6 +7,7 @@
 
 namespace Drupal\config_override_test;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 use Drupal\Core\Config\StorageInterface;
 
@@ -49,5 +50,25 @@ class ConfigOverriderLowPriority implements ConfigFactoryOverrideInterface {
     return NULL;
   }
 
-}
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts($name) {
+    return [];
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags($name) {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge($name) {
+    return Cache::PERMANENT;
+  }
+
+}

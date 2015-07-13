@@ -67,7 +67,10 @@ class BlockViewBuilder extends EntityViewBuilder {
         '#id' => $entity->id(),
         '#cache' => [
           'keys' => ['entity_view', 'block', $entity->id()],
-          'contexts' => $plugin->getCacheContexts(),
+          'contexts' => Cache::mergeContexts(
+            $entity->getCacheContexts(),
+            $plugin->getCacheContexts()
+          ),
           'tags' => Cache::mergeTags(
             $this->getCacheTags(), // Block view builder cache tag.
             $entity->getCacheTags(), // Block entity cache tag.

@@ -126,6 +126,10 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
           $this->cache[$cache_key]->setSettingsOverride($GLOBALS['config'][$name]);
         }
       }
+
+      // Propagate cache contexts to the config object.
+      $this->propagateCacheableDependencyOverrides($cache_key, $name);
+
       return $this->cache[$cache_key];
     }
   }
@@ -183,6 +187,10 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
             $this->cache[$cache_key]->setSettingsOverride($GLOBALS['config'][$name]);
           }
         }
+
+        // Propagate cacheable dependencies to the config object.
+        $this->propagateCacheableDependencyOverrides($cache_key, $name);
+
         $list[$name] = $this->cache[$cache_key];
       }
     }
@@ -207,6 +215,23 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
       $overrides = NestedArray::mergeDeepArray(array($override->loadOverrides($names), $overrides), TRUE);
     }
     return $overrides;
+  }
+
+  /**
+   * Propagates overridden cacheable dependencies to cached config objects.
+   *
+   * @param string $cache_key
+   *   The key of the cached config object to update.
+   * @param string $name
+   *   The name of the configuration object to construct.
+   */
+  protected function propagateCacheableDependencyOverrides($cache_key, $name) {
+    foreach ($this->configFactoryOverrides as $override) {
+      $this->cache[$cache_key]
+        ->addCacheContexts($override->getCacheContexts($name))
+        ->addCacheTags($override->getCacheTags($name))
+        ->mergeCacheMaxAge($override->getCacheMaxAge($name));
+    }
   }
 
   /**

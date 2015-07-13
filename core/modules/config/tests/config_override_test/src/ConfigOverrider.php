@@ -7,6 +7,7 @@
 
 namespace Drupal\config_override_test;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 
 /**
@@ -42,6 +43,27 @@ class ConfigOverrider implements ConfigFactoryOverrideInterface {
    */
   public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION) {
     return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts($name) {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags($name) {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge($name) {
+    return Cache::PERMANENT;
   }
 
 }

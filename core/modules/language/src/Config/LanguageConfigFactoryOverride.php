@@ -7,6 +7,7 @@
 
 namespace Drupal\language\Config;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigCollectionInfo;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigFactoryOverrideBase;
@@ -220,6 +221,30 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
         $config_translation->delete();
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts($name) {
+    if ($this->language) {
+      return ['languages:language_interface'];
+    }
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags($name) {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheMaxAge($name) {
+    return Cache::PERMANENT;
   }
 
 }

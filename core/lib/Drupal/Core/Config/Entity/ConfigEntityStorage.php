@@ -184,11 +184,35 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     }
 
     // Load all of the configuration entities.
-    $records = array();
+    /** @var Config[] $configs */
+    $configs = [];
+    $records = [];
     foreach ($this->configFactory->loadMultiple($names) as $config) {
-      $records[$config->get($this->idKey)] = $this->overrideFree ? $config->getOriginal(NULL, FALSE) : $config->get();
+      $id = $config->get($this->idKey);
+      $records[$id] = $this->overrideFree ? $config->getOriginal(NULL, FALSE) : $config->get();
+      $configs[$id] = $config;
     }
-    return $this->mapFromStorageRecords($records);
+    $entities = $this->mapFromStorageRecords($records, $configs);
+
+    // Add cacheability metadata to the entities.
+    foreach ($entities as $id => $entity) {
+      $entity->addCacheContexts($configs[$id]->getCacheContexts());
+      $entity->mergeCacheMaxAge($configs[$id]->getCacheMaxAge());
+
+      // Remove the self-referring cache tag that is present on Config objects
+      // before setting it. A ConfigEntity doesn't need this since it will be
+      // dynamically generated in EntityInterface::getCacheTagsToInvalidate().
+      // The cache tags are merged during rendering, and having fewer tags
+      // available improves performance.
+      $cache_tags = $configs[$id]->getCacheTags();
+      $key = array_search('config:' . $configs[$id]->getName(), $cache_tags);
+      if ($key !== FALSE) {
+        unset($cache_tags[$key]);
+      }
+      $entity->addCacheTags($cache_tags);
+    }
+
+    return $entities;
   }
 
   /**
