@@ -53,12 +53,7 @@ class CacheableMetadata implements CacheableDependencyInterface {
    * @return $this
    */
   public function addCacheTags(array $cache_tags) {
-    if (empty($this->tags)) {
-      $this->tags = $cache_tags;
-    }
-    elseif ($cache_tags) {
-      $this->tags = Cache::mergeTags($this->tags, $cache_tags);
-    }
+    $this->tags = Cache::mergeTags($this->tags, $cache_tags);
     return $this;
   }
 
@@ -91,12 +86,7 @@ class CacheableMetadata implements CacheableDependencyInterface {
    * @return $this
    */
   public function addCacheContexts(array $cache_contexts) {
-    if (empty($this->contexts)) {
-      $this->contexts = $cache_contexts;
-    }
-    elseif ($cache_contexts) {
-      $this->contexts = Cache::mergeContexts($this->contexts, $cache_contexts);
-    }
+    $this->contexts = Cache::mergeContexts($this->contexts, $cache_contexts);
     return $this;
   }
 
