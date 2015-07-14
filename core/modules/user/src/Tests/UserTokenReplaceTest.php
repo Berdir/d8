@@ -8,6 +8,7 @@
 namespace Drupal\user\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\simpletest\WebTestBase;
 use Drupal\user\Entity\User;
@@ -66,12 +67,28 @@ class UserTokenReplaceTest extends WebTestBase {
     $tests['[user:created:short]'] = format_date($account->getCreatedTime(), 'short', '', NULL, $language_interface->getId());
     $tests['[current-user:name]'] = SafeMarkup::checkPlain(user_format_name($global_account));
 
+    $base_cacheable_metadata = CacheableMetadata::createFromObject($account);
+    $metadata_tests = [];
+    $metadata_tests['[user:uid]'] = $base_cacheable_metadata;
+    $metadata_tests['[user:name]'] = $base_cacheable_metadata;
+    $metadata_tests['[user:mail]'] = $base_cacheable_metadata;
+    $metadata_tests['[user:url]'] = $base_cacheable_metadata;
+    $metadata_tests['[user:edit-url]'] = $base_cacheable_metadata;
+    $cacheable_metadata = clone $base_cacheable_metadata;
+    $metadata_tests['[user:last-login]'] = $cacheable_metadata->addCacheTags(['rendered']);
+    $metadata_tests['[user:last-login:short]'] = $cacheable_metadata;
+    $metadata_tests['[user:created]'] = $cacheable_metadata;
+    $metadata_tests['[user:created:short]'] = $cacheable_metadata;
+    $metadata_tests['[current-user:name]'] = $base_cacheable_metadata->merge(CacheableMetadata::createFromObject($global_account)->addCacheContexts(['user']));
+
     // Test to make sure that we generated something for each token.
     $this->assertFalse(in_array(0, array_map('strlen', $tests)), 'No empty tokens generated.');
 
     foreach ($tests as $input => $expected) {
-      $output = $token_service->replace($input, array('user' => $account), array('langcode' => $language_interface->getId()));
+      $cacheable_metadata = new CacheableMetadata();
+      $output = $token_service->replace($input, array('user' => $account), array('langcode' => $language_interface->getId()), $cacheable_metadata);
       $this->assertEqual($output, $expected, format_string('Sanitized user token %token replaced.', array('%token' => $input)));
+      $this->assertEqual($cacheable_metadata, $metadata_tests[$input]);
     }
 
     // Generate and test unsanitized tokens.

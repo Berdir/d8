@@ -53,7 +53,12 @@ class CacheableMetadata implements CacheableDependencyInterface {
    * @return $this
    */
   public function addCacheTags(array $cache_tags) {
-    $this->tags = Cache::mergeTags($this->tags, $cache_tags);
+    if (empty($this->tags)) {
+      $this->tags = $cache_tags;
+    }
+    elseif ($cache_tags) {
+      $this->tags = Cache::mergeTags($this->tags, $cache_tags);
+    }
     return $this;
   }
 
@@ -86,7 +91,12 @@ class CacheableMetadata implements CacheableDependencyInterface {
    * @return $this
    */
   public function addCacheContexts(array $cache_contexts) {
-    $this->contexts = Cache::mergeContexts($this->contexts, $cache_contexts);
+    if (empty($this->contexts)) {
+      $this->contexts = $cache_contexts;
+    }
+    elseif ($cache_contexts) {
+      $this->contexts = Cache::mergeContexts($this->contexts, $cache_contexts);
+    }
     return $this;
   }
 
@@ -129,6 +139,35 @@ class CacheableMetadata implements CacheableDependencyInterface {
     }
 
     $this->maxAge = $max_age;
+    return $this;
+  }
+
+  /**
+   * Adds a dependency on an object: merges its cacheability metadata.
+   *
+   * @param \Drupal\Core\Cache\CacheableDependencyInterface|mixed $other_object
+   *   The dependency. If the object implements CacheableDependencyInterface,
+   *   then its cacheability metadata will be used. Otherwise, the passed in
+   *   object must be assumed to be uncacheable, so max-age 0 is set.
+   *
+   * @return $this
+   */
+  public function addCacheableDependency($other_object) {
+    if ($other_object instanceof CacheableDependencyInterface) {
+      $this->addCacheTags($other_object->getCacheTags());
+      $this->addCacheContexts($other_object->getCacheContexts());
+      if ($this->maxAge === Cache::PERMANENT) {
+        $this->maxAge = $other_object->getCacheMaxAge();
+      }
+      elseif (($max_age = $other_object->getCacheMaxAge()) && $max_age !== Cache::PERMANENT) {
+        $this->maxAge = Cache::mergeMaxAges($this->maxAge, $max_age);
+      }
+    }
+    else {
+      // Not a cacheable dependency, this can not be cached.
+      $this->maxAge = 0;
+    }
+
     return $this;
   }
 

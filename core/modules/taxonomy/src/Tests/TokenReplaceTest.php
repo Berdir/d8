@@ -9,6 +9,7 @@ namespace Drupal\taxonomy\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
@@ -92,9 +93,23 @@ class TokenReplaceTest extends TaxonomyTestBase {
     $tests['[term:parent:name]'] = '[term:parent:name]';
     $tests['[term:vocabulary:name]'] = SafeMarkup::checkPlain($this->vocabulary->label());
 
+    $base_cacheable_metadata = CacheableMetadata::createFromObject($term1);
+
+    $metadata_tests = array();
+    $metadata_tests['[term:tid]'] = $base_cacheable_metadata;
+    $metadata_tests['[term:name]'] = $base_cacheable_metadata;
+    $metadata_tests['[term:description]'] = $base_cacheable_metadata;
+    $metadata_tests['[term:url]'] = $base_cacheable_metadata;
+    $metadata_tests['[term:node-count]'] = $base_cacheable_metadata;
+    $metadata_tests['[term:parent:name]'] = $base_cacheable_metadata;
+    $cacheable_metadata = clone $base_cacheable_metadata;
+    $metadata_tests['[term:vocabulary:name]'] = $cacheable_metadata->addCacheTags($this->vocabulary->getCacheTags());
+
     foreach ($tests as $input => $expected) {
-      $output = $token_service->replace($input, array('term' => $term1), array('langcode' => $language_interface->getId()));
+      $cacheable_metadata = new CacheableMetadata();
+      $output = $token_service->replace($input, array('term' => $term1), array('langcode' => $language_interface->getId()), $cacheable_metadata);
       $this->assertEqual($output, $expected, format_string('Sanitized taxonomy term token %token replaced.', array('%token' => $input)));
+      $this->assertEqual($cacheable_metadata, $metadata_tests[$input]);
     }
 
     // Generate and test sanitized tokens for term2.

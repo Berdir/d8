@@ -35,12 +35,17 @@ use Drupal\user\Entity\User;
  *   names, and the values are the raw [type:token] strings that appeared in the
  *   original text.
  * @param $data
- *   (optional) An associative array of data objects to be used when generating
+ *   An associative array of data objects to be used when generating
  *   replacement values, as supplied in the $data parameter to
  *   \Drupal\Core\Utility\Token::replace().
  * @param $options
- *   (optional) An associative array of options for token replacement; see
+ *   An associative array of options for token replacement; see
  *   \Drupal\Core\Utility\Token::replace() for possible values.
+ * @param \Drupal\Core\Cache\CacheableMetadata $cacheable_metadata
+ *   The cacheability metadata. By default we gather cacheability metadata from
+ *   the passed $data objects, but for global tokens the implementation needs
+ *   to take into account cacheable metadata from related objects, like the
+ *   'system.site' config object, for the 'site:name' token.
  *
  * @return
  *   An associative array of replacement values, keyed by the raw [type:token]
@@ -49,7 +54,7 @@ use Drupal\user\Entity\User;
  * @see hook_token_info()
  * @see hook_tokens_alter()
  */
-function hook_tokens($type, $tokens, array $data = array(), array $options = array()) {
+function hook_tokens($type, $tokens, array $data, array $options, \Drupal\Core\Cache\CacheableMetadata $cacheable_metadata) {
   $token_service = \Drupal::token();
 
   $url_options = array('absolute' => TRUE);
@@ -87,6 +92,7 @@ function hook_tokens($type, $tokens, array $data = array(), array $options = arr
         case 'author':
           $account = $node->getOwner() ? $node->getOwner() : User::load(0);
           $replacements[$original] = $sanitize ? SafeMarkup::checkPlain($account->label()) : $account->label();
+          $cacheable_metadata->addCacheableDependency($account);
           break;
 
         case 'created':
@@ -96,11 +102,11 @@ function hook_tokens($type, $tokens, array $data = array(), array $options = arr
     }
 
     if ($author_tokens = $token_service->findWithPrefix($tokens, 'author')) {
-      $replacements = $token_service->generate('user', $author_tokens, array('user' => $node->getOwner()), $options);
+      $replacements = $token_service->generate('user', $author_tokens, array('user' => $node->getOwner()), $options, $cacheable_metadata);
     }
 
     if ($created_tokens = $token_service->findWithPrefix($tokens, 'created')) {
-      $replacements = $token_service->generate('date', $created_tokens, array('date' => $node->getCreatedTime()), $options);
+      $replacements = $token_service->generate('date', $created_tokens, array('date' => $node->getCreatedTime()), $options, $cacheable_metadata);
     }
   }
 
@@ -120,10 +126,13 @@ function hook_tokens($type, $tokens, array $data = array(), array $options = arr
  *   - 'tokens'
  *   - 'data'
  *   - 'options'
+ * @param \Drupal\Core\Cache\CacheableMetadata $cacheable_metadata
+ *   The cacheability metadata. In case you alter an existing token based upon
+ *   cacheability metadata, the implementation needs to take that into account.
  *
  * @see hook_tokens()
  */
-function hook_tokens_alter(array &$replacements, array $context) {
+function hook_tokens_alter(array &$replacements, array $context, \Drupal\Core\Cache\CacheableMetadata $cacheable_metadata) {
   $options = $context['options'];
 
   if (isset($options['langcode'])) {

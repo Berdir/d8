@@ -9,6 +9,7 @@ namespace Drupal\system\Tests\System;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * Generates text using placeholders for dummy content to check token
@@ -111,12 +112,25 @@ class TokenReplaceUnitTest extends TokenReplaceUnitTestBase {
     $tests['[site:url-brief]'] = preg_replace(array('!^https?://!', '!/$!'), '', \Drupal::url('<front>', [], $url_options));
     $tests['[site:login-url]'] = \Drupal::url('user.page', [], $url_options);
 
+    $base_cacheable_metadata = new CacheableMetadata();
+
+    $metadata_tests = [];
+    $metadata_tests['[site:name]'] = CacheableMetadata::createFromObject(\Drupal::config('system.site'));
+    $metadata_tests['[site:slogan]'] = CacheableMetadata::createFromObject(\Drupal::config('system.site'));
+    $metadata_tests['[site:mail]'] = CacheableMetadata::createFromObject(\Drupal::config('system.site'));
+    $cacheable_metadata = clone $base_cacheable_metadata;
+    $metadata_tests['[site:url]'] = $cacheable_metadata->addCacheContexts(['url.site']);
+    $metadata_tests['[site:url-brief]'] = $cacheable_metadata;
+    $metadata_tests['[site:login-url]'] = $cacheable_metadata;
+
     // Test to make sure that we generated something for each token.
     $this->assertFalse(in_array(0, array_map('strlen', $tests)), 'No empty tokens generated.');
 
     foreach ($tests as $input => $expected) {
-      $output = $this->tokenService->replace($input, array(), array('langcode' => $this->interfaceLanguage->getId()));
+      $cacheable_metadata = new CacheableMetadata();
+      $output = $this->tokenService->replace($input, array(), array('langcode' => $this->interfaceLanguage->getId()), $cacheable_metadata);
       $this->assertEqual($output, $expected, format_string('Sanitized system site information token %token replaced.', array('%token' => $input)));
+      $this->assertEqual($cacheable_metadata, $metadata_tests[$input]);
     }
 
     // Generate and test unsanitized tokens.
@@ -124,7 +138,7 @@ class TokenReplaceUnitTest extends TokenReplaceUnitTestBase {
     $tests['[site:slogan]'] = $config->get('slogan');
 
     foreach ($tests as $input => $expected) {
-      $output = $this->tokenService->replace($input, array(), array('langcode' => $this->interfaceLanguage->getId(), 'sanitize' => FALSE));
+      $output = $this->tokenService->replace($input, array(), array('langcode' => $this->interfaceLanguage->getId(), 'sanitize' => FALSE), $cacheable_metadata);
       $this->assertEqual($output, $expected, format_string('Unsanitized system site information token %token replaced.', array('%token' => $input)));
     }
 
@@ -133,10 +147,10 @@ class TokenReplaceUnitTest extends TokenReplaceUnitTestBase {
     // flag is being passed properly through the call stack and being handled
     // correctly by a 'known' token, [site:slogan].
     $raw_tokens = array('slogan' => '[site:slogan]');
-    $generated = $this->tokenService->generate('site', $raw_tokens);
+    $generated = $this->tokenService->generate('site', $raw_tokens, [], [], $cacheable_metadata);
     $this->assertEqual($generated['[site:slogan]'], $safe_slogan, 'Token sanitized.');
 
-    $generated = $this->tokenService->generate('site', $raw_tokens, array(), array('sanitize' => FALSE));
+    $generated = $this->tokenService->generate('site', $raw_tokens, array(), array('sanitize' => FALSE), $cacheable_metadata);
     $this->assertEqual($generated['[site:slogan]'], $slogan, 'Unsanitized token generated properly.');
   }
 

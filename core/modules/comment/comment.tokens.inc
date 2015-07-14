@@ -7,6 +7,8 @@
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Datetime\Entity\DateFormat;
 
 /**
  * Implements hook_token_info().
@@ -105,7 +107,7 @@ function comment_token_info() {
 /**
  * Implements hook_tokens().
  */
-function comment_tokens($type, $tokens, array $data = array(), array $options = array()) {
+function comment_tokens($type, $tokens, array $data, array $options, CacheableMetadata $cacheable_metadata) {
   $token_service = \Drupal::token();
 
   $url_options = array('absolute' => TRUE);
@@ -176,20 +178,26 @@ function comment_tokens($type, $tokens, array $data = array(), array $options = 
         case 'parent':
           if ($comment->hasParentComment()) {
             $parent = $comment->getParentComment();
+            $cacheable_metadata->addCacheableDependency($parent);
             $replacements[$original] = $sanitize ? Xss::filter($parent->getSubject()) : $parent->getSubject();
           }
           break;
 
         case 'created':
+          $date_format = DateFormat::load('medium');
+          $cacheable_metadata->addCacheableDependency($date_format);
           $replacements[$original] = format_date($comment->getCreatedTime(), 'medium', '', NULL, $langcode);
           break;
 
         case 'changed':
+          $date_format = DateFormat::load('medium');
+          $cacheable_metadata->addCacheableDependency($date_format);
           $replacements[$original] = format_date($comment->getChangedTime(), 'medium', '', NULL, $langcode);
           break;
 
         case 'entity':
           $entity = $comment->getCommentedEntity();
+          $cacheable_metadata->addCacheableDependency($entity);
           $title = $entity->label();
           $replacements[$original] = $sanitize ? Xss::filter($title) : $title;
           break;
@@ -199,23 +207,23 @@ function comment_tokens($type, $tokens, array $data = array(), array $options = 
     // Chained token relationships.
     if ($entity_tokens = $token_service->findwithPrefix($tokens, 'entity')) {
       $entity = $comment->getCommentedEntity();
-      $replacements += $token_service->generate($comment->getCommentedEntityTypeId(), $entity_tokens, array($comment->getCommentedEntityTypeId() => $entity), $options);
+      $replacements += $token_service->generate($comment->getCommentedEntityTypeId(), $entity_tokens, array($comment->getCommentedEntityTypeId() => $entity), $options, $cacheable_metadata);
     }
 
     if ($date_tokens = $token_service->findwithPrefix($tokens, 'created')) {
-      $replacements += $token_service->generate('date', $date_tokens, array('date' => $comment->getCreatedTime()), $options);
+      $replacements += $token_service->generate('date', $date_tokens, array('date' => $comment->getCreatedTime()), $options, $cacheable_metadata);
     }
 
     if ($date_tokens = $token_service->findwithPrefix($tokens, 'changed')) {
-      $replacements += $token_service->generate('date', $date_tokens, array('date' => $comment->getChangedTime()), $options);
+      $replacements += $token_service->generate('date', $date_tokens, array('date' => $comment->getChangedTime()), $options, $cacheable_metadata);
     }
 
     if (($parent_tokens = $token_service->findwithPrefix($tokens, 'parent')) && $parent = $comment->getParentComment()) {
-      $replacements += $token_service->generate('comment', $parent_tokens, array('comment' => $parent), $options);
+      $replacements += $token_service->generate('comment', $parent_tokens, array('comment' => $parent), $options, $cacheable_metadata);
     }
 
     if (($author_tokens = $token_service->findwithPrefix($tokens, 'author')) && $account = $comment->getOwner()) {
-      $replacements += $token_service->generate('user', $author_tokens, array('user' => $account), $options);
+      $replacements += $token_service->generate('user', $author_tokens, array('user' => $account), $options, $cacheable_metadata);
     }
   }
   elseif ($type == 'entity' & !empty($data['entity'])) {

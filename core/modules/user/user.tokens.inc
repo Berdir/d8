@@ -6,6 +6,8 @@
  */
 
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\user\Entity\User;
 
 /**
@@ -64,7 +66,7 @@ function user_token_info() {
 /**
  * Implements hook_tokens().
  */
-function user_tokens($type, $tokens, array $data = array(), array $options = array()) {
+function user_tokens($type, $tokens, array $data, array $options, CacheableMetadata $cacheable_metadata) {
 
   $token_service = \Drupal::token();
   $url_options = array('absolute' => TRUE);
@@ -108,10 +110,14 @@ function user_tokens($type, $tokens, array $data = array(), array $options = arr
 
         // These tokens are default variations on the chained tokens handled below.
         case 'last-login':
+          $date_format = DateFormat::load('medium');
+          $cacheable_metadata->addCacheableDependency($date_format);
           $replacements[$original] = $account->getLastLoginTime() ? format_date($account->getLastLoginTime(), 'medium', '', NULL, $langcode) : t('never');
           break;
 
         case 'created':
+          $date_format = DateFormat::load('medium');
+          $cacheable_metadata->addCacheableDependency($date_format);
           // In the case of user_presave the created date may not yet be set.
           $replacements[$original] = $account->getCreatedTime() ? format_date($account->getCreatedTime(), 'medium', '', NULL, $langcode) : t('not yet created');
           break;
@@ -119,17 +125,18 @@ function user_tokens($type, $tokens, array $data = array(), array $options = arr
     }
 
     if ($login_tokens = $token_service->findWithPrefix($tokens, 'last-login')) {
-      $replacements += $token_service->generate('date', $login_tokens, array('date' => $account->getLastLoginTime()), $options);
+      $replacements += $token_service->generate('date', $login_tokens, array('date' => $account->getLastLoginTime()), $options, $cacheable_metadata);
     }
 
     if ($registered_tokens = $token_service->findWithPrefix($tokens, 'created')) {
-      $replacements += $token_service->generate('date', $registered_tokens, array('date' => $account->getCreatedTime()), $options);
+      $replacements += $token_service->generate('date', $registered_tokens, array('date' => $account->getCreatedTime()), $options, $cacheable_metadata);
     }
   }
 
   if ($type == 'current-user') {
     $account = User::load(\Drupal::currentUser()->id());
-    $replacements += $token_service->generate('user', $tokens, array('user' => $account), $options);
+    $cacheable_metadata->addCacheContexts(['user']);
+    $replacements += $token_service->generate('user', $tokens, array('user' => $account), $options, $cacheable_metadata);
   }
 
   return $replacements;

@@ -386,4 +386,14 @@ interface RendererInterface {
    */
   public function addCacheableDependency(array &$elements, $dependency);
 
+  /**
+   * Checks whether a render context is active.
+   *
+   * @return bool
+   *   TRUE if the renderer has a render context active, FALSE otherwise.
+   *
+   * @see \Drupal\Core\Render\RenderContext
+   */
+  public function hasRenderContext();
+
 }

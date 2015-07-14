@@ -9,6 +9,7 @@ namespace Drupal\file\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\file\Entity\File;
+use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * Generates text using placeholders for dummy content to check file token
@@ -58,12 +59,31 @@ class FileTokenReplaceTest extends FileFieldTestBase {
     $tests['[file:owner]'] = SafeMarkup::checkPlain(user_format_name($this->adminUser));
     $tests['[file:owner:uid]'] = $file->getOwnerId();
 
+    $base_cacheable_metadata = CacheableMetadata::createFromObject($file);
+    $metadata_tests = [];
+    $metadata_tests['[file:fid]'] = $base_cacheable_metadata;
+    $metadata_tests['[file:name]'] = $base_cacheable_metadata;
+    $metadata_tests['[file:path]'] = $base_cacheable_metadata;
+    $metadata_tests['[file:mime]'] = $base_cacheable_metadata;
+    $metadata_tests['[file:size]'] = $base_cacheable_metadata;
+    $metadata_tests['[file:url]'] = $base_cacheable_metadata;
+    $cacheable_metadata = clone $base_cacheable_metadata;
+    $metadata_tests['[file:created]'] = $cacheable_metadata->addCacheTags(['rendered']);
+    $metadata_tests['[file:created:short]'] = $cacheable_metadata;
+    $metadata_tests['[file:changed]'] = $cacheable_metadata;
+    $metadata_tests['[file:changed:short]'] = $cacheable_metadata;
+    $cacheable_metadata = clone $base_cacheable_metadata;
+    $metadata_tests['[file:owner]'] = $cacheable_metadata->addCacheTags(['user:2']);
+    $metadata_tests['[file:owner:uid]'] = $cacheable_metadata;
+
     // Test to make sure that we generated something for each token.
     $this->assertFalse(in_array(0, array_map('strlen', $tests)), 'No empty tokens generated.');
 
     foreach ($tests as $input => $expected) {
-      $output = $token_service->replace($input, array('file' => $file), array('langcode' => $language_interface->getId()));
+      $cacheable_metadata = new CacheableMetadata();
+      $output = $token_service->replace($input, array('file' => $file), array('langcode' => $language_interface->getId()), $cacheable_metadata);
       $this->assertEqual($output, $expected, format_string('Sanitized file token %token replaced.', array('%token' => $input)));
+      $this->assertEqual($cacheable_metadata, $metadata_tests[$input]);
     }
 
     // Generate and test unsanitized tokens.

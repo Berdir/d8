@@ -262,12 +262,12 @@ class FrontPageTest extends ViewTestBase {
       $view,
       $empty_node_listing_cache_tags,
       $do_assert_views_caches,
-      Cache::mergeTags($empty_node_listing_cache_tags, $cache_context_tags)
+      Cache::mergeTags($empty_node_listing_cache_tags, $cache_context_tags, ['config:system.site'])
     );
     $this->assertPageCacheContextsAndTags(
       Url::fromRoute('view.frontpage.page_1'),
       $cache_contexts,
-      Cache::mergeTags($empty_node_listing_cache_tags, $cache_context_tags, ['rendered', 'config:user.role.anonymous'])
+      Cache::mergeTags($empty_node_listing_cache_tags, $cache_context_tags, ['rendered', 'config:user.role.anonymous', 'config:system.site'])
     );
 
     // Create some nodes on the frontpage view. Add more than 10 nodes in order

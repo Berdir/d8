@@ -164,6 +164,12 @@ class Renderer implements RendererInterface {
     return $elements;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function hasRenderContext() {
+    return isset(static::$context);
+  }
 
   /**
    * {@inheritdoc}

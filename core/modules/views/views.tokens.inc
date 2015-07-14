@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * Implements hook_token_info().
@@ -68,7 +69,7 @@ function views_token_info() {
 /**
  * Implements hook_tokens().
  */
-function views_tokens($type, $tokens, array $data = array(), array $options = array()) {
+function views_tokens($type, $tokens, array $data, array $options, CacheableMetadata $cacheable_metadata) {
   $token_service = \Drupal::token();
 
   $url_options = array('absolute' => TRUE);
@@ -82,6 +83,8 @@ function views_tokens($type, $tokens, array $data = array(), array $options = ar
   if ($type == 'view' && !empty($data['view'])) {
     /** @var \Drupal\views\ViewExecutable $view */
     $view = $data['view'];
+
+    $cacheable_metadata->addCacheableDependency($view->storage);
 
     foreach ($tokens as $name => $original) {
       switch ($name) {
