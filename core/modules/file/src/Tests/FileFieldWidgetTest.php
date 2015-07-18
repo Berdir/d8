@@ -228,9 +228,14 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $this->assertRaw(t('Field %field can only hold @max values but there were @count uploaded. The following files have been omitted as a result: %list.', $args));
 
     // Upload a permitted amount of files.
-    $post = $this->postMultipleFiles('node/add/' . $type_name, $field_name, 2, t('Save and publish'));
+    $post = $this->postMultipleFiles('node/add/' . $type_name, $field_name, 1, t('Save and publish'));
     $node = $this->drupalGetNodeByTitle($post['title[0][value]']);
     $this->assertText(t('Article @label has been created.', ['@label' => $post['title[0][value]']]));
+
+
+    // Edit and add two additional files.
+    $post = $this->postMultipleFiles('node/' . $node->id() . '/edit', $field_name, 2, t('Save and keep published'));
+    $this->assertText(t('Article @label has been updated.', ['@label' => $post['title[0][value]']]));
 
     // Edit and add two additional files.
     $this->postMultipleFiles('node/' . $node->id() . '/edit', $field_name, 2, t('Upload'));
