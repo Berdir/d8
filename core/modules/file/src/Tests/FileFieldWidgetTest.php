@@ -215,6 +215,29 @@ class FileFieldWidgetTest extends FileFieldTestBase {
       $node = $node_storage->load($nid);
       $this->assertTrue(empty($node->{$field_name}->target_id), 'Node was successfully saved without any files.');
     }
+
+    // Try to upload more files than allowed.
+    $boundary = '----------------------ca6f8e551000b113';
+    $form_data = $this->buildFormData('node/add/' . $type_name, $field_name, $boundary);
+    $headers = [
+      'Content-Type: multipart/form-data; boundary=' . $boundary,
+      'Content-Length: ' . strlen($form_data),
+    ];
+
+    $this->curlExec([
+      CURLOPT_URL => $this->getAbsoluteUrl("node/add/$type_name"),
+      CURLOPT_POST => TRUE,
+      CURLOPT_POSTFIELDS => $form_data,
+      CURLOPT_HTTPHEADER => $headers
+    ]);
+
+    $args = [
+      '%field' => $field_name,
+      '@max' => 3,
+      '@count' => 4,
+      '%list' => $test_file->getFileName(),
+    ];
+    $this->assertRaw(t('Field %field can only hold @max values but there were @count uploaded. The following files have been omitted as a result: %list.', $args));
   }
 
   /**
@@ -374,5 +397,48 @@ class FileFieldWidgetTest extends FileFieldTestBase {
       }
       $this->assertNoRaw($error_message, t('Validation error removed when file with correct extension uploaded (JSMode=%type).', array('%type' => $type)));
     }
+  }
+
+  /**
+   * Builds a multipart/form-data string to test multiple file upload.
+   *
+   * @param string $path
+   *   Path to the form.
+   * @param string $field_name
+   *   Name of the file field.
+   * @param string $boundary
+   *   The boundary.
+   *
+   * @return string
+   *   The generated form-data.
+   */
+  protected function buildFormData($path, $field_name, $boundary) {
+    $this->drupalGet($path);
+
+    $xpath = "//form";
+    $forms = $this->xpath($xpath);
+    $form = reset($forms);
+    // We try to set the fields of this form as specified in $edit.
+    $edit = [];
+    $post = array();
+    $upload = array();
+    $this->handleForm($post, $edit, $upload, t('Upload'), $form);
+
+    $form_data = '';
+    foreach ($post as $key => $value) {
+      $form_data .= "--$boundary\r\nContent-Disposition: form-data; name=\"$key\"\r\n\r\n$value\r\n";
+    }
+
+    $test_file = $this->getTestFile('text');
+
+    $filename = drupal_realpath($test_file->getFileUri());
+    $content = file_get_contents($test_file->getFileUri());
+    $name = 'files[' . $field_name . '_0][]';
+    for ($i = 0; $i < 4; $i++) {
+      $form_data .= "--$boundary\r\nContent-Disposition: form-data; name=\"$name\"; filename=\"$filename\"\r\nContent-Type: application/octet-stream\r\n\r\n$content\r\n";
+    }
+
+    $form_data .= "--$boundary";
+    return $form_data;
   }
 }
