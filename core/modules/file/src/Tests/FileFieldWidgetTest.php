@@ -9,6 +9,7 @@ namespace Drupal\file\Tests;
 
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field_ui\Tests\FieldUiTestTrait;
 use Drupal\user\RoleInterface;
@@ -217,24 +218,26 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     }
 
     // Try to upload more files than allowed.
-    $boundary = '----------------------ca6f8e551000b113';
-    $form_data = $this->buildFormData('node/add/' . $type_name, $field_name, $boundary);
-    $headers = [
-      'Content-Type: multipart/form-data; boundary=' . $boundary,
-      'Content-Length: ' . strlen($form_data),
-    ];
-
-    $this->curlExec([
-      CURLOPT_URL => $this->getAbsoluteUrl("node/add/$type_name"),
-      CURLOPT_POST => TRUE,
-      CURLOPT_POSTFIELDS => $form_data,
-      CURLOPT_HTTPHEADER => $headers
-    ]);
-
+    $this->postMultipleFiles('node/add/' . $type_name, $field_name, 4, t('Upload'));
     $args = [
       '%field' => $field_name,
       '@max' => 3,
       '@count' => 4,
+      '%list' => $test_file->getFileName(),
+    ];
+    $this->assertRaw(t('Field %field can only hold @max values but there were @count uploaded. The following files have been omitted as a result: %list.', $args));
+
+    // Upload a permitted amount of files.
+    $post = $this->postMultipleFiles('node/add/' . $type_name, $field_name, 2, t('Save and publish'));
+    $node = $this->drupalGetNodeByTitle($post['title[0][value]']);
+    $this->assertText(t('Article @label has been created.', ['@label' => $post['title[0][value]']]));
+
+    // Edit and add two additional files.
+    $this->postMultipleFiles('node/' . $node->id() . '/edit', $field_name, 2, t('Upload'));
+    $args = [
+      '%field' => $field_name,
+      '@max' => 3,
+      '@count' => 2,
       '%list' => $test_file->getFileName(),
     ];
     $this->assertRaw(t('Field %field can only hold @max values but there were @count uploaded. The following files have been omitted as a result: %list.', $args));
@@ -400,20 +403,24 @@ class FileFieldWidgetTest extends FileFieldTestBase {
   }
 
   /**
-   * Builds a multipart/form-data string to test multiple file upload.
+   * Posts a form with multiple files.
    *
    * @param string $path
    *   Path to the form.
    * @param string $field_name
    *   Name of the file field.
-   * @param string $boundary
-   *   The boundary.
+   * @param int $file_count
+   *   Amount of files that should be uploaded.
+   * @param string $submit
+   *   The label for the submit button.
    *
-   * @return string
-   *   The generated form-data.
+   * @return array
+   *   The submitted form data.
    */
-  protected function buildFormData($path, $field_name, $boundary) {
+  protected function postMultipleFiles($path, $field_name, $file_count, $submit) {
     $this->drupalGet($path);
+
+    $boundary = '----------------------ca6f8e551000b113';
 
     $xpath = "//form";
     $forms = $this->xpath($xpath);
@@ -422,7 +429,9 @@ class FileFieldWidgetTest extends FileFieldTestBase {
     $edit = [];
     $post = array();
     $upload = array();
-    $this->handleForm($post, $edit, $upload, t('Upload'), $form);
+    $this->handleForm($post, $edit, $upload, $submit, $form);
+
+    $post['title[0][value]'] = $this->randomMachineName();
 
     $form_data = '';
     foreach ($post as $key => $value) {
@@ -431,14 +440,39 @@ class FileFieldWidgetTest extends FileFieldTestBase {
 
     $test_file = $this->getTestFile('text');
 
+    // Both existing and new nodes are supported. Calculate the delta of the
+    // file form element.
+    $files = $this->xpath('//tbody/tr');
+    $delta = count($files);
+
     $filename = drupal_realpath($test_file->getFileUri());
     $content = file_get_contents($test_file->getFileUri());
-    $name = 'files[' . $field_name . '_0][]';
-    for ($i = 0; $i < 4; $i++) {
+    $name = 'files[' . $field_name . '_' . $delta . '][]';
+    for ($i = 0; $i < $file_count; $i++) {
       $form_data .= "--$boundary\r\nContent-Disposition: form-data; name=\"$name\"; filename=\"$filename\"\r\nContent-Type: application/octet-stream\r\n\r\n$content\r\n";
     }
 
     $form_data .= "--$boundary";
-    return $form_data;
+    $headers = [
+      'Content-Type: multipart/form-data; boundary=' . $boundary,
+      'Content-Length: ' . strlen($form_data),
+    ];
+
+    $out = $this->curlExec([
+      CURLOPT_URL => $this->getAbsoluteUrl($path),
+      CURLOPT_POST => TRUE,
+      CURLOPT_POSTFIELDS => $form_data,
+      CURLOPT_HTTPHEADER => $headers
+    ]);
+
+    $verbose = 'POST request to: ' . $path;
+    $verbose .= '<hr />Ending URL: ' . $this->getUrl();
+    if ($this->dumpHeaders) {
+      $verbose .= '<hr />Headers: <pre>' . SafeMarkup::checkPlain(var_export(array_map('trim', $this->headers), TRUE)) . '</pre>';
+    }
+    $verbose .= '<hr />' . $out;
+    $this->verbose($verbose);
+
+    return $post;
   }
 }

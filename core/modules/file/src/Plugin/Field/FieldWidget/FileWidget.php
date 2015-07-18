@@ -335,7 +335,12 @@ class FileWidget extends WidgetBase implements ContainerFactoryPluginInterface {
     $parents = $element['#parents'];
     $values = NestedArray::getValue($form_state->getValues(), $parents);
 
+    // Parents includes the field delta but not widget, change parents
+    // accordingly.
+    // @todo Figure out why widget is not in the parents.
     array_pop($parents);
+    $parents[] = 'widget';
+
     $current = count(Element::children(NestedArray::getValue($form, $parents))) - 1;
 
     $field_storage_definitions = \Drupal::entityManager()->getFieldStorageDefinitions($element['#entity_type']);
