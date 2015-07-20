@@ -1,0 +1,3 @@
+[submodule "monitoring"]
+	path = monitoring
+	url = http://git.drupal.org/project/monitoring.git
