@@ -7,6 +7,7 @@
 
 namespace Drupal\Tests\Core\Entity;
 
+use Drupal\Core\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\Routing\Route;
 use Drupal\Core\Access\AccessResult;
@@ -25,6 +26,14 @@ class EntityAccessCheckTest extends UnitTestCase {
    * Tests the method for checking access to routes.
    */
   public function testAccess() {
+
+    $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container = new Container();
+    $container->set('cache_contexts_manager', $cache_contexts_manager);
+    \Drupal::setContainer($container);
+
     $route = new Route('/foo', array(), array('_entity_access' => 'node.update'));
     $upcasted_arguments = new ParameterBag();
     $route_match = $this->getMock('Drupal\Core\Routing\RouteMatchInterface');

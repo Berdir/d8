@@ -8,6 +8,8 @@ namespace Drupal\Core\Access;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Config\ConfigBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -25,47 +27,10 @@ use Drupal\Core\Session\AccountInterface;
  *
  * When using ::orIf() and ::andIf(), cacheability metadata will be merged
  * accordingly as well.
- *
- * @todo Use RefinableCacheableDependencyInterface and the corresponding trait in
- *   https://www.drupal.org/node/2526326.
  */
-abstract class AccessResult implements AccessResultInterface, CacheableDependencyInterface {
+abstract class AccessResult implements AccessResultInterface, RefinableCacheableDependencyInterface {
 
-  /**
-   * The cache context IDs (to vary a cache item ID based on active contexts).
-   *
-   * @see \Drupal\Core\Cache\Context\CacheContextInterface
-   * @see \Drupal\Core\Cache\Context\CacheContextsManager::convertTokensToKeys()
-   *
-   * @var string[]
-   */
-  protected $contexts;
-
-  /**
-   * The cache tags.
-   *
-   * @var array
-   */
-  protected $tags;
-
-  /**
-   * The maximum caching time in seconds.
-   *
-   * @var int
-   */
-  protected $maxAge;
-
-  /**
-   * Constructs a new AccessResult object.
-   */
-  public function __construct() {
-    $this->resetCacheContexts()
-      ->resetCacheTags()
-      // Max-age must be non-zero for an access result to be cacheable.
-      // Typically, cache items are invalidated via associated cache tags, not
-      // via a maximum age.
-      ->setCacheMaxAge(Cache::PERMANENT);
-  }
+  use RefinableCacheableDependencyTrait;
 
   /**
    * Creates an AccessResultInterface object with isNeutral() === TRUE.
@@ -215,35 +180,22 @@ abstract class AccessResult implements AccessResultInterface, CacheableDependenc
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    sort($this->contexts);
-    return $this->contexts;
+    sort($this->cacheContexts);
+    return $this->cacheContexts;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheTags() {
-    return $this->tags;
+    return $this->cacheTags;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheMaxAge() {
-    return $this->maxAge;
-  }
-
-  /**
-   * Adds cache contexts associated with the access result.
-   *
-   * @param string[] $contexts
-   *   An array of cache context IDs, used to generate a cache ID.
-   *
-   * @return $this
-   */
-  public function addCacheContexts(array $contexts) {
-    $this->contexts = array_unique(array_merge($this->contexts, $contexts));
-    return $this;
+    return $this->cacheMaxAge;
   }
 
   /**
@@ -252,20 +204,7 @@ abstract class AccessResult implements AccessResultInterface, CacheableDependenc
    * @return $this
    */
   public function resetCacheContexts() {
-    $this->contexts = array();
-    return $this;
-  }
-
-  /**
-   * Adds cache tags associated with the access result.
-   *
-   * @param array $tags
-   *   An array of cache tags.
-   *
-   * @return $this
-   */
-  public function addCacheTags(array $tags) {
-    $this->tags = Cache::mergeTags($this->tags, $tags);
+    $this->cacheContexts = array();
     return $this;
   }
 
@@ -275,7 +214,7 @@ abstract class AccessResult implements AccessResultInterface, CacheableDependenc
    * @return $this
    */
   public function resetCacheTags() {
-    $this->tags = array();
+    $this->cacheTags = array();
     return $this;
   }
 
@@ -288,7 +227,7 @@ abstract class AccessResult implements AccessResultInterface, CacheableDependenc
    * @return $this
    */
   public function setCacheMaxAge($max_age) {
-    $this->maxAge = $max_age;
+    $this->cacheMaxAge = $max_age;
     return $this;
   }
 
@@ -340,28 +279,6 @@ abstract class AccessResult implements AccessResultInterface, CacheableDependenc
    */
   public function cacheUntilConfigurationChanges(ConfigBase $configuration) {
     return $this->addCacheableDependency($configuration);
-  }
-
-  /**
-   * Adds a dependency on an object: merges its cacheability metadata.
-   *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface|object $other_object
-   *   The dependency. If the object implements CacheableDependencyInterface,
-   *   then its cacheability metadata will be used. Otherwise, the passed in
-   *   object must be assumed to be uncacheable, so max-age 0 is set.
-   *
-   * @return $this
-   */
-  public function addCacheableDependency($other_object) {
-    if ($other_object instanceof CacheableDependencyInterface) {
-      $this->contexts = Cache::mergeContexts($this->contexts, $other_object->getCacheContexts());
-      $this->tags = Cache::mergeTags($this->tags, $other_object->getCacheTags());
-      $this->maxAge = Cache::mergeMaxAges($this->maxAge, $other_object->getCacheMaxAge());
-    }
-    else {
-      $this->maxAge = 0;
-    }
-    return $this;
   }
 
   /**
