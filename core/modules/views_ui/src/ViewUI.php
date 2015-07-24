@@ -1370,11 +1370,4 @@ class ViewUI implements ViewEntityInterface {
     return $this->storage->addCacheTags($cache_tags);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function addCacheableDependency($other_object) {
-    return $this->storage->addCacheableDependency($other_object);
-  }
-
 }
