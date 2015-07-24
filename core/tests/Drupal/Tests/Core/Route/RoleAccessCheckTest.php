@@ -8,6 +8,7 @@
 namespace Drupal\Tests\Core\Route;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Session\UserSession;
 use Drupal\Tests\UnitTestCase;
@@ -145,9 +146,7 @@ class RoleAccessCheckTest extends UnitTestCase {
    */
   public function testRoleAccess($path, $grant_accounts, $deny_accounts) {
 
-    $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $cache_contexts_manager = $this->prophesize(CacheContextsManager::class)->reveal();
     $container = new Container();
     $container->set('cache_contexts_manager', $cache_contexts_manager);
     \Drupal::setContainer($container);

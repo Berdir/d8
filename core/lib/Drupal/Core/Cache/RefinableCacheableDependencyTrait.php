@@ -44,7 +44,7 @@ trait RefinableCacheableDependencyTrait {
     }
     else {
       // Not a cacheable dependency, this can not be cached.
-      $this->maxAge = 0;
+      $this->cacheMaxAge = 0;
     }
     return $this;
   }
@@ -73,29 +73,7 @@ trait RefinableCacheableDependencyTrait {
    * {@inheritdoc}
    */
   public function mergeCacheMaxAge($max_age) {
-    if ($this->cacheMaxAge === Cache::PERMANENT) {
-      $this->cacheMaxAge = $max_age;
-    }
-    elseif ($max_age && $max_age !== Cache::PERMANENT) {
-      $this->cacheMaxAge = Cache::mergeMaxAges($this->cacheMaxAge, $max_age);
-    }
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addCacheableDependency($other_object) {
-    if ($other_object instanceof CacheableDependencyInterface) {
-      $this->addCacheTags($other_object->getCacheTags());
-      $this->addCacheContexts($other_object->getCacheContexts());
-      $this->mergeCacheMaxAge($other_object->getCacheMaxAge());
-    }
-    else {
-      // Not a cacheable dependency, this can not be cached.
-      $this->cacheMaxAge = 0;
-    }
-
+    $this->cacheMaxAge = Cache::mergeMaxAges($this->cacheMaxAge, $max_age);
     return $this;
   }
 

@@ -180,7 +180,6 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    sort($this->cacheContexts);
     return $this->cacheContexts;
   }
 

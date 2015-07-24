@@ -444,13 +444,6 @@ class AccessResultTest extends UnitTestCase {
     // ::addCacheableDependency() convenience method.
     $node = $this->getMock('\Drupal\node\NodeInterface');
     $node->expects($this->any())
-      ->method('getCacheContexts')
-      ->willReturn([]);
-    $node->expects($this->any())
-      ->method('getCacheMaxAge')
-      ->willReturn(Cache::PERMANENT);
-    $tags = array('node:20011988');
-    $node->expects($this->any())
       ->method('getCacheTags')
       ->will($this->returnValue(array('node:20011988')));
     $node->expects($this->any())

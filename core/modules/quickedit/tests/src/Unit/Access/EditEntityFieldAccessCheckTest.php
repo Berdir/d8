@@ -8,6 +8,7 @@
 namespace Drupal\Tests\quickedit\Unit\Access;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\quickedit\Access\EditEntityFieldAccessCheck;
 use Drupal\Tests\UnitTestCase;
@@ -35,9 +36,7 @@ class EditEntityFieldAccessCheckTest extends UnitTestCase {
   protected function setUp() {
     $this->editAccessCheck = new EditEntityFieldAccessCheck();
 
-    $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $cache_contexts_manager = $this->prophesize(CacheContextsManager::class)->reveal();
     $container = new Container();
     $container->set('cache_contexts_manager', $cache_contexts_manager);
     \Drupal::setContainer($container);
@@ -63,14 +62,14 @@ class EditEntityFieldAccessCheckTest extends UnitTestCase {
    *
    * @param bool $entity_is_editable
    *   Whether the subject entity is editable.
-   * @param bool $field_storage_access
+   * @param bool $field_storage_is_accessible
    *   Whether the user has access to the field storage entity.
    * @param \Drupal\Core\Access\AccessResult $expected_result
    *   The expected result of the access call.
    *
    * @dataProvider providerTestAccess
    */
-  public function testAccess($entity_is_editable, $field_storage_access, AccessResult $expected_result) {
+  public function testAccess($entity_is_editable, $field_storage_is_accessible, AccessResult $expected_result) {
     $entity = $this->createMockEntity();
     $entity->expects($this->any())
       ->method('access')
@@ -79,7 +78,7 @@ class EditEntityFieldAccessCheckTest extends UnitTestCase {
     $field_storage = $this->getMock('Drupal\field\FieldStorageConfigInterface');
     $field_storage->expects($this->any())
       ->method('access')
-      ->willReturn(AccessResult::allowedIf($field_storage_access));
+      ->willReturn(AccessResult::allowedIf($field_storage_is_accessible));
 
     $expected_result->cachePerPermissions();
 

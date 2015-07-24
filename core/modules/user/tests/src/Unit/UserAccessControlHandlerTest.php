@@ -9,6 +9,7 @@ namespace Drupal\Tests\user\Unit;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\UserAccessControlHandler;
@@ -64,9 +65,7 @@ class UserAccessControlHandlerTest extends UnitTestCase {
   public function setUp() {
     parent::setUp();
 
-    $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $cache_contexts_manager = $this->prophesize(CacheContextsManager::class)->reveal();
     $container = new Container();
     $container->set('cache_contexts_manager', $cache_contexts_manager);
     \Drupal::setContainer($container);
