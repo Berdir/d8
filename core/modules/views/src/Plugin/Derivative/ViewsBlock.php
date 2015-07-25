@@ -8,6 +8,7 @@
 namespace Drupal\views\Plugin\Derivative;
 
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -105,9 +106,27 @@ class ViewsBlock implements ContainerDeriverInterface {
             'config_dependencies' => array(
               'config' => array(
                 $view->getConfigDependencyName(),
-              )
-            )
+              ),
+            ),
           );
+
+          // Look for arguments and expose them as context.
+          if ($arguments = $display->getOption('arguments')) {
+            foreach ($arguments as $argument_name => $argument) {
+              if (!empty($argument['specify_validation'])) {
+                if (strpos($argument['validate']['type'], 'entity:') !== FALSE) {
+                  $this->derivatives[$delta]['context'][$argument_name] = new ContextDefinition($argument['validate']['type'], $argument_name, FALSE);
+                }
+              }
+              else {
+                switch ($argument['plugin_id']) {
+                  case 'numeric':
+                    $this->derivatives[$delta]['context'][$argument_name] = new ContextDefinition('integer', $argument_name, FALSE);
+                }
+              }
+            }
+          }
+
           $this->derivatives[$delta] += $base_plugin_definition;
         }
       }

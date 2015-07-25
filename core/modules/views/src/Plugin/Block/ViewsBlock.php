@@ -9,9 +9,8 @@ namespace Drupal\views\Plugin\Block;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Xss;
-use Drupal\Core\Config\Entity\Query\Query;
 use Drupal\Core\Form\FormStateInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Provides a generic Views block.
@@ -30,7 +29,25 @@ class ViewsBlock extends ViewsBlockBase {
   public function build() {
     $this->view->display_handler->preBlockBuild($this);
 
-    if ($output = $this->view->buildRenderable($this->displayID, [], FALSE)) {
+    $this->view->display_handler->getOption('arguments');
+
+    $args = array();
+    if ($this->context) {
+      foreach ($this->view->display_handler->getOption('arguments') as $argument_name => $argument) {
+        if (isset($this->context[$argument_name])) {
+          $value = $this->context[$argument_name]->getContextValue();
+          if ($value instanceof EntityInterface) {
+            $value = $value->id();
+          }
+          $args[] = $value;
+        }
+        else {
+          $args[] = $argument['exception']['value'];
+        }
+      }
+    }
+
+    if ($output = $this->view->buildRenderable($this->displayID, $args, FALSE)) {
       // Override the label to the dynamic title configured in the view.
       if (empty($this->configuration['views_label']) && $this->view->getTitle()) {
         // @todo https://www.drupal.org/node/2527360 remove call to SafeMarkup.
