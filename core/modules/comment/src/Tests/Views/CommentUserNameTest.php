@@ -9,6 +9,7 @@ namespace Drupal\comment\Tests\Views;
 
 use Drupal\comment\Entity\Comment;
 use Drupal\Core\Session\AnonymousUserSession;
+use Drupal\entity_test\Entity\EntityTest;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\views\Entity\View;
