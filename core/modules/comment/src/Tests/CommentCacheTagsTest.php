@@ -98,9 +98,6 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
    */
   public function testCommentEntity() {
 
-    $this->verifyPageCache($this->entityTestHippopotamidae->urlInfo(), 'MISS');
-    $this->verifyPageCache($this->entityTestHippopotamidae->urlInfo(), 'HIT');
-
     $this->verifyPageCache($this->entityTestCamelid->urlInfo(), 'MISS');
     $this->verifyPageCache($this->entityTestCamelid->urlInfo(), 'HIT');
 
@@ -110,6 +107,9 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
       'type' => 'bar',
     ));
     $this->entityTestHippopotamidae->save();
+
+    $this->verifyPageCache($this->entityTestHippopotamidae->urlInfo(), 'MISS');
+    $this->verifyPageCache($this->entityTestHippopotamidae->urlInfo(), 'HIT');
 
     $hippo_comment = Comment::create(array(
       'subject' => 'Hippopotamus',
