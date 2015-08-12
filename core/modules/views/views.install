@@ -110,10 +110,53 @@ function views_update_8001(&$sandbox) {
   }
 
   if (!empty($ids)) {
-    $message = \Drupal::translation()->translate('Updated field plugins for views: @ids', ['@ids' => implode(', ', array_unique($ids))]);
+    $message = t('Updated field plugins for views: @ids', ['@ids' => implode(', ', array_unique($ids))]);
   }
 
   return $message;
+}
+
+/**
+ * Update all views to re-generate the cacheability metadata.
+ */
+function views_update_8002(&$sandbox) {
+  $config_factory = \Drupal::configFactory();
+
+  // Remove 'cacheable' key from cache_metadata. See change record
+  // https://www.drupal.org/node/2538352 for more explanation.
+  foreach ($config_factory->listAll('views.view.') as $view_config_name) {
+    $view = $config_factory->getEditable($view_config_name);
+    // To update the cacheability metadata of an existing view we have to
+    // recalculate it. Cacheability metadata is calculated per display bases so
+    // we have to load each display. To load the each display we need
+    // \Drupal\views\ViewExecutable. To load the ViewExecutable we need
+    // \Drupal\views\ViewEntityInterface which can be loaded using views storage
+    // controller.
+    /*  @var \Drupal\views\ViewEntityInterface $view_storage */
+    $view_storage = \Drupal::service('entity.manager')
+      ->getStorage('view')
+      ->load($view->get('id'));
+    $view_executable = \Drupal::service('views.executable')
+      ->get($view_storage);
+    $displays = $view->get('display');
+    foreach (array_keys($displays) as $display_id) {
+      $view_executable->setDisplay($display_id);
+      $display_plugin = $view_executable
+        ->getDisplay();
+      // Remove the old cacheability metadata so that we can recalculate.
+      unset($display_plugin->display['cache_metadata']);
+      $cache_metadata = $display_plugin->getCacheMetadata();
+      $view->set("display.$display_id.cache_metadata", [
+        'contexts' => $cache_metadata->getCacheContexts(),
+        'max_age'=> $cache_metadata->getCacheMaxAge(),
+        'tags' => $cache_metadata->getCacheTags(),
+      ]);
+    }
+    $view->save(TRUE);
+  }
+
+  return t('Updated cacheability metadata of all the views.');
+
 }
 
 /**

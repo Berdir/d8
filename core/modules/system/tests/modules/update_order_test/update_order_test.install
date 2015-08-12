@@ -50,4 +50,15 @@ if (\Drupal::state()->get('update_order_test', FALSE)) {
     }
   }
 
+  /**
+   * Makes sure views_update_8002 runs before test update hooks.
+   */
+  function update_order_test_update_dependencies() {
+    // Run this after the views have been updated.
+    $dependencies['update_order_test'][8001] = array(
+      'views' => 8002,
+    );
+    return $dependencies;
+  }
+
 }

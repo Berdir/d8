@@ -8,11 +8,12 @@
 namespace Drupal\user\Plugin\views\access;
 
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\PermissionHandlerInterface;
-use Drupal\views\Plugin\CacheablePluginInterface;
 use Drupal\views\Plugin\views\access\AccessPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
@@ -28,7 +29,7 @@ use Symfony\Component\Routing\Route;
  *   help = @Translation("Access will be granted to users with the specified permission string.")
  * )
  */
-class Permission extends AccessPluginBase implements CacheablePluginInterface {
+class Permission extends AccessPluginBase implements CacheableDependencyInterface {
 
   /**
    * Overrides Drupal\views\Plugin\Plugin::$usesOptions.
@@ -136,8 +137,8 @@ class Permission extends AccessPluginBase implements CacheablePluginInterface {
   /**
    * {@inheritdoc}
    */
-  public function isCacheable() {
-    return TRUE;
+  public function getCacheMaxAge() {
+    return Cache::PERMANENT;
   }
 
   /**
@@ -145,6 +146,13 @@ class Permission extends AccessPluginBase implements CacheablePluginInterface {
    */
   public function getCacheContexts() {
     return ['user.permissions'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    return [];
   }
 
 }

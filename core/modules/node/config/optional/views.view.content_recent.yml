@@ -339,6 +339,15 @@ display:
       use_more_text: More
       link_url: admin/content
       link_display: custom_url
+    cache_metadata:
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - user
+        - 'user.node_grants:view'
+        - user.permissions
+      max_age: -1
+      tags: {  }
   block_1:
     display_plugin: block
     id: block_1
@@ -346,3 +355,12 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
+    cache_metadata:
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - user
+        - 'user.node_grants:view'
+        - user.permissions
+      max_age: -1
+      tags: {  }

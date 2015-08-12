@@ -141,7 +141,7 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-      cacheable: false
+      max_age: 0
   feed_1:
     display_plugin: feed
     id: feed_1
@@ -398,7 +398,7 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-      cacheable: false
+      max_age: 0
   page_1:
     display_plugin: page
     id: page_1
@@ -418,4 +418,4 @@ display:
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
-      cacheable: false
+      max_age: 0
