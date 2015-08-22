@@ -1352,8 +1352,8 @@ abstract class WebTestBase extends TestBase {
     // to at least three external connections.
     $request = \Drupal::request();
     $cookie_params = $request->cookies;
-    if ($cookie_params->has('XDEBUG_SESSION')) {
-      $cookies[] = 'XDEBUG_SESSION=' . $cookie_params->get('XDEBUG_SESSION');
+    if (isset($_COOKIE['XDEBUG_SESSION'])) {
+      $cookies[] = 'XDEBUG_SESSION=' . $_COOKIE['XDEBUG_SESSION'];
     }
     // For CLI requests, the information is stored in $_SERVER.
     $server = $request->server;
