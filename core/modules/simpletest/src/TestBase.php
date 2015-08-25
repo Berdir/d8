@@ -1300,6 +1300,7 @@ abstract class TestBase {
     file_unmanaged_delete_recursive($this->siteDirectory, array($this, 'filePreDeleteCallback'));
 
     // Restore original database connection.
+    debug(spl_object_hash(Database::getConnection('default')));
     Database::removeConnection('default');
     Database::renameConnection('simpletest_original_default', 'default');
 

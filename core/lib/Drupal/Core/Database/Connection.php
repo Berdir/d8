@@ -99,7 +99,7 @@ abstract class Connection {
    *
    * @var \PDO
    */
-  protected $connection;
+  public $connection;
 
   /**
    * The connection information for this connection object.
@@ -162,6 +162,9 @@ abstract class Connection {
 
     // Set a Statement class, unless the driver opted out.
     if (!empty($this->statementClass)) {
+      if (function_exists('debug')) {
+      //  debug($this->statementClass);
+      }
       $connection->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array($this->statementClass, array($this)));
     }
 
@@ -193,6 +196,7 @@ abstract class Connection {
     // The Statement class attribute only accepts a new value that presents a
     // proper callable, so we reset it to PDOStatement.
     if (!empty($this->statementClass)) {
+      debug(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
       $this->connection->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('PDOStatement', array()));
     }
     $this->schema = NULL;

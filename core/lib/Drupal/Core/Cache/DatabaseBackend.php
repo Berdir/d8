@@ -363,6 +363,10 @@ class DatabaseBackend implements CacheBackendInterface {
       $database_schema = $this->connection->schema();
       if (!$database_schema->tableExists($this->bin)) {
         $schema_definition = $this->schemaDefinition();
+        if (function_exists('debug')) {
+          debug(spl_object_hash($this->connection));
+          //debug($this->connection->connection->getAttribute(\PDO::ATTR_STATEMENT_CLASS));
+        }
         $database_schema->createTable($this->bin, $schema_definition);
         return TRUE;
       }

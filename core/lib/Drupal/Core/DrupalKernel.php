@@ -1155,6 +1155,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $persist_ids[] = $id;
       }
     }
+    if (function_exists('debug')) {
+      debug($persist_ids);
+    }
     $container->setParameter('persist_ids', $persist_ids);
 
     $container->compile();

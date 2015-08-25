@@ -145,6 +145,8 @@ abstract class UpdatePathTestBase extends WebTestBase {
    */
   protected function setUp() {
 
+    \Drupal::unsetContainer();
+
     // Allow classes to set database dump files.
     $this->setDatabaseDumpFiles();
 

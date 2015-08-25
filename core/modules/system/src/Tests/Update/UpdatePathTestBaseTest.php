@@ -47,6 +47,11 @@ class UpdatePathTestBaseTest extends UpdatePathTestBase {
    * Test that updates are properly run.
    */
   public function testUpdateHookN() {
+    $this->container->set('config.storage', NULL);
+    $this->container->set('url_generator', NULL);
+    $this->container->set('cache_factory', NULL);
+    $this->container->set('cache.backend.database', NULL);
+    $this->container->set('cache.config', NULL);
     // Increment the schema version.
     \Drupal::state()->set('update_test_schema_version', 8001);
     $this->runUpdates();
