@@ -353,7 +353,11 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
 
         if (!empty($schema['indexes'])) {
           foreach ($schema['indexes'] as $name => $specifier) {
-            $schema_handler->addIndex($table_name, $name, $specifier, $schema);
+            // Check if the index exists because it might already have been
+            // created as part of the earlier entity type update event.
+            if (!$schema_handler->indexExists($table_name, $name)) {
+              $schema_handler->addIndex($table_name, $name, $specifier, $schema);
+            }
           }
         }
         if (!empty($schema['unique keys'])) {
@@ -1327,8 +1331,14 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
               $real_columns[] = $table_mapping->getFieldColumnName($storage_definition, $column_name);
             }
           }
-          $this->database->schema()->addIndex($table, $real_name, $real_columns, $actual_schema[$table]);
-          $this->database->schema()->addIndex($revision_table, $real_name, $real_columns, $actual_schema[$revision_table]);
+          // Check if the index exists because it might already have been
+          // created as part of the earlier entity type update event.
+          if (!$this->database->schema()->indexExists($table, $real_name)) {
+            $this->database->schema()->addIndex($table, $real_name, $real_columns, $actual_schema[$table]);
+          }
+          if (!$this->database->schema()->indexExists($revision_table, $real_name)) {
+            $this->database->schema()->addIndex($revision_table, $real_name, $real_columns, $actual_schema[$revision_table]);
+          }
         }
       }
       $this->saveFieldSchemaData($storage_definition, $this->getDedicatedTableSchema($storage_definition));
@@ -1405,7 +1415,11 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
             // Create new indexes and unique keys.
             if (!empty($schema[$table_name]['indexes'])) {
               foreach ($schema[$table_name]['indexes'] as $name => $specifier) {
-                $schema_handler->addIndex($table_name, $name, $specifier, $schema[$table_name]);
+                // Check if the index exists because it might already have been
+                // created as part of the earlier entity type update event.
+                if (!$schema_handler->indexExists($table_name, $name)) {
+                  $schema_handler->addIndex($table_name, $name, $specifier, $schema[$table_name]);
+                }
               }
             }
             if (!empty($schema[$table_name]['unique keys'])) {

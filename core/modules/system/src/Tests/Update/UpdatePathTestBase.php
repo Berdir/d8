@@ -144,6 +144,10 @@ abstract class UpdatePathTestBase extends WebTestBase {
    * container that would normally be done via the installer.
    */
   protected function setUp() {
+
+    // Allow classes to set database dump files.
+    $this->setDatabaseDumpFiles();
+
     // We are going to set a missing zlib requirement property for usage
     // during the performUpgrade() and tearDown() methods. Also set that the
     // tests failed.
@@ -190,6 +194,11 @@ abstract class UpdatePathTestBase extends WebTestBase {
     $account->setUsername($this->rootUser->getUsername());
     $account->save();
   }
+
+  /**
+   * Set database dump files to be used.
+   */
+  abstract protected function setDatabaseDumpFiles();
 
   /**
    * Add settings that are missed since the installer isn't run.
