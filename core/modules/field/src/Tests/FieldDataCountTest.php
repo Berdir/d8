@@ -8,6 +8,8 @@
 namespace Drupal\field\Tests;
 
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Tests counting field data records and the hasData() method on
@@ -148,14 +150,14 @@ class FieldDataCountTest extends FieldUnitTestBase {
   public function testCountWithIndex0() {
     // Create a field that will require dedicated storage.
     /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
-    $field_storage = entity_create('field_storage_config', array(
+    $field_storage = FieldStorageConfig::create(array(
       'field_name' => 'field_int',
       'entity_type' => 'user',
       'type' => 'integer',
       'cardinality' => 2,
     ));
     $field_storage->save();
-    entity_create('field_config', array(
+    FieldConfig::create(array(
       'field_storage' => $field_storage,
       'bundle' => 'user',
     ))->save();
