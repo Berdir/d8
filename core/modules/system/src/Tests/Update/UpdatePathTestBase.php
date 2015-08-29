@@ -179,9 +179,6 @@ abstract class UpdatePathTestBase extends WebTestBase {
     // Add the config directories to settings.php.
     drupal_install_config_directories();
 
-    // Install any additional modules.
-    $this->installModulesFromClassProperty($container);
-
     // Restore the original Simpletest batch.
     $this->restoreBatch();
 
@@ -189,6 +186,7 @@ abstract class UpdatePathTestBase extends WebTestBase {
     $this->rebuildAll();
 
     // Replace User 1 with the user created here.
+    // @todo: do this without saving the user account.
     /** @var \Drupal\user\UserInterface $account */
     $account = User::load(1);
     $account->setPassword($this->rootUser->pass_raw);
@@ -274,7 +272,9 @@ abstract class UpdatePathTestBase extends WebTestBase {
     // We know the rebuild causes notices, so don't exit on failure.
     $die_on_fail = $this->dieOnFail;
     $this->dieOnFail = FALSE;
-    parent::rebuildAll();
+
+    // Initialize the container. parent::rebuildall() is not safe to call here.
+    $this->container = \Drupal::getContainer();
 
     // Remove the notices we get due to the menu link rebuild prior to running
     // the system updates for the schema change.

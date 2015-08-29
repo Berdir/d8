@@ -10,10 +10,13 @@ namespace Drupal\Core\Update;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Site\Settings;
+use Drupal\system\Tests\Routing\MockRouteProvider;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Defines a kernel which is used primarily to run the update of Drupal.
@@ -55,6 +58,27 @@ class UpdateKernel extends DrupalKernel {
       return $this->handleException($e, $request, $type);
     }
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function initializeContainer() {
+    $container = parent::initializeContainer();
+
+    $routes = new RouteCollection();
+
+    $routes->add('<front>', new Route('/', ['_title' => 'Home'], ['_access' => 'TRUE']));
+    $routes->add('<none>', new Route('', [], ['_access' => 'TRUE'], ['_no_path' => TRUE]));
+    $routes->add('<current>', new Route('<current>'));
+    $routes->add('system.site_maintenance_mode', new Route('/admin/config/development/maintenance', ['_title' => 'Maintenance mode'], ['_permission' => 'administer site configuration']));
+    $routes->add('system.db_update', new Route('/update.php/{op}', ['op' => 'info'], ['_access' => 'TRUE']));
+
+    $mock_route_provider = new MockRouteProvider($routes);
+    $container->set('@router.route_provider', $mock_route_provider);
+
+    return $container;
+  }
+
 
   /**
    * Generates the actual result of update.php.
