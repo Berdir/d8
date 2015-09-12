@@ -713,6 +713,64 @@ class RendererTest extends RendererTestBase {
   }
 
   /**
+   * @covers ::render
+   * @covers ::doRender
+   * @covers \Drupal\Core\Render\RenderCache::get
+   * @covers \Drupal\Core\Render\RenderCache::set
+   * @covers \Drupal\Core\Render\RenderCache::createCacheID
+   *
+   * @dataProvider providerTestRenderCacheMinAge
+   */
+  public function testRenderCacheMinAge($min_age, $is_render_cached, $request_time_offset) {
+
+    // Simulate that cache items were written N seconds ago.
+    $_SERVER['REQUEST_TIME'] = $_SERVER['REQUEST_TIME'] - $request_time_offset;
+
+    $this->setUpRequest();
+    $this->setupMemoryCache();
+
+    $element = [
+      '#cache' => [
+        'keys' => ['render_cache_test'],
+        'tags' => ['test'],
+        'contexts' => [],
+        'max-age' => Cache::PERMANENT,
+      ],
+      '#attached' => [],
+      '#markup' => '',
+    ];
+
+    if ($min_age) {
+      $element['#cache']['min-age'] = $min_age;
+    }
+
+    $this->renderCache->set($element, $element);
+
+    $this->memoryCache->invalidateTags(['test']);
+
+    // Revert the request time back to the current time by adding the offset
+    // again.
+    $_SERVER['REQUEST_TIME'] = $_SERVER['REQUEST_TIME'] + $request_time_offset;
+    $this->requestStack->getMasterRequest()->server->set('REQUEST_TIME', (int) $_SERVER['REQUEST_TIME']);
+
+    $cached_element = $this->renderCache->get($element);
+    if (!$is_render_cached) {
+      $this->assertFalse($cached_element);
+    }
+    else {
+      $this->assertNotFalse($cached_element);
+    }
+  }
+
+  public function providerTestRenderCacheMinAge() {
+    return [
+      [NULL, FALSE, 0],
+      [60, TRUE, 30],
+      [60, FALSE, 61],
+    ];
+  }
+
+  /**
    * Tests that #cache_properties are properly handled.
    *
    * @param array $expected_results

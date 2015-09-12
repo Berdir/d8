@@ -72,14 +72,28 @@ class RenderCache implements RenderCacheInterface {
     }
     $bin = isset($elements['#cache']['bin']) ? $elements['#cache']['bin'] : 'render';
 
-    if (!empty($cid) && ($cache_bin = $this->cacheFactory->get($bin)) && $cache = $cache_bin->get($cid)) {
+    if (!empty($cid) && ($cache_bin = $this->cacheFactory->get($bin)) && $cache = $cache_bin->get($cid, TRUE)) {
+
       $cached_element = $cache->data;
+
+      // Check if the cache item was invalidated and if so, only return it
+      // if a min-age was set and has not expired.
+      if (!$cache->valid) {
+        if (!isset($cached_element['#cache']['min-age'])) {
+          return FALSE;
+        }
+        if ($cache->created + $cached_element['#cache']['min-age'] < $this->requestStack->getMasterRequest()->server->get('REQUEST_TIME')) {
+          return FALSE;
+        }
+      }
+
       // Two-tier caching: redirect to actual (post-bubbling) cache item.
       // @see \Drupal\Core\Render\RendererInterface::render()
       // @see ::set()
       if (isset($cached_element['#cache_redirect'])) {
         return $this->get($cached_element);
       }
+
       // Return the cached element.
       return $cached_element;
     }
@@ -332,6 +346,10 @@ class RenderCache implements RenderCacheInterface {
         'max-age' => $elements['#cache']['max-age'],
       ],
     ];
+
+    if (isset($elements['#cache']['min-age'])) {
+      $data['#cache']['min-age'] = $elements['#cache']['min-age'];
+    }
 
     // Preserve cacheable items if specified. If we are preserving any cacheable
     // children of the element, we assume we are only interested in their

@@ -75,7 +75,7 @@ class RendererTestBase extends UnitTestCase {
   protected $elementInfo;
 
   /**
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var \Drupal\Core\Cache\MemoryBackend
    */
   protected $memoryCache;
 
