@@ -7,7 +7,9 @@
 
 namespace Drupal\system\Tests\Routing;
 
+use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
+use Drupal\Core\Lock\NullLockBackend;
 use Drupal\Core\State\State;
 use Drupal\simpletest\KernelTestBase;
 use Symfony\Component\Routing\Route;
@@ -41,7 +43,7 @@ class MatcherDumperTest extends KernelTestBase {
     parent::setUp();
 
     $this->fixtures = new RoutingFixtures();
-    $this->state = new State(new KeyValueMemoryFactory());
+    $this->state = new State(new KeyValueMemoryFactory(), new MemoryBackend('test'), new NullLockBackend());;
   }
 
   /**
