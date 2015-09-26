@@ -7,6 +7,7 @@
 
 namespace Drupal\field_ui\Form;
 
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -42,6 +43,22 @@ class FieldConfigDeleteForm extends EntityDeleteForm {
     return new static(
       $container->get('entity.manager')
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getConfigNamesToDelete(ConfigEntityInterface $entity) {
+    /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
+    $field_storage = $entity->getFieldStorageDefinition();
+    $config_names = [$entity->getConfigDependencyName()];
+
+    // If there is only one bundle left for this field storage, it will be
+    // deleted too, notify the user about dependencies.
+    if (count($field_storage->getBundles()) <= 1) {
+      $config_names[] = $field_storage->getConfigDependencyName();
+    }
+    return $config_names;
   }
 
   /**

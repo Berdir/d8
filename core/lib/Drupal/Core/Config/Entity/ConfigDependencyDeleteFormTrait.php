@@ -53,8 +53,7 @@ trait ConfigDependencyDeleteFormTrait {
       '#type' => 'details',
       '#title' => $this->t('Configuration updates'),
       '#description' => $this->t('The listed configuration will be updated.'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
+      '#open' => TRUE,
       '#access' => FALSE,
     );
 
@@ -92,8 +91,7 @@ trait ConfigDependencyDeleteFormTrait {
       '#type' => 'details',
       '#title' => $this->t('Configuration deletions'),
       '#description' => $this->t('The listed configuration will be deleted.'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
+      '#open' => TRUE,
       '#access' => FALSE,
     );
 
@@ -119,10 +117,12 @@ trait ConfigDependencyDeleteFormTrait {
       asort($entity_types, SORT_FLAG_CASE);
       $weight = 0;
       foreach ($entity_types as $entity_type_id => $label) {
-        $form['entity_deletes'][$entity_type_id]['#weight'] = $weight;
-        // Sort the list of entity labels alphabetically.
-        sort($form['entity_deletes'][$entity_type_id]['#items'], SORT_FLAG_CASE);
-        $weight++;
+        if (isset($form['entity_deletes'][$entity_type_id])) {
+          $form['entity_deletes'][$entity_type_id]['#weight'] = $weight;
+          // Sort the list of entity labels alphabetically.
+          sort($form['entity_deletes'][$entity_type_id]['#items'], SORT_FLAG_CASE);
+          $weight++;
+        }
       }
     }
 
