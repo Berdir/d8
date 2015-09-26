@@ -140,7 +140,8 @@
       "lib/Drupal/Core/Database/Database.php",
       "lib/Drupal/Core/DrupalKernel.php",
       "lib/Drupal/Core/DrupalKernelInterface.php",
-      "lib/Drupal/Core/Site/Settings.php"
+      "lib/Drupal/Core/Site/Settings.php",
+      "lib/Drupal/Core/Session/AccountInterface.php"
     ]
   },
   "config": {

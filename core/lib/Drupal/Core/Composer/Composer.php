@@ -33,6 +33,8 @@ class Composer {
       'vendor/symfony/http-kernel/HttpKernel.php',
       'vendor/symfony/http-kernel/HttpKernelInterface.php',
       'vendor/symfony/http-kernel/TerminableInterface.php',
+      'vendor/symfony/dependency-injection/ContainerAwareInterface.php',
+      'vendor/symfony/class-loader/ApcClassLoader.php'
     ));
     $package->setAutoload($autoload);
   }
