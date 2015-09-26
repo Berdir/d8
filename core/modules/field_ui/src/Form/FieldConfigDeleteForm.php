@@ -11,6 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\field_ui\FieldUI;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -48,6 +49,28 @@ class FieldConfigDeleteForm extends EntityDeleteForm {
   /**
    * {@inheritdoc}
    */
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildForm($form, $form_state);
+
+    // If we are adding the field storage as a dependency to delete, then that
+    // will list ourself as a dependency. That is confusing, so remove it.
+    // Recursively also remove the entity type and the whole entity deletions
+    // details element if nothing else is in there.
+    if (isset($form['entity_deletes']['field_config']['#items']) && isset($form['entity_deletes']['field_config']['#items'][$this->entity->id()])) {
+      unset($form['entity_deletes']['field_config']['#items'][$this->entity->id()]);
+      if (empty($form['entity_deletes']['field_config']['#items'])) {
+        unset($form['entity_deletes']['field_config']);
+        if (!Element::children($form['entity_deletes'])) {
+          $form['entity_deletes']['#access'] = FALSE;
+        }
+      }
+    }
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getConfigNamesToDelete(ConfigEntityInterface $entity) {
     /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
     $field_storage = $entity->getFieldStorageDefinition();
@@ -78,11 +101,6 @@ class FieldConfigDeleteForm extends EntityDeleteForm {
 
     if ($field_storage && !$field_storage->isLocked()) {
       $this->entity->delete();
-      // Delete the associated field storages if they are not used anymore and
-      // are not persistent.
-      if (!$this->entity->deleted && $field_storage->isDeletable()) {
-        \Drupal::entityManager()->getStorage('field_storage_config')->delete(array($field_storage));
-      }
       drupal_set_message($this->t('The field %field has been deleted from the %type content type.', array('%field' => $this->entity->label(), '%type' => $bundle_label)));
     }
     else {

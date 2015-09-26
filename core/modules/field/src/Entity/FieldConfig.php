@@ -224,6 +224,27 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
         \Drupal::entityManager()->onFieldDefinitionDelete($field);
       }
     }
+
+    // If this is part of a configuration synchronization then the following
+    // configuration updates are not necessary.
+    $entity = reset($fields);
+    if ($entity->isSyncing()) {
+      return;
+    }
+
+    // Delete the associated field storages if they are not used anymore and are
+    // not persistent.
+    $storages_to_delete = array();
+    foreach ($fields as $field) {
+      $storage_definition = $field->getFieldStorageDefinition();
+      if (!$field->deleted && !$field->isUninstalling() && $storage_definition->isDeletable()) {
+        // Key by field UUID to avoid deleting the same storage twice.
+        $storages_to_delete[$storage_definition->uuid()] = $storage_definition;
+      }
+    }
+    if ($storages_to_delete) {
+      \Drupal::entityManager()->getStorage('field_storage_config')->delete($storages_to_delete);
+    }
   }
 
   /**

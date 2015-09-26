@@ -354,6 +354,8 @@ class BulkDeleteTest extends FieldUnitTestBase {
     // The field and the storage are gone.
     $fields = entity_load_multiple_by_properties('field_config', array('uuid' => $field->uuid(), 'include_deleted' => TRUE));
     $this->assertEqual(count($fields), 0, 'The field is purged.');
+    $storages = entity_load_multiple_by_properties('field_storage_config', array('uuid' => $field_storage->uuid(), 'include_deleted' => TRUE));
+    $this->assertEqual(count($storages), 0, 'The field storage is purged.');
   }
 
 }
