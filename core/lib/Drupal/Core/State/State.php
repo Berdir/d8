@@ -25,7 +25,7 @@ class State extends CacheCollector implements StateInterface {
   protected $keyValueStore;
 
   /**
-   * Constructs an State object.
+   * Constructs a State object.
    *
    * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
    *   The key value store to use.
