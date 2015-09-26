@@ -25,6 +25,8 @@ class Composer {
     $package = $composer->getPackage();
     $autoload = $package->getAutoload();
     $autoload['classmap'] = array_merge($autoload['classmap'], array(
+      'vendor/symfony/class-loader/ApcClassLoader.php',
+      'vendor/symfony/dependency-injection/ContainerAwareInterface.php',
       'vendor/symfony/http-foundation/Request.php',
       'vendor/symfony/http-foundation/ParameterBag.php',
       'vendor/symfony/http-foundation/FileBag.php',
@@ -32,8 +34,6 @@ class Composer {
       'vendor/symfony/http-foundation/HeaderBag.php',
       'vendor/symfony/http-kernel/HttpKernelInterface.php',
       'vendor/symfony/http-kernel/TerminableInterface.php',
-      'vendor/symfony/dependency-injection/ContainerAwareInterface.php',
-      'vendor/symfony/class-loader/ApcClassLoader.php'
     ));
     $package->setAutoload($autoload);
   }
