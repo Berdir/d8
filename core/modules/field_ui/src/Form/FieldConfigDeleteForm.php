@@ -57,7 +57,7 @@ class FieldConfigDeleteForm extends EntityDeleteForm {
     // Recursively also remove the entity type and the whole entity deletions
     // details element if nothing else is in there.
     if (isset($form['entity_deletes']['field_config']['#items']) && isset($form['entity_deletes']['field_config']['#items'][$this->entity->id()])) {
-      //unset($form['entity_deletes']['field_config']['#items'][$this->entity->id()]);
+      unset($form['entity_deletes']['field_config']['#items'][$this->entity->id()]);
       if (empty($form['entity_deletes']['field_config']['#items'])) {
         unset($form['entity_deletes']['field_config']);
         if (!Element::children($form['entity_deletes'])) {
