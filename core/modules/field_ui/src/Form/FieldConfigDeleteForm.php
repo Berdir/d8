@@ -61,6 +61,11 @@ class FieldConfigDeleteForm extends EntityDeleteForm {
 
     if ($field_storage && !$field_storage->isLocked()) {
       $this->entity->delete();
+      // Delete the associated field storages if they are not used anymore and
+      // are not persistent.
+      if (!$this->entity->deleted && $field_storage->isDeletable()) {
+        \Drupal::entityManager()->getStorage('field_storage_config')->delete(array($field_storage));
+      }
       drupal_set_message($this->t('The field %field has been deleted from the %type content type.', array('%field' => $this->entity->label(), '%type' => $bundle_label)));
     }
     else {

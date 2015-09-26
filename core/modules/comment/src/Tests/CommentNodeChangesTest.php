@@ -33,7 +33,6 @@ class CommentNodeChangesTest extends CommentTestBase {
     $this->assertNotNull(FieldConfig::load('node.article.comment'), 'Comment field exists');
     // Delete the node type.
     entity_delete_multiple('node_type', array($this->node->bundle()));
-    $this->assertNull(FieldStorageConfig::load('node.comment'), 'Comment field storage deleted');
     $this->assertNull(FieldConfig::load('node.article.comment'), 'Comment field deleted');
   }
 }
