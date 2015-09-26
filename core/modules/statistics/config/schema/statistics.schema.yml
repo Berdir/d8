@@ -17,6 +17,9 @@ statistics.settings:
     count_content_views:
       type: integer
       label: 'Count content views'
+    display_max_age:
+      type: integer
+      label: 'How long that content that shows a views counter is cached'
 
 block.settings.statistics_popular_block:
   type: block_settings
