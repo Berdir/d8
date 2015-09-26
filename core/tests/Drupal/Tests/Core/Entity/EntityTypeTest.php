@@ -288,7 +288,7 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * @covers ::getLabel
    */
-  public function testgetLabel() {
+  public function testGetLabel() {
     $translatable_label = new TranslatableString($this->randomMachineName());
     $entity_type = $this->setUpEntityType(array('label' => $translatable_label));
     $this->assertSame($translatable_label, $entity_type->getLabel());
@@ -301,7 +301,7 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * @covers ::getGroupLabel
    */
-  public function testgetGroupLabel() {
+  public function testGetGroupLabel() {
     $translatable_group_label = new TranslatableString($this->randomMachineName());
     $entity_type = $this->setUpEntityType(array('group_label' => $translatable_group_label));
     $this->assertSame($translatable_group_label, $entity_type->getGroupLabel());
