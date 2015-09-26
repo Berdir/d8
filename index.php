@@ -8,10 +8,10 @@
  * See COPYRIGHT.txt and LICENSE.txt files in the "core" directory.
  */
 
-$xhprof_path = '/var/www/html';
-include_once $xhprof_path . '/xhprof_lib/utils/xhprof_lib.php';
-include_once $xhprof_path . '/xhprof_lib/utils/xhprof_runs.php';
-xhprof_enable(XHPROF_FLAGS_NO_BUILTINS + XHPROF_FLAGS_MEMORY);
+$uprofiler_path = '/var/www/html';
+include_once $uprofiler_path . '/uprofiler_lib/utils/uprofiler_lib.php';
+include_once $uprofiler_path . '/uprofiler_lib/utils/uprofiler_runs.php';
+uprofiler_enable(UPROFILER_FLAGS_NO_BUILTINS + UPROFILER_FLAGS_MEMORY);
 
 use Drupal\Core\DrupalKernel;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,8 +26,8 @@ $response->send();
 
 $kernel->terminate($request, $response);
 
-$xhprof_data = xhprof_disable();
-$xhprof_runs = new XHProfRuns_Default();
+$uprofiler_data = uprofiler_disable();
+$uprofiler_runs = new uprofilerRuns_Default();
 $namespace = 'd8';
-$id = $xhprof_runs->save_run($xhprof_data, $namespace);
-print "<a href='http://localhost/xhprof_html/?run=$id&sort=excl_wt&source=$namespace'>XHPROF</a>";
+$id = $uprofiler_runs->save_run($uprofiler_data, $namespace);
+print "<a href='http://localhost/uprofiler_html/?run=$id&sort=excl_wt&source=$namespace'>uprofiler</a>";
