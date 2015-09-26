@@ -135,7 +135,6 @@
       "lib/Drupal.php"
     ],
     "classmap": [
-      "lib/Drupal/Component/Utility/Timer.php",
       "lib/Drupal/Component/Utility/Unicode.php",
       "lib/Drupal/Core/Database/Database.php",
       "lib/Drupal/Core/DrupalKernel.php",

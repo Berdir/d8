@@ -30,7 +30,6 @@ class Composer {
       'vendor/symfony/http-foundation/FileBag.php',
       'vendor/symfony/http-foundation/ServerBag.php',
       'vendor/symfony/http-foundation/HeaderBag.php',
-      'vendor/symfony/http-kernel/HttpKernel.php',
       'vendor/symfony/http-kernel/HttpKernelInterface.php',
       'vendor/symfony/http-kernel/TerminableInterface.php',
       'vendor/symfony/dependency-injection/ContainerAwareInterface.php',
