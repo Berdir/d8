@@ -102,7 +102,6 @@ class StatisticsAdminTest extends WebTestBase {
     $this->client->post($stats_path, array('form_params' => $post));
     $this->drupalGet('node/' . $this->testNode->id());
     $this->assertText('3 views', 'Views counter was not updated.');
-
   }
 
   /**
