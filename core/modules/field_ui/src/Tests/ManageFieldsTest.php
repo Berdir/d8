@@ -15,6 +15,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\simpletest\WebTestBase;
 use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\views\Tests\ViewTestData;
 
 /**
  * Tests the Field UI "Manage fields" screen.
@@ -31,7 +32,7 @@ class ManageFieldsTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('node', 'field_ui', 'field_test', 'taxonomy', 'image', 'block');
+  public static $modules = array('node', 'field_ui', 'field_test', 'taxonomy', 'image', 'block', 'field_test_views');
 
   /**
    * The ID of the custom content type created for testing.
@@ -62,6 +63,13 @@ class ManageFieldsTest extends WebTestBase {
   protected $fieldName;
 
   /**
+   * Test views to enable
+   *
+   * @var string[]
+   */
+  public static $testViews = array('test_view_field_delete');
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -82,7 +90,7 @@ class ManageFieldsTest extends WebTestBase {
 
     // Create random field name with markup to test escaping.
     $this->fieldLabel = '<em>' . $this->randomMachineName(8) . '</em>';
-    $this->fieldNameInput =  strtolower($this->randomMachineName(8));
+    $this->fieldNameInput =  'test';
     $this->fieldName = 'field_'. $this->fieldNameInput;
 
     // Create Basic page and Article node types.
@@ -115,7 +123,7 @@ class ManageFieldsTest extends WebTestBase {
    * In order to act on the same fields, and not create the fields over and over
    * again the following tests create, update and delete the same fields.
    */
-  function dtestCRUDFields() {
+  function testCRUDFields() {
     $this->manageFieldsPage();
     $this->createField();
     $this->updateField();
@@ -342,7 +350,7 @@ class ManageFieldsTest extends WebTestBase {
   /**
    * Tests that the 'field_prefix' setting works on Field UI.
    */
-  function dtestFieldPrefix() {
+  function testFieldPrefix() {
     // Change default field prefix.
     $field_prefix = strtolower($this->randomMachineName(10));
     $this->config('field_ui.settings')->set('field_prefix', $field_prefix)->save();
@@ -368,7 +376,7 @@ class ManageFieldsTest extends WebTestBase {
   /**
    * Tests that default value is correctly validated and saved.
    */
-  function dtestDefaultValue() {
+  function testDefaultValue() {
     // Create a test field storage and field.
     $field_name = 'test';
     FieldStorageConfig::create(array(
@@ -445,6 +453,9 @@ class ManageFieldsTest extends WebTestBase {
    * Tests that deletion removes field storages and fields as expected.
    */
   function testDeleteField() {
+
+    $this->fieldLabel = $this->randomMachineName();
+
     // Create a new field.
     $bundle_path1 = 'admin/structure/types/manage/' . $this->contentType;
     $this->fieldUIAddNewField($bundle_path1, $this->fieldNameInput, $this->fieldLabel);
@@ -458,10 +469,13 @@ class ManageFieldsTest extends WebTestBase {
     $bundle_path2 = 'admin/structure/types/manage/' . $type_name2;
     $this->fieldUIAddExistingField($bundle_path2, $this->fieldName, $this->fieldLabel);
 
-    // Check the config dependencies of the first field.
+    // Check the config dependencies of the first field, the field storage must
+    // not be shown as being deleted yet.
     $this->drupalGet("$bundle_path1/fields/node.$this->contentType.$this->fieldName/delete");
+    $this->assertNoText(t('The listed configuration will be deleted.'));
+    $this->assertNoText(t('View'));
+    $this->assertNoText('test_view_field_delete');
     
-
     // Delete the first field.
     $this->fieldUIDeleteField($bundle_path1, "node.$this->contentType.$this->fieldName", $this->fieldLabel, $this->contentType);
 
@@ -469,6 +483,19 @@ class ManageFieldsTest extends WebTestBase {
     $this->assertNull(FieldConfig::loadByName('node', $this->contentType, $this->fieldName), 'Field was deleted.');
     // Check that the field storage was not deleted
     $this->assertNotNull(FieldStorageConfig::loadByName('node', $this->fieldName), 'Field storage was not deleted.');
+
+    \Drupal::service('module_installer')->install(['views']);
+    ViewTestData::createTestViews(get_class($this), array('field_test_views'));
+
+    // Check the config dependencies of the first field.
+    $this->drupalGet("$bundle_path2/fields/node.$type_name2.$this->fieldName/delete");
+    $this->assertText(t('The listed configuration will be deleted.'));
+    $this->assertText(t('View'));
+    $this->assertText('test_view_field_delete');
+
+    $xml = $this->cssSelect('#edit-entity-deletes');
+    // Remove the wrapping HTML.
+    $this->assertIdentical(FALSE, strpos($xml[0]->asXml(), $this->fieldLabel), 'The currently being deleted field is not shown in the entity deletions.');
 
     // Delete the second field.
     $this->fieldUIDeleteField($bundle_path2, "node.$type_name2.$this->fieldName", $this->fieldLabel, $type_name2);
@@ -482,7 +509,7 @@ class ManageFieldsTest extends WebTestBase {
   /**
    * Tests that Field UI respects disallowed field names.
    */
-  function dtestDisallowedFieldNames() {
+  function testDisallowedFieldNames() {
     // Reset the field prefix so we can test properly.
     $this->config('field_ui.settings')->set('field_prefix', '')->save();
 
@@ -508,7 +535,7 @@ class ManageFieldsTest extends WebTestBase {
   /**
    * Tests that Field UI respects locked fields.
    */
-  function dtestLockedField() {
+  function testLockedField() {
     // Create a locked field and attach it to a bundle. We need to do this
     // programmatically as there's no way to create a locked field through UI.
     $field_name = strtolower($this->randomMachineName(8));
@@ -545,7 +572,7 @@ class ManageFieldsTest extends WebTestBase {
   /**
    * Tests that Field UI respects the 'no_ui' flag in the field type definition.
    */
-  function dtestHiddenFields() {
+  function testHiddenFields() {
     // Check that the field type is not available in the 'add new field' row.
     $this->drupalGet('admin/structure/types/manage/' . $this->contentType . '/fields/add-field');
     $this->assertFalse($this->xpath('//select[@id="edit-new-storage-type"]//option[@value="hidden_test_field"]'), "The 'add new field' select respects field types 'no_ui' property.");
@@ -596,7 +623,7 @@ class ManageFieldsTest extends WebTestBase {
   /**
    * Tests renaming a bundle.
    */
-  function dtestRenameBundle() {
+  function testRenameBundle() {
     $type2 = strtolower($this->randomMachineName(8)) . '_test';
 
     $options = array(
@@ -609,7 +636,7 @@ class ManageFieldsTest extends WebTestBase {
   /**
    * Tests that a duplicate field name is caught by validation.
    */
-  function dtestDuplicateFieldName() {
+  function testDuplicateFieldName() {
     // field_tags already exists, so we're expecting an error when trying to
     // create a new field with the same name.
     $edit = array(
@@ -627,7 +654,7 @@ class ManageFieldsTest extends WebTestBase {
   /**
    * Tests that external URLs in the 'destinations' query parameter are blocked.
    */
-  public function dtestExternalDestinations() {
+  public function testExternalDestinations() {
     $options = [
       'query' => ['destinations' => ['http://example.com']],
     ];
@@ -641,7 +668,7 @@ class ManageFieldsTest extends WebTestBase {
   /**
    * Tests that deletion removes field storages and fields as expected for a term.
    */
-  function dtestDeleteTaxonomyField() {
+  function testDeleteTaxonomyField() {
     // Create a new field.
     $bundle_path = 'admin/structure/taxonomy/manage/tags/overview';
 
@@ -659,7 +686,7 @@ class ManageFieldsTest extends WebTestBase {
   /**
    * Tests that help descriptions render valid HTML.
    */
-  function dtestHelpDescriptions() {
+  function testHelpDescriptions() {
     // Create an image field
     FieldStorageConfig::create(array(
       'field_name' => 'field_image',
@@ -710,7 +737,7 @@ class ManageFieldsTest extends WebTestBase {
    *
    * @see \Drupal\Core\Field\PreconfiguredFieldUiOptionsInterface
    */
-  public function dtestPreconfiguredFields() {
+  public function testPreconfiguredFields() {
     $this->drupalGet('admin/structure/types/manage/article/fields/add-field');
 
     // Check that the preconfigured field option exist alongside the regular
