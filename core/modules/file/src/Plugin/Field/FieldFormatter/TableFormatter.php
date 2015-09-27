@@ -8,7 +8,6 @@
 namespace Drupal\file\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Plugin implementation of the 'file_table' formatter.

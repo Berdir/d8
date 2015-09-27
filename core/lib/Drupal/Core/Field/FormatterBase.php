@@ -77,8 +77,11 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
   /**
    * {@inheritdoc}
    */
-  public function view(FieldItemListInterface $items, $langcode) {
-    $this->languageFallback($langcode);
+  public function view(FieldItemListInterface $items, $langcode = NULL) {
+    // Default the language to the current content language.
+    if (empty($langcode)) {
+      $langcode = \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+    }
     $elements = $this->viewElements($items, $langcode);
 
     // If there are actual renderable children, use #theme => field, otherwise,
@@ -108,20 +111,6 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
     }
 
     return $elements;
-  }
-
-  /**
-   * Sets the language code variable to the current user interface language.
-   *
-   * @param string $langcode
-   *   The language code passed by reference. If it is null/empty, it is set to
-   *   the current user interface language. If it is already defined, nothing is
-   *   done.
-   */
-  public function languageFallback(&$langcode) {
-    if (empty($langcode)) {
-      $langcode = \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
-    }
   }
 
   /**

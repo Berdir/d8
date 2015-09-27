@@ -10,7 +10,6 @@ namespace Drupal\taxonomy\Plugin\Field\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\EntityReferenceFormatterBase;
-use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Plugin implementation of the 'entity reference taxonomy term RSS' formatter.

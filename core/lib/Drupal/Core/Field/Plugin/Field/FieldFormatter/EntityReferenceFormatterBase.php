@@ -13,7 +13,6 @@ use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Field\FormatterBase;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
 
 /**
@@ -78,7 +77,7 @@ abstract class EntityReferenceFormatterBase extends FormatterBase {
    * @see ::prepareView()
    * @see ::getEntitiestoView()
    */
-  public function view(FieldItemListInterface $items, $langcode) {
+  public function view(FieldItemListInterface $items, $langcode = NULL) {
     $elements = parent::view($items, $langcode);
 
     $field_level_access_cacheability = new CacheableMetadata();
