@@ -8,6 +8,7 @@
 namespace Drupal\Core\Field;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\Element;
 
 /**
@@ -76,8 +77,9 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
   /**
    * {@inheritdoc}
    */
-  public function view(FieldItemListInterface $items) {
-    $elements = $this->viewElements($items);
+  public function view(FieldItemListInterface $items, $langcode) {
+    $this->languageFallback($langcode);
+    $elements = $this->viewElements($items, $langcode);
 
     // If there are actual renderable children, use #theme => field, otherwise,
     // let access cacheability metadata pass through for correct bubbling.
@@ -106,6 +108,20 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
     }
 
     return $elements;
+  }
+
+  /**
+   * Sets the language code variable to the current user interface language.
+   *
+   * @param string $langcode
+   *   The language code passed by reference. If it is null/empty, it is set to
+   *   the current user interface language. If it is already defined, nothing is
+   *   done.
+   */
+  public function languageFallback(&$langcode) {
+    if (empty($langcode)) {
+      $langcode = \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+    }
   }
 
   /**

@@ -8,6 +8,7 @@
 namespace Drupal\file\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Plugin implementation of the 'file_default' formatter.
@@ -25,10 +26,10 @@ class GenericFileFormatter extends FileFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items) {
+  public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = array();
 
-    foreach ($this->getEntitiesToView($items) as $delta => $file) {
+    foreach ($this->getEntitiesToView($items, $langcode) as $delta => $file) {
       $item = $file->_referringItem;
       $elements[$delta] = array(
         '#theme' => 'file_link',

@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -39,6 +40,13 @@ class ImageFormatter extends ImageFormatterBase implements ContainerFactoryPlugi
    * @var \Drupal\Core\Session\AccountInterface
    */
   protected $currentUser;
+
+  /**
+   * The language manager.
+   *
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   */
+  protected $languageManager;
 
   /**
    * The image style entity storage.
@@ -169,9 +177,9 @@ class ImageFormatter extends ImageFormatterBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items) {
+  public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = array();
-    $files = $this->getEntitiesToView($items);
+    $files = $this->getEntitiesToView($items, $langcode);
 
     // Early opt-out if the field is empty.
     if (empty($files)) {

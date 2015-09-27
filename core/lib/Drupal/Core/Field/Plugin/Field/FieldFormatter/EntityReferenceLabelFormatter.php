@@ -10,6 +10,7 @@ namespace Drupal\Core\Field\Plugin\Field\FieldFormatter;
 use Drupal\Core\Entity\Exception\UndefinedLinkTemplateException;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Plugin implementation of the 'entity reference label' formatter.
@@ -59,11 +60,11 @@ class EntityReferenceLabelFormatter extends EntityReferenceFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items) {
+  public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = array();
     $output_as_link = $this->getSetting('link');
 
-    foreach ($this->getEntitiesToView($items) as $delta => $entity) {
+    foreach ($this->getEntitiesToView($items, $langcode) as $delta => $entity) {
       $label = $entity->label();
       // If the link is to be displayed and the entity has a uri, display a
       // link.
