@@ -70,6 +70,17 @@ trait PlaceholderTrait {
         case '@':
           // Escaped only.
           $args[$key] = static::placeholderEscape($value);
+          if (!SafeMarkup::isSafe($value)) {
+            $args[$key] = Html::escape($value);
+          }
+          break;
+
+        case '%':
+          // Escaped and placeholder.
+          if (!SafeMarkup::isSafe($value)) {
+            $value = Html::escape($value);
+          }
+          $args[$key] = '<em class="placeholder">' . $value . '</em>';
           break;
 
         case ':':
@@ -80,10 +91,8 @@ trait PlaceholderTrait {
           $args[$key] = Html::escape(UrlHelper::stripDangerousProtocols($value));
           break;
 
-        case '%':
         default:
-          // Escaped and placeholder.
-          $args[$key] = '<em class="placeholder">' . static::placeholderEscape($value) . '</em>';
+          trigger_error('Invalid placeholder: ' . $key, E_USER_ERROR);
           break;
       }
     }

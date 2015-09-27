@@ -169,6 +169,9 @@ function _drupal_log_error($error, $fatal = FALSE) {
     }
   }
 
+  // Severity_level is not a valid replacement value for t().
+  unset($error['severity_level']);
+
   if (PHP_SAPI === 'cli') {
     if ($fatal) {
       // When called from CLI, simply output a plain text message.
