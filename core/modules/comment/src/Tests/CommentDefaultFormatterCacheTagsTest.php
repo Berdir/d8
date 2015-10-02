@@ -127,6 +127,10 @@ class CommentDefaultFormatterCacheTagsTest extends EntityUnitTestBase {
     ];
     sort($expected_cache_tags);
     $this->assertEqual($build['#cache']['tags'], $expected_cache_tags);
+
+    // First, ensure some node bundle has a comment field.
+    $this->assertIdentical(Cache::PERMANENT, $build['#cache']['max-age']);
+    $this->assertFalse(isset($build['#printed']), 'Cache hit');
   }
 
 }
