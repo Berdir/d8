@@ -558,7 +558,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    return $this->get('uid')->target_id;
+    return $this->getFieldValue('uid', 'target_id');
   }
 
   /**
