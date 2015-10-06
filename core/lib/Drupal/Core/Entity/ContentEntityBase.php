@@ -505,6 +505,41 @@ abstract class ContentEntityBase extends Entity implements \IteratorAggregate, C
     return $this->fields[$name][$langcode];
   }
 
+
+  public function getFieldValue($field_name, $property) {
+    // If a field object is already instantiated for this field, use that.
+    if (isset($this->fields[$field_name])) {
+      return $this->get($field_name)->$property;
+    }
+
+    // Otherwise attempt to get the value from the values directly.
+    if (isset($this->values[$field_name][$this->activeLangcode])) {
+      $field_values = $this->values[$field_name][$this->activeLangcode];
+      if (isset($field_values[0][$property]) && is_array($field_values[0])) {
+        return $field_values[0][$property];
+      }
+      elseif (isset($field_values[$property]) && is_array($field_values)) {
+        return $field_values[$property];
+      }
+      elseif (!is_array($field_values)) {
+        return $field_values;
+      }
+    }
+    elseif ($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT]) {
+      $field_values = $this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT];
+      if (isset($field_values[0][$property]) && is_array($field_values[0])) {
+        return $field_values[0][$property];
+      }
+      elseif (isset($field_values[$property]) && is_array($field_values)) {
+        return $field_values[$property];
+      }
+      elseif (!is_array($field_values)) {
+        return $field_values;
+      }
+    }
+
+  }
+
   /**
    * {@inheritdoc}
    */

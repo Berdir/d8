@@ -361,21 +361,25 @@ class Comment extends ContentEntityBase implements CommentInterface {
    * {@inheritdoc}
    */
   public function getCommentedEntity() {
-    return $this->get('entity_id')->entity;
+    if ($entity_id = $this->getCommentedEntityId()) {
+      return $this->entityManager()
+        ->getStorage($this->getCommentedEntityTypeId())
+        ->load($entity_id);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCommentedEntityId() {
-    return $this->get('entity_id')->target_id;
+    return $this->getFieldValue('entity_id', 'target_id');
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCommentedEntityTypeId() {
-    return $this->get('entity_type')->value;
+    return $this->getFieldValue('entity_type', 'value');
   }
 
   /**
@@ -390,7 +394,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
    * {@inheritdoc}
    */
   public function getFieldName() {
-    return $this->get('field_name')->value;
+    return $this->getFieldValue('field_name', 'value');
   }
 
   /**
@@ -491,14 +495,14 @@ class Comment extends ContentEntityBase implements CommentInterface {
    * {@inheritdoc}
    */
   public function isPublished() {
-    return $this->get('status')->value == CommentInterface::PUBLISHED;
+    return $this->getFieldValue('status', 'value') == CommentInterface::PUBLISHED;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getStatus() {
-    return $this->get('status')->value;
+    return $this->getFieldValue('status', 'value');
   }
 
   /**

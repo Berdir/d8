@@ -168,7 +168,7 @@ class CommentLazyBuilders {
    */
   protected function buildLinks(CommentInterface $entity, EntityInterface $commented_entity) {
     $links = array();
-    $status = $commented_entity->get($entity->getFieldName())->status;
+    $status = $commented_entity->getFieldValue($entity->getFieldName(), 'status');
 
     if ($status == CommentItemInterface::OPEN) {
       if ($entity->access('delete')) {
