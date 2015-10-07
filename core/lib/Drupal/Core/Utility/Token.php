@@ -9,6 +9,7 @@ namespace Drupal\Core\Utility;
 
 use Drupal\Component\Render\HtmlEscapedText;
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -208,6 +209,90 @@ class Token {
     // Escape the tokens, unless they are explicitly markup.
     foreach ($replacements as $token => $value) {
       $replacements[$token] = $value instanceof MarkupInterface ? $value : new HtmlEscapedText($value);
+    }
+
+    // Optionally alter the list of replacement values.
+    if (!empty($options['callback'])) {
+      $function = $options['callback'];
+      $function($replacements, $data, $options, $bubbleable_metadata);
+    }
+
+    $tokens = array_keys($replacements);
+    $values = array_values($replacements);
+
+    // If a local $bubbleable_metadata object was created, apply the metadata
+    // it collected to the renderer's currently active render context.
+    if (!$bubbleable_metadata_is_passed_in && $this->renderer->hasRenderContext()) {
+      $build = [];
+      $bubbleable_metadata->applyTo($build);
+      $this->renderer->render($build);
+    }
+
+    return str_replace($tokens, $values, $text);
+  }
+
+  /**
+   * Replaces all tokens in a given plain text string with appropriate values.
+   *
+   * @param string $text
+   *   An plain text string containing replaceable tokens.
+   * @param array $data
+   *   (optional) An array of keyed objects. For simple replacement scenarios
+   *   'node', 'user', and others are common keys, with an accompanying node or
+   *   user object being the value. Some token types, like 'site', do not require
+   *   any explicit information from $data and can be replaced even if it is
+   *   empty.
+   * @param array $options
+   *   (optional) A keyed array of settings and flags to control the token
+   *   replacement process. Supported options are:
+   *   - langcode: A language code to be used when generating locale-sensitive
+   *     tokens.
+   *   - callback: A callback function that will be used to post-process the
+   *     array of token replacements after they are generated.
+   *   - clear: A boolean flag indicating that tokens should be removed from the
+   *     final text if no replacement value can be generated.
+   * @param \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata|null
+   *   (optional) An object to which static::generate() and the hooks and
+   *   functions that it invokes will add their required bubbleable metadata.
+   *
+   *   To ensure that the metadata associated with the token replacements gets
+   *   attached to the same render array that contains the token-replaced text,
+   *   callers of this method are encouraged to pass in a BubbleableMetadata
+   *   object and apply it to the corresponding render array. For example:
+   *   @code
+   *     $bubbleable_metadata = new BubbleableMetadata();
+   *     $build['#markup'] = $token_service->replace('Tokens: [node:nid] [current-user:uid]', ['node' => $node], [], $bubbleable_metadata);
+   *     $bubbleable_metadata->applyTo($build);
+   *   @endcode
+   *
+   *   When the caller does not pass in a BubbleableMetadata object, this
+   *   method creates a local one, and applies the collected metadata to the
+   *   Renderer's currently active render context.
+   *
+   * @return string
+   *   The token result is the entered plain text with tokens replaced. The
+   *   caller is responsible for choosing the right escaping / sanitization.
+   */
+  public function replacePlainText($text, array $data = array(), array $options = array(), BubbleableMetadata $bubbleable_metadata = NULL) {
+    $text_tokens = $this->scan($text);
+    if (empty($text_tokens)) {
+      return $text;
+    }
+
+    $bubbleable_metadata_is_passed_in = (bool) $bubbleable_metadata;
+    $bubbleable_metadata = $bubbleable_metadata ?: new BubbleableMetadata();
+
+    $replacements = array();
+    foreach ($text_tokens as $type => $tokens) {
+      $replacements += $this->generate($type, $tokens, $data, $options, $bubbleable_metadata);
+      if (!empty($options['clear'])) {
+        $replacements += array_fill_keys($tokens, '');
+      }
+    }
+
+    // Convert all replacements to plain text.
+    foreach ($replacements as $token => $value) {
+      $replacements[$token] = PlainTextOutput::renderFromHtml($value);
     }
 
     // Optionally alter the list of replacement values.
