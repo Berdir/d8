@@ -9,6 +9,7 @@ namespace Drupal\entity_test\Entity;
 
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\entity_test\FieldStorageDefinition;
 
 /**
  * Defines a test entity class for base fields display.
@@ -23,9 +24,10 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     },
  *     "translation" = "Drupal\content_translation\ContentTranslationHandler"
  *   },
- *   base_table = "entity_test",
+ *   base_table = "entity_test_base_field_display",
  *   entity_keys = {
  *     "id" = "id",
+ *     "label" = "name",
  *     "uuid" = "uuid",
  *     "bundle" = "type"
  *   },
@@ -61,6 +63,18 @@ class EntityTestBaseFieldDisplay extends EntityTest {
 
     $fields['test_display_non_configurable'] = BaseFieldDefinition::create('text')
       ->setLabel(t('Field with non-configurable display'))
+      ->setDisplayOptions('view', array(
+        'type' => 'text_default',
+        'weight' => 11,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'text_textfield',
+        'weight' => 11,
+      ));
+
+    $fields['test_display_multiple'] = BaseFieldDefinition::create('text')
+      ->setLabel(t('A field with multiple values'))
+      ->setCardinality(FieldStorageDefinition::CARDINALITY_UNLIMITED)
       ->setDisplayOptions('view', array(
         'type' => 'text_default',
         'weight' => 11,
