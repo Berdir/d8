@@ -82,6 +82,13 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
     }
     $this->values = $values;
 
+    // Initialize computed properties.
+    foreach ($this->definition->getPropertyDefinitions() as $name => $definition) {
+      if (!isset($this->properties[$name]) && $definition->isComputed()) {
+        $this->properties[$name] = \Drupal::typedDataManager()->getPropertyInstance($this, $name);
+      }
+    }
+
     // Update any existing property objects.
     foreach ($this->properties as $name => $property) {
       $value = isset($values[$name]) ? $values[$name] : NULL;

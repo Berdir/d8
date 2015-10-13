@@ -48,20 +48,6 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
   /**
    * {@inheritdoc}
    */
-  public function __construct(DataDefinitionInterface $definition, $name = NULL, TypedDataInterface $parent = NULL) {
-    parent::__construct($definition, $name, $parent);
-    // Initialize computed properties by default, such that they get cloned
-    // with the whole item.
-    foreach ($this->definition->getPropertyDefinitions() as $name => $definition) {
-      if ($definition->isComputed()) {
-        $this->properties[$name] = \Drupal::typedDataManager()->getPropertyInstance($this, $name);
-      }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getEntity() {
     return $this->getParent()->getEntity();
   }
@@ -147,6 +133,15 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
     elseif (isset($this->values[$name])) {
       return $this->values[$name];
     }
+    // If there is no property or value, it might be a computed property.
+    // Try to initialize it and return the value.
+    elseif ($definition = $this->definition->getPropertyDefinition($name)) {
+      if ($definition->isComputed()) {
+        $this->properties[$name] = \Drupal::typedDataManager()->getPropertyInstance($this, $name);
+        return $this->properties[$name]->getValue();
+      }
+    }
+
   }
 
   /**
@@ -168,7 +163,16 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
     if (isset($this->properties[$name])) {
       return $this->properties[$name]->getValue() !== NULL;
     }
-    return isset($this->values[$name]);
+    elseif (isset($this->values[$name])) {
+      return TRUE;
+    }
+    elseif ($definition = $this->definition->getPropertyDefinition($name)) {
+      if ($definition->isComputed()) {
+        $this->properties[$name] = \Drupal::typedDataManager()->getPropertyInstance($this, $name);
+        return $this->properties[$name]->getValue() !== NULL;
+      }
+    }
+
   }
 
   /**
