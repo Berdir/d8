@@ -12,6 +12,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemList;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -68,8 +69,13 @@ class FieldItemListTest extends UnitTestCase {
     // Tests field item lists with no values.
     $datasets[] = [TRUE];
 
+    $definition = $this->getMock(ComplexDataDefinitionInterface::class);
+    $definition->expects($this->any())
+      ->method('getPropertyDefinitions')
+      ->willReturn([]);
+
     /** @var \Drupal\Core\Field\FieldItemBase  $field_item_a */
-    $field_item_a = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [], '', FALSE);
+    $field_item_a = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [$definition], '');
     $field_item_a->setValue([1]);
     // Tests field item lists where one has a value and one does not.
     $datasets[] = [FALSE, $field_item_a];
@@ -78,22 +84,22 @@ class FieldItemListTest extends UnitTestCase {
     $datasets[] = [TRUE, $field_item_a, $field_item_a];
 
     /** @var \Drupal\Core\Field\FieldItemBase  $fv */
-    $field_item_b = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [], '', FALSE);
+    $field_item_b = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [$definition], '');
     $field_item_b->setValue([2]);
     // Tests field item lists where both have the different values.
     $datasets[] = [FALSE, $field_item_a, $field_item_b];
 
     /** @var \Drupal\Core\Field\FieldItemBase  $fv */
-    $field_item_c = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [], '', FALSE);
+    $field_item_c = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [$definition], '');
     $field_item_c->setValue(['0' => 1, '1' => 2]);
-    $field_item_d = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [], '', FALSE);
+    $field_item_d = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [$definition], '');
     $field_item_d->setValue(['1' => 2, '0' => 1]);
 
     // Tests field item lists where both have the differently ordered values.
     $datasets[] = [TRUE, $field_item_c, $field_item_d];
 
     /** @var \Drupal\Core\Field\FieldItemBase  $field_item_e */
-    $field_item_e = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [], '', FALSE);
+    $field_item_e = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [$definition], '');
     $field_item_e->setValue(['2']);
 
     // Tests field item lists where both have same values but different data
@@ -107,12 +113,17 @@ class FieldItemListTest extends UnitTestCase {
    * @covers ::equals
    */
   public function testEqualsEmptyItems() {
+    $definition = $this->getMock(ComplexDataDefinitionInterface::class);
+    $definition->expects($this->any())
+      ->method('getPropertyDefinitions')
+      ->willReturn([]);
+
     /** @var \Drupal\Core\Field\FieldItemBase  $fv */
-    $first_field_item = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [], '', FALSE);
+    $first_field_item = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [$definition], '');
     $first_field_item->setValue(['0' => 1, '1' => 2]);
-    $second_field_item = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [], '', FALSE);
+    $second_field_item = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [$definition], '');
     $second_field_item->setValue(['1' => 2, '0' => 1]);
-    $empty_field_item = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [], '', FALSE);
+    $empty_field_item = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemBase', [$definition], '');
     // Mock the field type manager and place it in the container.
     $field_type_manager = $this->getMock('Drupal\Core\Field\FieldTypePluginManagerInterface');
     $container = new ContainerBuilder();
