@@ -528,11 +528,13 @@ function simpletest_classloader_register() {
  *     the range of 0 to 31.
  *   - binary-text: The generated file contains random sequence of '0' and '1'
  *     values.
+ * @param bool $public
+ *   (optional) Whether the test files should be public or private.
  *
  * @return string
  *   The name of the file, including the path.
  */
-function simpletest_generate_file($filename, $width, $lines, $type = 'binary-text') {
+function simpletest_generate_file($filename, $width, $lines, $type = 'binary-text', $public = TRUE) {
   $text = '';
   for ($i = 0; $i < $lines; $i++) {
     // Generate $width - 1 characters to leave space for the "\n" character.
@@ -554,7 +556,7 @@ function simpletest_generate_file($filename, $width, $lines, $type = 'binary-tex
   }
 
   // Create filename.
-  file_put_contents('public://' . $filename . '.txt', $text);
+  file_put_contents(($public ? 'public://' : 'private://') . $filename . '.txt', $text);
   return $filename;
 }
 

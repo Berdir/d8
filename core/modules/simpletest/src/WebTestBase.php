@@ -27,6 +27,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StreamWrapper\PrivateStream;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Url;
 use Drupal\node\Entity\NodeType;
@@ -510,27 +511,27 @@ abstract class WebTestBase extends TestBase {
    * @return
    *   List of files in public:// that match the filter(s).
    */
-  protected function drupalGetTestFiles($type, $size = NULL) {
+  protected function drupalGetTestFiles($type, $size = NULL, $public = TRUE) {
     if (empty($this->generatedTestFiles)) {
       // Generate binary test files.
       $lines = array(64, 1024);
       $count = 0;
       foreach ($lines as $line) {
-        simpletest_generate_file('binary-' . $count++, 64, $line, 'binary');
+        simpletest_generate_file('binary-' . $count++, 64, $line, 'binary', $public);
       }
 
       // Generate ASCII text test files.
       $lines = array(16, 256, 1024, 2048, 20480);
       $count = 0;
       foreach ($lines as $line) {
-        simpletest_generate_file('text-' . $count++, 64, $line, 'text');
+        simpletest_generate_file('text-' . $count++, 64, $line, 'text', $public);
       }
 
       // Copy other test files from simpletest.
       $original = drupal_get_path('module', 'simpletest') . '/files';
       $files = file_scan_directory($original, '/(html|image|javascript|php|sql)-.*/');
       foreach ($files as $file) {
-        file_unmanaged_copy($file->uri, PublicStream::basePath());
+        file_unmanaged_copy($file->uri, $public ? PublicStream::basePath() : PrivateStream::basePath());
       }
 
       $this->generatedTestFiles = TRUE;
@@ -539,7 +540,7 @@ abstract class WebTestBase extends TestBase {
     $files = array();
     // Make sure type is valid.
     if (in_array($type, array('binary', 'html', 'image', 'javascript', 'php', 'sql', 'text'))) {
-      $files = file_scan_directory('public://', '/' . $type . '\-.*/');
+      $files = file_scan_directory($public ? 'public://' : 'private://', '/' . $type . '\-.*/');
 
       // If size is set then remove any files that are not of that size.
       if ($size !== NULL) {
