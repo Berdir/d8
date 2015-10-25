@@ -106,11 +106,16 @@ class EntityResource extends ResourceBase {
     try {
       $entity->save();
       $this->logger->notice('Created entity %type with ID %id.', array('%type' => $entity->getEntityTypeId(), '%id' => $entity->id()));
-
-      // 201 Created responses have an empty body.
-      $url = $entity->urlInfo('canonical', ['absolute' => TRUE])->toString(TRUE);
-      $response = new ResourceResponse(NULL, 201, ['Location' => $url->getGeneratedUrl()]);
-      $response->addCacheableDependency($url);
+      // 201 Created responses have an empty body. Verify if canonical path
+      // exists.
+      if ($entity->hasLinkTemplate('canonical')) {
+        $url = $entity->urlInfo('canonical', ['absolute' => TRUE])->toString(TRUE);
+        $response = new ResourceResponse(NULL, 201, ['Location' => $url->getGeneratedUrl()]);
+        $response->addCacheableDependency($url);
+      }
+      else {
+        $response = new ResourceResponse(NULL, 201);
+      }
       return $response;
     }
     catch (EntityStorageException $e) {

@@ -10,6 +10,7 @@ namespace Drupal\hal\Tests;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\hal\Encoder\JsonEncoder;
 use Drupal\hal\Normalizer\FieldItemNormalizer;
+use Drupal\hal\Normalizer\FieldNormalizer;
 use Drupal\hal\Normalizer\FileEntityNormalizer;
 use Drupal\rest\LinkManager\LinkManager;
 use Drupal\rest\LinkManager\RelationLinkManager;
@@ -43,8 +44,9 @@ class FileNormalizeTest extends NormalizerTestBase {
 
     // Set up the mock serializer.
     $normalizers = array(
+      new FieldNormalizer(),
       new FieldItemNormalizer(),
-      new FileEntityNormalizer($entity_manager, \Drupal::httpClient(), $link_manager, \Drupal::moduleHandler()),
+      new FileEntityNormalizer($link_manager, $entity_manager, \Drupal::moduleHandler()),
     );
 
     $encoders = array(
@@ -72,13 +74,17 @@ class FileNormalizeTest extends NormalizerTestBase {
     $expected_array = array(
       'uri' => array(
         array(
-          'value' => file_create_url($file->getFileUri())),
+          'value' => $file->getFileUri()),
+      ),
+      'data' => array(
+        array(
+          'value' => base64_encode('hello world'),
+        ),
       ),
     );
 
     $normalized = $this->serializer->normalize($file, $this->format);
-    $this->assertEqual($normalized['uri'], $expected_array['uri'], 'URI is normalized.');
-
+    $this->assertEqual($normalized['uri'], $expected_array['uri']);
   }
 
 }

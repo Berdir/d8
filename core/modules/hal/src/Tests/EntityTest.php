@@ -23,7 +23,7 @@ class EntityTest extends NormalizerTestBase {
    *
    * @var array
    */
-  public static $modules = array('node', 'taxonomy', 'comment');
+  public static $modules = array('node', 'taxonomy', 'comment', 'file');
 
   /**
    * {@inheritdoc}
@@ -36,6 +36,7 @@ class EntityTest extends NormalizerTestBase {
     $this->installSchema('comment', array('comment_entity_statistics'));
     $this->installEntitySchema('taxonomy_term');
     $this->installConfig(['node', 'comment']);
+    $this->installEntitySchema('file');
   }
 
   /**
@@ -219,6 +220,43 @@ class EntityTest extends NormalizerTestBase {
         unset($field_values[0]['revision_id']);
       }
       $this->assertEqual($field_values, $denormalized_comment->get($field_name)->getValue());
+    }
+  }
+
+  /**
+   * Tests the normalization of files.
+   */
+  public function testFile() {
+    $user = entity_create('user', array('name' => $this->randomMachineName()));
+    $user->save();
+
+    $file_uri = 'public://' . $this->randomMachineName();
+    file_put_contents($file_uri, 'hello world');
+
+    $data = file_get_contents($file_uri);
+    $data = base64_encode($data);
+    file_put_contents($file_uri, 'hello world');
+    $file = entity_create('file', array(
+      'uid' => $user->id(),
+      'uri' => $file_uri,
+      'status' => FILE_STATUS_PERMANENT,
+    ));
+    $file->save();
+
+    $original_values = $file->toArray();
+    unset($original_values['fid']);
+
+    $normalized = $this->serializer->normalize($file, $this->format);
+    // Adding data to the entity.
+    $normalized['data'][0]['value'] = $data;
+    // Use PATCH to avoid trying to create new file on denormalize.
+    $denormalized_file = $this->serializer->denormalize($normalized, 'Drupal\file\Entity\File', $this->format, array('request_method' => 'patch'));
+    // Verify that the ID was skipped by the normalizer.
+    $this->assertEqual(NULL, $denormalized_file->id());
+
+    // Loop over the remaining fields and verify that they are identical.
+    foreach ($original_values as $field_name => $field_values) {
+      $this->assertEqual($field_values, $denormalized_file->get($field_name)->getValue());
     }
   }
 

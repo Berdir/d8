@@ -235,6 +235,7 @@ class File extends ContentEntityBase implements FileInterface {
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('User ID'))
       ->setDescription(t('The user ID of the file.'))
+      ->setDefaultValueCallback('Drupal\file\Entity\File::getCurrentUserId')
       ->setSetting('target_type', 'user');
 
     $fields['filename'] = BaseFieldDefinition::create('string')
@@ -273,6 +274,18 @@ class File extends ContentEntityBase implements FileInterface {
       ->setDescription(t('The timestamp that the file was last changed.'));
 
     return $fields;
+  }
+
+  /**
+   * Default value callback for 'uid' base field definition.
+   *
+   * @see ::baseFieldDefinitions()
+   *
+   * @return array
+   *   An array of default values.
+   */
+  public static function getCurrentUserId() {
+    return array(\Drupal::currentUser()->id());
   }
 
 }

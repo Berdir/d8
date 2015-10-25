@@ -7,10 +7,9 @@
 
 namespace Drupal\hal\Normalizer;
 
-use Drupal\Core\Entity\EntityManagerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\rest\LinkManager\LinkManagerInterface;
-use GuzzleHttp\ClientInterface;
+use Drupal\Component\Utility\SafeMarkup;
+use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Converts the Drupal entity object structure to a HAL array structure.
@@ -25,37 +24,10 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
   protected $supportedInterfaceOrClass = 'Drupal\file\FileInterface';
 
   /**
-   * The HTTP client.
-   *
-   * @var \GuzzleHttp\ClientInterface
-   */
-  protected $httpClient;
-
-  /**
-   * Constructs a FileEntityNormalizer object.
-   *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager.
-   * @param \GuzzleHttp\ClientInterface $http_client
-   *   The HTTP Client.
-   * @param \Drupal\rest\LinkManager\LinkManagerInterface $link_manager
-   *   The hypermedia link manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   */
-  public function __construct(EntityManagerInterface $entity_manager, ClientInterface $http_client, LinkManagerInterface $link_manager, ModuleHandlerInterface $module_handler) {
-    parent::__construct($link_manager, $entity_manager, $module_handler);
-
-    $this->httpClient = $http_client;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function normalize($entity, $format = NULL, array $context = array()) {
     $data = parent::normalize($entity, $format, $context);
-    // Replace the file url with a full url for the file.
-    $data['uri'][0]['value'] = $this->getEntityUri($entity);
 
     return $data;
   }
@@ -64,12 +36,26 @@ class FileEntityNormalizer extends ContentEntityNormalizer {
    * {@inheritdoc}
    */
   public function denormalize($data, $class, $format = NULL, array $context = array()) {
-    $file_data = (string) $this->httpClient->get($data['uri'][0]['value'])->getBody();
+    // Avoid 'data' being treated as a field.
+    $file_data = $data['data'][0]['value'];
+    unset($data['data']);
 
-    $path = 'temporary://' . drupal_basename($data['uri'][0]['value']);
-    $data['uri'] = file_unmanaged_save_data($file_data, $path);
+    $entity = parent::denormalize($data, $class, $format, $context);
 
-    return $this->entityManager->getStorage('file')->create($data);
+    // Decode and save to file if it's a new file.
+    if (!isset($context['request_method']) || $context['request_method'] != 'patch') {
+      $file_contents = base64_decode($file_data);
+      $dirname = drupal_dirname($entity->getFileUri());
+      file_prepare_directory($dirname, FILE_CREATE_DIRECTORY);
+      if ($uri = file_unmanaged_save_data($file_contents, $entity->getFileUri())) {
+        $entity->setFileUri($uri);
+      }
+      else {
+        throw new RuntimeException(SafeMarkup::format('Failed to write @filename.', array('@filename' => $entity->getFilename())));
+      }
+    }
+
+    return $entity;
   }
 
 }

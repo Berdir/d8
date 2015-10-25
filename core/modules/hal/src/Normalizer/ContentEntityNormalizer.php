@@ -132,8 +132,9 @@ class ContentEntityNormalizer extends NormalizerBase {
       throw new UnexpectedValueException('The type link relation must be specified.');
     }
 
-    // Create the entity.
+    // Identify entity type and bundle.
     $typed_data_ids = $this->getTypedDataIds($data['_links']['type'], $context);
+    // Get definition of entity type and bundle (if any).
     $entity_type = $this->entityManager->getDefinition($typed_data_ids['entity_type']);
     $langcode_key = $entity_type->getKey('langcode');
     $values = array();
@@ -148,10 +149,9 @@ class ContentEntityNormalizer extends NormalizerBase {
     if ($entity_type->hasKey('bundle')) {
       $bundle_key = $entity_type->getKey('bundle');
       $values[$bundle_key] = $typed_data_ids['bundle'];
-      // Unset the bundle key from data, if it's there.
-      unset($data[$bundle_key]);
     }
 
+    // Create the entity.
     $entity = $this->entityManager->getStorage($typed_data_ids['entity_type'])->create($values);
 
     // Remove links from data array.

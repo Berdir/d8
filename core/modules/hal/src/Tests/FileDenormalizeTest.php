@@ -39,14 +39,18 @@ class FileDenormalizeTest extends WebTestBase {
     $file = entity_create('file', $file_params);
     file_put_contents($file->getFileUri(), 'hello world');
     $file->save();
+    $data = file_get_contents($file_params['uri']);
+    $data = base64_encode($data);
 
     $serializer = \Drupal::service('serializer');
     $normalized_data = $serializer->normalize($file, 'hal_json');
-    $denormalized = $serializer->denormalize($normalized_data, 'Drupal\file\Entity\File', 'hal_json');
-
+    // Adding data to the entity.
+    $normalized_data['data'][0]['value'] = $data;
+    // Use 'patch' to avoid trying to recreate the file.
+    $denormalized = $serializer->denormalize($normalized_data, 'Drupal\file\Entity\File', 'hal_json', array('request_method' => 'patch'));
     $this->assertTrue($denormalized instanceof File, 'A File instance was created.');
 
-    $this->assertIdentical('temporary://' . $file->getFilename(), $denormalized->getFileUri(), 'The expected file URI was found.');
+    $this->assertIdentical('public://' . $file->getFilename(), $denormalized->getFileUri());
     $this->assertTrue(file_exists($denormalized->getFileUri()), 'The temporary file was found.');
 
     $this->assertIdentical($file->uuid(), $denormalized->uuid(), 'The expected UUID was found');
@@ -54,27 +58,6 @@ class FileDenormalizeTest extends WebTestBase {
     $this->assertIdentical($file->getFilename(), $denormalized->getFilename(), 'The expected filename was found.');
     $this->assertTrue($denormalized->isPermanent(), 'The file has a permanent status.');
 
-    // Try to denormalize with the file uri only.
-    $file_name = 'test_2.txt';
-    $file_path = 'public://' . $file_name;
-
-    file_put_contents($file_path, 'hello world');
-    $file_uri = file_create_url($file_path);
-
-    $data = array(
-      'uri' => array(
-        array('value' => $file_uri),
-      ),
-    );
-
-    $denormalized = $serializer->denormalize($data, 'Drupal\file\Entity\File', 'hal_json');
-
-    $this->assertIdentical('temporary://' . $file_name, $denormalized->getFileUri(), 'The expected file URI was found.');
-    $this->assertTrue(file_exists($denormalized->getFileUri()), 'The temporary file was found.');
-
-    $this->assertIdentical('text/plain', $denormalized->getMimeType(), 'The expected mime type was found.');
-    $this->assertIdentical($file_name, $denormalized->getFilename(), 'The expected filename was found.');
-    $this->assertFalse($denormalized->isPermanent(), 'The file has a permanent status.');
   }
 
 }
