@@ -19,11 +19,4 @@ use Symfony\Component\Validator\Constraint;
  */
 class FileValidationConstraint extends Constraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'Validation Error for the file.';
-
 }

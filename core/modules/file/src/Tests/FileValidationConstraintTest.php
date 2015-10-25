@@ -10,7 +10,6 @@ namespace Drupal\file\Tests;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\node\Entity\Node;
 
 /**
  * Tests the file validation constraint.
@@ -54,7 +53,9 @@ class FileValidationConstraintTest extends FileManagedUnitTestBase {
       ],
     ]);
     $violations = $entity_test->validate();
-    $this->assertNotEqual(0, count($violations));
+    $this->assertEqual(1, count($violations));
+    $this->assertEqual($violations[0]->getPropertyPath(), "field_pdf_file.0");
+    $this->assertEqual($violations[0]->getMessage(), t('Only files with the following extensions are allowed: %files-allowed.', ['%files-allowed' => 'pdf']));
   }
 
   /**

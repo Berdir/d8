@@ -24,8 +24,8 @@ class FileValidationConstraintValidator extends ConstraintValidator {
     // Get the validators.
     $validators = $value->getUploadValidators();
     // Checks that a file meets the criteria specified by the validators.
-    if ($errors = file_validate($file, $validators)) {
-      $this->context->addViolation($constraint->message);
+    foreach (file_validate($file, $validators) as $error) {
+      $this->context->addViolation($error);
     }
   }
 
