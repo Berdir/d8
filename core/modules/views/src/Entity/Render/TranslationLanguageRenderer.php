@@ -35,12 +35,13 @@ class TranslationLanguageRenderer extends EntityTranslationRendererBase {
     // If the data table is defined, we use the translation language as render
     // language, otherwise we fall back to the default entity language, which is
     // stored in the revision table for revisionable entity types.
-    $langcode_key = $this->entityType->getKey('langcode');
-    foreach (array('data_table', 'revision_table', 'base_table') as $key) {
-      if ($table = $this->entityType->get($key)) {
+    if ($this->entityType->hasKey('langcode')) {
+      $langcode_key = $this->entityType->getKey('langcode');
+      $storage = \Drupal::entityManager()->getStorage($this->entityType->id());
+
+      if ($table = $storage->getTableMapping()->getFieldTableName($langcode_key)) {
         $table_alias = $query->ensureTable($table, $relationship);
         $this->langcodeAlias = $query->addField($table_alias, $langcode_key);
-        break;
       }
     }
   }
