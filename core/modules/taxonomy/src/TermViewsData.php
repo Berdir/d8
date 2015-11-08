@@ -157,41 +157,43 @@ class TermViewsData extends EntityViewsData {
       ),
     );
 
-    $data['taxonomy_index']['nid'] = array(
-      'title' => t('Content with term'),
-      'help' => t('Relate all content tagged with a term.'),
-      'relationship' => array(
-        'id' => 'standard',
-        'base' => 'node',
-        'base field' => 'nid',
-        'label' => t('node'),
-        'skip base' => 'node',
-      ),
-    );
+    if (\Drupal::moduleHandler()->moduleExists('node')) {
+      $data['taxonomy_index']['nid'] = array(
+        'title' => t('Content with term'),
+        'help' => t('Relate all content tagged with a term.'),
+        'relationship' => array(
+          'id' => 'standard',
+          'base' => 'node',
+          'base field' => 'nid',
+          'label' => t('node'),
+          'skip base' => 'node',
+        ),
+      );
 
-    // @todo This stuff needs to move to a node field since really it's all
-    //   about nodes.
-    $data['taxonomy_index']['tid'] = array(
-      'group' => t('Content'),
-      'title' => t('Has taxonomy term ID'),
-      'help' => t('Display content if it has the selected taxonomy terms.'),
-      'argument' => array(
-        'id' => 'taxonomy_index_tid',
-        'name table' => 'taxonomy_term_field_data',
-        'name field' => 'name',
-        'empty field name' => t('Uncategorized'),
-        'numeric' => TRUE,
-        'skip base' => 'taxonomy_term_field_data',
-      ),
-      'filter' => array(
-        'title' => t('Has taxonomy term'),
-        'id' => 'taxonomy_index_tid',
-        'hierarchy table' => 'taxonomy_term_hierarchy',
-        'numeric' => TRUE,
-        'skip base' => 'taxonomy_term_field_data',
-        'allow empty' => TRUE,
-      ),
-    );
+      // @todo This stuff needs to move to a node field since really it's all
+      //   about nodes.
+      $data['taxonomy_index']['tid'] = array(
+        'group' => t('Content'),
+        'title' => t('Has taxonomy term ID'),
+        'help' => t('Display content if it has the selected taxonomy terms.'),
+        'argument' => array(
+          'id' => 'taxonomy_index_tid',
+          'name table' => 'taxonomy_term_field_data',
+          'name field' => 'name',
+          'empty field name' => t('Uncategorized'),
+          'numeric' => TRUE,
+          'skip base' => 'taxonomy_term_field_data',
+        ),
+        'filter' => array(
+          'title' => t('Has taxonomy term'),
+          'id' => 'taxonomy_index_tid',
+          'hierarchy table' => 'taxonomy_term_hierarchy',
+          'numeric' => TRUE,
+          'skip base' => 'taxonomy_term_field_data',
+          'allow empty' => TRUE,
+        ),
+      );
+    }
 
     $data['taxonomy_index']['status'] = [
       'title' => t('Publish status'),

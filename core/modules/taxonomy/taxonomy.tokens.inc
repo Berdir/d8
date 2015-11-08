@@ -36,10 +36,12 @@ function taxonomy_token_info() {
     'name' => t("Description"),
     'description' => t("The optional description of the taxonomy term."),
   );
-  $term['node-count'] = array(
-    'name' => t("Node count"),
-    'description' => t("The number of nodes tagged with the taxonomy term."),
-  );
+  if (\Drupal::moduleHandler()->moduleExists('node')) {
+    $term['node-count'] = array(
+      'name' => t("Node count"),
+      'description' => t("The number of nodes tagged with the taxonomy term."),
+    );
+  }
   $term['url'] = array(
     'name' => t("URL"),
     'description' => t("The URL of the taxonomy term."),
@@ -58,10 +60,12 @@ function taxonomy_token_info() {
     'name' => t("Description"),
     'description' => t("The optional description of the taxonomy vocabulary."),
   );
-  $vocabulary['node-count'] = array(
-    'name' => t("Node count"),
-    'description' => t("The number of nodes tagged with terms belonging to the taxonomy vocabulary."),
-  );
+  if (\Drupal::moduleHandler()->moduleExists('node')) {
+    $vocabulary['node-count'] = array(
+      'name' => t("Node count"),
+      'description' => t("The number of nodes tagged with terms belonging to the taxonomy vocabulary."),
+    );
+  }
   $vocabulary['term-count'] = array(
     'name' => t("Term count"),
     'description' => t("The number of terms belonging to the taxonomy vocabulary."),
