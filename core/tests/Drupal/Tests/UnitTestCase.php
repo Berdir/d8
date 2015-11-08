@@ -224,6 +224,10 @@ abstract class UnitTestCase extends \PHPUnit_Framework_TestCase {
         $wrapper = new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $translation);
         return $wrapper;
       });
+    $translation->expects($this->any())
+      ->method('getPluralIndex')
+      ->willReturn(-1);
+
     return $translation;
   }
 

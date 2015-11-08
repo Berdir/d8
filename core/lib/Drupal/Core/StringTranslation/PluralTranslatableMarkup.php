@@ -130,7 +130,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
       return $this->placeholderFormat($translated_array[0], $arguments);
     }
 
-    $index = $this->getPluralIndex();
+    $index = $this->getStringTranslation()->getPluralIndex($this->count, $this->getOption('langcode'));
     if ($index == 0) {
       // Singular form.
       $return = $translated_array[0];
@@ -149,21 +149,6 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
     }
 
     return $this->placeholderFormat($return, $arguments);
-  }
-
-  /**
-   * Gets the plural index through the gettext formula.
-   *
-   * @return int
-   */
-  protected function getPluralIndex() {
-    if (!isset(static::$localeEnabled)) {
-      static::$localeEnabled = function_exists('locale_get_plural');
-    }
-    if (function_exists('locale_get_plural')) {
-      return locale_get_plural($this->count, $this->getOption('langcode'));
-    }
-    return -1;
   }
 
 }

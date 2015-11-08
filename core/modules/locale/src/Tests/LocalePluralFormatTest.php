@@ -64,6 +64,8 @@ class LocalePluralFormatTest extends WebTestBase {
     drupal_static_reset('locale_get_plural:plurals');
     drupal_static_reset('locale');
 
+    $this->rebuildContainer();
+
     // Expected plural translation strings for each plural index.
     $plural_strings = array(
       // English is not imported in this case, so we assume built-in text

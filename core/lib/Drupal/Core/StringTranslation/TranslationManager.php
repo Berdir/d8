@@ -13,7 +13,7 @@ use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
 /**
  * Defines a chained translation implementation combining multiple translators.
  */
-class TranslationManager implements TranslationInterface, TranslatorInterface {
+class TranslationManager implements TranslationInterface {
 
   /**
    * An array of active translators keyed by priority.
@@ -55,15 +55,7 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
   }
 
   /**
-   * Appends a translation system to the translation chain.
-   *
-   * @param \Drupal\Core\StringTranslation\Translator\TranslatorInterface $translator
-   *   The translation interface to be appended to the translation chain.
-   * @param int $priority
-   *   The priority of the logger being added.
-   *
-   * @return \Drupal\Core\StringTranslation\TranslationManager
-   *   The called object.
+   * {@inheritdoc}
    */
   public function addTranslator(TranslatorInterface $translator, $priority = 0) {
     $this->translators[$priority][] = $translator;
@@ -151,10 +143,7 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
   }
 
   /**
-   * Sets the default langcode.
-   *
-   * @param string $langcode
-   *   A language code.
+   * {@inheritdoc}
    */
   public function setDefaultLangcode($langcode) {
     $this->defaultLangcode = $langcode;
@@ -170,6 +159,13 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
     foreach ($this->sortedTranslators as $translator) {
       $translator->reset();
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluralIndex($count, $langcode = NULL) {
+    return -1;
   }
 
 }

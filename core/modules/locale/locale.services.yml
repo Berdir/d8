@@ -37,3 +37,9 @@ services:
     arguments: ['@cache_tags.invalidator']
     tags:
       - { name: event_subscriber }
+  locale.string_translation:
+    decorates: string_translation
+    class: Drupal\locale\TranslationManager
+    decoration_inner_name: string_translation.inner
+    arguments: ['@string_translation.inner']
+    public: false

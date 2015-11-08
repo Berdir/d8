@@ -7,6 +7,7 @@
 
 namespace Drupal\system\Tests\Module;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Logger\RfcLogLevel;
 
 /**
@@ -78,6 +79,7 @@ class InstallUninstallTest extends ModuleTestBase {
     // Go through each module in the list and try to install and uninstall
     // it with its dependencies.
     while (list($name, $module) = each($all_modules)) {
+      debug("It's going to install: " . $name);
       $was_installed_list = \Drupal::moduleHandler()->getModuleList();
 
       // Start a list of modules that we expect to be installed this time.
@@ -98,12 +100,12 @@ class InstallUninstallTest extends ModuleTestBase {
       $edit = array();
       $package = $module->info['package'];
       $edit["modules[$package][$name][enable]"] = TRUE;
-      $this->drupalPostForm('admin/modules', $edit, t('Install'));
+      $this->drupalPostForm('admin/modules', $edit, 'Install');
 
       // Handle the case where modules were installed along with this one and
       // where we therefore hit a confirmation screen.
       if (count($modules_to_install) > 1) {
-        $this->drupalPostForm(NULL, array(), t('Continue'));
+        $this->drupalPostForm(NULL, array(), 'Continue');
       }
 
       // List the module display names to check the confirmation message.
@@ -111,17 +113,26 @@ class InstallUninstallTest extends ModuleTestBase {
       foreach ($modules_to_install as $module_to_install) {
         $module_names[] = $all_modules[$module_to_install]->info['name'];
       }
-      $expected_text = \Drupal::translation()->formatPlural(count($module_names), 'Module @name has been enabled.', '@count modules have been enabled: @names.', array(
+      // We cannot use \Drupal::translation()->formatPlural() as the service is
+      // changed by the Locale module.
+      $arguments = [
         '@name' => $module_names[0],
         '@names' => implode(', ', $module_names),
-      ));
+        '@count' => count($module_names),
+      ];
+      if (count($module_names) == 1) {
+        $expected_text = new FormattableMarkup('Module @name has been enabled.', $arguments);
+      }
+      else {
+        $expected_text = new FormattableMarkup('@count modules have been enabled: @names.', $arguments);
+      }
       $this->assertText($expected_text, 'Modules status has been updated.');
 
       // Check that hook_modules_installed() was invoked with the expected list
       // of modules, that each module's database tables now exist, and that
       // appropriate messages appear in the logs.
       foreach ($modules_to_install as $module_to_install) {
-        $this->assertText(t('hook_modules_installed fired for @module', array('@module' => $module_to_install)));
+        $this->assertText(new FormattableMarkup('hook_modules_installed fired for @module', array('@module' => $module_to_install)));
         $this->assertLogMessage('system', "%module module installed.", array('%module' => $module_to_install), RfcLogLevel::INFO);
         $this->assertInstallModuleUpdates($module_to_install);
         $this->assertModuleSuccessfullyInstalled($module_to_install);
@@ -181,8 +192,8 @@ class InstallUninstallTest extends ModuleTestBase {
     foreach ($all_modules as $name => $module) {
       $edit['modules[' . $module->info['package'] . '][' . $name . '][enable]'] = TRUE;
     }
-    $this->drupalPostForm('admin/modules', $edit, t('Install'));
-    $this->assertText(t('@count modules have been enabled: ', array('@count' => count($all_modules))), 'Modules status has been updated.');
+    $this->drupalPostForm('admin/modules', $edit, 'Install');
+    $this->assertText(new FormattableMarkup('@count modules have been enabled: ', array('@count' => count($all_modules))), 'Modules status has been updated.');
   }
 
   /**
@@ -220,16 +231,16 @@ class InstallUninstallTest extends ModuleTestBase {
   protected function assertSuccessfulUninstall($module, $package = 'Core') {
     $edit = array();
     $edit['uninstall[' . $module . ']'] = TRUE;
-    $this->drupalPostForm('admin/modules/uninstall', $edit, t('Uninstall'));
-    $this->drupalPostForm(NULL, NULL, t('Uninstall'));
-    $this->assertText(t('The selected modules have been uninstalled.'), 'Modules status has been updated.');
+    $this->drupalPostForm('admin/modules/uninstall', $edit, 'Uninstall');
+    $this->drupalPostForm(NULL, NULL, 'Uninstall');
+    $this->assertText(('The selected modules have been uninstalled.'), 'Modules status has been updated.');
     $this->assertModules(array($module), FALSE);
 
     // Check that the appropriate hook was fired and the appropriate log
     // message appears. (But don't check for the log message if the dblog
     // module was just uninstalled, since the {watchdog} table won't be there
     // anymore.)
-    $this->assertText(t('hook_modules_uninstalled fired for @module', array('@module' => $module)));
+    $this->assertText(new FormattableMarkup('hook_modules_uninstalled fired for @module', array('@module' => $module)));
     $this->assertLogMessage('system', "%module module uninstalled.", array('%module' => $module), RfcLogLevel::INFO);
 
     // Check that the module's database tables no longer exist.

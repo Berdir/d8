@@ -7,12 +7,14 @@
 
 namespace Drupal\Core\StringTranslation;
 
+use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
+
 /**
  * Interface for the translation.manager translation service.
  *
  * @ingroup i18n
  */
-interface TranslationInterface {
+interface TranslationInterface extends TranslatorInterface {
 
   /**
    * Translates a string to the current language or to a given language.
@@ -111,5 +113,56 @@ interface TranslationInterface {
    * @see \Drupal\Core\StringTranslation\PluralTranslatableMarkup::createFromTranslatedString()
    */
   public function formatPlural($count, $singular, $plural, array $args = array(), array $options = array());
+
+  /**
+   * Returns plural form index for a specific number.
+   *
+   * @param int $count
+   *   Number to return plural for.
+   * @param string $langcode
+   *   (optional) Language code to translate to a language other than what is
+   *   used to display the page.
+   *
+   * @return int
+   *   The default translation manager returns -1 because Locale is not
+   *   installed.
+   */
+  public function getPluralIndex($count, $langcode = NULL);
+
+  /**
+   * Retrieves English string to given language.
+   *
+   * @param string $langcode
+   *   Language code to translate to.
+   * @param string $string
+   *   The source string.
+   * @param string $context
+   *   The string context.
+   *
+   * @return string|FALSE
+   *   Translated string if there is a translation, FALSE if not.
+   */
+  public function getStringTranslation($langcode, $string, $context);
+
+  /**
+   * Sets the default langcode.
+   *
+   * @param string $langcode
+   *   A language code.
+   */
+  public function setDefaultLangcode($langcode);
+
+  /**
+   * Appends a translation system to the translation chain.
+   *
+   * @param \Drupal\Core\StringTranslation\Translator\TranslatorInterface $translator
+   *   The translation interface to be appended to the translation chain.
+   * @param int $priority
+   *   The priority of the logger being added.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslationManager
+   *   The called object.
+   */
+  public function addTranslator(TranslatorInterface $translator, $priority = 0);
 
 }
