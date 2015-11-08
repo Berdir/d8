@@ -83,6 +83,10 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
    */
   protected $lastWriteTimestamp;
 
+  public static $invalidatedCounter = 0;
+
+  protected $invalidated = FALSE;
+
   /**
    * Constructs a ChainedFastBackend object.
    *
@@ -115,6 +119,8 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
   public function getMultiple(&$cids, $allow_invalid = FALSE) {
     $cids_copy = $cids;
     $cache = array();
+
+    $this->invalidated = FALSE;
 
     // If we can determine the time at which the last write to the consistent
     // backend occurred (we might not be able to if it has been recently
@@ -306,8 +312,10 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
     // the same millisecond and are then incorrectly invalidated, but that only
     // costs one additional roundtrip to the persistent cache.
     $now = round(microtime(TRUE) + .001, 3);
-    if ($now > $this->getLastWriteTimestamp()) {
+    if (!$this->invalidated && $now > $this->getLastWriteTimestamp()) {
       $this->lastWriteTimestamp = $now;
+      $this->invalidated = TRUE;
+      static::$invalidatedCounter++;
       $this->consistentBackend->set(self::LAST_WRITE_TIMESTAMP_PREFIX . $this->bin, $this->lastWriteTimestamp);
     }
   }
