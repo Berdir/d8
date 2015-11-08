@@ -674,6 +674,15 @@ abstract class WebTestBase extends TestBase {
    * being executed.
    */
   protected function setUp() {
+
+    // Set an explicit time zone to not rely on the system one, which may vary
+    // from setup to setup. The Australia/Sydney time zone is chosen so all
+    // tests are run using an edge case scenario (UTC+10 and DST). This choice
+    // is made to prevent time zone related regressions and reduce the
+    // fragility of the testing system in general. This is also set in config in
+    // \Drupal\simpletest\WebTestBase::initConfig().
+    date_default_timezone_set('Australia/Sydney');
+
     // Preserve original batch for later restoration.
     $this->setBatch();
 
