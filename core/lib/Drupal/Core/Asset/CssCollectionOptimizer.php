@@ -174,7 +174,7 @@ class CssCollectionOptimizer implements AssetCollectionOptimizerInterface {
     foreach ($css_group['items'] as $css_file) {
       $css_data[] = $css_file['data'];
     }
-    return hash('sha256', serialize($css_data));
+    return hash('sha256', \Drupal::request()->getScheme() . ':' . serialize($css_data));
   }
 
   /**
