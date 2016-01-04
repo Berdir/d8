@@ -17,8 +17,6 @@ use Drupal\Core\Utility\ThemeRegistry;
 
 /**
  * Defines the theme registry service.
- *
- * @todo Replace local $registry variables in methods with $this->registry.
  */
 class Registry implements DestructableInterface {
 
@@ -104,20 +102,6 @@ class Registry implements DestructableInterface {
   protected $runtimeRegistry = [];
 
   /**
-   * Stores whether the registry was already initialized.
-   *
-   * @var bool
-   */
-  protected $initialized = FALSE;
-
-  /**
-   * The name of the theme for which to construct the registry, if given.
-   *
-   * @var string|null
-   */
-  protected $themeName;
-
-  /**
    * The app root.
    *
    * @var string
@@ -151,19 +135,13 @@ class Registry implements DestructableInterface {
    *   The module handler to use to load modules.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler.
-   * @param \Drupal\Core\Theme\ThemeInitializationInterface $theme_initialization
-   *   The theme initialization.
-   * @param string $theme_name
-   *   (optional) The name of the theme for which to construct the registry.
    */
-  public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ThemeInitializationInterface $theme_initialization, $theme_name = NULL) {
+  public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler) {
     $this->root = $root;
     $this->cache = $cache;
     $this->lock = $lock;
     $this->moduleHandler = $module_handler;
-    $this->themeName = $theme_name;
     $this->themeHandler = $theme_handler;
-    $this->themeInitialization = $theme_initialization;
   }
 
   /**
@@ -177,27 +155,10 @@ class Registry implements DestructableInterface {
   }
 
   /**
-   * Initializes a theme with a certain name.
-   *
-   * This function does to much magic, so it should be replaced by another
-   * services which holds the current active theme information.
-   *
-   * @param string $theme_name
-   *   (optional) The name of the theme for which to construct the registry.
+   * Updates $this->theme with the currently active theme.
    */
-  protected function init($theme_name = NULL) {
-    if ($this->initialized) {
-      return;
-    }
-    // Unless instantiated for a specific theme, use globals.
-    if (!isset($theme_name)) {
-      $this->theme = $this->themeManager->getActiveTheme();
-    }
-    // Instead of the active theme, a specific theme was requested.
-    else {
-      $this->theme = $this->themeInitialization->getActiveThemeByName($theme_name);
-      $this->themeInitialization->loadActiveTheme($this->theme);
-    }
+  protected function init() {
+    $this->theme = $this->themeManager->getActiveTheme();
   }
 
   /**
@@ -209,7 +170,7 @@ class Registry implements DestructableInterface {
    * @see Registry::$registry
    */
   public function get() {
-    $this->init($this->themeName);
+    $this->init();
     if (isset($this->registry[$this->theme->getName()])) {
       return $this->registry[$this->theme->getName()];
     }
@@ -235,7 +196,7 @@ class Registry implements DestructableInterface {
    *   lightweight than the full registry.
    */
   public function getRuntime() {
-    $this->init($this->themeName);
+    $this->init();
     if (!isset($this->runtimeRegistry[$this->theme->getName()])) {
       $this->runtimeRegistry[$this->theme->getName()] = new ThemeRegistry('theme_registry:runtime:' . $this->theme->getName(), $this->cache, $this->lock, array('theme_registry'), $this->moduleHandler->isLoaded());
     }
@@ -259,7 +220,7 @@ class Registry implements DestructableInterface {
    *   The name of the base hook or FALSE.
    */
   public function getBaseHook($hook) {
-    $this->init($this->themeName);
+    $this->init();
     $base_hook = $hook;
     // Iteratively strip everything after the last '__' delimiter, until a
     // base hook definition is found. Recursive base hooks of base hooks are
