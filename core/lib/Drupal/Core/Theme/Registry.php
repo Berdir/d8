@@ -721,9 +721,7 @@ class Registry implements DestructableInterface {
   public function reset() {
     // Reset the runtime registry.
     foreach ($this->runtimeRegistry as $runtime_registry) {
-      if ($runtime_registry instanceof ThemeRegistry) {
-        $runtime_registry->clear();
-      }
+      $runtime_registry->clear();
     }
     $this->runtimeRegistry = [];
 
