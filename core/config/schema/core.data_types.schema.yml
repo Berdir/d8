@@ -307,15 +307,6 @@ block_settings:
     label_display:
       type: string
       label: 'Display title'
-    status:
-      type: boolean
-      label: 'Status'
-    info:
-      type: label
-      label: 'Admin info'
-    view_mode:
-      type: string
-      label: 'View mode'
     provider:
       type: string
       label: 'Provider'

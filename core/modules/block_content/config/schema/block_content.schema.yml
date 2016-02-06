@@ -28,3 +28,16 @@ migrate.source.d6_box:
         type:
           type: string
           label: 'Type'
+
+block.settings.block_content:*
+  type: block_settings
+  mapping:
+    status:
+      type: boolean
+      label: 'Status'
+    info:
+      type: label
+      label: 'Admin info'
+    view_mode:
+      type: string
+      label: 'View mode'
