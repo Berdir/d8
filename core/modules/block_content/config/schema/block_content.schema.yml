@@ -29,7 +29,7 @@ migrate.source.d6_box:
           type: string
           label: 'Type'
 
-block.settings.block_content:*
+block.settings.block_content:*:
   type: block_settings
   mapping:
     status:
