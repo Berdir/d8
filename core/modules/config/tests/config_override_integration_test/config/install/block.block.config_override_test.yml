@@ -9,9 +9,6 @@ settings:
   label: 'Test HTML block'
   provider: block_test
   label_display: visible
-  status: true
-  info: ''
-  view_mode: default
 dependencies:
   module:
     - block_test

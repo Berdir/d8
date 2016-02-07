@@ -19,5 +19,4 @@ settings:
   label_display: visible
   cache:
     max_age: -1
-  status: true
 visibility: {  }

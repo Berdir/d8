@@ -16,5 +16,4 @@ settings:
   label_display: '0'
   cache:
     max_age: 0
-  status: true
 visibility: {  }

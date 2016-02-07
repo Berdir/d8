@@ -19,7 +19,6 @@ settings:
   label_display: visible
   cache:
     max_age: -1
-  status: true
 visibility:
   node_type:
     id: node_type

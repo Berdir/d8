@@ -23,8 +23,6 @@ settings:
   label_display: visible
   cache:
     max_age: -1
-  status: true
-  info: ''
   view_mode: full
 visibility:
   node_type:

@@ -16,8 +16,6 @@ settings:
   label: 'Shop for cheap now!'
   provider: block_content
   label_display: visible
-  status: true
-  info: ''
   view_mode: default
 visibility:
   request_path:
