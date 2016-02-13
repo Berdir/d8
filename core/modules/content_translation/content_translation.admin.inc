@@ -19,11 +19,13 @@ use Drupal\Core\Render\Element;
  *
  * @param \Drupal\Core\Field\FieldDefinitionInterface $field
  *   A field definition object.
+ * @param string $element_name
+ *   The name that the element will have, used applying javascript.
  *
  * @return array
  *   A form element to configure field synchronization.
  */
-function content_translation_field_sync_widget(FieldDefinitionInterface $field) {
+function content_translation_field_sync_widget(FieldDefinitionInterface $field, $element_name = 'third_party_settings[content_translation][translation_sync]') {
   // No way to store field sync information on this field.
   if (!($field instanceof ThirdPartySettingsInterface)) {
     return array();
@@ -35,13 +37,16 @@ function content_translation_field_sync_widget(FieldDefinitionInterface $field) 
   if (!empty($column_groups) && count($column_groups) > 1) {
     $options = array();
     $default = array();
+    $require_all = array();
 
     foreach ($column_groups as $group => $info) {
       $options[$group] = $info['label'];
       $default[$group] = !empty($info['translatable']) ? $group : FALSE;
+      if (!empty($info['require_all'])) {
+        $require_all[] = $group;
+      }
     }
 
-    $settings = array('dependent_selectors' => array('third_party_settings[content_translation][translation_sync]' => array('file')));
     $default = $field->getThirdPartySetting('content_translation', 'translation_sync', $default);
 
     $element = array(
@@ -49,15 +54,17 @@ function content_translation_field_sync_widget(FieldDefinitionInterface $field) 
       '#title' => t('Translatable elements'),
       '#options' => $options,
       '#default_value' => $default,
-      '#attached' => array(
-        'library' => array(
-          'content_translation/drupal.content_translation.admin',
-        ),
-        'drupalSettings' => [
-          'contentTranslationDependentOptions' => $settings,
-        ],
-      ),
     );
+
+    if ($require_all) {
+      // The actual checkboxes are sometimes rendered separately and the parent
+      // element is ignored. Attach to the first option to ensure that this
+      // does not get lost.
+      $element[key($options)]['#attached']['drupalSettings']['contentTranslationDependentOptions'] = array('dependent_selectors' =>
+        array($element_name => $require_all)
+      );
+      $element[key($options)]['#attached']['library'][] = 'content_translation/drupal.content_translation.admin';
+    }
   }
 
   return $element;
@@ -82,7 +89,6 @@ function _content_translation_form_language_content_settings_form_alter(array &$
 
   $form['#attached']['library'][] = 'content_translation/drupal.content_translation.admin';
 
-  $dependent_options_settings = array();
   $entity_manager = Drupal::entityManager();
   foreach ($form['#labels'] as $entity_type_id => $label) {
     $entity_type = $entity_manager->getDefinition($entity_type_id);
@@ -110,13 +116,9 @@ function _content_translation_form_language_content_settings_form_alter(array &$
               '#default_value' => $definition->isTranslatable(),
             );
             // Display the column translatability configuration widget.
-            $column_element = content_translation_field_sync_widget($definition);
+            $column_element = content_translation_field_sync_widget($definition, "settings[{$entity_type_id}][{$bundle}][columns][{$field_name}]");
             if ($column_element) {
               $form['settings'][$entity_type_id][$bundle]['columns'][$field_name] = $column_element;
-              // @todo This should not concern only files.
-              if (isset($column_element['#options']['file'])) {
-                $dependent_options_settings["settings[{$entity_type_id}][{$bundle}][columns][{$field_name}]"] = array('file');
-              }
             }
           }
         }
@@ -132,8 +134,6 @@ function _content_translation_form_language_content_settings_form_alter(array &$
     }
   }
 
-  $settings = array('dependent_selectors' => $dependent_options_settings);
-  $form['#attached']['drupalSettings']['contentTranslationDependentOptions'] = $settings;
   $form['#validate'][] = 'content_translation_form_language_content_settings_validate';
   $form['#submit'][] = 'content_translation_form_language_content_settings_submit';
 }
@@ -350,15 +350,6 @@ function content_translation_form_language_content_settings_submit(array $form, 
           foreach ($bundle_settings['columns'] as $field_name => $column_settings) {
             $field_config = $fields[$field_name]->getConfig($bundle);
             if ($field_config->isTranslatable()) {
-              // Special case for image field: in case the file property is
-              // translatable, set title and alt translatable as well. The
-              // javascript disables the checkboxes on the form and are not
-              // send along when posting the form.
-              // @todo make this generic (create issue, also add to line 116)
-              if (isset($column_settings['file']) && $column_settings['file'] === 'file' && isset($column_settings['alt']) && isset($column_settings['title'])) {
-                $column_settings['alt'] = 'alt';
-                $column_settings['title'] = 'title';
-              }
               $field_config->setThirdPartySetting('content_translation', 'translation_sync', $column_settings);
             }
             // If the field does not have translatable enabled we need to reset

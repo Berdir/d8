@@ -66,6 +66,17 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
         // Retrieve all the untranslatable column groups and merge them into
         // single list.
         $groups = array_keys(array_diff($translation_sync, array_filter($translation_sync)));
+
+        // If a group was selected that has the require_all flag set, there are
+        // no untranslatable columns. This is done because the UI adds
+        // Javascript that disables the other checkboxes, so their values are
+        // not saved.
+        foreach (array_filter($translation_sync) as $group) {
+          if (!empty($column_groups[$group]['require_all'])) {
+            $groups = [];
+            break;
+          }
+        }
         if (!empty($groups)) {
           $columns = array();
           foreach ($groups as $group) {

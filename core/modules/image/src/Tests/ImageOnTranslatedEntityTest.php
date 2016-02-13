@@ -40,7 +40,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
 
     // Create a image field on the "Basic page" node type.
     $this->fieldName = strtolower($this->randomMachineName());
-    $this->createImageField($this->fieldName, 'basicpage');
+    $this->createImageField($this->fieldName, 'basicpage', [], ['title_field' => 1]);
 
     // Create and login user.
     $permissions = array(
@@ -85,30 +85,6 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     );
     $this->drupalPostForm('admin/config/regional/content-language', $edit, 'Save configuration');
 
-    // Verify that file, alt and title are translatable.
-    $field = FieldConfig::load('node.basicpage.' . $this->fieldName);
-    $settings = $field->getThirdPartySetting('content_translation', 'translation_sync');
-    foreach (array('file' , 'alt', 'title') as $key) {
-      $this->assertTrue($settings[$key] == $key);
-    }
-
-    // Save the field settings form.
-    $edit = array(
-      'third_party_settings[content_translation][translation_sync][file]' => 1,
-      // Explicitly disable alt and title since the javascript disables the
-      // checkboxes on the form.
-      'third_party_settings[content_translation][translation_sync][alt]' => FALSE,
-      'third_party_settings[content_translation][translation_sync][title]' => FALSE,
-    );
-    $this->drupalPostForm('admin/structure/types/manage/basicpage/fields/node.basicpage.' . $this->fieldName, $edit, 'Save settings');
-
-    // Verify that file, alt and title are translatable.
-    $field = FieldConfig::load('node.basicpage.' . $this->fieldName);
-    $settings = $field->getThirdPartySetting('content_translation', 'translation_sync');
-    foreach (array('file' , 'alt', 'title') as $key) {
-      $this->assertTrue($settings[$key] == $key);
-    }
-
     // Verify that the image field on the "Basic basic" node type is
     // translatable.
     $definitions = \Drupal::entityManager()->getFieldDefinitions('node', 'basicpage');
@@ -122,8 +98,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     $name = 'files[' . $this->fieldName . '_0]';
     $edit[$name] = drupal_realpath($this->drupalGetTestFiles('image')[0]->uri);
     $this->drupalPostForm('node/' . $default_language_node->id() . '/edit', $edit, t('Save'));
-    $name = $this->fieldName . '[0][alt]';
-    $edit = [$name => 'Lost in translation image'];
+    $edit = [$this->fieldName . '[0][alt]' => 'Lost in translation image', $this->fieldName . '[0][title]' => 'Lost in translation image title'];
     $this->drupalPostForm(NULL, $edit, t('Save'));
     $first_fid = $this->getLastFileId();
 
@@ -136,12 +111,12 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     $name = 'files[' . $this->fieldName . '_0]';
     $edit[$name] = drupal_realpath($this->drupalGetTestFiles('image')[1]->uri);
     $this->drupalPostForm(NULL, $edit, t('Save (this translation)'));
-    $name = $this->fieldName . '[0][alt]';
-    $edit = [$name => 'Scarlett Johansson image'];
+    $edit = [$this->fieldName . '[0][alt]' => 'Scarlett Johansson image', $this->fieldName . '[0][title]' => 'Scarlett Johansson image title'];
     $this->drupalPostForm(NULL, $edit, t('Save (this translation)'));
     // This inspects the HTML after the post of the translation, the image
     // should be displayed on the original node.
     $this->assertRaw('alt="Lost in translation image"');
+    $this->assertRaw('title="Lost in translation image title"');
     $second_fid = $this->getLastFileId();
     // View the translated node.
     $this->drupalGet('fr/node/' . $default_language_node->id());
@@ -168,8 +143,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     $name = 'files[' . $this->fieldName . '_0]';
     $edit[$name] = drupal_realpath($this->drupalGetTestFiles('image')[2]->uri);
     $this->drupalPostForm(NULL, $edit, t('Save (this translation)'));
-    $name = $this->fieldName . '[0][alt]';
-    $edit = [$name => 'Akiko Takeshita image'];
+    $edit = [$this->fieldName . '[0][alt]' => 'Akiko Takeshita image', $this->fieldName . '[0][title]' => 'Akiko Takeshita image title'];
     $this->drupalPostForm(NULL, $edit, t('Save (this translation)'));
     $third_fid = $this->getLastFileId();
 
@@ -181,9 +155,11 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     // This inspects the HTML after the post of the translation, the image
     // should be displayed on the original node.
     $this->assertRaw('alt="Lost in translation image"');
+    $this->assertRaw('title="Lost in translation image title"');
     // View the translated node.
     $this->drupalGet('nl/node/' . $default_language_node->id());
     $this->assertRaw('alt="Akiko Takeshita image"');
+    $this->assertRaw('title="Akiko Takeshita image title"');
 
     // Ensure the file status of the second file is permanent.
     $file = File::load($second_fid);
@@ -203,6 +179,7 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     $edit[$name] = drupal_realpath($this->drupalGetTestFiles('image')[3]->uri);
     $this->drupalPostForm(NULL, $edit, t('Save (this translation)'));
     $name = $this->fieldName . '[0][alt]';
+
     $edit = [$name => 'Giovanni Ribisi image'];
     $this->drupalPostForm(NULL, $edit, t('Save (this translation)'));
     $replaced_second_fid = $this->getLastFileId();
