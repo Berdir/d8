@@ -163,9 +163,13 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
             continue;
           }
           // If a synchronized column has changed or has been created from
-          // scratch we need to override the full items array for all languages.
+          // scratch we need to replace the values for this language as a
+          // combination of the values that need to be synced from the source
+          // items and the other columns from the existing values.
           elseif ($created) {
-            $values[$langcode][$delta] = $source_items[$delta];
+            $item_columns_to_sync = array_intersect_key($source_items[$delta], array_flip($columns));
+            $item_columns_to_keep = array_diff_key($original_field_values[$langcode][$delta], array_flip($columns));
+            $values[$langcode][$delta] = $item_columns_to_sync + $item_columns_to_keep;
           }
           // Otherwise the current item might have been reordered.
           elseif (isset($old_delta) && isset($new_delta)) {
