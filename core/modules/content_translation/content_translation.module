@@ -14,6 +14,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\field\FieldConfigInterface;
 
 /**
  * Implements hook_help().
@@ -391,6 +392,27 @@ function content_translation_form_field_config_edit_form_alter(array &$form, For
     if ($element) {
       $form['third_party_settings']['content_translation']['translation_sync'] = $element;
       $form['third_party_settings']['content_translation']['translation_sync']['#weight'] = -10;
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for 'field_config'.
+ *
+ * This will special case on field images to alter the value of title and alt
+ * properties in case the file has been set as translatable. The javascript
+ * disables the checkboxes on the form and are not send along when posting the
+ * form.
+ *
+ * @see content_translation_field_sync_widget().
+ */
+function content_translation_field_config_presave(FieldConfigInterface $field) {
+  if ($field->getType() == 'image') {
+    $settings = $field->getThirdPartySetting('content_translation', 'translation_sync');
+    if (isset($settings['file']) && $settings['file'] === 'file') {
+      $settings['title'] = 'title';
+      $settings['alt'] = 'alt';
+      $field->setThirdPartySetting('content_translation', 'translation_sync', $settings);
     }
   }
 }

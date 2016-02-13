@@ -41,7 +41,7 @@ function content_translation_field_sync_widget(FieldDefinitionInterface $field) 
       $default[$group] = !empty($info['translatable']) ? $group : FALSE;
     }
 
-    $settings = array('dependent_selectors' => array('instance[third_party_settings][content_translation][translation_sync]' => array('file')));
+    $settings = array('dependent_selectors' => array('third_party_settings[content_translation][translation_sync]' => array('file')));
     $default = $field->getThirdPartySetting('content_translation', 'translation_sync', $default);
 
     $element = array(
@@ -350,6 +350,15 @@ function content_translation_form_language_content_settings_submit(array $form, 
           foreach ($bundle_settings['columns'] as $field_name => $column_settings) {
             $field_config = $fields[$field_name]->getConfig($bundle);
             if ($field_config->isTranslatable()) {
+              // Special case for image field: in case the file property is
+              // translatable, set title and alt translatable as well. The
+              // javascript disables the checkboxes on the form and are not
+              // send along when posting the form.
+              // @todo make this generic (create issue, also add to line 116)
+              if (isset($column_settings['file']) && $column_settings['file'] === 'file' && isset($column_settings['alt']) && isset($column_settings['title'])) {
+                $column_settings['alt'] = 'alt';
+                $column_settings['title'] = 'title';
+              }
               $field_config->setThirdPartySetting('content_translation', 'translation_sync', $column_settings);
             }
             // If the field does not have translatable enabled we need to reset

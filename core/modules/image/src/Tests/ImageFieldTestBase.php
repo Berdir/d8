@@ -154,4 +154,10 @@ abstract class ImageFieldTestBase extends WebTestBase {
     return isset($matches[1]) ? $matches[1] : FALSE;
   }
 
+  /**
+   * Retrieves the fid of the last inserted file.
+   */
+  function getLastFileId() {
+    return (int) db_query('SELECT MAX(fid) FROM {file_managed}')->fetchField();
+  }
 }
