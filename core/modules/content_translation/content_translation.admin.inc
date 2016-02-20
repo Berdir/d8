@@ -35,9 +35,9 @@ function content_translation_field_sync_widget(FieldDefinitionInterface $field, 
   $definition = \Drupal::service('plugin.manager.field.field_type')->getDefinition($field->getType());
   $column_groups = $definition['column_groups'];
   if (!empty($column_groups) && count($column_groups) > 1) {
-    $options = array();
-    $default = array();
-    $require_all = array();
+    $options = [];
+    $default = [];
+    $require_all = [];
 
     foreach ($column_groups as $group => $info) {
       $options[$group] = $info['label'];
@@ -60,9 +60,9 @@ function content_translation_field_sync_widget(FieldDefinitionInterface $field, 
       // The actual checkboxes are sometimes rendered separately and the parent
       // element is ignored. Attach to the first option to ensure that this
       // does not get lost.
-      $element[key($options)]['#attached']['drupalSettings']['contentTranslationDependentOptions'] = array('dependent_selectors' =>
-        array($element_name => $require_all)
-      );
+      $element[key($options)]['#attached']['drupalSettings']['contentTranslationDependentOptions'] = ['dependent_selectors' =>
+        [$element_name => $require_all],
+      ];
       $element[key($options)]['#attached']['library'][] = 'content_translation/drupal.content_translation.admin';
     }
   }

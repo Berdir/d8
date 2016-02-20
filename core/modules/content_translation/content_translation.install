@@ -43,5 +43,12 @@ function content_translation_update_8001() {
 }
 
 /**
+ * Clear field type plugin caches to make the new require_all flag available.
+ */
+function content_translation_update_8002() {
+  \Drupal::service('plugin.manager.field.field_type')->clearCachedDefinitions();
+}
+
+/**
  * @} End of "addtogroup updates-8.0.0-rc".
  */
