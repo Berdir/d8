@@ -310,48 +310,44 @@ class ConfigManager implements ConfigManagerInterface {
       'unchanged' => [],
     ];
 
+    dependencies_changed:
+
     // Try to fix any dependencies and find out what will happen to the
     // dependency graph. Reverse the dependencies to start with nested
     // dependencies first.
-    do {
-      foreach (array_reverse($dependents) as $dependent) {
-        /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $dependent */
-        if ($dry_run) {
-          // Clone the entity so any changes do not change any static caches.
-          $dependent = clone $dependent;
-        }
-        if ($this->callOnDependencyRemoval($dependent, $original_dependencies, $type, $names)) {
-          // Recalculate dependencies and update the dependency graph data.
-          $dependent->calculateDependencies();
-          $dependency_manager->updateData($dependent->getConfigDependencyName(), $dependent->getDependencies());
-          // Based on the updated data rebuild the list of dependents.
-          $dependents = $this->findConfigEntityDependentsAsEntities($type, $names, $dependency_manager);
+    foreach (array_reverse($dependents) as $dependent) {
+      /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $dependent */
+      if ($dry_run) {
+        // Clone the entity so any changes do not change any static caches.
+        $dependent = clone $dependent;
+      }
+      if ($this->callOnDependencyRemoval($dependent, $original_dependencies, $type, $names)) {
+        // Recalculate dependencies and update the dependency graph data.
+        $dependent->calculateDependencies();
+        $dependency_manager->updateData($dependent->getConfigDependencyName(), $dependent->getDependencies());
+        // Based on the updated data rebuild the list of dependents.
+        $dependents = $this->findConfigEntityDependentsAsEntities($type, $names, $dependency_manager);
 
-          // Ensure that the dependency has actually been fixed. It is possible
-          // that the dependent has multiple dependencies that cause it to be in
-          // the dependency chain.
-          $fixed = TRUE;
-          foreach ($dependents as $entity) {
-            if ($entity->uuid() == $dependent->uuid()) {
-              $fixed = FALSE;
-              break;
-            }
+        // Ensure that the dependency has actually been fixed. It is possible
+        // that the dependent has multiple dependencies that cause it to be in
+        // the dependency chain.
+        $fixed = TRUE;
+        foreach ($dependents as $entity) {
+          if ($entity->uuid() == $dependent->uuid()) {
+            $fixed = FALSE;
+            break;
           }
-          if ($fixed) {
-            $return['update'][] = $dependent;
-            $update_uuids[] = $dependent->uuid();
-            // If this entity was able to change itself, then others that
-            // depended on it no longer need to be removed. Restart the loop
-            // with the remaining dependants.
-            continue 2;
-          }
+        }
+        if ($fixed) {
+          $return['update'][] = $dependent;
+          $update_uuids[] = $dependent->uuid();
+          // If this entity was able to change itself, then others that
+          // depended on it no longer need to be removed. Restart the foreach
+          // with the remaining dependants.
+          goto dependencies_changed;
         }
       }
-
-      // If we got here then we processed all dependants without finding any
-      // that can change themself. The remaining ones have to be deleted.
-      break;
-    }  while (TRUE);
+    }
     // Now that we've fixed all the possible dependencies the remaining need to
     // be deleted. Reverse the deletes so that entities are removed in the
     // correct order of dependence. For example, this ensures that fields are
