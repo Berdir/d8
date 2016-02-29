@@ -52,6 +52,32 @@ class DateTimeWidgetBase extends WidgetBase {
       $element['value']['#default_value'] = $date;
     }
 
+    if ($this->getFieldSetting('enddate_get')) {
+      $element['value']['#title'] = t('Start date');
+
+      $element['value2'] = array(
+        '#title' => t('End date'),
+        '#type' => 'datetime',
+        '#default_value' => NULL,
+        '#date_increment' => 1,
+        '#date_timezone' => drupal_get_user_timezone(),
+        '#required' => $element['#required'],
+      );
+
+      if ($items[$delta]->date2) {
+        $date = $items[$delta]->date2;
+        // The date was created and verified during field_load(), so it is safe to
+        // use without further inspection.
+        if ($this->getFieldSetting('datetime_type') == DateTimeItem::DATETIME_TYPE_DATE) {
+          // A date without time will pick up the current time, use the default
+          // time.
+          datetime_date_default_time($date);
+        }
+        $date->setTimezone(new \DateTimeZone($element['value2']['#date_timezone']));
+        $element['value2']['#default_value'] = $date;
+      }
+    }
+
     return $element;
   }
 
@@ -62,9 +88,22 @@ class DateTimeWidgetBase extends WidgetBase {
     // The widget form element type has transformed the value to a
     // DrupalDateTime object at this point. We need to convert it back to the
     // storage timezone and format.
+    $properties = array('value');
+    if ($this->getFieldSetting('enddate_get')) {
+      $properties[] = 'value2';
+    }
     foreach ($values as &$item) {
-      if (!empty($item['value']) && $item['value'] instanceof DrupalDateTime) {
-        $date = $item['value'];
+      foreach ($properties as $property) {
+        if (!empty($item[$property]) && $item[$property] instanceof DrupalDateTime) {
+          $this->massageDateProperty($item, $property);
+        }
+      }
+    }
+    return $values;
+  }
+
+  public function massageDateProperty(&$item, $property) {
+    $date = $item[$property];
         switch ($this->getFieldSetting('datetime_type')) {
           case DateTimeItem::DATETIME_TYPE_DATE:
             // If this is a date-only field, set it to the default time so the
@@ -79,10 +118,7 @@ class DateTimeWidgetBase extends WidgetBase {
         }
         // Adjust the date for storage.
         $date->setTimezone(new \DateTimezone(DATETIME_STORAGE_TIMEZONE));
-        $item['value'] = $date->format($format);
-      }
-    }
-    return $values;
-  }
+    $item[$property] = $date->format($format);
 
+  }
 }

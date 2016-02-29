@@ -13,6 +13,7 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Tests\FieldUnitTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\entity_test\Entity\EntityTest;
 
 /**
  * Tests the new entity API for the date field type.
@@ -125,4 +126,25 @@ class DateTimeItemTest extends FieldUnitTestBase {
     $this->assertEqual($entity->field_datetime[0]->value, $value, '"Value" property can be set directly.');
   }
 
+  /**
+   * Tests collecting an end date.
+   */
+  public function testEnddate() {
+    /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
+    $field_storage = FieldStorageConfig::load('entity_test.field_datetime');
+    $field_storage->setSetting('enddate_get', TRUE);
+    $field_storage->save();
+
+    $entity = EntityTest::create();
+    $value = '2014-01-01T20:00:00Z';
+    $value2 = '2014-02-01T20:00:00Z';
+
+    $entity->set('field_datetime', ['value' => $value, 'value2' => $value2]);
+    $entity->save();
+
+    // Load the entity.
+    $id = $entity->id();
+    $entity = EntityTest::load($id);
+    $this->assertEqual($value2, $entity->field_datetime[0]->value2, '"end date" property can be set.');
+  }
 }

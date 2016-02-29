@@ -89,6 +89,17 @@ class DateTimeDefaultWidget extends DateTimeWidgetBase implements ContainerFacto
       '#date_time_callbacks' => array(),
     );
 
+    if ($this->getFieldSetting('enddate_get')) {
+      $element['value2'] += array(
+        '#date_date_format'=>  $date_format,
+        '#date_date_element' => $date_type,
+        '#date_date_callbacks' => array(),
+        '#date_time_format' => $time_format,
+        '#date_time_element' => $time_type,
+        '#date_time_callbacks' => array(),
+      );
+    }
+
     return $element;
   }
 

@@ -42,6 +42,8 @@ class DateTimeDefaultFormatter extends DateTimeFormatterBase {
     foreach ($items as $delta => $item) {
       $output = '';
       $iso_date = '';
+      $output2 = '';
+      $iso_date2 = '';
 
       if ($item->date) {
         /** @var \Drupal\Core\Datetime\DrupalDateTime $date */
@@ -58,8 +60,33 @@ class DateTimeDefaultFormatter extends DateTimeFormatterBase {
         $output = $this->formatDate($date);
       }
 
+      if ($item->date2 && $item->date != $item->date2) {
+        /** @var \Drupal\Core\Datetime\DrupalDateTime $date */
+        $date2 = $item->date2;
+        // Create the ISO date in Universal Time.
+        $iso_date2 = $date->format("Y-m-d\TH:i:s") . 'Z';
+
+        if ($this->getFieldSetting('datetime_type') == 'date') {
+          // A date without time will pick up the current time, use the default.
+          datetime_date_default_time($date2);
+        }
+        $this->setTimeZone($date2);
+
+        $output2 = $this->formatDate($date2);
+
+        // Check if start day == end day.
+        if ($this->getFieldSetting('datetime_type') == 'datetime') {
+          // TODO better logic to split the date and time based on the format.
+          $length = strspn($output2, $output);
+          if ($length) {
+
+            $output2 = substr($output2, $length - 1);
+          }
+        }
+      }
+
       // Display the date using theme datetime.
-      $elements[$delta] = array(
+      $elements[$delta][] = [
         '#cache' => [
           'contexts' => [
             'timezone',
@@ -68,12 +95,31 @@ class DateTimeDefaultFormatter extends DateTimeFormatterBase {
         '#theme' => 'time',
         '#text' => $output,
         '#html' => FALSE,
-        '#attributes' => array(
-          'datetime' => $iso_date,
-        ),
-      );
+        '#attributes' => ['datetime' => $iso_date],
+      ];
+
+      // Append on the end date.
+      if ($this->getFieldSetting('enddate_get') && !empty($output2)) {
+        $elements[$delta][] = [
+          '#markup' => $this->t(' to '),
+        ];
+        $elements[$delta][] = [
+          '#cache' => [
+            'contexts' => [
+              'timezone',
+            ],
+          ],
+          '#theme' => 'time',
+          '#text' => $output2,
+          '#html' => FALSE,
+          '#attributes' => ['datetime' => $iso_date2],
+        ];
+      }
       if (!empty($item->_attributes)) {
-        $elements[$delta]['#attributes'] += $item->_attributes;
+        $elements[$delta][0]['#attributes'] += $item->_attributes;
+        if ($this->getFieldSetting('enddate_get') && !empty($output2)) {
+          $elements[$delta][2]['#attributes'] += $item->_attributes;
+        }
         // Unset field item attributes since they have been included in the
         // formatter output and should not be rendered in the field template.
         unset($item->_attributes);

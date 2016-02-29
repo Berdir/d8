@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the datetime module.
+ */
+
+use Drupal\Core\Database\Database;
+
+/**
+ * Add 'enddate_get' field to 'field.storage_settings.datetime'.
+ *
+ * Add 'value2' field.
+ */
+function datetime_update_8001() {
+
+  // Update field storage for existing datetime fields.
+  $entity_manager = \Drupal::entityManager();
+  $entity_manager->useCaches(FALSE);
+  $change_list = array();
+
+  foreach ($entity_manager->getDefinitions() as $entity_type_id => $entity_type) {
+
+    if ($entity_manager->getStorage($entity_type_id) instanceof \Drupal\Core\Entity\Schema\DynamicallyFieldableEntityStorageSchemaInterface) {
+      $field_changes = array();
+
+      $storage_definitions = $entity_manager->getFieldStorageDefinitions($entity_type_id);
+      $original_storage_definitions = $entity_manager->getLastInstalledFieldStorageDefinitions($entity_type_id);
+
+      // Detect updated field storage definitions.
+      foreach (array_intersect_key($storage_definitions, $original_storage_definitions) as $field_name => $storage_definition) {
+
+        if ($storage_definition->getType() == 'datetime') {
+          if ($entity_manager->getStorage($entity_type_id)->requiresFieldStorageSchemaChanges($storage_definition, $original_storage_definitions[$field_name])) {
+            $field_changes[$field_name] = TRUE;
+          }
+        }
+      }
+
+      if ($field_changes) {
+        $change_list[$entity_type_id] = array(
+          'field_storage_definitions' => $field_changes,
+          'base_table' => $entity_type->getBaseTable(),
+          'revision_table' => $entity_type->getRevisionTable(),
+        );
+      }
+    }
+  }
+
+  $field_spec = array(
+    'description' => 'The end date value.',
+    'type' => 'varchar',
+    'length' => 20,
+  );
+
+  $schema = Database::getConnection()->schema();
+
+  foreach ($change_list as $entity_type_id => $changes) {
+    foreach (array_keys($changes['field_storage_definitions']) as $field_name) {
+      $value_field_name = $field_name . '_value2';
+
+      $field_schema = array(
+        'fields' => array(
+          $value_field_name => array(
+            'description' => 'The end date value.',
+            'type' => 'varchar',
+            'length' => 20,
+          ),
+        ),
+        'indexes' => array(
+          $value_field_name => array($value_field_name),
+        ),
+      );
+
+      $index_spec = array($value_field_name);
+      $base_table = $changes['base_table'] . '__' . $field_name;
+      $schema->addField($base_table, $value_field_name, $field_spec);
+      $schema->addIndex($base_table, $value_field_name, $index_spec, $field_schema);
+
+      if ($changes['revision_table']) {
+        $revision_table = $changes['revision_table'] . '__' . $field_name;
+        $schema->addField($revision_table, $value_field_name, $field_spec);
+        $schema->addIndex($revision_table, $value_field_name, $index_spec, $field_schema);
+      }
+    }
+  }
+
+  // Update the storage configs.
+  if (!$field_storage_configs = \Drupal::entityManager()->getStorage('field_storage_config')->loadByProperties(array('type' => 'datetime'))) {
+    return;
+  }
+
+  foreach ($field_storage_configs as $field_storage) {
+    $field_storage->setSetting('enddate_get', FALSE);
+    $field_storage->setSetting('enddate_require', FALSE);
+    $field_storage->save();
+  }
+
+}

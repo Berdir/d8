@@ -7,6 +7,12 @@ field.storage_settings.datetime:
     datetime_type:
       type: string
       label: 'Date type'
+    enddate_get:
+      type: string
+      label: 'Collect end date'
+    enddate_require:
+      type: string
+      label: 'Require end date'
 
 field.field_settings.datetime:
   type: mapping

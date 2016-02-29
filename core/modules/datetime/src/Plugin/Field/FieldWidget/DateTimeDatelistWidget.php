@@ -83,6 +83,14 @@ class DateTimeDatelistWidget extends DateTimeWidgetBase {
       '#date_part_order'=> $date_part_order,
     ) + $element['value'];
 
+    if ($this->getFieldSetting('enddate_get')) {
+      $element['value2'] = array(
+          '#type' => 'datelist',
+          '#date_increment' => $increment,
+          '#date_part_order'=> $date_part_order,
+        ) + $element['value'];
+    }
+
     return $element;
   }
 

@@ -113,8 +113,17 @@ class DateTimeTimeAgoFormatter extends FormatterBase implements ContainerFactory
 
     foreach ($items as $delta => $item) {
       $date = $item->date;
+      $date2 = $item->date2;
       $output = [];
-      if (!empty($item->date)) {
+      // Base the timeago calculation off of the end date, if it exists.
+      if (!empty($item->date2)) {
+        if ($this->getFieldSetting('datetime_type') == 'date') {
+          // A date without time will pick up the current time, use the default.
+          datetime_date_default_time($date2);
+        }
+        $output = $this->formatDate($date2);
+      }
+      elseif (!empty($item->date)) {
         if ($this->getFieldSetting('datetime_type') == 'date') {
           // A date without time will pick up the current time, use the default.
           datetime_date_default_time($date);

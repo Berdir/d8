@@ -53,6 +53,21 @@ class DateTimeCustomFormatter extends DateTimeFormatterBase {
 
         $output = $this->formatDate($date);
       }
+      if (!empty($item->date2)) {
+        /** @var \Drupal\Core\Datetime\DrupalDateTime $date */
+        $date2 = $item->date2;
+
+        if ($this->getFieldSetting('datetime_type') == 'date') {
+          // A date without time will pick up the current time, use the default.
+          datetime_date_default_time($date2);
+        }
+        $this->setTimeZone($date2);
+
+        $output = $this->t('@date to @date2', [
+          '@date' => $this->formatDate($date),
+          '@date2' => $this->formatDate($date2),
+        ]);
+      }
       $elements[$delta] = [
         '#markup' => $output,
         '#cache' => [
