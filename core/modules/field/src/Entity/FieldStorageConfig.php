@@ -288,6 +288,10 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     $default_settings = $field_type_manager->getDefaultStorageSettings($this->type);
     $this->settings = array_intersect_key($this->settings, $default_settings) + $default_settings;
 
+    // Different settings could lead to different property definitions,
+    // invalidate the statically cached definitions.
+    $this->propertyDefinitions = NULL;
+
     if ($this->isNew()) {
       $this->preSaveNew($storage);
     }

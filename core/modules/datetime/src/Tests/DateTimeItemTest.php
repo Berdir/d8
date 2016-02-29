@@ -13,7 +13,6 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Tests\FieldUnitTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\entity_test\Entity\EntityTest;
 
 /**
  * Tests the new entity API for the date field type.

@@ -65,16 +65,17 @@ class DateTimeItem extends FieldItemBase {
       ->setClass('\Drupal\datetime\DateTimeComputed')
       ->setSetting('date source', 'value');
 
-    $properties['value2'] = DataDefinition::create('datetime_iso8601')
-      ->setLabel(t('Date value (end)'))
-      ->setRequired($require_end);
-
-    $properties['date2'] = DataDefinition::create('any')
-      ->setLabel(t('Computed date (end)'))
-      ->setDescription(t('The computed end DateTime object.'))
-      ->setComputed(TRUE)
-      ->setClass('\Drupal\datetime\DateTimeComputed')
-      ->setSetting('date source', 'value2');
+    if ($has_end) {
+      $properties['value2'] = DataDefinition::create('datetime_iso8601')
+        ->setLabel(t('Date value (end)'))
+        ->setRequired($require_end);
+      $properties['date2'] = DataDefinition::create('any')
+        ->setLabel(t('Computed date (end)'))
+        ->setDescription(t('The computed end DateTime object.'))
+        ->setComputed(TRUE)
+        ->setClass('\Drupal\datetime\DateTimeComputed')
+        ->setSetting('date source', 'value2');
+    }
 
     return $properties;
   }
@@ -90,17 +91,23 @@ class DateTimeItem extends FieldItemBase {
           'type' => 'varchar',
           'length' => 20,
         ),
-        'value2' => array(
-          'description' => 'The end date value.',
-          'type' => 'varchar',
-          'length' => 20,
-        ),
       ),
       'indexes' => array(
         'value' => array('value'),
-        'value2' => array('value2'),
       ),
     );
+
+    if ($field_definition->getSetting('enddate_get')) {
+      $schema['columns']['value2'] = [
+        'description' => 'The end date value.',
+        'type' => 'varchar',
+        'length' => 20,
+      ];
+      $schema['indexes'] = [
+        'value' => ['value', 'value2'],
+        'value2' => ['value2'],
+      ];
+    }
 
     return $schema;
   }
