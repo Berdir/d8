@@ -59,7 +59,7 @@ trait AssertLegacyTrait {
    *   instead.
    */
   protected function assertEqual($actual, $expected, $message = '') {
-    $this->assertEquals($expected, $actual, $message);
+    $this->assertEquals($this->castSafeStrings($expected), $this->castSafeStrings($actual), $message);
   }
 
   /**
