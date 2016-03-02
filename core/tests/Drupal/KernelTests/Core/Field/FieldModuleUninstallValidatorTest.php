@@ -10,14 +10,14 @@ namespace Drupal\KernelTests\Core\Field;
 use Drupal\Core\Extension\ModuleUninstallValidatorException;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\entity_test\FieldStorageDefinition;
-use Drupal\system\Tests\Entity\EntityUnitTestBase;
+use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
  * Tests FieldModuleUninstallValidator functionality.
  *
  * @group Field
  */
-class FieldModuleUninstallValidatorTest extends EntityUnitTestBase {
+class FieldModuleUninstallValidatorTest extends EntityKernelTestBase {
 
   /**
    * The entity definition update manager.

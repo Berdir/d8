@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\filter\Tests\FilterAPITest.
+ * Contains \Drupal\KernelTests\filter\FilterAPITest.
  */
 
-namespace Drupal\filter\Tests;
+namespace Drupal\KernelTests\filter;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AnonymousUserSession;
@@ -14,7 +14,7 @@ use Drupal\Core\TypedData\DataDefinition;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\Plugin\DataType\FilterFormat as FilterFormatDataType;
 use Drupal\filter\Plugin\FilterInterface;
-use Drupal\system\Tests\Entity\EntityUnitTestBase;
+use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -22,7 +22,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * @group filter
  */
-class FilterAPITest extends EntityUnitTestBase {
+class FilterAPITest extends EntityKernelTestBase {
 
   public static $modules = array('system', 'filter', 'filter_test', 'user');
 

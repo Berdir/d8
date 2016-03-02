@@ -2,22 +2,22 @@
 
 /**
  * @file
- * Contains \Drupal\system\Tests\Field\FieldSettingsTest.
+ * Contains \Drupal\KernelTests\Core\Field\FieldSettingsTest.
  */
 
-namespace Drupal\system\Tests\Field;
+namespace Drupal\KernelTests\Core\Field;
 
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\system\Tests\Entity\EntityUnitTestBase;
+use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
  * Tests field settings methods on field definition structures.
  *
  * @group Field
  */
-class FieldSettingsTest extends EntityUnitTestBase {
+class FieldSettingsTest extends EntityKernelTestBase {
 
   /**
    * Modules to enable.
@@ -27,8 +27,8 @@ class FieldSettingsTest extends EntityUnitTestBase {
   public static $modules = array('field', 'field_test');
 
   /**
-   * @covers \Drupal\Core\Field\BaseFieldDefinition::getSettings()
-   * @covers \Drupal\Core\Field\BaseFieldDefinition::setSettings()
+   * @covers \Drupal\Core\Field\BaseFieldDefinition::getSettings
+   * @covers \Drupal\Core\Field\BaseFieldDefinition::setSettings
    */
   public function testBaseFieldSettings() {
     $base_field = BaseFieldDefinition::create('test_field');
@@ -52,8 +52,8 @@ class FieldSettingsTest extends EntityUnitTestBase {
   }
 
   /**
-   * @covers \Drupal\field\Entity\FieldStorageConfig::getSettings()
-   * @covers \Drupal\field\Entity\FieldStorageConfig::setSettings()
+   * @covers \Drupal\field\Entity\FieldStorageConfig::getSettings
+   * @covers \Drupal\field\Entity\FieldStorageConfig::setSettings
    */
   public function testConfigurableFieldStorageSettings() {
     $field_storage = FieldStorageConfig::create([
@@ -79,8 +79,8 @@ class FieldSettingsTest extends EntityUnitTestBase {
   }
 
   /**
-   * @covers \Drupal\field\Entity\FieldStorageConfig::getSettings()
-   * @covers \Drupal\field\Entity\FieldStorageConfig::setSettings()
+   * @covers \Drupal\field\Entity\FieldStorageConfig::getSettings
+   * @covers \Drupal\field\Entity\FieldStorageConfig::setSettings
    */
   public function testConfigurableFieldSettings() {
     $field_storage = FieldStorageConfig::create([
@@ -88,6 +88,7 @@ class FieldSettingsTest extends EntityUnitTestBase {
       'entity_type' => 'entity_test',
       'type' => 'test_field'
     ]);
+    $field_storage->save();
     $field = FieldConfig::create([
       'field_storage' => $field_storage,
       'bundle' => 'entity_test'
@@ -96,6 +97,7 @@ class FieldSettingsTest extends EntityUnitTestBase {
     // is saved.
     // @todo Remove once https://www.drupal.org/node/2327883 is fixed.
     $field->save();
+    $field = FieldConfig::load($field->id());
 
     // Check that the default settings have been populated. Note: getSettings()
     // returns both storage and field settings.
@@ -107,6 +109,7 @@ class FieldSettingsTest extends EntityUnitTestBase {
       'test_field_setting' => 'dummy test string',
       'translatable_field_setting' => 'a translatable field setting',
       'field_setting_from_config_data' => TRUE,
+      'field_storage_setting_from_config_data' => TRUE,
     ];
     $this->assertEqual($field->getSettings(), $expected_settings);
 
