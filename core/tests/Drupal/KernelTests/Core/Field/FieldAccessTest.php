@@ -9,7 +9,7 @@ namespace Drupal\KernelTests\Core\Field;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\simpletest\KernelTestBase;
+use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 
 /**

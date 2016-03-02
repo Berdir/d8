@@ -12,14 +12,14 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\system\Tests\Entity\EntityUnitTestBase;
+use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 
 /**
  * Test field item methods.
  *
  * @group Field
  */
-class FieldItemTest extends EntityUnitTestBase {
+class FieldItemTest extends EntityKernelTestBase {
 
   /**
    * @var string
