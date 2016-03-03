@@ -12,7 +12,6 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\KernelTests\Core\Entity\EntityLanguageTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 
 /**

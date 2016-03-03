@@ -9,6 +9,8 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\user\Entity\Role;
+use Drupal\user\Entity\User;
 
 /**
  * Defines an abstract test base for entity kernel tests.
@@ -99,7 +101,7 @@ abstract class EntityKernelTestBase extends KernelTestBase {
   protected function createUser($values = array(), $permissions = array()) {
     if ($permissions) {
       // Create a new role and apply permissions to it.
-      $role = entity_create('user_role', array(
+      $role = Role::create(array(
         'id' => strtolower($this->randomMachineName(8)),
         'label' => $this->randomMachineName(8),
       ));
@@ -108,7 +110,7 @@ abstract class EntityKernelTestBase extends KernelTestBase {
       $values['roles'][] = $role->id();
     }
 
-    $account = entity_create('user', $values + array(
+    $account = User::create($values + array(
       'name' => $this->randomMachineName(),
       'status' => 1,
     ));

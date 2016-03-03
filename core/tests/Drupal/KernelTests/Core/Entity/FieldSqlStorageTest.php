@@ -12,7 +12,6 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\system\Tests\Entity\EntityUnitTestBase;
 
 /**
  * Tests Field SQL Storage .

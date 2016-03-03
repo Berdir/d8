@@ -10,7 +10,6 @@ namespace Drupal\KernelTests\Core\Entity;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\KernelTests\Core\Entity\EntityLanguageTestBase;
 
 /**
  * Tests Field translation SQL Storage.
