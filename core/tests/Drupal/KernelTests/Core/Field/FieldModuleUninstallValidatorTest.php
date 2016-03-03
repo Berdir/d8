@@ -113,7 +113,10 @@ class FieldModuleUninstallValidatorTest extends EntityKernelTestBase {
    *   The module to install and uninstall.
    */
   protected function assertModuleInstallUninstall($module_name) {
-    $this->enableModules([$module_name]);
+    // Install the module if it is not installed yet.
+    if (!\Drupal::moduleHandler()->moduleExists($module_name)) {
+      $this->enableModules([$module_name]);
+    }
     $this->entityDefinitionUpdateManager->applyUpdates();
     $this->assertTrue($this->getModuleHandler()->moduleExists($module_name), $module_name .' module is enabled.');
     $this->getModuleInstaller()->uninstall([$module_name]);

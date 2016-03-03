@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\KernelTests\filter\FilterAPITest.
+ * Contains \Drupal\Tests\filter\Kernel\FilterAPITest.
  */
 
-namespace Drupal\KernelTests\filter;
+namespace Drupal\Tests\filter\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AnonymousUserSession;

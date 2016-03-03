@@ -88,7 +88,6 @@ class FieldSettingsTest extends EntityKernelTestBase {
       'entity_type' => 'entity_test',
       'type' => 'test_field'
     ]);
-    $field_storage->save();
     $field = FieldConfig::create([
       'field_storage' => $field_storage,
       'bundle' => 'entity_test'
@@ -97,7 +96,6 @@ class FieldSettingsTest extends EntityKernelTestBase {
     // is saved.
     // @todo Remove once https://www.drupal.org/node/2327883 is fixed.
     $field->save();
-    $field = FieldConfig::load($field->id());
 
     // Check that the default settings have been populated. Note: getSettings()
     // returns both storage and field settings.
@@ -108,8 +106,7 @@ class FieldSettingsTest extends EntityKernelTestBase {
       'translatable_storage_setting' => 'a translatable field storage setting',
       'test_field_setting' => 'dummy test string',
       'translatable_field_setting' => 'a translatable field setting',
-      'field_setting_from_config_data' => TRUE,
-      'field_storage_setting_from_config_data' => TRUE,
+      'field_setting_from_config_data' => 'TRUE',
     ];
     $this->assertEqual($field->getSettings(), $expected_settings);
 
