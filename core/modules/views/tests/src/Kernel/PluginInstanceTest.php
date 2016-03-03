@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\PluginInstanceTest.
+ * Contains \Drupal\Tests\views\Kernel\PluginInstanceTest.
  */
 
-namespace Drupal\views\Tests;
+namespace Drupal\Tests\views\Kernel;
 
 use Drupal\views\Views;
 

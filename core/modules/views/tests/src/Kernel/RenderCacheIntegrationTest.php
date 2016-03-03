@@ -2,15 +2,17 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\RenderCacheIntegrationTest.
+ * Contains \Drupal\Tests\views\Kernel\RenderCacheIntegrationTest.
  */
 
-namespace Drupal\views\Tests;
+namespace Drupal\Tests\views\Kernel;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\views\Tests\AssertViewsCacheTagsTrait;
+use Drupal\views\Tests\ViewKernelTestBase;
 use Drupal\views\Views;
 use Drupal\views\Entity\View;
 

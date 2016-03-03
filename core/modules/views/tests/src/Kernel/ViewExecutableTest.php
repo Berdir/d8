@@ -2,15 +2,16 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\ViewExecutableTest.
+ * Contains \Drupal\Tests\views\Kernel\ViewExecutableTest.
  */
 
-namespace Drupal\views\Tests;
+namespace Drupal\Tests\views\Kernel;
 
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\Xss;
 use Drupal\node\Entity\NodeType;
 use Drupal\views\Entity\View;
+use Drupal\views\Tests\ViewKernelTestBase;
 use Drupal\views\Views;
 use Drupal\views\ViewExecutable;
 use Drupal\views\ViewExecutableFactory;

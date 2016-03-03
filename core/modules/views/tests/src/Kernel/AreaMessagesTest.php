@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\Handler\AreaMessagesTest.
+ * Contains \Drupal\Tests\views\Kernel\Handler\AreaMessagesTest.
  */
 
-namespace Drupal\views\Tests\Handler;
+namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\views\Tests\ViewKernelTestBase;
 use Drupal\views\Views;

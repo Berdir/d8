@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\EventSubscriber\ViewsEntitySchemaSubscriberIntegrationTest.
+ * Contains \Drupal\Tests\views\Kernel\EventSubscriber\ViewsEntitySchemaSubscriberIntegrationTest.
  */
 
-namespace Drupal\views\Tests\EventSubscriber;
+namespace Drupal\Tests\views\Kernel\EventSubscriber;
 
 use Drupal\Core\Entity\EntityTypeEvent;
 use Drupal\Core\Entity\EntityTypeEvents;

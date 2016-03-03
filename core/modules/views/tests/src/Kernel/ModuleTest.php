@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\ModuleTest.
+ * Contains \Drupal\Tests\views\Kernel\ModuleTest.
  */
 
-namespace Drupal\views\Tests;
+namespace Drupal\Tests\views\Kernel;
 
 /**
  * Tests basic functions from the Views module.

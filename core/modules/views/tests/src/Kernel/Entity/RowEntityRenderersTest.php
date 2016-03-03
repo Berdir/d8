@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\Entity\RowEntityRenderersTest.
+ * Contains \Drupal\Tests\views\Kernel\Entity\RowEntityRenderersTest.
  */
 
-namespace Drupal\views\Tests\Entity;
+namespace Drupal\Tests\views\Kernel\Entity;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\NodeType;

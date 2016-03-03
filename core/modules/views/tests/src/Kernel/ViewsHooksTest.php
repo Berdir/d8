@@ -2,12 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\ViewsHooksTest.
+ * Contains \Drupal\Tests\views\Kernel\ViewsHooksTest.
  */
 
-namespace Drupal\views\Tests;
+namespace Drupal\Tests\views\Kernel;
 
 use Drupal\Core\Render\RenderContext;
+use Drupal\views\Tests\ViewKernelTestBase;
 use Drupal\views\Views;
 
 /**

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\Handler\ArgumentDateTest.
+ * Contains \Drupal\Tests\views\Kernel\Handler\ArgumentDateTest.
  */
 
-namespace Drupal\views\Tests\Handler;
+namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\views\Tests\ViewKernelTestBase;
 use Drupal\views\Views;

@@ -2,15 +2,16 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\QueryGroupByTest.
+ * Contains \Drupal\Tests\views\Kernel\QueryGroupByTest.
  */
 
-namespace Drupal\views\Tests;
+namespace Drupal\Tests\views\Kernel;
 
 use Drupal\entity_test\Entity\EntityTestMul;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\views\Tests\ViewKernelTestBase;
 use Drupal\views\Views;
 
 /**

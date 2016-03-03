@@ -2,12 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\TokenReplaceTest.
+ * Contains \Drupal\Tests\views\Kernel\TokenReplaceTest.
  */
 
-namespace Drupal\views\Tests;
+namespace Drupal\Tests\views\Kernel;
 
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\views\Tests\ViewKernelTestBase;
 use Drupal\views\Views;
 
 /**

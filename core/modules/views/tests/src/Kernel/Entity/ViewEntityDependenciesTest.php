@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\Entity\ViewEntityDependenciesTest.
+ * Contains \Drupal\Tests\views\Kernel\Entity\ViewEntityDependenciesTest.
  */
 
-namespace Drupal\views\Tests\Entity;
+namespace Drupal\Tests\views\Kernel\Entity;
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\field\Entity\FieldConfig;

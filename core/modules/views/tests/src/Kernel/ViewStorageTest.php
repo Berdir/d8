@@ -2,14 +2,15 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\ViewStorageTest.
+ * Contains \Drupal\Tests\views\Kernel\ViewStorageTest.
  */
 
-namespace Drupal\views\Tests;
+namespace Drupal\Tests\views\Kernel;
 
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\display\Page;
+use Drupal\views\Tests\ViewKernelTestBase;
 use Drupal\views\Views;
 
 /**

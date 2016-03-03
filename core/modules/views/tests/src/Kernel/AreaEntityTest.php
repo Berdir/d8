@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\views\Tests\Handler\AreaEntityTest.
+ * Contains \Drupal\Tests\views\Kernel\Handler\AreaEntityTest.
  */
 
-namespace Drupal\views\Tests\Handler;
+namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\block\Entity\Block;
 use Drupal\Core\Entity\EntityTypeInterface;
